@@ -4,16 +4,21 @@
 #include "unit.h"
 #include "message.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 
-typedef struct SERVER_UNIT {
+
+struct SERVER_UNIT {
 	unsigned int		owner;
 	unsigned int		type;
 	unsigned int		hp;
 	unsigned int		shield;
 	unsigned int		powered;
 	unsigned int		status;
-	SERVER_UNIT		*next;
+	struct SERVER_UNIT	*next;
 };
+
+typedef struct SERVER_UNIT SERVER_UNIT;
 
 
 typedef struct {
@@ -21,6 +26,8 @@ typedef struct {
 	unsigned int		w;
 	unsigned int		h;
 	SERVER_UNIT		**map;
+	unsigned int		*power_grid;
+	UNIT_DEF		*unit_def;
 } SERVER;
 
 

@@ -1,6 +1,11 @@
 #include "server.h"
 
 
+int serverPowerGet(int owner, int x, int y) {
+	return 1;
+}
+
+
 /* TODO: Expand with arguments */
 SERVER *serverInit(const int map_w, const int map_h) {
 	int i;
@@ -31,7 +36,7 @@ SERVER *serverInit(const int map_w, const int map_h) {
 SERVER *serverDestroy(SERVER *server) {
 	int i;
 
-	for (i = 0; i < server->w * server->h; i++)
+	for (i = 0; i < server->w * server->h; i++) {
 		free(server->map[i]);
 		free(server->map);
 		free(server);
@@ -44,5 +49,11 @@ SERVER *serverDestroy(SERVER *server) {
 int serverLoop(SERVER *server) {
 	/* FIXME: STUB */
 
+	return 0;
+}
+
+
+int main(int argc, char **argv) {
+	/* FIXME: Do stuff */
 	return 0;
 }
