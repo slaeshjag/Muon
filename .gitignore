@@ -1,0 +1,4 @@
+*.o
+client/muon
+server/server
+*.swp
