@@ -4,7 +4,7 @@ LIBS	= -L"/usr/lib"
 INCS	= -I"/usr/include"
 BIN	= muon
 DBGFLAGS= -g -D__DEBUG__
-CFLAGS 	+= $(INCS)
+CFLAGS 	+= $(INCS) $(DBGFLAGS)
 LDFLAGS += -ldarnit
 RM	= rm -f
 
