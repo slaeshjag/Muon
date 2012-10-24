@@ -7,7 +7,7 @@ int serverPowerGet(int owner, int x, int y) {
 
 
 /* TODO: Expand with arguments */
-SERVER *serverInit(const int map_w, const int map_h) {
+SERVER *serverInit(const int map_w, const int map_h, unsigned int players) {
 	int i;
 	SERVER *server;
 
@@ -16,8 +16,12 @@ SERVER *serverInit(const int map_w, const int map_h) {
 		return NULL;
 	}
 
-	if ((server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h)) == NULL) {
+	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
+	server->message_buffer = messageBufferInit();
+
+	if (!server->map || !server->message_buffer) {
 		fprintf(stderr, "Unable to allocate a server\n");
+		messageBufferDelete(server->message_buffer);
 		free(server);
 		return NULL;
 	}
@@ -28,6 +32,7 @@ SERVER *serverInit(const int map_w, const int map_h) {
 	server->unit = NULL;
 	server->w = map_w;
 	server->h = map_h;
+	server->players = players;
 
 	return server;
 }
@@ -37,6 +42,7 @@ SERVER *serverDestroy(SERVER *server) {
 	int i;
 
 	for (i = 0; i < server->w * server->h; i++) {
+		messageBufferDelete(server->message_buffer);
 		free(server->map[i]);
 		free(server->map);
 		free(server);
