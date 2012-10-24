@@ -13,7 +13,7 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-	@echo " [ CC ]	$(OBJFILES)"
+	@echo " [ LD ]	$(BIN)"
 	@$(CC) $(OBJFILES) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " Done."
 	@echo

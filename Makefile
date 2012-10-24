@@ -1,7 +1,7 @@
 MAKEFLAGS += --no-print-directory
 
 all:
-	@echo "[ CD ] server/"
+	@echo " [ CD ] server/"
 	@make -C server/
 	@echo " [ CD ] client/"
 	@make -C client/
