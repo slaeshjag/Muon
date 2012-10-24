@@ -28,6 +28,8 @@ typedef struct {
 	SERVER_UNIT		**map;
 	unsigned int		*power_grid;
 	UNIT_DEF		*unit_def;
+	MESSAGE_BUFFER		*message_buffer;
+	unsigned int		players;
 } SERVER;
 
 
