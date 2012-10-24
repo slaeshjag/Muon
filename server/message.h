@@ -7,8 +7,7 @@
 typedef struct {
 	unsigned int		player_ID;
 	unsigned int		command;
-	unsigned int		arg_1;
-	unsigned int		arg_2;
+	unsigned int		arg[2];
 } MESSAGE;
 
 
