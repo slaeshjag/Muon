@@ -3,7 +3,7 @@
 CC   = gcc
 LIBS =  -L"/usr/lib"
 INCS =  -I"/usr/include"
-BIN  = muon
+BIN  = server
 DEBUGFLAGS = -g -D__DEBUG__
 CFLAGS = $(INCS)
 LDFLAGS = 
