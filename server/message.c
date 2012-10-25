@@ -15,8 +15,8 @@ MESSAGE_BUFFER *messageBufferInit() {
 		return NULL;
 	}
 
-	msg_buf->msg_buf_len = MESSAGE_BUFFER_INITIAL;
-	msg_buf->msg_buf_use = 0;
+	msg_buf->len = MESSAGE_BUFFER_INITIAL;
+	msg_buf->read_pos = msg_buf->write_pos = 0;
 
 	return msg_buf;
 }
@@ -32,57 +32,45 @@ MESSAGE_BUFFER *messageBufferDelete(MESSAGE_BUFFER *msg_buf) {
 }
 
 
-int messageBufferGrow(MESSAGE_BUFFER *msg_buf) {
-	MESSAGE *tmp;
-
-	msg_buf->msg_buf_len += 128;
-	if ((tmp = realloc(msg_buf->message, msg_buf->msg_buf_len)) == NULL) {
-		msg_buf->msg_buf_len -= 128;
-		return -1;
-	}
-
-	msg_buf->message = tmp;
-	return 0;
-}
-
-
 int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 	if (msg_buf == NULL) {
 		fprintf(stderr, "Message buffer is NULL, unable to push message\n");
 		return -1;
 	}
 
-	if (msg_buf->msg_buf_use == msg_buf->msg_buf_len)
-		if (messageBufferGrow(msg_buf) < 0) {
-			fprintf(stderr, "Unable to grow message buffer, message was not pushed\n");
-			return -1;
-		}
+	if ((msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1 == msg_buf->read_pos)
+		return;
 	
-	msg_buf->message[msg_buf->msg_buf_use] = *message;
-	msg_buf->msg_buf_use++;
+	msg_buf->message[msg_buf->write_pos] = *message;
+	msg_buf->write_pos++;
+	if (msg_buf->write_pos == msg_buf->len)
+		msg_buf->write_pos = 0;
 
 	return 0;
 }
 
 
-int messageBufferPop(MESSAGE_BUFFER *msg_buf, int msg_i, MESSAGE *message) {
+int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 	if (msg_buf == NULL) {
-		fprintf(stderr, "Message buffer is NULL, unable to pop message %i\n", msg_i);
+		fprintf(stderr, "Message buffer is NULL, unable to pop message\n");
 		return -1;
 	}
 
-	if (msg_i >= msg_buf->msg_buf_use)
+	if (msg_buf->read_pos == msg_buf->write_pos)
 		return -1;
 	
-	*message = msg_buf->message[msg_i];
-	return msg_i + 1;
+	*message = msg_buf->message[msg_buf->read_pos];
+	msg_buf->read_pos++;
+	if (msg_buf->read_pos == msg_buf->len)
+		msg_buf->read_pos = 0;
+	return 0;
 }
 
 
 int messageBufferFlush(MESSAGE_BUFFER *msg_buf) {
 	if (msg_buf == NULL)
 		return -1;
-	msg_buf->msg_buf_use = 0;
+	msg_buf->write_pos = msg_buf->read_pos = 0;
 
 	return 0;
 }

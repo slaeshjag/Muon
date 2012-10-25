@@ -15,16 +15,16 @@ typedef struct {
 
 typedef struct {
 	MESSAGE			*message;
-	unsigned int		msg_buf_len;
-	unsigned int		msg_buf_use;
+	unsigned int		len;
+	unsigned int		read_pos;
+	unsigned int		write_pos;
 } MESSAGE_BUFFER;
 
 
 MESSAGE_BUFFER *messageBufferInit();
 MESSAGE_BUFFER *messageBufferDelete(MESSAGE_BUFFER *msg_buf);
-int messageBufferGrow(MESSAGE_BUFFER *msg_buf);
 int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message);
-int messageBufferPop(MESSAGE_BUFFER *msg_buf, int msg_i, MESSAGE *message);
+int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message);
 int messageBufferFlush(MESSAGE_BUFFER *msg_buf);
 
 

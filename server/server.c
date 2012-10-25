@@ -1,8 +1,8 @@
 #include "server.h"
 
 
-int serverPowerGet(int owner, int x, int y) {
-	return 1;
+int serverPowerGet(SERVER *server, int owner, int x, int y) {
+	return server->player[owner].map[x + y * server->w].power;
 }
 
 
@@ -18,10 +18,12 @@ SERVER *serverInit(const int map_w, const int map_h, unsigned int players) {
 
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
 	server->message_buffer = messageBufferInit();
+	server->player = playerInit(players, map_w, map_h);
 
-	if (!server->map || !server->message_buffer) {
+	if (!server->map || !server->message_buffer || !server->player) {
 		fprintf(stderr, "Unable to allocate a server\n");
 		messageBufferDelete(server->message_buffer);
+		playerDestroy(server->player, server->players);
 		free(server);
 		return NULL;
 	}
@@ -52,7 +54,7 @@ SERVER *serverDestroy(SERVER *server) {
 }
 
 
-int serverLoop(SERVER *server) {
+int serverLoop(SERVER *server, unsigned int d_ms) {
 	/* FIXME: STUB */
 
 	return 0;
@@ -60,6 +62,8 @@ int serverLoop(SERVER *server) {
 
 
 int main(int argc, char **argv) {
+	serverInit(32, 32, 1);
+
 	/* FIXME: Do stuff */
 	return 0;
 }
