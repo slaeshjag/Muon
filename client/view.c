@@ -40,13 +40,13 @@ void view_scroll(DARNIT_MOUSE mouse) {
 
 void view_draw() {
 	darnitRenderTilemap(map->layer->tilemap);
-	darnitRenderTint(0, 0, 0, 255);
+	darnitRenderTint(0, 0, 0, 1);
 	darnitRenderRectDraw(sidebar, 1);
-	darnitRenderTint(255, 0, 0, 255);
+	darnitRenderTint(1, 0, 0, 1);
 	darnitRenderLineDraw(sidebar_lines, 5);
 	darnitRenderBlendingEnable();
 	darnitTextSurfaceDraw(sidebar_text_title);
 	darnitTextSurfaceDraw(sidebar_text_buildings);
 	darnitRenderBlendingDisable();
-	darnitRenderTint(255, 255, 255, 255);
+	darnitRenderTint(1, 1, 1, 1);
 }
