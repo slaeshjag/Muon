@@ -1,10 +1,8 @@
 # Project: muon
 
 MAKEFLAGS += --no-print-directory
-
 LIBS	= -L"/usr/lib"
 INCS	= -I"/usr/include"
-BIN	= muon
 DBGFLAGS= -g -D__DEBUG__
 CFLAGS 	+= -Wall $(INCS) $(DBGFLAGS)
 LDFLAGS += -ldarnit
@@ -15,21 +13,13 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-	@echo " [ CD ] ui/"
-	@make -C ui/
-	@echo " [ LD ]	$(BIN)"
-	@$(CC) $(OBJFILES) ui/*.o -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " Done."
 	@echo
 
 clean:
-	@echo " [ CD ] ui/"
-	@make -C ui/ clean
 	@echo ""
 	@echo " [ RM ]	$(OBJFILES)"
-	@echo " [ RM ]	$(BIN)"
 	@$(RM) $(OBJFILES)
-	@$(RM) $(BIN)
 	@echo " Done."
 	@echo
 

@@ -5,8 +5,10 @@
 
 #define SIDEBAR_WIDTH 128
 
+void view_init();
 void view_move(DARNIT_MOUSE mouse);
 void view_draw();
+void view_scroll(DARNIT_MOUSE mouse);
 
 DARNIT_FONT *font_std;
 
