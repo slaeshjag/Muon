@@ -30,5 +30,6 @@ typedef struct UI_WIDGET {
 #include "pane.h"
 #include "label.h"
 #include "vbox.h"
+#include "button.h"
 
 #endif

@@ -11,7 +11,7 @@ struct UI_LABEL_PROPERTIES{
 	char *text;
 };
 
-UI_WIDGET *ui_widget_create_label();
+UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, char *text);
 void ui_label_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value);
 UI_PROPERTY_VALUE ui_label_get_prop(UI_WIDGET *widget, int prop);
 void ui_label_resize(UI_WIDGET *widget, int x, int y, int w, int h);
