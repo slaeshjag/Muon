@@ -27,7 +27,7 @@ LDMZ_MAP *ldmzLoad(const char *fname) {
 	void *map;
 
 	if ((fp = fopen(fname, "rb")) == NULL) {
-		fprintf(stderr, "Unable to open map %i\n", fname);
+		fprintf(stderr, "Unable to open map %s\n", fname);
 		return NULL;
 	}
 
