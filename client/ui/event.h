@@ -3,6 +3,9 @@
 
 struct UI_PANE_LIST;
 
+#include <SDL/SDL.h>
+#define KEY(k) SDLK_##k
+
 #define PINR(px, py, x, y, w, h) ((px)>(x)&&(py)>(y)&&(px)<((x)+(w))&&(py)<((y)+(h)))
 
 #define UI_EVENT_TYPE_KEYBOARD		0x100
@@ -35,7 +38,7 @@ struct UI_PANE_LIST;
 typedef struct {
 	unsigned char character;
 	unsigned char modifiers;
-	int scancode;
+	int keysym;
 } UI_EVENT_KEYBOARD;
 
 #define UI_EVENT_MOUSE_BUTTON_LEFT	0x01

@@ -1,5 +1,3 @@
-#include <string.h>
-
 #include "muon.h"
 #include "../server/server_api/server.h"
 
@@ -16,8 +14,7 @@ int main() {
 	
 	serverInit("map.ldi", 1, 1337);
 	view_init();
-	
-	memset(&ui_e_m_prev, 0, sizeof(ui_e_m_prev));
+	ui_init();
 	
 	UI_PANE *msgbox=ui_pane_create(10, 10, 256, 256, NULL);
 	struct UI_PANE_LIST panelist={msgbox, NULL};

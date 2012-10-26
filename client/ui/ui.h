@@ -28,11 +28,15 @@ typedef struct UI_WIDGET {
 	int h;
 } UI_WIDGET;
 
+UI_WIDGET *ui_selected_widget;
+
 #include "event.h"
 
 #include "pane.h"
 #include "label.h"
 #include "vbox.h"
 #include "button.h"
+
+void ui_init();
 
 #endif
