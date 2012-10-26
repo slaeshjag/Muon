@@ -1,9 +1,12 @@
 #ifndef __SERVER_H__
 #define	__SERVER_H__
 
+#define	SERVER_PORT		56789
+
 #include "unit.h"
 #include "message.h"
 #include "player.h"
+#include "network.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,10 +36,11 @@ typedef struct {
 	MESSAGE_BUFFER		*message_buffer;
 	PLAYER			*player;
 	unsigned int		players;
+	SERVER_SOCKET		*accept;
 } SERVER;
 
 int serverPowerGet(SERVER *server, int owner, int x, int y);
-SERVER *serverInit(const int map_w, const int map_h, unsigned int players);
+SERVER *serverInit(const int map_w, const int map_h, unsigned int players, int port);
 SERVER *serverDestroy(SERVER *server);
 int serverLoop(SERVER *server, unsigned int d_ms);
 

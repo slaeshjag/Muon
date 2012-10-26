@@ -2,10 +2,7 @@
 
 CC   = gcc
 LIBS =  -L"/usr/lib"
-INCS =  -I"/usr/include"
-BIN  = server
-LIBOUT = server.a
-STANDALONE = standalone/*.o
+INCS =  -I"/usr/include" -I../
 DEBUGFLAGS = -g -D__DEBUG__
 CFLAGS = $(INCS)
 LDFLAGS = 
@@ -16,22 +13,12 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-	@echo " [ LD ]	$(BIN)"
-	@$(CC) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS)
-	@echo " [ AR ] $(LIBOUT)"
-	@$(AR) -cq $(LIBOUT) $(OBJFILES)
-	@echo " Done."
 	@echo
 
 clean:
 	@echo ""
 	@echo " [ RM ]	$(OBJFILES)"
 	@$(RM) $(OBJFILES)
-	@echo " [ RM ]	$(BIN)"
-	@$(RM) $(BIN)
-	@echo " [ RM ] $(LIBOUT)"
-	@$(RM) $(LIBOUT)
-	@echo " Done."
 	@echo
 
 %.o: %.c %.h
