@@ -1,7 +1,7 @@
 #include "view.h"
 
 void view_init() {
-	map=darnitMapLoad("maps/testmap.ldmz");
+	map=darnitMapLoad("maps/map.ldmz");
 	map_w=map->layer->tilemap->w*map->layer->tile_w;
 	map_h=map->layer->tilemap->h*map->layer->tile_h;
 	

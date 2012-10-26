@@ -3,3 +3,4 @@ client/muon
 server/server
 *.swp
 *.a
+*.ldi

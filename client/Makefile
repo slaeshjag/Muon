@@ -2,6 +2,7 @@
 
 MAKEFLAGS += --no-print-directory
 
+SERVER	= ../server/server.a
 LIBS	= -L"/usr/lib"
 INCS	= -I"/usr/include"
 BIN	= muon
@@ -15,10 +16,11 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
+	@darnit-fsimage maps map.ldi
 	@echo " [ CD ] ui/"
 	@make -C ui/
 	@echo " [ LD ]	$(BIN)"
-	@$(CC) $(OBJFILES) ui/*.o -o $(BIN) $(LIBS) $(LDFLAGS)
+	@$(CC) $(OBJFILES) ui/*.o $(SERVER) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " Done."
 	@echo
 

@@ -1,6 +1,8 @@
 #include <string.h>
 
 #include "muon.h"
+#include "../server/server_api/server.h"
+
 #include "view.h"
 #include "ui/ui.h"
 
@@ -12,6 +14,7 @@ int main() {
 	platform=darnitPlatformGet();
 	DARNIT_MOUSE mouse;
 	
+	serverInit("map.ldi", 1, 1337);
 	view_init();
 	
 	memset(&ui_e_m_prev, 0, sizeof(ui_e_m_prev));
