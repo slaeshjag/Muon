@@ -8,6 +8,15 @@ UI_WIDGET *ui_widget_create_button(UI_WIDGET *child) {
 		free(widget);
 		return NULL;
 	}
+	if((widget->event_handler=malloc(sizeof(UI_EVENT_HANDLER)))==NULL) {
+		free(widget->properties);
+		free(widget);
+		return NULL;
+	}
+	widget->event_handler->handlers=NULL;
+	widget->event_handler->add=ui_event_add;
+	widget->event_handler->send=ui_event_send;
+	widget->event_handler->add(widget, ui_button_event_click, UI_EVENT_TYPE_MOUSE);
 	
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	p->child=child;
@@ -19,6 +28,7 @@ UI_WIDGET *ui_widget_create_button(UI_WIDGET *child) {
 	widget->resize=ui_button_resize;
 	widget->request_size=ui_button_request_size;
 	widget->render=ui_button_render;
+	
 	widget->x=widget->y=widget->w=widget->h=0;
 
 	return widget;
@@ -38,6 +48,22 @@ UI_WIDGET *ui_widget_create_button_image() {
 
 void ui_widget_destroy_button_text(UI_WIDGET *widget) {
 	return;
+}
+
+void ui_button_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	struct UI_BUTTON_PROPERTIES *p=widget->properties;
+	switch(type) {
+		case UI_EVENT_TYPE_MOUSE_DOWN:
+			if(e->mouse->buttons==UI_EVENT_MOUSE_BUTTON_LEFT)
+				p->activated=1;
+			break;
+		case UI_EVENT_TYPE_MOUSE_UP:
+			if(((e->mouse->buttons)&UI_EVENT_MOUSE_BUTTON_LEFT)==UI_EVENT_MOUSE_BUTTON_LEFT)
+				break;
+		case UI_EVENT_TYPE_MOUSE_LEAVE:
+			p->activated=0;
+			break;
+	}
 }
 
 void ui_button_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
@@ -77,6 +103,8 @@ UI_PROPERTY_VALUE ui_button_get_prop(UI_WIDGET *widget, int prop) {
 
 void ui_button_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
+	widget->x=x; widget->y=y;
+	widget->w=w; widget->h=h;
 	p->child->resize(p->child, x+4+UI_PADDING, y+4+UI_PADDING, w-8-UI_PADDING*2, h-8-UI_PADDING*2);
 	
 	darnitRenderLineMove(p->border, 0, x, y, x+w-1, y);

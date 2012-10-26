@@ -16,16 +16,19 @@ typedef struct UI_WIDGET {
 	void (*destroy)(struct UI_WIDGET *);
 	void (*set_prop)(struct UI_WIDGET *, int, UI_PROPERTY_VALUE);
 	UI_PROPERTY_VALUE (*get_prop)(struct UI_WIDGET *, int);
-	void (*event)(struct UI_WIDGET *, int, int);
+	/*void (*event)(struct UI_WIDGET *, int, int);*/
 	void (*resize)(struct UI_WIDGET *, int, int, int, int);
 	void (*request_size)(struct UI_WIDGET *, int *, int *);
 	void (*render)(struct UI_WIDGET *);
 	void *properties;
+	struct UI_EVENT_HANDLER *event_handler;
 	int x;
 	int y;
 	int w;
 	int h;
 } UI_WIDGET;
+
+#include "event.h"
 
 #include "pane.h"
 #include "label.h"

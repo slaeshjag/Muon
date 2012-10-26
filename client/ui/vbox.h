@@ -12,6 +12,9 @@ struct UI_VBOX_PROPERTIES{
 };
 
 UI_WIDGET *ui_widget_create_vbox();
+
+void ui_vbox_event_notify_children(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+
 void ui_vbox_add_child(UI_WIDGET *widget, UI_WIDGET *child, int expand); 
 void ui_vbox_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value);
 UI_PROPERTY_VALUE ui_vbox_get_prop(UI_WIDGET *widget, int prop);

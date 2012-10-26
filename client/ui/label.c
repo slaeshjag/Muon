@@ -11,6 +11,7 @@ UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, char *text) {
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
 	p->surface=NULL;
 	p->font=font;
+	widget->event_handler=NULL;
 	widget->set_prop=ui_label_set_prop;
 	widget->get_prop=ui_label_get_prop;
 	widget->resize=ui_label_resize;
