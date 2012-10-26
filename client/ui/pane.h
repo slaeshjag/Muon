@@ -9,7 +9,13 @@ typedef struct {
 	DARNIT_LINE *border;
 	DARNIT_RECT *background;
 	UI_WIDGET *root_widget;
+	UI_EVENT_HANDLER *event_handler;
 } UI_PANE;
+
+struct UI_PANE_LIST {
+	UI_PANE *pane;
+	struct UI_PANE_LIST *next;
+};
 
 UI_PANE *ui_pane_create(int x, int y, int w, int h, UI_WIDGET *root_widget);
 void ui_pane_destroy(UI_PANE *pane);

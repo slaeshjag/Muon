@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "muon.h"
 #include "view.h"
 #include "ui/ui.h"
@@ -12,7 +14,10 @@ int main() {
 	
 	view_init();
 	
+	memset(&ui_e_m_prev, 0, sizeof(ui_e_m_prev));
+	
 	UI_PANE *msgbox=ui_pane_create(10, 10, 256, 256, NULL);
+	struct UI_PANE_LIST panelist={msgbox, NULL};
 	UI_WIDGET *msglabel1=ui_widget_create_label(font_std, "din mamma.\npå pizza");
 	UI_WIDGET *button1=ui_widget_create_button_text("testknapp");
 	UI_WIDGET *msglabel2=ui_widget_create_label(font_std, "lol");
@@ -28,7 +33,9 @@ int main() {
 		mouse=darnitMouseGet();
 		view_scroll(mouse);
 		
-		printf("%i           \r", darnitFPSGet());
+		//printf("%i           \r", darnitFPSGet());
+		ui_events(&panelist);
+		
 		darnitRenderBegin();
 		view_draw();
 		darnitRenderTint(0, 1, 0, 1);

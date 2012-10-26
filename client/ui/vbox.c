@@ -8,6 +8,16 @@ UI_WIDGET *ui_widget_create_vbox() {
 		free(widget);
 		return NULL;
 	}
+	if((widget->event_handler=malloc(sizeof(UI_EVENT_HANDLER)))==NULL) {
+		free(widget->properties);
+		free(widget);
+		return NULL;
+	}
+	widget->event_handler->handlers=NULL;
+	widget->event_handler->add=ui_event_add;
+	widget->event_handler->send=ui_event_send;
+	widget->event_handler->add(widget, ui_vbox_event_notify_children, UI_EVENT_TYPE_MOUSE|UI_EVENT_TYPE_UI);
+	
 	struct UI_VBOX_PROPERTIES *p=widget->properties;
 	p->size=0;
 	p->children=NULL;
@@ -19,6 +29,21 @@ UI_WIDGET *ui_widget_create_vbox() {
 	widget->x=widget->y=widget->w=widget->h=0;
 	
 	return widget;
+}
+
+void ui_vbox_event_notify_children(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	struct UI_VBOX_PROPERTIES *p=widget->properties;
+	UI_WIDGET_LIST *c;
+	for(c=p->children; c; c=c->next)
+		if(c->widget->event_handler) {
+			if(PINR(e->mouse->x, e->mouse->y, c->widget->x, c->widget->y, c->widget->w, c->widget->h)) {
+				if((type&UI_EVENT_TYPE_MOUSE_BUTTON))
+					c->widget->event_handler->send(c->widget, type, e);
+				else if(!PINR(ui_e_m_prev.x, ui_e_m_prev.y, c->widget->x, c->widget->y, c->widget->w, c->widget->h))
+					c->widget->event_handler->send(c->widget, UI_EVENT_TYPE_MOUSE_ENTER, e);
+			} else if((type==UI_EVENT_TYPE_MOUSE_LEAVE||type==UI_EVENT_TYPE_UI_EVENT)&&!PINR(ui_e_m_prev.x, ui_e_m_prev.y, c->widget->x, c->widget->y, c->widget->w, c->widget->h))
+			c->widget->event_handler->send(c->widget, UI_EVENT_TYPE_MOUSE_LEAVE, e);
+		}
 }
 
 void ui_vbox_add_child(UI_WIDGET *widget, UI_WIDGET *child, int expand) {

@@ -19,6 +19,8 @@ UI_WIDGET *ui_widget_create_button_image();
 
 void ui_widget_destroy_button_text(UI_WIDGET *widget);
 
+void ui_button_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+
 void ui_button_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value);
 UI_PROPERTY_VALUE ui_button_get_prop(UI_WIDGET *widget, int prop);
 void ui_button_resize(UI_WIDGET *widget, int x, int y, int w, int h);
