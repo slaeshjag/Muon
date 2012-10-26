@@ -6,7 +6,7 @@ int unitHPMax(int type) {
 }
 
 
-SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
+SERVER_UNIT *unitInit(SERVER *server, int owner, int type, int x, int y) {
 	SERVER_UNIT *unit;
 
 	if ((unit = malloc(sizeof(SERVER_UNIT))) == NULL) {
@@ -18,7 +18,7 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->type = type;
 	unit->hp = unitHPMax(type);
 	unit->shield = 0;		/* Don't spawn with any shield! */
-	unit->powered = serverPowerGet(owner, x, y);
+	unit->powered = serverPowerGet(server, owner, x, y);
 	unit->status = 0;		/* Nothing yet? */
 	unit->next = NULL;
 
@@ -39,7 +39,7 @@ int unitAdd(SERVER *server, int owner, int type, int x, int y) {
 		return -1;
 	}
 
-	if ((unit = unitInit(owner, type, x, y)) == NULL)
+	if ((unit = unitInit(server, owner, type, x, y)) == NULL)
 		return -1;
 	
 	unit->next = server->unit;
