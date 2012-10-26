@@ -1,14 +1,17 @@
 # Project: muon
 
+MAKEFLAGS += --no-print-directory
+
 CC   = gcc
 LIBS =  -L"/usr/lib"
 INCS =  -I"/usr/include"
 BIN  = server
 LIBOUT = server.a
 STANDALONE = standalone/*.o
+LIBOBJ = lib/*.o
 DEBUGFLAGS = -g -D__DEBUG__
 CFLAGS = $(INCS)
-LDFLAGS = 
+LDFLAGS =  -lm
 RM = rm -f
 
 SRCFILES=$(wildcard *.c)
@@ -16,8 +19,12 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
+	@echo " [ CD ] standalone/"
+	@make -C standalone/
+	@echo " [ CD ] lib/"
+	@make -C lib/
 	@echo " [ LD ]	$(BIN)"
-	@$(CC) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS)
+	@$(CC) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " [ AR ] $(LIBOUT)"
 	@$(AR) -cq $(LIBOUT) $(OBJFILES)
 	@echo " Done."
@@ -25,6 +32,10 @@ all: $(OBJFILES)
 
 clean:
 	@echo ""
+	@echo " [ CD ] standalone/"
+	@make -C standalone/ clean
+	@echo " [ CD ] lib/"
+	@make -C lib/ clean
 	@echo " [ RM ]	$(OBJFILES)"
 	@$(RM) $(OBJFILES)
 	@echo " [ RM ]	$(BIN)"

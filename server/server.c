@@ -7,8 +7,8 @@ int serverPowerGet(SERVER *server, int owner, int x, int y) {
 
 
 /* TODO: Expand with arguments */
-SERVER *serverInit(const int map_w, const int map_h, unsigned int players, int port) {
-	int i;
+SERVER *serverInit(const char *fname, unsigned int players, int port) {
+	int i, map_w, map_h;
 	SERVER *server;
 
 	if ((server = malloc(sizeof(SERVER))) == NULL) {
@@ -16,6 +16,13 @@ SERVER *serverInit(const int map_w, const int map_h, unsigned int players, int p
 		return NULL;
 	}
 
+	if ((server->map_data = ldmzLoad(fname)) == NULL) {
+		free(server);
+		fprintf(stderr, "Unable to load map %s\n", fname);
+		return NULL;
+	}
+
+	ldmzGetSize(server->map_data, &map_w, &map_h);
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
 	server->message_buffer = messageBufferInit();
 	server->player = playerInit(players, map_w, map_h);
@@ -26,6 +33,7 @@ SERVER *serverInit(const int map_w, const int map_h, unsigned int players, int p
 		messageBufferDelete(server->message_buffer);
 		playerDestroy(server->player, server->players);
 		networkSocketDisconnect(server->accept);
+		ldmzFree(server->map_data);
 		free(server);
 		return NULL;
 	}

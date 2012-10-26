@@ -3,13 +3,17 @@
 
 #define	SERVER_PORT		56789
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "unit.h"
 #include "message.h"
 #include "player.h"
 #include "network.h"
-
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef __TTMZ_H__
+#include "map.h"
+#endif
 
 
 struct SERVER_UNIT {
@@ -37,10 +41,11 @@ typedef struct {
 	PLAYER			*player;
 	unsigned int		players;
 	SERVER_SOCKET		*accept;
+	void			*map_data;
 } SERVER;
 
 int serverPowerGet(SERVER *server, int owner, int x, int y);
-SERVER *serverInit(const int map_w, const int map_h, unsigned int players, int port);
+SERVER *serverInit(const char *fname, unsigned int players, int port);
 SERVER *serverDestroy(SERVER *server);
 int serverLoop(SERVER *server, unsigned int d_ms);
 

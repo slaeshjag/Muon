@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
 	else
 		port = SERVER_PORT;
 	
-	if ((server = serverInit(32, 32, atoi(argv[2]), port)) == NULL)
+	if ((server = serverInit(argv[1], atoi(argv[2]), port)) == NULL)
 		return -1;
 	
 	return 0;
