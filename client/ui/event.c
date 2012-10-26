@@ -3,9 +3,9 @@
 void ui_events(struct UI_PANE_LIST *panes) {
 	UI_EVENT e;
 	UI_EVENT_MOUSE e_m;
+	UI_EVENT_UI e_u;
 	//UI_EVENT_KEYBOARD e_k;
 	
-	static UI_EVENT_MOUSE oldmouse={0};
 	DARNIT_MOUSE mouse;
 	mouse=darnitMouseGet();
 	
@@ -18,20 +18,23 @@ void ui_events(struct UI_PANE_LIST *panes) {
 		if(p->pane->root_widget->event_handler) {
 			UI_WIDGET *w=p->pane->root_widget;
 			
+			e.ui=&e_u;
+			w->event_handler->send(w, UI_EVENT_TYPE_UI_EVENT, &e);
+			
 			e.mouse=&e_m;
 			if(PINR(e_m.x, e_m.y, w->x, w->y, w->w, w->h)) {
-				if(!PINR(oldmouse.x, oldmouse.y, w->x, w->y, w->w, w->h))
+				if(!PINR(ui_e_m_prev.x, ui_e_m_prev.y, w->x, w->y, w->w, w->h))
 					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_ENTER, &e);
-				if((oldmouse.buttons&e_m.buttons)<e_m.buttons)
+				if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
 					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_DOWN, &e);
-				if((oldmouse.buttons&e_m.buttons)<oldmouse.buttons)
+				if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
 					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_UP, &e);
 				
-			} else if(PINR(oldmouse.x, oldmouse.y, w->x, w->y, w->w, w->h))
+			} else if(PINR(ui_e_m_prev.x, ui_e_m_prev.y, w->x, w->y, w->w, w->h))
 				w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_LEAVE, &e);
 		}
 	}
-	oldmouse=e_m;
+	ui_e_m_prev=e_m;
 }
 
 void ui_event_add(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask) {
@@ -49,5 +52,5 @@ void ui_event_send(UI_WIDGET *widget , unsigned int type, UI_EVENT *e) {
 	struct UI_EVENT_HANDLER_LIST *h;
 	for(h=widget->event_handler->handlers; h; h=h->next)
 		if(type&h->mask)
-			h->handler(widget, type&h->mask, e);
+			h->handler(widget, type&(h->mask|0xFF), e);
 }

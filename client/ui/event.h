@@ -5,16 +5,19 @@ struct UI_PANE_LIST;
 
 #define PINR(px, py, x, y, w, h) ((px)>(x)&&(py)>(y)&&(px)<((x)+(w))&&(py)<((y)+(h)))
 
-#define UI_EVENT_TYPE_KEYBOARD		0x1FF
+#define UI_EVENT_TYPE_KEYBOARD		0x100
 #define UI_EVENT_TYPE_KEYBOARD_PRESS	0x101
 #define UI_EVENT_TYPE_KEYBOARD_RELEASE	0x102
-#define UI_EVENT_TYPE_MOUSE		0x2FF
+#define UI_EVENT_TYPE_MOUSE		0x200
+#define UI_EVENT_TYPE_MOUSE_BUTTON	0x21C
 #define UI_EVENT_TYPE_MOUSE_ENTER	0x201
 #define UI_EVENT_TYPE_MOUSE_LEAVE	0x202
 #define UI_EVENT_TYPE_MOUSE_UP		0x204
 #define UI_EVENT_TYPE_MOUSE_DOWN	0x208
 #define UI_EVENT_TYPE_MOUSE_CLICK	0x210
-#define UI_EVENT_TYPE_JOYSTICK		0x4FF
+#define UI_EVENT_TYPE_JOYSTICK		0x400
+#define UI_EVENT_TYPE_UI		0x800
+#define UI_EVENT_TYPE_UI_EVENT		0x801
 
 #define UI_EVENT_KEYBOARD_MOD_CTRL	0x03
 #define UI_EVENT_KEYBOARD_MOD_LCTRL	0x01
@@ -46,10 +49,15 @@ typedef struct {
 	signed int wheel;
 } UI_EVENT_MOUSE;
 
+typedef struct {
+	
+} UI_EVENT_UI;
+
 typedef union {
 	UI_EVENT_KEYBOARD *keyboard;
 	UI_EVENT_MOUSE *mouse;
 	/*UI_EVENT_JOYSTICK *joystick;*/
+	UI_EVENT_UI *ui;
 } UI_EVENT;
 
 struct UI_EVENT_HANDLER_LIST {
@@ -64,6 +72,8 @@ typedef struct UI_EVENT_HANDLER {
 	void (*send)(UI_WIDGET *, unsigned int, UI_EVENT *);
 	struct UI_EVENT_HANDLER_LIST *handlers;
 } UI_EVENT_HANDLER;
+
+UI_EVENT_MOUSE ui_e_m_prev;
 
 void ui_events(struct UI_PANE_LIST *panes);
 void ui_event_add(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask);
