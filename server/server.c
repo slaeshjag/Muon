@@ -73,10 +73,68 @@ SERVER *serverDestroy() {
 }
 
 
+void serverProcessNetwork() {
+	int i, t;
+	MESSAGE msg, msg_c;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status == PLAYER_UNUSED)
+			continue;
+		if (server->player[i].process_recv) {
+			msg_c = server->player[i].process_msg_recv;
+			if ((t = networkReceiveTry(server->player[i].socket, msg_c.extra, msg_c.arg[1])) > 0) {
+				server->player[i].process_recv = PLAYER_PROCESS_NOTHING;
+				messageExecute(i, &msg_c);
+			} else if (t == -1) {
+				playerDisconnect(i);
+				continue;
+			}
+		}
+
+		while ((t = networkReceiveTry(server->player[i].socket, (void *) &msg, 16)) > 0) {
+			msg.player_ID = ntohl(msg.player_ID);
+			msg.command = ntohl(msg.player_ID);
+			msg.arg[0] = ntohl(msg.player_ID);
+			msg.arg[1] = ntohl(msg.player_ID);
+
+			if (messageHasData(msg.command, msg.arg[1]) <= 0) {
+				if (msg.arg[1] > MESSAGE_MAX_PAYLOAD) {
+					messageSend(server->player[i].socket, i, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+					playerDisconnect(i);
+					break;
+				}
+				
+				if ((msg.extra = malloc(msg.arg[1] + 1)) == NULL) {
+					fprintf(stderr, "Fatal error: System seems to be out of RAM. Server is dieing\n");
+					serverDestroy();
+					exit(-1);
+				}
+
+				if ((t = networkReceiveTry(server->player[i].socket, (void *) msg.extra, msg.arg[1])) > 0) {
+					messageExecute(i, &msg_c);
+				} else {
+					server->player[i].process_msg_recv = msg;
+					server->player[i].process_recv = PLAYER_PROCESS_DATA;
+					break;
+				}
+			} else {
+				messageExecute(i, &msg_c);
+			}
+		}
+	}
+
+	return;
+}
+
+
+
 int serverLoop(unsigned int d_ms) {
 	/* FIXME: STUB */
-	if (!server->game.started)
+	if (!server->game.started) {
 		lobbyPoll();
+		serverProcessNetwork();
+		playerCheckIdentify();
+	}
 
 	return 0;
 }

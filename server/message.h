@@ -2,6 +2,7 @@
 #define	__MESSAGE_H__
 
 #define	MESSAGE_BUFFER_INITIAL		2048
+#define	MESSAGE_MAX_PAYLOAD		256
 
 #define	MESSAGE_ALWAYS_MAX		1
 
@@ -58,5 +59,7 @@ int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message);
 int messageBufferFlush(MESSAGE_BUFFER *msg_buf);
 
 int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message, int arg1, int arg2, void *data);
+int messageExecute(unsigned int player, MESSAGE *message);
+int messageHasData(unsigned int command, unsigned int arg);
 
 #endif

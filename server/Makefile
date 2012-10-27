@@ -7,7 +7,7 @@ LIBOUT = server.a
 STANDALONE = standalone/*.o
 LIBOBJ = lib/*.o
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS) -O0 -g
+CFLAGS = $(INCS) -O0 -g -Wall
 LDFLAGS =  -lm
 RM = rm -f
 

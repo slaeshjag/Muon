@@ -19,6 +19,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].status = PLAYER_UNUSED;
 		player[i].msg_buf = messageBufferInit();
 		player[i].socket = NULL;
+		player[i].process_recv = PLAYER_PROCESS_NOTHING;
 	}
 
 	if (err) {
@@ -67,23 +68,35 @@ void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned 
 
 
 void playerDisconnect(unsigned int player) {
-	int broadcast, i;
-	MESSAGE msg;
+	int broadcast;
 
 	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
 
-	fprintf(stderr, "Disconnecting user...\n");
 	/* We probably need to add a mutex here */
 	gameKillPlayerUnits(player);
 	server->player[player].status = PLAYER_UNUSED;
 	server->player[player].socket = networkSocketDisconnect(server->player[player].socket);
 	messageBufferFlush(server->player[player].msg_buf);
+	fprintf(stderr, "Disconnecting player...\n");
 	
 	if (!broadcast)
 		return;
 	
 	playerMessageBroadcast(player, MSG_SEND_LEAVE, 0, 0, NULL);
 
+	return;
+}
+
+
+void playerCheckIdentify() {
+	int i;
+	time_t now = time(NULL);
+
+	for (i = 0; i < server->players; i++)
+		if (server->player[i].status == PLAYER_WAITING_FOR_IDENTIFY && now - server->player[i].id_req_send >= PLAYER_ID_TIME) {
+			messageSend(server->player[i].socket, i, MSG_SEND_KICKED, 0, 0, NULL);
+			playerDisconnect(i);
+		}
 	return;
 }
 

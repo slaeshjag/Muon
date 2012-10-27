@@ -39,7 +39,7 @@ int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 	}
 
 	if ((msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1 == msg_buf->read_pos)
-		return;
+		return -1;
 	
 	msg_buf->message[msg_buf->write_pos] = *message;
 	msg_buf->write_pos = (msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1;
@@ -102,16 +102,18 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 }
 
 
-int messageExecute(SERVER *server, unsigned int player, MESSAGE *message) {
+int messageExecute(unsigned int player, MESSAGE *message) {
 	
 	if (message->command >= MESSAGE_HANDLERS) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		free(message->extra);
 		return -1;				/* Illegal command */
 	}
 
 	if (server->player[player].status == PLAYER_WAITING_FOR_IDENTIFY && message->command != MSG_RECV_IDENTIFY) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		messageSend(server->player[player].socket, player, MSG_SEND_KICKED, 0, 0, NULL);
+		free(message->extra);
 		
 		playerDisconnect(player);
 		return -1;
@@ -119,18 +121,33 @@ int messageExecute(SERVER *server, unsigned int player, MESSAGE *message) {
 
 	if ((!server->game.started) && message->command > MESSAGE_LOBBY_MAX) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		free(message->extra);
 		return -1;
 	}	
 
 	if (server->game.started && (message->command < MESSAGE_GAME_MIN || message->command > MESSAGE_GAME_MAX) && message->command > MESSAGE_ALWAYS_MAX) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		free(message->extra);
 		return -1;
 	}
 
 	(server->message_handler.handle[message->command])(player, message);
+	free(message->extra);
 
 	return 0;
 }
 
 
+int messageHasData(unsigned int command, unsigned int arg) {
+	switch (command) {
+		case MSG_RECV_CHAT:
+		case MSG_RECV_IDENTIFY:
+			return 0;
+		case MSG_RECV_PONG:
+		case MSG_RECV_READY:
+		default:
+			return -1;
+	}
 
+	return -1;
+}
