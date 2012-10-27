@@ -156,9 +156,18 @@ int networkReceiveTry(SERVER_SOCKET *sock, char *buff, int buff_len) {
 
 
 int networkSend(SERVER_SOCKET *sock, char *buff, int buff_len) {
+	int t;
+
 	if (!sock)
 		return -1;
-	return send(sock->socket, buff, buff_len, 0);
+	
+	t = send(sock->socket, buff, buff_len, 0);
+
+	if (t >= 0)
+		return t;
+	if (errno != EAGAIN && errno != EWOULDBLOCK)
+		return -1;
+	return 0;
 }
 
 

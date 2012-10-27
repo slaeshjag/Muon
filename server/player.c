@@ -61,7 +61,7 @@ void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned 
 	msg.extra = data;
 
 	for (i = 0; i < server->players; i++)
-		if (server->player[i].status > PLAYER_WAITING_FOR_IDENTIFY)
+		if (server->player[i].status >= PLAYER_WAITING_FOR_IDENTIFY)
 			messageBufferPush(server->player[i].msg_buf, &msg);
 	return;
 }
@@ -75,8 +75,8 @@ void playerDisconnect(unsigned int player) {
 	/* We probably need to add a mutex here */
 	gameKillPlayerUnits(player);
 	server->player[player].status = PLAYER_UNUSED;
-	server->player[player].socket = networkSocketDisconnect(server->player[player].socket);
 	messageBufferFlush(server->player[player].msg_buf);
+	server->player[player].socket = networkSocketDisconnect(server->player[player].socket);
 	fprintf(stderr, "Disconnecting player...\n");
 	
 	if (!broadcast)

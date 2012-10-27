@@ -54,7 +54,7 @@ int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 		return -1;
 	}
 
-	if (msg_buf->read_pos == msg_buf->write_pos)
+	if (msg_buf->read_pos == msg_buf->write_pos) 
 		return -1;
 	
 	*message = msg_buf->message[msg_buf->read_pos];

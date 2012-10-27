@@ -18,7 +18,13 @@ int lobbyPoll() {
 	server->player[slot].socket = socket;
 	server->player[slot].id_req_send = time(NULL);
 
+	server->player[slot].process_recv = PLAYER_PROCESS_NOTHING;
+	server->player[slot].process_send = PLAYER_PROCESS_NOTHING;
+	server->player[slot].process_byte_send = 0;
+
 	messageSend(socket, 0, MSG_SEND_REQUEST_IDENTIFY, 0, 0, NULL);
+	playerMessageBroadcast('F', MSG_SEND_CHAT, 'G', 7, "Hejhej!");
+	playerMessageBroadcast('F', MSG_SEND_CHAT, 'G', 7, "Hejhej!");
 
 	return 0;
 }
