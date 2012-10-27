@@ -123,6 +123,82 @@ void serverProcessNetwork() {
 		}
 	}
 
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status == PLAYER_UNUSED)
+			continue;
+		if (server->player[i].process_send) {
+			msg_c = server->player[i].process_msg_send;
+			msg.player_ID = htonl(msg_c.player_ID);
+			msg.command = htonl(msg_c.command);
+			msg.arg[0] = htonl(msg_c.arg[0]);
+			msg.arg[1] = htonl(msg_c.arg[1]);
+
+			if (server->player[i].process_send == PLAYER_PROCESS_MSG) {
+				if ((t = networkSend(server->player[i].socket, (void *) &msg, 16 - server->player[i].process_byte_send)) > 0) {
+					if (t + server->player[i].process_byte_send < 16) {
+						server->player[i].process_byte_send =+ t;
+						continue;
+					} else {
+						server->player[i].process_send = (server->player[i].process_msg_send.extra) ? PLAYER_PROCESS_DATA : PLAYER_PROCESS_NOTHING;
+						server->player[i].process_byte_send = 0;
+					}
+				} else if (t < 0) {
+					playerDisconnect(i);
+					continue;
+				} else
+					continue;
+			}
+
+			if (server->player[i].process_send == PLAYER_PROCESS_DATA) {
+				if ((t = networkSend(server->player[i].socket, msg_c.extra, msg_c.arg[1])) > 0) {
+					if (t + server->player[i].process_byte_send < msg_c.arg[1]) {
+						server->player[i].process_byte_send += t;
+						continue;
+					}
+				} else if (t < 0) {
+					playerDisconnect(i);
+					continue;
+				} else 
+					continue;
+			}
+		}
+
+		if (messageBufferPop(server->player[i].msg_buf, &msg_c) < 0)
+			continue;
+		msg.player_ID = htonl(msg_c.player_ID);
+		msg.command = htonl(msg_c.command);
+		msg.arg[0] = htonl(msg_c.arg[0]);
+		msg.arg[1] = htonl(msg_c.arg[1]);
+		while ((t = networkSend(server->player[i].socket, (void *) &msg, 16)) > 0) {
+			server->player[i].process_send = PLAYER_PROCESS_DATA;
+			if (msg_c.extra) {
+				if ((t = networkSend(server->player[i].socket, (void *) msg_c.extra, msg_c.arg[1])) > 0) {
+					if (t + server->player[i].process_byte_send < msg_c.arg[1]) {
+						server->player[i].process_byte_send += t;
+						break;
+					} else
+						server->player[i].process_send = PLAYER_PROCESS_NOTHING;
+				} else if (t < 0) {
+					playerDisconnect(i);
+					break;
+				} else {
+					server->player[i].process_send = PLAYER_PROCESS_DATA;
+					break;
+				}
+			} else
+				server->player[i].process_send = PLAYER_PROCESS_NOTHING;
+			if ((messageBufferPop(server->player[i].msg_buf, &msg_c)) < 0)
+				break;
+			msg.player_ID = htonl(msg_c.player_ID);
+			msg.command = htonl(msg_c.command);
+			msg.arg[0] = htonl(msg_c.arg[0]);
+			msg.arg[1] = htonl(msg_c.arg[1]);
+		}
+
+	}
+		
+
 	return;
 }
 
