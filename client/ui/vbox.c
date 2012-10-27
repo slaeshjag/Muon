@@ -113,8 +113,8 @@ void ui_vbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 			c->widget->resize(c->widget, x, y+UI_PADDING, w, exp_h);
 			y+=exp_h;
 		} else {
-			c->widget->resize(c->widget, x, y+UI_PADDING, w, requested[i]-UI_PADDING*2);
-			y+=requested[i];
+			c->widget->resize(c->widget, x, y+UI_PADDING, w, requested[i]);
+			y+=requested[i]+UI_PADDING*2;
 			i++;
 		}
 	}

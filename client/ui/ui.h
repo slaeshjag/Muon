@@ -36,6 +36,7 @@ UI_WIDGET *ui_selected_widget;
 #include "label.h"
 #include "vbox.h"
 #include "button.h"
+#include "entry.h"
 
 void ui_init();
 
