@@ -1,10 +1,12 @@
 #include "ui.h"
 
+#define SETMOD(m) e_k.modifiers=(key_action==DARNIT_KEYACTION_PRESS)?e_k.modifiers|UI_EVENT_KEYBOARD_MOD_##m :e_k.modifiers&~UI_EVENT_KEYBOARD_MOD_##m
+
 void ui_events(struct UI_PANE_LIST *panes) {
 	UI_EVENT e;
 	UI_EVENT_MOUSE e_m;
 	UI_EVENT_UI e_u;
-	UI_EVENT_KEYBOARD e_k;
+	static UI_EVENT_KEYBOARD e_k={0, 0, 0};
 	
 	DARNIT_MOUSE mouse;
 	mouse=darnitMouseGet();
@@ -15,13 +17,42 @@ void ui_events(struct UI_PANE_LIST *panes) {
 	
 	int key_action;
 	e_k.keysym=darnitKeyboardRawPop(&key_action);
+	switch(e_k.keysym) {
+		case KEY(LCTRL):
+			SETMOD(LCTRL);
+			break;
+		case KEY(RCTRL):
+			SETMOD(RCTRL);
+			break;
+		case KEY(LSHIFT):
+			SETMOD(LSHIFT);
+			break;
+		case KEY(RSHIFT):
+			SETMOD(RSHIFT);
+			break;
+		case KEY(LALT):
+			SETMOD(LALT);
+			break;
+		case KEY(RALT):
+			SETMOD(RALT);
+			break;
+		case KEY(LSUPER):
+			SETMOD(LSUPER);
+			break;
+		case KEY(RSUPER):
+			SETMOD(RSUPER);
+			break;
+	}
+	
+	e_k.character=(e_k.keysym>=32&&e_k.keysym<128)?e_k.keysym-0x20*((e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT)>0&&(e_k.keysym>=0x61&&e_k.keysym<0x7b)):0;
 	
 	e.keyboard=&e_k;
 	if(ui_selected_widget) {
-		if(key_action==DARNIT_KEYACTION_PRESS)
+		if(key_action==DARNIT_KEYACTION_PRESS) {
 			ui_selected_widget->event_handler->send(ui_selected_widget, UI_EVENT_TYPE_KEYBOARD_PRESS, &e);
-		else if(key_action==DARNIT_KEYACTION_RELEASE)
+		} else if(key_action==DARNIT_KEYACTION_RELEASE) {
 			ui_selected_widget->event_handler->send(ui_selected_widget, UI_EVENT_TYPE_KEYBOARD_RELEASE, &e);
+		}
 	}
 	
 	struct UI_PANE_LIST *p;

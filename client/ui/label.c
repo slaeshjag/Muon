@@ -59,7 +59,7 @@ UI_PROPERTY_VALUE ui_label_get_prop(UI_WIDGET *widget, int prop) {
 }
 
 void ui_label_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
-	if((w|h)==0)
+	if(h==0||h==0)
 		return;
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
 	widget->x=x; widget->y=y;
