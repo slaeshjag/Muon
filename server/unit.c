@@ -18,7 +18,7 @@ SERVER_UNIT *unitInit(SERVER *server, int owner, int type, int x, int y) {
 	unit->type = type;
 	unit->hp = unitHPMax(type);
 	unit->shield = 0;		/* Don't spawn with any shield! */
-	unit->powered = serverPowerGet(server, owner, x, y);
+	unit->powered = serverPowerGet(owner, x, y);
 	unit->status = 0;		/* Nothing yet? */
 	unit->next = NULL;
 

@@ -88,10 +88,11 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 		return NULL;
 
 	#ifndef _WIN32
-	int socket, address_len;
+	int socket, address_len, flags;
 	struct sockaddr_in address;
+	address_len = sizeof(struct sockaddr_in);
 
-	if ((socket = accept(sock->socket, (struct sockaddr *) &address, &address_len)) < 0)
+	if ((socket = accept(sock->socket, (struct sockaddr *) &address, (unsigned int *) &address_len)) <= 0)
 		return NULL;
 	#endif
 
@@ -100,6 +101,11 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 
 	#ifndef _WIN32
 	sock_a->socket = socket;
+	
+	if ((flags = fcntl(sock_a->socket, F_GETFL, 0)) < 0)
+		flags = 0;
+	if (fcntl(sock_a->socket, F_SETFL, flags | O_NONBLOCK) < 0)
+		return networkSocketDisconnect(sock_a);
 	#endif
 
 	return sock_a;
@@ -133,7 +139,6 @@ int networkReceive(SERVER_SOCKET *sock, char *buff, int buff_len) {
 
 int networkReceiveTry(SERVER_SOCKET *sock, char *buff, int buff_len) {
 	int t;
-	void *buff_tmp;
 
 	if (!sock)
 		return -1;
@@ -151,8 +156,6 @@ int networkReceiveTry(SERVER_SOCKET *sock, char *buff, int buff_len) {
 
 
 int networkSend(SERVER_SOCKET *sock, char *buff, int buff_len) {
-	int t;
-
 	if (!sock)
 		return -1;
 	return send(sock->socket, buff, buff_len, 0);
@@ -163,7 +166,7 @@ SERVER_SOCKET_SELECT *networkSelectInit() {
 	SERVER_SOCKET_SELECT *sel;
 
 	if ((sel = malloc(sizeof(SERVER_SOCKET_SELECT))) == NULL)
-		return;
+		return NULL;
 	
 	sel->read = sel->write = NULL;
 	FD_ZERO(&sel->set_r);
@@ -189,8 +192,6 @@ int networkSelectAdd(SERVER_SOCKET_SELECT_N **sel, SERVER_SOCKET *sock) {
 
 
 void networkSelectAddWrite(SERVER_SOCKET_SELECT *sel, SERVER_SOCKET *sock) {
-	SERVER_SOCKET_SELECT_N *sel_n;
-
 	if (!sock)
 		return;
 	if (networkSelectAdd(&sel->write, sock) < 0)
@@ -206,8 +207,6 @@ void networkSelectAddWrite(SERVER_SOCKET_SELECT *sel, SERVER_SOCKET *sock) {
 
 
 void networkSelectAddRead(SERVER_SOCKET_SELECT *sel, SERVER_SOCKET *sock) {
-	SERVER_SOCKET_SELECT_N *sel_n;
-
 	if (!sock)
 		return;
 	if (networkSelectAdd(&sel->read, sock) < 0)
@@ -240,26 +239,25 @@ int networkSelectMax(SERVER_SOCKET_SELECT_N *sel, fd_set *set) {
 
 void networkSelectRecalc(SERVER_SOCKET_SELECT *sel) {
 	int max = 0;
-	SERVER_SOCKET_SELECT_N *sel_n;
 
 	sel->max = networkSelectMax(sel->read, &sel->set_r);
-	if ((max = networkSelectMax(sel->write, &sel->set_w)) > max)
+	if ((max = networkSelectMax(sel->write, &sel->set_w)) > sel->max)
 		sel->max = max;
 
 	return;
 }
 
 void networkSelectRemove(SERVER_SOCKET_SELECT *sel_m, SERVER_SOCKET_SELECT_N **sel, SERVER_SOCKET *sock) {
-	SERVER_SOCKET_SELECT_N **sel_t, **sel_n;
+	SERVER_SOCKET_SELECT_N **sel_t, *sel_n;
 
-	*sel_t = *sel;
+	sel_t = sel;
 	while (*sel_t != NULL) {
 		if ((*sel_t)->sock == sock) {
-			*sel_n = *sel_t;	
-			*sel_t = (*sel_n)->next;
-			free(*sel_n);
+			sel_n = *sel_t;	
+			*sel_t = (sel_n)->next;
+			free(sel_n);
 		}
-		*sel_t = (*sel_t)->next;
+		sel_t = &(*sel_t)->next;
 	}
 
 	networkSelectRecalc(sel_m);
@@ -312,3 +310,4 @@ int networkSelectTestRead(SERVER_SOCKET_SELECT *sel, SERVER_SOCKET *sock) {
 		return -1;
 	return FD_ISSET(sock->socket, &sel->tmp_r);
 }
+

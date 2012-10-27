@@ -58,6 +58,8 @@ LDMZ_MAP *mapDestroy(LDMZ_MAP *map) {
 	free(map->stringrefs);
 	free(map->object);
 	free(map->stringdata);
+	for (i = 0; i < map->layers; i++)
+		mapDeleteTilemap(map->layer[i].tilemap);
 	free(map->layer);
 	free(map);
 

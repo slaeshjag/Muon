@@ -1,8 +1,10 @@
 # Project: muon
 
-INCS =  -I../
+CC   = gcc
+LIBS =  -L"/usr/lib"
+INCS =  -I"/usr/include" -I../
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS) -O0 -g
+CFLAGS = $(INCS)
 LDFLAGS = 
 RM = rm -f
 
@@ -11,13 +13,16 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
+<<<<<<< HEAD
 	@echo ""
+=======
+>>>>>>> ae77c678b04f12abda6bf9a2dc0ff414dece5f0f
 
 clean:
 	@echo " [ RM ]	$(OBJFILES)"
 	@$(RM) $(OBJFILES)
-	@echo
+	@echo ""
 
 %.o: %.c %.h
-	@echo " [ CC ]	server/standalone/$<"
+	@echo " [ CC ]	server/standalone$<"
 	@$(CC) $(CFLAGS) -c -o $@ $< 
