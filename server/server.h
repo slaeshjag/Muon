@@ -10,8 +10,10 @@
 #include "network.h"
 #include "unit.h"
 #include "message.h"
+#include "message_handlers.h"
 #include "player.h"
 #include "game.h"
+#include "lobby.h"
 #ifndef __TTMZ_H__
 #include "map.h"
 #endif
@@ -33,6 +35,7 @@ typedef struct SERVER_UNIT SERVER_UNIT;
 
 typedef struct {
 	SERVER_UNIT		*unit;
+	MESSAGE_HANDLER		message_handler;
 	unsigned int		w;
 	unsigned int		h;
 	SERVER_UNIT		**map;
@@ -46,13 +49,12 @@ typedef struct {
 	void			*map_data;
 } SERVER;
 
+SERVER *server;
 
-#include "lobby.h"
 
-
-int serverPowerGet(SERVER *server, int owner, int x, int y);
+int serverPowerGet(int owner, int x, int y);
 SERVER *serverInit(const char *fname, unsigned int players, int port);
-SERVER *serverDestroy(SERVER *server);
-int serverLoop(SERVER *server, unsigned int d_ms);
+SERVER *serverDestroy();
+int serverLoop(unsigned int d_ms);
 
 #endif

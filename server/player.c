@@ -43,8 +43,7 @@ PLAYER *playerDestroy(PLAYER *player, int players) {
 }
 
 
-int playerSlot(void *handle) {
-	SERVER *server = handle;
+int playerSlot() {
 	int i;
 
 	for (i = 0; i < server->players; i++)

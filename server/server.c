@@ -1,7 +1,7 @@
 #include "server.h"
 
 
-int serverPowerGet(SERVER *server, int owner, int x, int y) {
+int serverPowerGet(int owner, int x, int y) {
 	return server->player[owner].map[x + y * server->w].power;
 }
 
@@ -9,15 +9,17 @@ int serverPowerGet(SERVER *server, int owner, int x, int y) {
 /* TODO: Expand with arguments */
 SERVER *serverInit(const char *fname, unsigned int players, int port) {
 	int i, map_w, map_h;
-	SERVER *server;
 
 	if ((server = malloc(sizeof(SERVER))) == NULL) {
 		fprintf(stderr, "Unable to allocate a server\n");
 		return NULL;
 	}
 
+	messageHandlerInit(server);
+
 	if ((server->map_data = ldmzLoad(fname)) == NULL) {
 		free(server);
+		server = NULL;
 		fprintf(stderr, "Unable to load map %s\n", fname);
 		return NULL;
 	}
@@ -35,6 +37,7 @@ SERVER *serverInit(const char *fname, unsigned int players, int port) {
 		networkSocketDisconnect(server->accept);
 		ldmzFree(server->map_data);
 		free(server);
+		server = NULL;
 		return NULL;
 	}
 
@@ -50,7 +53,7 @@ SERVER *serverInit(const char *fname, unsigned int players, int port) {
 }
 
 
-SERVER *serverDestroy(SERVER *server) {
+SERVER *serverDestroy() {
 	int i;
 
 	for (i = 0; i < server->w * server->h; i++) {
@@ -64,10 +67,10 @@ SERVER *serverDestroy(SERVER *server) {
 }
 
 
-int serverLoop(SERVER *server, unsigned int d_ms) {
+int serverLoop(unsigned int d_ms) {
 	/* FIXME: STUB */
 	if (!server->game.started)
-		lobbyPoll(server);
+		lobbyPoll();
 
 	return 0;
 }
