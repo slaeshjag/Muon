@@ -4,6 +4,7 @@
 typedef void SERVER;
 
 SERVER *serverInit(const char *map, unsigned int players, int port);
+void serverDestroy();
 
 
 #endif

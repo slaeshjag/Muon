@@ -1,7 +1,6 @@
 #include "server.h"
 
 int main(int argc, char **argv) {
-	SERVER *server;
 	int port;
 
 	if (argc <3) {
@@ -14,12 +13,13 @@ int main(int argc, char **argv) {
 	else
 		port = SERVER_PORT;
 	
-	if ((server = serverInit(argv[1], atoi(argv[2]), port)) == NULL)
+	if (serverInit(argv[1], atoi(argv[2]), port) == NULL)
 		return -1;
 	for (;;) {
-		serverLoop(server, 1000);
 		sleep(1);
+		serverLoop(1000);
 	}
+
 	
 	return 0;
 }

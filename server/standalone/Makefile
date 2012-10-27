@@ -1,10 +1,8 @@
 # Project: muon
 
-CC   = gcc
-LIBS =  -L"/usr/lib"
-INCS =  -I"/usr/include" -I../
+INCS =  -I../
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS)
+CFLAGS = $(INCS) -O0 -g
 LDFLAGS = 
 RM = rm -f
 

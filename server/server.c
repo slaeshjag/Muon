@@ -16,6 +16,7 @@ SERVER *serverInit(const char *fname, unsigned int players, int port) {
 	}
 
 	messageHandlerInit(server);
+	gameInit();
 
 	if ((server->map_data = ldmzLoad(fname)) == NULL) {
 		free(server);
@@ -57,11 +58,16 @@ SERVER *serverDestroy() {
 	int i;
 
 	for (i = 0; i < server->w * server->h; i++) {
-		messageBufferDelete(server->message_buffer);
 		free(server->map[i]);
-		free(server->map);
-		free(server);
 	}
+	
+	playerDestroy(server->player, server->players);
+	free(server->map);
+	messageBufferDelete(server->message_buffer);
+	networkSocketDisconnect(server->accept);
+	ldmzFree(server->map_data);
+
+	free(server);
 
 	return NULL;
 }

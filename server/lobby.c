@@ -15,7 +15,8 @@ int lobbyPoll() {
 
 	server->player[slot].status = PLAYER_WAITING_FOR_IDENTIFY;
 	server->player[slot].socket = socket;
-	
+	server->player[slot].id_req_send = time(NULL);
+
 	messageSend(socket, 0, MSG_SEND_REQUEST_IDENTIFY, 0, 0, NULL);
 
 	return 0;

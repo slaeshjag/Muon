@@ -90,6 +90,7 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 	#ifndef _WIN32
 	int socket, address_len;
 	struct sockaddr_in address;
+	address_len = 0;
 
 	if ((socket = accept(sock->socket, (struct sockaddr *) &address, &address_len)) < 0)
 		return NULL;

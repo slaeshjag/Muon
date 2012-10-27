@@ -85,7 +85,7 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 	msg.arg[1] = ntohl(arg2);
 	buf = (char *) &msg;
 
-	for (i = 0; i < 16 && t > -1; ) {
+	for (i = t = 0; i < 16 && t > -1; ) {
 		t = networkSend(socket, &buf[i], 16 - i);
 		i += t;
 	}
@@ -113,8 +113,7 @@ int messageExecute(SERVER *server, unsigned int player, MESSAGE *message) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		messageSend(server->player[player].socket, player, MSG_SEND_KICKED, 0, 0, NULL);
 		
-		server->player[player].status = PLAYER_UNUSED;
-		server->player[player].socket = networkSocketDisconnect(server->player[player].socket);
+		playerDisconnect(player);
 		return -1;
 	}
 

@@ -6,5 +6,7 @@ typedef struct {
 	int			started;
 } GAME;
 
+int gameInit();
+int gameKillPlayerUnits(unsigned int player);
 
 #endif

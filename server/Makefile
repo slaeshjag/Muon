@@ -2,15 +2,12 @@
 
 MAKEFLAGS += --no-print-directory
 
-CC   = gcc
-LIBS =  -L"/usr/lib"
-INCS =  -I"/usr/include"
 BIN  = server
 LIBOUT = server.a
 STANDALONE = standalone/*.o
 LIBOBJ = lib/*.o
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS)
+CFLAGS = $(INCS) -O0 -g
 LDFLAGS =  -lm
 RM = rm -f
 
