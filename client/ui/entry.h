@@ -18,7 +18,7 @@ struct UI_ENTRY_PROPERTIES{
 	char *offset;
 	DARNIT_LINE *border;
 	DARNIT_LINE *cursor;
-	char text[UI_ENTRY_LENGTH];
+	char text[UI_ENTRY_LENGTH+1];
 };
 
 UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font);

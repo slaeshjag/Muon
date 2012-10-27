@@ -42,13 +42,26 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 
 void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
-	if(!e->keyboard->character||p->cursor_pos>=UI_ENTRY_LENGTH-1)
-		return;
 	switch(type) {
 		case UI_EVENT_TYPE_KEYBOARD_PRESS:
-			p->text[p->cursor_pos]=e->keyboard->character;
-			darnitTextSurfaceCharAppend(p->surface, &e->keyboard->character);
-			p->cursor_pos++;
+			if(e->keyboard->keysym==8&&p->cursor_pos>0) {
+				p->cursor_pos--;
+				p->text[p->cursor_pos]=0;
+				if(p->offset>p->text+1) {
+					for(; darnitFontGetStringWidthPixels(p->font, p->offset)<widget->w; p->offset--);
+					p->offset++;
+				} else if(p->offset==p->text+1)
+					p->offset=p->text;
+			} else if(p->cursor_pos>=UI_ENTRY_LENGTH-1||!e->keyboard->character) {
+				return;
+			} else {
+				p->text[p->cursor_pos]=e->keyboard->character;
+				for(; darnitFontGetStringWidthPixels(p->font, p->offset)>widget->w; p->offset++);
+				p->cursor_pos++;
+			}
+			darnitTextSurfaceReset(p->surface);
+			darnitTextSurfaceStringAppend(p->surface, p->offset);
+			//darnitTextSurfaceCharAppend(p->surface, &e->keyboard->character);
 			break;
 	}
 }
