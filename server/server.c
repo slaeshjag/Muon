@@ -66,6 +66,8 @@ SERVER *serverDestroy(SERVER *server) {
 
 int serverLoop(SERVER *server, unsigned int d_ms) {
 	/* FIXME: STUB */
+	if (!server->game.started)
+		lobbyPoll(server);
 
 	return 0;
 }

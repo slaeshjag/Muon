@@ -7,10 +7,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "network.h"
 #include "unit.h"
 #include "message.h"
 #include "player.h"
-#include "network.h"
+#include "game.h"
 #ifndef __TTMZ_H__
 #include "map.h"
 #endif
@@ -40,9 +41,14 @@ typedef struct {
 	MESSAGE_BUFFER		*message_buffer;
 	PLAYER			*player;
 	unsigned int		players;
+	GAME			game;
 	SERVER_SOCKET		*accept;
 	void			*map_data;
 } SERVER;
+
+
+#include "lobby.h"
+
 
 int serverPowerGet(SERVER *server, int owner, int x, int y);
 SERVER *serverInit(const char *fname, unsigned int players, int port);

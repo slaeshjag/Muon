@@ -312,3 +312,4 @@ int networkSelectTestRead(SERVER_SOCKET_SELECT *sel, SERVER_SOCKET *sock) {
 		return -1;
 	return FD_ISSET(sock->socket, &sel->tmp_r);
 }
+

@@ -16,6 +16,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 				player[i].map[j].power = 0;
 				player[i].map[j].fog = 1;
 			}
+		player[i].status = PLAYER_UNUSED;
 	}
 
 	if (err) {
@@ -39,4 +40,15 @@ PLAYER *playerDestroy(PLAYER *player, int players) {
 		free(player->map);
 	free(player);
 	return NULL;
+}
+
+
+int playerSlot(void *handle) {
+	SERVER *server = handle;
+	int i;
+
+	for (i = 0; i < server->players; i++)
+		if (!server->player[i].status)
+			return i;
+	return -1;
 }

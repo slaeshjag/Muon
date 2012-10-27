@@ -19,6 +19,7 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
+	@echo
 	@echo " [ CD ] standalone/"
 	@make -C standalone/
 	@echo " [ CD ] lib/"

@@ -16,6 +16,10 @@ int main(int argc, char **argv) {
 	
 	if ((server = serverInit(argv[1], atoi(argv[2]), port)) == NULL)
 		return -1;
+	for (;;) {
+		serverLoop(server, 1000);
+		sleep(1);
+	}
 	
 	return 0;
 }

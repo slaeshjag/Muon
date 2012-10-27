@@ -74,3 +74,20 @@ int messageBufferFlush(MESSAGE_BUFFER *msg_buf) {
 
 	return 0;
 }
+
+
+int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message, int arg1, int arg2, void *data) {
+	int i;
+	MESSAGE msg;
+	char *buf;
+
+	msg.player_ID = ntohl(player);
+	msg.command = ntohl(message);
+	msg.arg[0] = ntohl(arg1);
+	msg.arg[1] = ntohl(arg2);
+	buf = (char *) &msg;
+	for (i = 0; i < 16; )
+		i += networkSend(socket, &buf[i], 16 - i);
+	
+	return 0;
+}

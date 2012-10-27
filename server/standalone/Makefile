@@ -13,7 +13,7 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-	@echo
+	@echo ""
 
 clean:
 	@echo ""
