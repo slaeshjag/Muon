@@ -17,6 +17,7 @@ UI_WIDGET *ui_widget_create_button(UI_WIDGET *child) {
 	widget->event_handler->add=ui_event_add;
 	widget->event_handler->send=ui_event_send;
 	widget->event_handler->add(widget, ui_button_event_click, UI_EVENT_TYPE_MOUSE);
+	widget->event_handler->add(widget, ui_button_event_key, UI_EVENT_TYPE_KEYBOARD);
 	
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	p->child=child;
@@ -50,11 +51,26 @@ void ui_widget_destroy_button_text(UI_WIDGET *widget) {
 	return;
 }
 
+void ui_button_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	struct UI_BUTTON_PROPERTIES *p=widget->properties;
+	if(e->keyboard->keysym!=KEY(RETURN)&&e->keyboard->keysym!=KEY(KP_ENTER)&&e->keyboard->keysym!=KEY(SPACE))
+		return;
+	switch(type) {
+		case UI_EVENT_TYPE_KEYBOARD_PRESS:
+			p->activated=1;
+			break;
+		case UI_EVENT_TYPE_KEYBOARD_RELEASE:
+			p->activated=0;
+			break;
+	}
+}
+
 void ui_button_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	switch(type) {
 		case UI_EVENT_TYPE_MOUSE_DOWN:
 			if(e->mouse->buttons==UI_EVENT_MOUSE_BUTTON_LEFT)
+				ui_selected_widget=widget;
 				p->activated=1;
 			break;
 		case UI_EVENT_TYPE_MOUSE_UP:

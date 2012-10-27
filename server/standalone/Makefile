@@ -16,11 +16,10 @@ all: $(OBJFILES)
 	@echo ""
 
 clean:
-	@echo ""
 	@echo " [ RM ]	$(OBJFILES)"
 	@$(RM) $(OBJFILES)
 	@echo
 
 %.o: %.c %.h
-	@echo " [ CC ]	$<"
+	@echo " [ CC ]	server/standalone/$<"
 	@$(CC) $(CFLAGS) -c -o $@ $< 

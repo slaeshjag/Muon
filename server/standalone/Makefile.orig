@@ -1,19 +1,22 @@
 # Project: muon
 
-MAKEFLAGS += --no-print-directory
-LIBS	= -L"/usr/lib"
-INCS	= -I"/usr/include"
-DBGFLAGS= -g -D__DEBUG__
-CFLAGS 	+= -Wall $(INCS) $(DBGFLAGS)
-LDFLAGS += -ldarnit
-RM	= rm -f
+CC   = gcc
+LIBS =  -L"/usr/lib"
+INCS =  -I"/usr/include" -I../
+DEBUGFLAGS = -g -D__DEBUG__
+CFLAGS = $(INCS)
+LDFLAGS = 
+RM = rm -f
 
 SRCFILES=$(wildcard *.c)
 OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
+<<<<<<< HEAD
 	@echo ""
+=======
+>>>>>>> ae77c678b04f12abda6bf9a2dc0ff414dece5f0f
 
 clean:
 	@echo " [ RM ]	$(OBJFILES)"
@@ -21,5 +24,5 @@ clean:
 	@echo ""
 
 %.o: %.c %.h
-	@echo " [ CC ]	client/ui/$<"
+	@echo " [ CC ]	server/standalone$<"
 	@$(CC) $(CFLAGS) -c -o $@ $< 
