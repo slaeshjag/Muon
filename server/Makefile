@@ -19,9 +19,11 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-	@echo " [ CD ] standalone/"
+	@echo ""
+	@echo " [ CD ] server/standalone/"
 	@make -C standalone/
-	@echo " [ CD ] lib/"
+	@echo ""
+	@echo " [ CD ] server/lib/"
 	@make -C lib/
 	@echo " [ LD ]	$(BIN)"
 	@$(CC) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
@@ -31,20 +33,18 @@ all: $(OBJFILES)
 	@echo
 
 clean:
-	@echo ""
-	@echo " [ CD ] standalone/"
-	@make -C standalone/ clean
-	@echo " [ CD ] lib/"
-	@make -C lib/ clean
 	@echo " [ RM ]	$(OBJFILES)"
 	@$(RM) $(OBJFILES)
 	@echo " [ RM ]	$(BIN)"
 	@$(RM) $(BIN)
 	@echo " [ RM ] $(LIBOUT)"
 	@$(RM) $(LIBOUT)
-	@echo " Done."
-	@echo
+	@echo ""
+	@echo " [ CD ] server/standalone/"
+	@make -C standalone/ clean
+	@echo " [ CD ] server/lib/"
+	@make -C lib/ clean
 
 %.o: %.c %.h
-	@echo " [ CC ]	$<"
+	@echo " [ CC ]	server/$<"
 	@$(CC) $(CFLAGS) -c -o $@ $< 

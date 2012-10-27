@@ -17,24 +17,23 @@ OBJFILES=$(SRCFILES:.c=.o)
 
 all: $(OBJFILES)
 	@darnit-fsimage maps map.ldi
-	@echo " [ CD ] ui/"
+	@echo ""
+	@echo " [ CD ] client/ui/"
 	@make -C ui/
-	@echo " [ LD ]	$(BIN)"
+	@echo " [ LD ]	client/$(BIN)"
 	@$(CC) $(OBJFILES) ui/*.o $(SERVER) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " Done."
 	@echo
 
 clean:
-	@echo " [ CD ] ui/"
-	@make -C ui/ clean
-	@echo ""
 	@echo " [ RM ]	$(OBJFILES)"
 	@echo " [ RM ]	$(BIN)"
 	@$(RM) $(OBJFILES)
 	@$(RM) $(BIN)
-	@echo " Done."
-	@echo
+	@echo ""
+	@echo " [ CD ] client/ui/"
+	@make -C ui/ clean
 
 %.o: %.c %.h
-	@echo " [ CC ]	$<"
+	@echo " [ CC ]	client/$<"
 	@$(CC) $(CFLAGS) -c -o $@ $< 

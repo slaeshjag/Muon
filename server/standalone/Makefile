@@ -13,14 +13,12 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-	@echo
 
 clean:
-	@echo ""
 	@echo " [ RM ]	$(OBJFILES)"
 	@$(RM) $(OBJFILES)
-	@echo
+	@echo ""
 
 %.o: %.c %.h
-	@echo " [ CC ]	$<"
+	@echo " [ CC ]	server/standalone$<"
 	@$(CC) $(CFLAGS) -c -o $@ $< 
