@@ -1,4 +1,5 @@
 #include "ui.h"
+#include "../view.h"
 
 UI_WIDGET *ui_widget_create_button(UI_WIDGET *child) {
 	UI_WIDGET *widget;

@@ -81,6 +81,18 @@ void ui_entry_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 
 UI_PROPERTY_VALUE ui_entry_get_prop(UI_WIDGET *widget, int prop) {
 	UI_PROPERTY_VALUE v={.p=NULL};
+	struct UI_ENTRY_PROPERTIES *p=widget->properties;
+	switch(prop) {
+		case UI_ENTRY_PROP_FONT:
+			v.p=p->font;
+			break;
+		case UI_ENTRY_PROP_SURFACE:
+			v.p=p->surface;
+			break;
+		case UI_ENTRY_PROP_TEXT:
+			v.p=p->text;
+			break;
+	}
 	return v;
 }
 

@@ -79,7 +79,7 @@ typedef struct UI_EVENT_HANDLER {
 
 UI_EVENT_MOUSE ui_e_m_prev;
 
-void ui_events(struct UI_PANE_LIST *panes);
+void ui_events(struct UI_PANE_LIST *panes, int render);
 void ui_event_add(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask);
 void ui_event_send(UI_WIDGET *widget , unsigned int type, UI_EVENT *e);
 

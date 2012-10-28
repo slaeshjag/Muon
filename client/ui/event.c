@@ -2,7 +2,7 @@
 
 #define SETMOD(m) e_k.modifiers=(key_action==DARNIT_KEYACTION_PRESS)?e_k.modifiers|UI_EVENT_KEYBOARD_MOD_##m :e_k.modifiers&~UI_EVENT_KEYBOARD_MOD_##m
 
-void ui_events(struct UI_PANE_LIST *panes) {
+void ui_events(struct UI_PANE_LIST *panes, int render) {
 	UI_EVENT e;
 	UI_EVENT_MOUSE e_m;
 	UI_EVENT_UI e_u;
@@ -75,6 +75,8 @@ void ui_events(struct UI_PANE_LIST *panes) {
 			} else if(PINR(ui_e_m_prev.x, ui_e_m_prev.y, w->x, w->y, w->w, w->h))
 				w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_LEAVE, &e);
 		}
+		if(render)
+			ui_pane_render(p->pane);
 	}
 	ui_e_m_prev=e_m;
 }

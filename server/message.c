@@ -42,6 +42,12 @@ int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 		return -1;
 	
 	msg_buf->message[msg_buf->write_pos] = *message;
+	
+	if (message->extra) {
+		msg_buf->message[msg_buf->write_pos].extra  = malloc(message->arg[1]);
+		memcpy(msg_buf->message[msg_buf->write_pos].extra, message->extra, message->arg[1]);
+	}
+
 	msg_buf->write_pos = (msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1;
 
 	return 0;
@@ -103,7 +109,7 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 
 
 int messageExecute(unsigned int player, MESSAGE *message) {
-	
+
 	if (message->command >= MESSAGE_HANDLERS) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);

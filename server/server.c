@@ -93,9 +93,9 @@ void serverProcessNetwork() {
 
 		while ((t = networkReceiveTry(server->player[i].socket, (void *) &msg, 16)) > 0) {
 			msg.player_ID = ntohl(msg.player_ID);
-			msg.command = ntohl(msg.player_ID);
-			msg.arg[0] = ntohl(msg.player_ID);
-			msg.arg[1] = ntohl(msg.player_ID);
+			msg.command = ntohl(msg.command);
+			msg.arg[0] = ntohl(msg.arg[0]);
+			msg.arg[1] = ntohl(msg.arg[1]);
 
 			if (messageHasData(msg.command, msg.arg[1]) <= 0) {
 				if (msg.arg[1] > MESSAGE_MAX_PAYLOAD) {
@@ -111,15 +111,20 @@ void serverProcessNetwork() {
 				}
 
 				if ((t = networkReceiveTry(server->player[i].socket, (void *) msg.extra, msg.arg[1])) > 0) {
-					messageExecute(i, &msg_c);
+					messageExecute(i, &msg);
 				} else {
 					server->player[i].process_msg_recv = msg;
 					server->player[i].process_recv = PLAYER_PROCESS_DATA;
 					break;
 				}
 			} else {
-				messageExecute(i, &msg_c);
+				msg.extra = NULL;
+				messageExecute(i, &msg);
 			}
+		}
+
+		if (t < 0) {
+			playerDisconnect(i);
 		}
 	}
 
@@ -155,6 +160,9 @@ void serverProcessNetwork() {
 					if (t + server->player[i].process_byte_send < msg_c.arg[1]) {
 						server->player[i].process_byte_send += t;
 						continue;
+					} else {
+						free(msg_c.extra);
+						server->player[i].process_send = PLAYER_PROCESS_NOTHING;
 					}
 				} else if (t < 0) {
 					playerDisconnect(i);
@@ -177,8 +185,10 @@ void serverProcessNetwork() {
 					if (t + server->player[i].process_byte_send < msg_c.arg[1]) {
 						server->player[i].process_byte_send += t;
 						break;
-					} else
+					} else {
+						free(msg_c.extra);
 						server->player[i].process_send = PLAYER_PROCESS_NOTHING;
+					}
 				} else if (t < 0) {
 					playerDisconnect(i);
 					break;

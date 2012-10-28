@@ -2,16 +2,17 @@
 
 MAKEFLAGS += --no-print-directory
 
-CC   = gcc
-LIBS =  -L"/usr/lib"
-INCS =  -I"/usr/include"
 BIN  = server
 LIBOUT = server.a
 STANDALONE = standalone/*.o
 LIBOBJ = lib/*.o
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS)
+CFLAGS += $(INCS) -O0 -g -Wall
+<<<<<<< HEAD
+LDFLAGS +=  -lm
+=======
 LDFLAGS =  -lm
+>>>>>>> 53b5a87a629850f6224176e5286ec53392ab1a30
 RM = rm -f
 
 SRCFILES=$(wildcard *.c)
@@ -19,19 +20,14 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-<<<<<<< HEAD
-	@echo
-	@echo " [ CD ] standalone/"
-=======
 	@echo ""
 	@echo " [ CD ] server/standalone/"
->>>>>>> ae77c678b04f12abda6bf9a2dc0ff414dece5f0f
 	@make -C standalone/
 	@echo ""
 	@echo " [ CD ] server/lib/"
 	@make -C lib/
 	@echo " [ LD ]	$(BIN)"
-	@$(CC) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
+	@$(CC) $(CFLAGS) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " [ AR ] $(LIBOUT)"
 	@$(AR) -cq $(LIBOUT) $(OBJFILES) $(LIBOBJ)
 	@echo " Done."
