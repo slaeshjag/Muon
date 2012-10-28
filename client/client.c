@@ -30,7 +30,7 @@ void client_identify(MESSAGE_RAW *msg) {
 	MESSAGE_RAW msg_send;
 	msg_send.player_id=msg->player_id;
 	msg_send.command=MSG_SEND_IDENTIFY;
-	msg_send.arg_1=1;
+	msg_send.arg_1=API_VERSION;
 	msg_send.arg_2=strnlen(player_name, 32);
 	client_message_convert_send(&msg_send);
 	darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
