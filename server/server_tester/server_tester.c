@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 	send(sock, "Testspelare", strlen("Testspelare"), 0);
 
 	for (j = 0;j < 20; j++) {
-		if (recv(sock, &message, 16, 0) == -1)
+		if (recv(sock, &message, 16, 0) <= 0)
 			break;
 		messageConvert(&message);
 		fprintf(stderr, "\n\nMessage %i from player %i: %i %i;; ", message.command, message.player_ID, message.arg[0], message.arg[1]);
@@ -76,7 +76,7 @@ int main(int argc, char **argv) {
 		for (i = 0; i < message.arg[1]; ) {
 			a = (message.arg[1] - i > 256) ? 256 : message.arg[1] - i;
 			
-			if ((port = recv(sock, buff, a, 0)) == -1)
+			if ((port = recv(sock, buff, a, 0)) <= 0)
 				break;
 			i += port;
 			fwrite(buff, port, 1, stderr);
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 			messageSend(sock, 3, 100, 0);
 		}
 
-		if (port == -1)
+		if (port <= 0)
 			break;
 	}
 

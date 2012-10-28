@@ -77,6 +77,7 @@ void playerDisconnect(unsigned int player) {
 	server->player[player].status = PLAYER_UNUSED;
 	messageBufferFlush(server->player[player].msg_buf);
 	server->player[player].socket = networkSocketDisconnect(server->player[player].socket);
+
 	fprintf(stderr, "Disconnecting player...\n");
 	
 	if (!broadcast)

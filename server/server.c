@@ -157,7 +157,6 @@ void serverProcessNetwork() {
 		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
 		if (server->player[i].process_recv) {
-			fprintf(stderr, "Partial data!\n");
 			msg_c = server->player[i].process_msg_recv;
 			if ((t = networkReceiveTry(server->player[i].socket, msg_c.extra, msg_c.arg[1])) > 0) {
 				server->player[i].process_recv = PLAYER_PROCESS_NOTHING;
@@ -189,7 +188,6 @@ void serverProcessNetwork() {
 				}
 
 				if ((t = networkReceiveTry(server->player[i].socket, (void *) msg.extra, msg.arg[1])) > 0) {
-					fprintf(stderr, "Got a message!\n");
 					messageExecute(i, &msg);
 					server->player[i].process_recv = PLAYER_PROCESS_NOTHING;
 				} else {
@@ -199,7 +197,6 @@ void serverProcessNetwork() {
 				}
 			} else {
 				msg.extra = NULL;
-				fprintf(stderr, "Got a message!\n");
 				server->player[i].process_recv = PLAYER_PROCESS_NOTHING;
 				messageExecute(i, &msg);
 			}
@@ -304,10 +301,11 @@ int serverLoop(unsigned int d_ms) {
 	/* FIXME: STUB */
 	if (!server->game.started) {
 		lobbyPoll();
-		serverProcessNetwork();
 		playerCheckIdentify();
-		serverSendPing();
 	}
+
+	serverProcessNetwork();
+	serverSendPing();
 
 	return 0;
 }

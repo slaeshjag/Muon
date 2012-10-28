@@ -3,6 +3,8 @@
 
 void lobbyMapSend(unsigned int player) {
 	MESSAGE msg;
+	int i, send;
+	char *data = server->map_c.data;
 
 	msg.player_ID = player;
 	msg.command = MSG_SEND_MAP_BEGIN;
@@ -11,12 +13,17 @@ void lobbyMapSend(unsigned int player) {
 	msg.extra = (void *) server->map_c.path;
 	messageBufferPush(server->player[player].msg_buf, &msg);
 	
-	msg.player_ID = player;
-	msg.command = MSG_SEND_MAP_CHUNK;
-	msg.arg[0] = 0;
-	msg.arg[1] = server->map_c.data_len;
-	msg.extra = server->map_c.data;
-	messageBufferPush(server->player[player].msg_buf, &msg);
+	for (i = 0; i < server->map_c.data_len; ) {
+		send = (server->map_c.data_len - i > MESSAGE_MAX_PAYLOAD) ? MESSAGE_MAX_PAYLOAD : server->map_c.data_len - i;
+		
+		msg.player_ID = player;
+		msg.command = MSG_SEND_MAP_CHUNK;
+		msg.arg[0] = 0;
+		msg.arg[1] = send;
+		msg.extra = &data[i];
+		messageBufferPush(server->player[player].msg_buf, &msg);
+		i += send;
+	}
 
 	msg.player_ID = player;
 	msg.command = MSG_SEND_MAP_END;
@@ -42,7 +49,6 @@ int lobbyPoll() {
 		return 0;
 	}
 
-	fprintf(stderr, "Accepted a connection\n");
 	server->player[slot].status = PLAYER_WAITING_FOR_IDENTIFY;
 	server->player[slot].socket = socket;
 	server->player[slot].id_req_send = time(NULL);

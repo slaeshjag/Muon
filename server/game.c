@@ -26,10 +26,13 @@ int gameAttemptStart() {
 	}
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status < PLAYER_READY_TO_START) {
+		if (server->player[i].status == PLAYER_WAITING_FOR_IDENTIFY) {
 			playerDisconnect(i);
 			continue;
 		}
+
+		if (server->player[i].status == PLAYER_UNUSED)
+			continue;
 
 		server->player[i].status = PLAYER_IN_GAME;
 	}
