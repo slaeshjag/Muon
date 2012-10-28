@@ -1,9 +1,11 @@
 #ifndef __MESSAGE_H__
 #define	__MESSAGE_H__
 
+#define	MSG_PAYLOAD_BIT			0x100
+
 /* Message protocol, general stuff */
 
-/* This struct is used for *all* message bodies */
+/* This struct is used for *all* message bodies. Ints are in correct (big) endian */
 typedef struct {
 	/* When sending messages, this field is ignored */
 	/* The server uses this field to tell the client what player caused the message */
@@ -30,49 +32,53 @@ typedef struct {
 
 
 /* No arguments, no data. The message is fatal. */
-#define	MSG_RECV_SERVER_FULL		0
+#define	MSG_RECV_SERVER_FULL		0x000
 
 /* arg_1 is your player ID. Requires you to send an identify message */
-#define	MSG_RECV_REQUEST_IDENTIFY	1
+#define	MSG_RECV_REQUEST_IDENTIFY	0x001
 
 /* No arguments. Not very helpful, but if you get it before you are accepted into the lobby, it is fatal */
-#define	MSG_RECV_ILLEGAL_COMMAND	2
+#define	MSG_RECV_ILLEGAL_COMMAND	0x002
 
 /* arg_1 is the accepted client version on the server. This message is fatal */
-#define	MSG_RECV_BAD_CLIENT		3
+#define	MSG_RECV_BAD_CLIENT		0x003
 
 /* arg_1 may be used for reason in the future, but for now you can ignore all arguments */
-#define	MSG_RECV_KICKED			4
-
-/* arg_1 is 0. This message has data (the chat message.) */
-#define	MSG_RECV_CHAT			5
-
-/* arg_1 is 0. This message has data (the players name.) */
-#define	MSG_RECV_JOIN			6
+#define	MSG_RECV_KICKED			0x004
 
 /* Both arguments are 0 */
-#define	MSG_RECV_LEAVE			7
-
-/* player_id is always 0. arg_1 is the size of the map in bytes. The message has data (map file name.) */
-#define	MSG_RECV_MAP_BEGIN		8
-
-/* player_id is always 0. arg_1 is 0. The message has data (part of the map.) */
-#define	MSG_RECV_MAP_CHUNK		9
+#define	MSG_RECV_LEAVE			0x005
 
 /* player_id is always 0. No arguments, but arg_1 and arg_2 may be used for checksum in the future. */
-#define	MSG_RECV_MAP_END		10
+#define	MSG_RECV_MAP_END		0x006
 
 /* arg_1 is in the range 0..100. Used to display map transfer progress for players in lobby. No data. */
-#define	MSG_RECV_MAP_PROGRESS		11
+#define	MSG_RECV_MAP_PROGRESS		0x007
 
 /* No arguments. No data. Not used at the moment, but is reserved for future use. Client must reply with PONG */
-#define	MSG_RECV_PING			12
+#define	MSG_RECV_PING			0x008
 
 /* arg_1 is 1 if the player is ready, 0 if not. No data. */
-#define	MSG_RECV_PLAYER_READY		13
+#define	MSG_RECV_PLAYER_READY		0x009
 
 /* No arguments. No data. When you get this message, you should switch from lobby to game play mode */
-#define	MSG_RECV_GAME_START		14
+#define	MSG_RECV_GAME_START		0x00A
+
+
+
+
+/* player_id is always 0. arg_1 is the size of the map in bytes. The message has data (map file name.) */
+#define	MSG_RECV_MAP_BEGIN		0x100
+
+/* player_id is always 0. arg_1 is 0. The message has data (part of the map.) */
+#define	MSG_RECV_MAP_CHUNK		0x101
+
+/* arg_1 is 0. This message has data (the chat message.) */
+#define	MSG_RECV_CHAT			0x102
+
+/* arg_1 is 0. This message has data (the players name.) */
+#define	MSG_RECV_JOIN			0x103
+
 
 
 /***** Commands the CLIENT can send ******/
