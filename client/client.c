@@ -48,6 +48,20 @@ void client_check_incomming() {
 	}
 }
 
+void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
+	MESSAGE_RAW msg_send;
+	switch(msg->command) {
+		case MSG_RECV_PING:
+			printf("PING!\n");
+			msg_send.player_id=player_id;
+			msg_send.command=MSG_SEND_PONG;
+			msg_send.arg_1=msg_send.arg_2=0;
+			client_message_convert_send(&msg_send);
+			darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
+			break;
+	}
+}
+
 void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static char *filename=NULL;
 	static FILE *f;
@@ -71,19 +85,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_END:
 			fclose(f);
 			printf("Map %s successfully downloaded!\n", filename);
-			break;
-	}
-}
-
-void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
-	MESSAGE_RAW msg_send;
-	switch(msg->command) {
-		case MSG_RECV_PING:
-			msg_send.player_id=player_id;
-			msg_send.command=MSG_SEND_PONG;
-			msg_send.arg_1=msg_send.arg_2=0;
-			client_message_convert_send(&msg_send);
-			darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
+			client_message_handler=client_game_handler;
 			break;
 	}
 }
