@@ -1,6 +1,8 @@
 #ifndef __SERVER_H__
 #define	__SERVER_H__
 
+#define	API_VERSION			0x10000
+
 #include "message.h"
 
 typedef void SERVER;
