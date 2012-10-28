@@ -38,21 +38,20 @@ void view_init() {
 	connect_server_entry_port->set_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT, v);
 	
 	//Game
-	//old code, should be converted to UI
-	sidebar=darnitRenderRectAlloc(1);
-	sidebar_lines=darnitRenderLineAlloc(5, 2);
-	sidebar_text_title=darnitTextSurfaceAlloc(font_std, 16, SIDEBAR_WIDTH-32, platform.screen_w-SIDEBAR_WIDTH+16, 8);
-	sidebar_text_buildings=darnitTextSurfaceAlloc(font_std, 16, SIDEBAR_WIDTH-32, platform.screen_w-SIDEBAR_WIDTH+16, 64-12-4);
-	darnitRenderRectSet(sidebar, 0, platform.screen_w-SIDEBAR_WIDTH, platform.screen_h, platform.screen_w, 0);
-	darnitRenderLineMove(sidebar_lines, 0, platform.screen_w-SIDEBAR_WIDTH+2, 0, platform.screen_w-SIDEBAR_WIDTH+2, platform.screen_h);
-
-	darnitRenderLineMove(sidebar_lines, 1, platform.screen_w-SIDEBAR_WIDTH+8, 64, platform.screen_w-8, 64);
-	darnitRenderLineMove(sidebar_lines, 2, platform.screen_w-SIDEBAR_WIDTH+8, platform.screen_h-32, platform.screen_w-8, platform.screen_h-32);
-	darnitRenderLineMove(sidebar_lines, 3, platform.screen_w-SIDEBAR_WIDTH+8, 64, platform.screen_w-SIDEBAR_WIDTH+8, platform.screen_h-32);
-	darnitRenderLineMove(sidebar_lines, 4, platform.screen_w-8, 64, platform.screen_w-8, platform.screen_h-32);
-
-	darnitTextSurfaceStringAppend(sidebar_text_title, "fancy sidebar");
-	darnitTextSurfaceStringAppend(sidebar_text_buildings, "buildings");
+	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
+	ui_pane_set_root_widget(panelist_game_sidebar.pane, ui_widget_create_vbox());
+	panelist_game_sidebar.next=NULL;
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Buildings:"), 0);
+	game_sidebar_button_build_1=ui_widget_create_button(ui_widget_create_label(font_std, "Repeater"));
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build_1, 0);
+	game_sidebar_button_build_1->event_handler->add(game_sidebar_button_build_1, game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
+	game_sidebar_button_build_2=ui_widget_create_button(ui_widget_create_label(font_std, "Scout"));
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build_2, 0);
+	game_sidebar_button_build_2->event_handler->add(game_sidebar_button_build_2, game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
+	game_sidebar_button_build_3=ui_widget_create_button(ui_widget_create_label(font_std, "Pizza hut"));
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build_3, 0);
+	game_sidebar_button_build_3->event_handler->add(game_sidebar_button_build_3, game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
 }
 
 void view_scroll(DARNIT_MOUSE mouse) {
@@ -71,13 +70,4 @@ void view_scroll(DARNIT_MOUSE mouse) {
 
 void view_draw() {
 	darnitRenderTilemap(map->layer->tilemap);
-	darnitRenderTint(0, 0, 0, 1);
-	darnitRenderRectDraw(sidebar, 1);
-	darnitRenderTint(1, 0, 0, 1);
-	darnitRenderLineDraw(sidebar_lines, 5);
-	darnitRenderBlendingEnable();
-	darnitTextSurfaceDraw(sidebar_text_title);
-	darnitTextSurfaceDraw(sidebar_text_buildings);
-	darnitRenderBlendingDisable();
-	darnitRenderTint(1, 1, 1, 1);
 }

@@ -28,6 +28,10 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	state=GAME_STATE_GAME;
 }
 
+void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	
+}
+
 int main() {
 	if(darnitInit("Muon", "muon")==NULL) {
 		fprintf(stderr, "Failed to initialize libdarnit!\n");
@@ -69,6 +73,9 @@ int main() {
 				view_scroll(mouse);
 				darnitRenderBegin();
 				view_draw();
+				darnitRenderTint(1, 0, 0, 1);
+				ui_events(&panelist_game_sidebar, 1);
+				darnitRenderTint(1, 1, 1, 1);
 				darnitRenderEnd();
 				break;
 		}
