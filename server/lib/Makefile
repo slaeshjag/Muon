@@ -1,11 +1,10 @@
 # Project: muon
 
-CC   = gcc
 LIBS =  -L"/usr/lib"
 INCS =  -I"/usr/include" -I../
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS)
-LDFLAGS = 
+CFLAGS += $(INCS) $(DEBUGFLAGS)
+LDFLAGS += 
 RM = rm -f
 
 SRCFILES=$(wildcard *.c)

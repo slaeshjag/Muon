@@ -2,8 +2,8 @@
 
 INCS =  -I../
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS) -O0 -g
-LDFLAGS = 
+CFLAGS += $(INCS) -O0 $(DEBUGFLAGS)
+LDFLAGS += 
 RM = rm -f
 
 SRCFILES=$(wildcard *.c)

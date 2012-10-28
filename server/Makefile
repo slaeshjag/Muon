@@ -7,8 +7,8 @@ LIBOUT = server.a
 STANDALONE = standalone/*.o
 LIBOBJ = lib/*.o
 DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS = $(INCS) -O0 -g -Wall
-LDFLAGS =  -lm
+CFLAGS += $(INCS) -O0 -g -Wall
+LDFLAGS +=  -lm
 RM = rm -f
 
 SRCFILES=$(wildcard *.c)
@@ -23,7 +23,7 @@ all: $(OBJFILES)
 	@echo " [ CD ] server/lib/"
 	@make -C lib/
 	@echo " [ LD ]	$(BIN)"
-	@$(CC) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
+	@$(CC) $(CFLAGS) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " [ AR ] $(LIBOUT)"
 	@$(AR) -cq $(LIBOUT) $(OBJFILES) $(LIBOBJ)
 	@echo " Done."
