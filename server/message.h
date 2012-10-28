@@ -7,9 +7,9 @@
 #define	MESSAGE_ALWAYS_MAX		1
 
 #define	MESSAGE_LOBBY_MIN		2
-#define	MESSAGE_LOBBY_MAX		3
+#define	MESSAGE_LOBBY_MAX		4
 
-#define	MESSAGE_GAME_MIN		4
+#define	MESSAGE_GAME_MIN		5
 #define	MESSAGE_GAME_MAX		5
 
 /* Messages we can always get */
@@ -37,7 +37,8 @@
 #define	MSG_SEND_MAP_END		10
 #define	MSG_SEND_MAP_PROGRESS		11
 #define	MSG_SEND_PING			12
-#define	MSG_SEND_GAME_START		13
+#define	MSG_SEND_CLIENT_READY		13
+#define	MSG_SEND_GAME_START		14
 
 
 typedef struct {

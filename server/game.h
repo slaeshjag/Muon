@@ -8,5 +8,7 @@ typedef struct {
 
 int gameInit();
 int gameKillPlayerUnits(unsigned int player);
+int gameAttemptStart();
+
 
 #endif

@@ -10,6 +10,20 @@ void messageConvert(MESSAGE *msg) {
 }
 
 
+void messageSend(int sock, unsigned int command, unsigned int arg1, unsigned int arg2) {
+	MESSAGE msg;
+
+	msg.player_ID = 0;
+	msg.command = htonl(command);
+	msg.arg[0] = htonl(arg1);
+	msg.arg[1] = htonl(arg2);
+
+	send(sock, &msg, 16, 0);
+
+	return;
+}
+
+
 int main(int argc, char **argv) {
 	MESSAGE message;
 	struct sockaddr_in address;
@@ -53,7 +67,7 @@ int main(int argc, char **argv) {
 	send(sock, &message, 16, 0);
 	send(sock, "Testspelare", strlen("Testspelare"), 0);
 
-	for (j = 0;j < 10; j++) {
+	for (j = 0;j < 20; j++) {
 		if (recv(sock, &message, 16, 0) == -1)
 			break;
 		messageConvert(&message);
@@ -66,6 +80,12 @@ int main(int argc, char **argv) {
 				break;
 			i += port;
 			fwrite(buff, port, 1, stderr);
+
+		}
+		if (j == 10) {
+			fprintf(stderr, "\nSending ready message\n");
+			messageSend(sock, 4, 1, 0);
+			messageSend(sock, 3, 100, 0);
 		}
 
 		if (port == -1)
