@@ -8,14 +8,12 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 	if (message->arg[1] > PLAYER_NAME_LEN - 1) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		playerDisconnect(player);
-		free(message->extra);
 		return;
 	}
 
 	if (message->arg[0] != SERVER_VERSION) {
 		messageSend(server->player[player].socket, player, MSG_SEND_BAD_CLIENT, SERVER_VERSION, 0, NULL);
 		playerDisconnect(player);
-		free(message->extra);
 		return;
 	}
 
