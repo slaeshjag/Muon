@@ -2,7 +2,7 @@
 
 #include "muon.h"
 #include "view.h"
-#include "../server/server_api/server.h"
+#include "client.h"
 
 UI_WIDGET *chatbuf;
 UI_WIDGET *textentry;
@@ -30,6 +30,7 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	v=connect_server_entry_port->get_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT);
 	int port=atoi(v.p);
 	printf("Server: %s:%i\n", host, port);
+	client_init(host, port);
 	state=GAME_STATE_GAME;
 }
 
@@ -78,6 +79,7 @@ int main() {
 				darnitRenderEnd();
 				break;
 			case GAME_STATE_GAME:
+				client_check_incomming();
 				mouse=darnitMouseGet();
 				view_scroll(mouse);
 				darnitRenderBegin();
