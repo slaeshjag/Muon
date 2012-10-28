@@ -2,6 +2,7 @@
 #define	__SERVER_H__
 
 #define	SERVER_PORT		56789
+#define	SERVER_VERSION		0x10000
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -2,7 +2,7 @@
 #define	__MESSAGE_H__
 
 #define	MESSAGE_BUFFER_INITIAL		2048
-#define	MESSAGE_MAX_PAYLOAD		256
+#define	MESSAGE_MAX_PAYLOAD		512
 
 #define	MESSAGE_ALWAYS_MAX		1
 
@@ -18,7 +18,8 @@
 
 /* Messages we can only get in lobby mode */
 #define	MSG_RECV_IDENTIFY		2
-#define	MSG_RECV_READY			3
+#define	MSG_RECV_MAP_PROGRESS		3
+#define	MSG_RECV_READY			4
 
 /* Messages we can only get in-game */
 
@@ -26,14 +27,17 @@
 #define	MSG_SEND_SERVER_FULL		0
 #define	MSG_SEND_REQUEST_IDENTIFY	1
 #define	MSG_SEND_ILLEGAL_COMMAND	2
-#define	MSG_SEND_KICKED			3
-#define	MSG_SEND_CHAT			4
-#define	MSG_SEND_JOIN			5
-#define	MSG_SEND_LEAVE			6
-#define	MSG_SEND_MAP_BEGIN		7
-#define	MSG_SEND_MAP_CHUNK		8
-#define	MSG_SEND_MAP_END		9
-#define	MSG_SEND_GAME_START		10
+#define	MSG_SEND_BAD_CLIENT		3
+#define	MSG_SEND_KICKED			4
+#define	MSG_SEND_CHAT			5
+#define	MSG_SEND_JOIN			6
+#define	MSG_SEND_LEAVE			7
+#define	MSG_SEND_MAP_BEGIN		8
+#define	MSG_SEND_MAP_CHUNK		9
+#define	MSG_SEND_MAP_END		10
+#define	MSG_SEND_MAP_PROGRESS		11
+#define	MSG_SEND_PING			12
+#define	MSG_SEND_GAME_START		13
 
 
 typedef struct {
