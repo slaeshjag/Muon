@@ -18,12 +18,14 @@ void client_message_convert_recv(MESSAGE_RAW *message) {
 	message->arg_2=darnitUtilNtohl(message->arg_2);
 }
 
-void client_check_incomming() {
+int client_check_incomming() {
 	if(msg_recv.command&MSG_PAYLOAD_BIT) {
 		//download message payload
 		int s=darnitSocketRecvTry(sock, msg_recv_payload_offset, msg_recv.arg_2-(msg_recv_payload_offset-msg_recv_payload));
-		if(s>0)
-			printf("read %i bytes of %i\n", s, msg_recv.arg_2);
+		if(s==-1) {
+			sock=darnitSocketClose(sock);
+			return -1;
+		}
 		if(s==msg_recv.arg_2-(msg_recv_payload_offset-msg_recv_payload)) {
 			msg_recv_payload_offset=msg_recv_payload;
 			if(client_message_handler)
@@ -35,6 +37,10 @@ void client_check_incomming() {
 	} else {
 		//download message
 		int s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW)-(msg_recv_offset-(void*)&msg_recv));
+		if(s==-1) {
+			sock=darnitSocketClose(sock);
+			return -1;
+		}
 		if(s==sizeof(MESSAGE_RAW)-(msg_recv_offset-(void *)&msg_recv)) {
 			msg_recv_offset=&msg_recv;
 			client_message_convert_recv(&msg_recv);
@@ -46,6 +52,7 @@ void client_check_incomming() {
 			msg_recv_offset+=s;
 		}
 	}
+	return 0;
 }
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {

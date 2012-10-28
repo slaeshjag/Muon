@@ -20,6 +20,7 @@ void view_init() {
 	input_name_button->event_handler->add(input_name_button, input_name_button_click, UI_EVENT_TYPE_UI);
 	
 	//Connect to server
+	UI_PROPERTY_VALUE v={.p=NULL};
 	panelist_connect_server.pane=ui_pane_create(16, 16, 256, 128, NULL);
 	ui_pane_set_root_widget(panelist_connect_server.pane, ui_widget_create_vbox());
 	panelist_connect_server.next=NULL;
@@ -31,6 +32,10 @@ void view_init() {
 	connect_server_button=ui_widget_create_button(ui_widget_create_label(font_std, "Connect"));
 	ui_vbox_add_child(panelist_connect_server.pane->root_widget, connect_server_button, 0);
 	connect_server_button->event_handler->add(connect_server_button, connect_server_button_click, UI_EVENT_TYPE_UI);
+	v.p="localhost";
+	connect_server_entry_host->set_prop(connect_server_entry_host, UI_ENTRY_PROP_TEXT, v);
+	v.p="1337";
+	connect_server_entry_port->set_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT, v);
 	
 	//Game
 	//old code, should be converted to UI

@@ -13,6 +13,6 @@ int player_id;
 void (*client_message_handler)(MESSAGE_RAW *, unsigned char *);
 
 int client_init(char *host, int port);
-void client_check_incomming();
+int client_check_incomming();
 
 #endif

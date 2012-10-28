@@ -24,7 +24,7 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
 	p->surface=NULL;
 	p->font=font;
-	memset(p->text, 0, UI_ENTRY_LENGTH);
+	memset(p->text, 0, UI_ENTRY_LENGTH+1);
 	p->offset=p->text;
 	p->cursor_pos=0;
 	p->cursor=0;
@@ -76,7 +76,17 @@ void ui_entry_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 }
 
 void ui_entry_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
-	
+	struct UI_ENTRY_PROPERTIES *p=widget->properties;
+	switch(prop) {
+		case UI_ENTRY_PROP_TEXT:
+			strncpy(p->text, value.p, UI_ENTRY_LENGTH);
+			p->offset=p->text;
+			for(; darnitFontGetStringWidthPixels(p->font, p->offset)>widget->w; p->offset++);
+			p->cursor_pos=strlen(p->text);
+			darnitTextSurfaceReset(p->surface);
+			darnitTextSurfaceStringAppend(p->surface, p->offset);
+			break;
+	}
 }
 
 UI_PROPERTY_VALUE ui_entry_get_prop(UI_WIDGET *widget, int prop) {

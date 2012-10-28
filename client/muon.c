@@ -4,12 +4,6 @@
 #include "view.h"
 #include "client.h"
 
-UI_WIDGET *chatbuf;
-UI_WIDGET *textentry;
-
-char textbuf[256]={};
-char *textp=textbuf;
-
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;	
@@ -36,7 +30,7 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 
 int main() {
 	if(darnitInit("Muon", "muon")==NULL) {
-		fprintf(stderr, "lol\n");
+		fprintf(stderr, "Failed to initialize libdarnit!\n");
 		return 1;
 	}
 	platform=darnitPlatformGet();
@@ -47,19 +41,6 @@ int main() {
 	
 	ui_init();
 	view_init();
-	
-	/*UI_PANE *chatpane=ui_pane_create(10, 10, 256, 256, NULL);
-	struct UI_PANE_LIST panelist={chatpane, NULL};
-	chatbuf=ui_widget_create_label(font_std, "");
-	UI_WIDGET *vbox=ui_widget_create_vbox();
-	UI_WIDGET *sendbutton=ui_widget_create_button_text("Send");
-	textentry=ui_widget_create_entry(font_std);
-	ui_pane_set_root_widget(chatpane, vbox);
-	ui_vbox_add_child(vbox, ui_widget_create_label(font_std, "Muon Chat"), 0);
-	ui_vbox_add_child(vbox, chatbuf, 1);
-	ui_vbox_add_child(vbox, textentry, 0);
-	ui_vbox_add_child(vbox, sendbutton, 0);
-	sendbutton->event_handler->add(sendbutton, sendbutton_click , UI_EVENT_TYPE_UI);*/
 	
 	while(1) {
 		serverLoop(darnitTimeLastFrameTook());
@@ -79,7 +60,11 @@ int main() {
 				darnitRenderEnd();
 				break;
 			case GAME_STATE_GAME:
-				client_check_incomming();
+				if(client_check_incomming()==-1) {
+					printf("Server disconnected!\n");
+					state=GAME_STATE_CONNECT_SERVER;
+					break;
+				}
 				mouse=darnitMouseGet();
 				view_scroll(mouse);
 				darnitRenderBegin();
