@@ -147,6 +147,7 @@ int networkReceiveTry(SERVER_SOCKET *sock, char *buff, int buff_len) {
 		recv(sock->socket, buff, buff_len, 0);
 		return t;
 	}
+
 	if (t > -1)		/* Should be impossible */
 		return 0;
 	if (errno == EAGAIN || errno == EWOULDBLOCK)

@@ -8,6 +8,8 @@
 #define	PLAYER_UNUSED				0
 #define	PLAYER_WAITING_FOR_IDENTIFY		1
 #define	PLAYER_IN_LOBBY				2
+#define	PLAYER_READY_TO_START			3
+#define	PLAYER_IN_GAME				4
 
 #define	PLAYER_PROCESS_NOTHING			0
 #define	PLAYER_PROCESS_MSG			1
@@ -22,6 +24,7 @@ typedef struct {
 
 typedef struct {
 	PLAYER_MAP		*map;
+	unsigned int		map_progress;
 	int			status;
 	SERVER_SOCKET		*socket;
 	time_t			id_req_send;

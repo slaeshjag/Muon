@@ -47,6 +47,7 @@ int lobbyPoll() {
 	server->player[slot].socket = socket;
 	server->player[slot].id_req_send = time(NULL);
 	*server->player[slot].name = 0;
+	server->player[slot].map_progress = 0;
 
 	server->player[slot].process_recv = PLAYER_PROCESS_NOTHING;
 	server->player[slot].process_send = PLAYER_PROCESS_NOTHING;
