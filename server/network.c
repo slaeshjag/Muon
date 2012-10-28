@@ -161,7 +161,7 @@ int networkSend(SERVER_SOCKET *sock, char *buff, int buff_len) {
 	if (!sock)
 		return -1;
 	
-	t = send(sock->socket, buff, buff_len, 0);
+	t = send(sock->socket, buff, buff_len, MSG_NOSIGNAL);
 
 	if (t >= 0)
 		return t;

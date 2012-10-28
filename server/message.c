@@ -26,6 +26,8 @@ MESSAGE_BUFFER *messageBufferDelete(MESSAGE_BUFFER *msg_buf) {
 	if (msg_buf == NULL)
 		return NULL;
 
+	messageBufferFlush(msg_buf);
+
 	free(msg_buf->message);
 	free(msg_buf);
 	return NULL;
@@ -72,9 +74,12 @@ int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 
 
 int messageBufferFlush(MESSAGE_BUFFER *msg_buf) {
+	MESSAGE msg;
 	if (msg_buf == NULL)
 		return -1;
-	msg_buf->write_pos = msg_buf->read_pos = 0;
+	
+	while (messageBufferPop(msg_buf, &msg) > -1)
+		free(msg.extra);
 
 	return 0;
 }

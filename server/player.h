@@ -25,6 +25,7 @@ typedef struct {
 	int			status;
 	SERVER_SOCKET		*socket;
 	time_t			id_req_send;
+	time_t			last_ping_sent;
 	MESSAGE_BUFFER		*msg_buf;
 	int			process_recv;
 	MESSAGE			process_msg_recv;

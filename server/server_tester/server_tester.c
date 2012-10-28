@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	struct sockaddr_in address;
 	struct hostent *hp;
 	char buff[256];
-	int sock, port, i;
+	int sock, port, i, a, j;
 	
 	if (argc <3) {
 		printf("Usage: %s <host> <port>\n", argv[0]);
@@ -53,7 +53,26 @@ int main(int argc, char **argv) {
 	send(sock, &message, 16, 0);
 	send(sock, "Testspelare", strlen("Testspelare"), 0);
 
-	sleep(8);
-	
+	for (j = 0;j < 10; j++) {
+		if (recv(sock, &message, 16, 0) == -1)
+			break;
+		messageConvert(&message);
+		fprintf(stderr, "\n\nMessage %i from player %i: %i %i;; ", message.command, message.player_ID, message.arg[0], message.arg[1]);
+
+		for (i = 0; i < message.arg[1]; ) {
+			a = (message.arg[1] - i > 256) ? 256 : message.arg[1] - i;
+			
+			if ((port = recv(sock, buff, a, 0)) == -1)
+				break;
+			i += port;
+			fwrite(buff, port, 1, stderr);
+		}
+
+		if (port == -1)
+			break;
+	}
+
+	close(sock);
+
 	return 0;
 }

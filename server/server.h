@@ -4,6 +4,8 @@
 #define	SERVER_PORT		56789
 #define	SERVER_VERSION		0x10000
 
+#define	SERVER_PING_INTERVAL	2
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,6 +38,13 @@ typedef struct SERVER_UNIT SERVER_UNIT;
 
 
 typedef struct {
+	const char		*path;
+	void			*data;
+	unsigned int		data_len;
+} SERVER_MAP;
+
+
+typedef struct {
 	SERVER_UNIT		*unit;
 	MESSAGE_HANDLER		message_handler;
 	unsigned int		w;
@@ -49,6 +58,7 @@ typedef struct {
 	GAME			game;
 	SERVER_SOCKET		*accept;
 	void			*map_data;
+	SERVER_MAP		map_c;
 } SERVER;
 
 SERVER *server;

@@ -36,6 +36,10 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 		}
 	
 	fprintf(stderr, "Debug: Player '%s' joined the game\n", server->player[player].name);
+	fprintf(stderr, "Sending map...\n");
+
+	lobbyMapSend(player);
+
 	return;
 }
 

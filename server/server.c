@@ -1,6 +1,48 @@
 #include "server.h"
 
 
+int serverInitMap(const char *path) {
+	FILE *fp;
+
+
+	if ((fp = fopen(path, "rb")) == NULL) {
+		fprintf(stderr, "Unable to open map %s for cache", path);
+		return -1;
+	}
+
+	fseek(fp, 0, SEEK_END);
+	server->map_c.data_len = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+
+	if ((server->map_c.data = malloc(server->map_c.data_len)) == NULL) {
+		fprintf(stderr, "Unable to malloc for map cache\n");
+		fclose(fp);
+		return -1;
+	}
+
+	fread(server->map_c.data, server->map_c.data_len, 1, fp);
+	fclose(fp);
+
+	for (;;) {
+		if (strstr(path, "/") != NULL)
+			path = strstr(path, "/") + 1;
+		else
+			break;
+	}
+
+	for (;;) {
+		if (strstr(path, "\\") != NULL)
+			path = strstr(path, "\\") + 1;
+		else
+			break;
+	}
+
+	server->map_c.path = path;
+
+	return 0;
+}
+
+
 int serverPowerGet(int owner, int x, int y) {
 	return server->player[owner].map[x + y * server->w].power;
 }
@@ -44,11 +86,13 @@ SERVER *serverInit(const char *fname, unsigned int players, int port) {
 
 	for (i = 0; i < map_w * map_h; i++)
 		server->map[i] = NULL;
-	
+
 	server->unit = NULL;
 	server->w = map_w;
 	server->h = map_h;
 	server->players = players;
+	if (serverInitMap(fname) < 0)
+		server = serverDestroy();
 
 	return server;
 }
@@ -56,6 +100,9 @@ SERVER *serverInit(const char *fname, unsigned int players, int port) {
 
 SERVER *serverDestroy() {
 	int i;
+	
+	if (!server)
+		return NULL;
 
 	for (i = 0; i < server->w * server->h; i++) {
 		free(server->map[i]);
@@ -68,8 +115,37 @@ SERVER *serverDestroy() {
 	ldmzFree(server->map_data);
 
 	free(server);
+	server = NULL;
 
 	return NULL;
+}
+
+
+void serverSendPing() {
+	time_t now;
+	int i;
+	MESSAGE msg;
+
+	msg.command = MSG_SEND_PING;
+	msg.arg[0] = msg.arg[1] = 0;
+
+	now = time(NULL);
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status < PLAYER_IN_LOBBY)
+			continue;
+
+		if (now - server->player[i].last_ping_sent >= SERVER_PING_INTERVAL) {
+			msg.command = MSG_SEND_PING;
+			msg.arg[0] = msg.arg[1] = 0;
+			msg.player_ID = i;
+			msg.extra = NULL;
+			messageBufferPush(server->player[i].msg_buf, &msg);
+			server->player[i].last_ping_sent = now;
+		}
+	}
+
+	return;
 }
 
 
@@ -123,9 +199,8 @@ void serverProcessNetwork() {
 			}
 		}
 
-		if (t < 0) {
+		if (t < 0)
 			playerDisconnect(i);
-		}
 	}
 
 
@@ -206,6 +281,11 @@ void serverProcessNetwork() {
 			msg.arg[1] = htonl(msg_c.arg[1]);
 		}
 
+		if (t == -1) {
+			playerDisconnect(i);
+			continue;
+		}
+
 	}
 		
 
@@ -220,6 +300,7 @@ int serverLoop(unsigned int d_ms) {
 		lobbyPoll();
 		serverProcessNetwork();
 		playerCheckIdentify();
+		serverSendPing();
 	}
 
 	return 0;
