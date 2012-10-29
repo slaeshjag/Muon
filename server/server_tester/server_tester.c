@@ -73,15 +73,16 @@ int main(int argc, char **argv) {
 		messageConvert(&message);
 		fprintf(stderr, "\n\nMessage %i from player %i: %i %i;; ", message.command, message.player_ID, message.arg[0], message.arg[1]);
 
-		for (i = 0; i < message.arg[1]; ) {
-			a = (message.arg[1] - i > 256) ? 256 : message.arg[1] - i;
-			
-			if ((port = recv(sock, buff, a, 0)) <= 0)
-				break;
-			i += port;
-			fwrite(buff, port, 1, stderr);
+		if (j > 0)
+			for (i = 0; i < message.arg[1]; ) {
+					a = (message.arg[1] - i > 256) ? 256 : message.arg[1] - i;
+				
+				if ((port = recv(sock, buff, a, 0)) <= 0)
+					break;
+				i += port;
+				fwrite(buff, port, 1, stderr);
 
-		}
+			}
 		if (j == 10) {
 			fprintf(stderr, "\nSending ready message\n");
 			messageSend(sock, 4, 1, 0);

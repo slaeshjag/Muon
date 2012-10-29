@@ -41,7 +41,7 @@ typedef struct {
 /* No arguments, no data. The message is fatal. */
 #define	MSG_RECV_SERVER_FULL		0x000
 
-/* arg_1 is your player ID. Requires you to send an identify message */
+/* arg_1 is your player ID. arg_2 is the maximum amount of player on the map. Requires you to send an identify message */
 #define	MSG_RECV_REQUEST_IDENTIFY	0x001
 
 /* No arguments. Not very helpful, but if you get it before you are accepted into the lobby, it is fatal */

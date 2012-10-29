@@ -15,7 +15,10 @@ typedef struct {
 } UNIT_DEF;
 
 int unitLOS(int unit);
- int unitAdd(int owner, int type, int x, int y) ;
+int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y);
+int unitAdd(int owner, int type, int x, int y);
+int unitRemove(int x, int y);
+
 
 
 #endif
