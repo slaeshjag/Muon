@@ -34,37 +34,36 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 }
 
 int client_check_incomming() {
-	if(msg_recv.command&MSG_PAYLOAD_BIT) {
-		//download message payload
-		int s=darnitSocketRecvTry(sock, msg_recv_payload_offset, msg_recv.arg_2-(msg_recv_payload_offset-msg_recv_payload));
-		if(s==-1) {
-			sock=darnitSocketClose(sock);
-			return -1;
-		}
-		if(s==msg_recv.arg_2-(msg_recv_payload_offset-msg_recv_payload)) {
-			msg_recv_payload_offset=msg_recv_payload;
-			if(client_message_handler)
-				client_message_handler(&msg_recv, msg_recv_payload);
-			msg_recv.command=0;
-		} else if(s>0) {
-			msg_recv_payload_offset+=s;
-		}
-	} else {
-		//download message
-		int s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW)-(msg_recv_offset-(void*)&msg_recv));
-		if(s==-1) {
-			sock=darnitSocketClose(sock);
-			return -1;
-		}
-		if(s==sizeof(MESSAGE_RAW)-(msg_recv_offset-(void *)&msg_recv)) {
-			msg_recv_offset=&msg_recv;
-			client_message_convert_recv(&msg_recv);
-			msg_recv_payload_offset=msg_recv_payload;
-			printf("message: 0x%x\n", msg_recv.command);
-			if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
-				client_message_handler(&msg_recv, NULL);
-		} else if(s>0) {
-			msg_recv_offset+=s;
+	int s, i;
+	for(i=0; i<1000; i++) {
+		if(msg_recv.command&MSG_PAYLOAD_BIT) {
+			//download message payload
+			if((s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2))) {
+				if(s==0)
+					return 0;
+				if(s==-1) {
+					sock=darnitSocketClose(sock);
+					return -1;
+				}
+				printf("payload size %i\n", msg_recv.arg_2);
+				if(client_message_handler)
+					client_message_handler(&msg_recv, msg_recv_payload);
+				msg_recv.command=0;
+			}
+		} else {
+			//download message
+			if((s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW)))) {
+				if(s==0)
+					return 0;
+				if(s==-1) {
+					sock=darnitSocketClose(sock);
+					return -1;
+				}
+				client_message_convert_recv(&msg_recv);
+				printf("message: 0x%x\n", msg_recv.command);
+				if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
+					client_message_handler(&msg_recv, NULL);
+			}
 		}
 	}
 	return 0;
