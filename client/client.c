@@ -5,6 +5,8 @@
 #include "client.h"
 #include "view.h"
 
+#define PONG case MSG_RECV_PING: client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL); break
+
 void client_message_convert_send(MESSAGE_RAW *message) {
 	message->player_id=darnitUtilHtonl(message->player_id);
 	message->command=darnitUtilHtonl(message->command);
@@ -71,10 +73,7 @@ int client_check_incomming() {
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	char *chatmsg;
 	switch(msg->command) {
-		case MSG_RECV_PING:
-			printf("PING!\n");
-			client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL);
-			break;
+		PONG;
 		case MSG_RECV_CHAT:
 			chatmsg=(char *)malloc(msg->arg_2+1);
 			memcpy(chatmsg, payload, msg->arg_2);
@@ -87,10 +86,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 
 void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
-		case MSG_RECV_PING:
-			printf("PING!\n");
-			client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL);
-			break;
+		PONG;
 		case MSG_RECV_GAME_START:
 			printf("Game starts in %i\n", msg->arg_1);
 			UI_PROPERTY_VALUE v={.p=countdown_text};
@@ -110,6 +106,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static char *filename=NULL;
 	static DARNIT_FILE *f;
 	switch(msg->command) {
+		PONG;
 		case MSG_RECV_JOIN:
 			if(!payload)
 				break;
