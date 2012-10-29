@@ -25,7 +25,7 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	int port=atoi(v.p);
 	printf("Server: %s:%i\n", host, port);
 	client_init(host, port);
-	state=GAME_STATE_GAME;
+	state=GAME_STATE_COUNTDOWN;
 }
 
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -40,7 +40,8 @@ int main() {
 	platform=darnitPlatformGet();
 	DARNIT_MOUSE mouse;
 	
-	serverInit("map.ldi", 1, 1337);
+	serverInit();
+	serverStart("map.ldi", 1, 1337);
 	state=GAME_STATE_INPUT_NAME;
 	
 	ui_init();
@@ -60,6 +61,18 @@ int main() {
 				darnitRenderBegin();
 				darnitRenderTint(1, 0, 0, 1);
 				ui_events(&panelist_connect_server, 1);
+				darnitRenderTint(1, 1, 1, 1);
+				darnitRenderEnd();
+				break;
+			case GAME_STATE_COUNTDOWN:
+				if(client_check_incomming()==-1) {
+					printf("Server disconnected!\n");
+					state=GAME_STATE_CONNECT_SERVER;
+					break;
+				}
+				darnitRenderBegin();
+				darnitRenderTint(1, 0, 0, 1);
+				ui_events(&panelist_countdown, 1);
 				darnitRenderTint(1, 1, 1, 1);
 				darnitRenderEnd();
 				break;

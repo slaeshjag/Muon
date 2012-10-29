@@ -2,10 +2,6 @@
 #include "view.h"
 
 void view_init() {
-	map=darnitMapLoad("maps/map.ldmz");
-	map_w=map->layer->tilemap->w*map->layer->tile_w;
-	map_h=map->layer->tilemap->h*map->layer->tile_h;
-	
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
 	
 	//Input player name
@@ -36,6 +32,13 @@ void view_init() {
 	connect_server_entry_host->set_prop(connect_server_entry_host, UI_ENTRY_PROP_TEXT, v);
 	v.p="1337";
 	connect_server_entry_port->set_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT, v);
+	
+	//Countdown
+	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
+	countdown_text[0]='5';
+	countdown_text[1]=0;
+	ui_pane_set_root_widget(panelist_countdown.pane, ui_widget_create_label(font_std, countdown_text));
+	panelist_game_sidebar.next=NULL;
 	
 	//Game
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);

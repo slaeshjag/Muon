@@ -5,6 +5,8 @@ all:
 	@make -C server/
 	@echo " [ CD ] client/"
 	@make -C client/
+	@echo " [ CD ] res/"
+	@make -C res/
 	
 clean:
 	@echo " [ CD ] server/"

@@ -3,6 +3,7 @@
 
 #include "muon.h"
 #include "client.h"
+#include "view.h"
 
 void client_message_convert_send(MESSAGE_RAW *message) {
 	message->player_id=darnitUtilHtonl(message->player_id);
@@ -16,6 +17,18 @@ void client_message_convert_recv(MESSAGE_RAW *message) {
 	message->command=darnitUtilNtohl(message->command);
 	message->arg_1=darnitUtilNtohl(message->arg_1);
 	message->arg_2=darnitUtilNtohl(message->arg_2);
+}
+
+void client_message_send(int player_id, int command, int arg_1, int arg_2, char *payload) {
+	MESSAGE_RAW msg_send;
+	msg_send.player_id=player_id;
+	msg_send.command=command;
+	msg_send.arg_1=arg_1;
+	msg_send.arg_2=arg_2;
+	client_message_convert_send(&msg_send);
+	darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
+	if(payload)
+		darnitSocketSend(sock, payload, arg_2);
 }
 
 int client_check_incomming() {
@@ -56,24 +69,42 @@ int client_check_incomming() {
 }
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
-	MESSAGE_RAW msg_send;
 	switch(msg->command) {
 		case MSG_RECV_PING:
 			printf("PING!\n");
-			msg_send.player_id=player_id;
-			msg_send.command=MSG_SEND_PONG;
-			msg_send.arg_1=msg_send.arg_2=0;
-			client_message_convert_send(&msg_send);
-			darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
+			client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL);
+			break;
+		case MSG_RECV_CHAT:
+			printf("Chat: \n");
+	}
+}
+
+void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
+	switch(msg->command) {
+		case MSG_RECV_PING:
+			printf("PING!\n");
+			client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL);
+			break;
+		case MSG_RECV_GAME_START:
+			printf("Game starts in %i\n", msg->arg_1);
+			UI_PROPERTY_VALUE v={.p=countdown_text};
+			countdown_text[0]=(char)(msg->arg_1)+0x30;
+			panelist_countdown.pane->root_widget->set_prop(panelist_countdown.pane->root_widget, UI_LABEL_PROP_TEXT, v);
+			if(!msg->arg_1) {
+				state=GAME_STATE_GAME;
+				client_message_handler=client_game_handler;
+			}
 			break;
 	}
 }
 
 void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static char *filename=NULL;
-	static FILE *f;
+	static DARNIT_FILE *f;
 	switch(msg->command) {
 		case MSG_RECV_JOIN:
+			memcpy(players[msg->player_id*32], payload, msg->arg_2);
+			printf("Player %s joined the game\n", players[msg->player_id*32]);
 			break;
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
@@ -83,30 +114,31 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			filename=malloc(msg->arg_2+1);
 			memcpy(filename, payload, msg->arg_2);
 			filename[msg->arg_2]=0;
-			f=fopen(filename, "wb");
+			f=darnitFileOpen(filename, "wb");
 			printf("Started map download of file %s\n", filename);
 			break;
 		case MSG_RECV_MAP_CHUNK:
-			fwrite(payload, msg->arg_2, 1, f);
+			darnitFileWrite(payload, msg->arg_2, f);
 			break;
 		case MSG_RECV_MAP_END:
-			fclose(f);
+			darnitFileClose(f);
 			printf("Map %s successfully downloaded!\n", filename);
-			client_message_handler=client_game_handler;
+			client_message_send(player_id, MSG_SEND_MAP_PROGRESS, 100, 0, NULL);
+			client_message_send(player_id, MSG_SEND_READY, 1, 0, NULL);
+			darnitFSMount(filename);
+			map=darnitMapLoad("maps/map.ldmz");
+			map_w=map->layer->tilemap->w*map->layer->tile_w;
+			map_h=map->layer->tilemap->h*map->layer->tile_h;
+			state=GAME_STATE_COUNTDOWN;
+			client_message_handler=client_countdown_handler;
 			break;
 	}
 }
 
 void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
-	MESSAGE_RAW msg_send;
 	player_id=msg->player_id;
-	msg_send.player_id=player_id;
-	msg_send.command=MSG_SEND_IDENTIFY;
-	msg_send.arg_1=API_VERSION;
-	msg_send.arg_2=strnlen(player_name, 32);
-	client_message_convert_send(&msg_send);
-	darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
-	darnitSocketSend(sock, player_name, strnlen(player_name, 32));
+	players=(char **)calloc(msg->arg_2, 32);
+	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strnlen(player_name, 32), player_name);
 	client_message_handler=client_download_map;
 }
 

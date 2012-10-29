@@ -9,6 +9,7 @@ void *msg_recv_offset;
 unsigned char msg_recv_payload[512];
 unsigned char *msg_recv_payload_offset;
 int player_id;
+char *players;
 
 void (*client_message_handler)(MESSAGE_RAW *, unsigned char *);
 
