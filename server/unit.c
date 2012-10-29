@@ -2,12 +2,23 @@
 
 
 int unitLOS(int type) {
-	return 1;
+	if (type < 0 || type > UNITS_DEFINED)
+		return 0;
+	return unit_los[type];
 }
 
 
 int unitHPMax(int type) {
-	return 1;
+	if (type < 0 || type > UNITS_DEFINED)
+		return 0;
+	return unit_maxhp[type];
+}
+
+
+int unitRange(int type) {
+	if (type < 0 || type > UNITS_DEFINED)
+		return 0;
+	return unit_range[type];
 }
 
 
@@ -40,6 +51,7 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->shield = 0;		/* Don't spawn with any shield! */
 	unit->powered = serverPowerGet(owner, x, y);
 	unit->status = 0;		/* Nothing yet? */
+	unit->updating = 0;
 	unit->next = NULL;
 
 
@@ -68,6 +80,8 @@ int unitAdd(int owner, int type, int x, int y) {
 
 	server->map[x + y * server->w] = unit;
 	playerCalcLOS(server->player[owner].team, owner, x + y * server->w, 1);
+	if (type == UNIT_GENERATOR)
+		playerCalcSetPower(server->player[owner].team, owner, x + y * server->w, 1);
 
 	return 0;
 }

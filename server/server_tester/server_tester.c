@@ -67,13 +67,13 @@ int main(int argc, char **argv) {
 	send(sock, &message, 16, 0);
 	send(sock, "Testspelare", strlen("Testspelare"), 0);
 
-	for (j = 0;j < 30; j++) {
+	for (j = 0;; j++) {
 		if (recv(sock, &message, 16, 0) <= 0)
 			break;
 		messageConvert(&message);
 		fprintf(stderr, "\n\nMessage %i from player %i: %i %i;; ", message.command, message.player_ID, message.arg[0], message.arg[1]);
 
-		if (j > 0)
+		if (message.command & 0x100)
 			for (i = 0; i < message.arg[1]; ) {
 					a = (message.arg[1] - i > 256) ? 256 : message.arg[1] - i;
 				
@@ -85,8 +85,7 @@ int main(int argc, char **argv) {
 			}
 		if (j == 10) {
 			fprintf(stderr, "\nSending ready message\n");
-			messageSend(sock, 4, 1, 0);
-			messageSend(sock, 3, 100, 0);
+			messageSend(sock, 4, 1, 100);
 		}
 
 		if (port <= 0)

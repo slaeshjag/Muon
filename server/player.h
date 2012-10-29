@@ -52,7 +52,7 @@ void playerDisconnect(unsigned int player);
 void playerCheckIdentify();
 void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned int arg1, unsigned int arg2, void *data);
 int playerSlot();
-int playerCalcLOS(unsigned int team, unsigned int player, unsigned int index, int mode);
+int playerCalcLOS(unsigned int team, unsigned int player, int index, int mode);
 
 
 #endif

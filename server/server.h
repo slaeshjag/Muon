@@ -33,6 +33,7 @@ struct SERVER_UNIT {
 	unsigned int		powered;
 	unsigned int		status;
 	unsigned int		target;
+	unsigned int		updating;
 	struct SERVER_UNIT	*next;
 };
 

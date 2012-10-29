@@ -4,6 +4,7 @@
 #define	API_VERSION			0x10000
 #define	SERVER_PORT_DEFAULT		56789
 
+#include "building.h"
 #include "message.h"
 #include "error.h"
 

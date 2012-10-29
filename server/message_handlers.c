@@ -33,16 +33,9 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 			messageBufferPush(server->player[player].msg_buf, &msg);
 
 			msg.player_ID = i;
-			msg.command = MSG_SEND_MAP_PROGRESS;
-			msg.arg[0] = server->player[i].map_progress;
-			msg.arg[1] = 0;
-			msg.extra = NULL;
-			messageBufferPush(server->player[player].msg_buf, &msg);
-			
-			msg.player_ID = i;
 			msg.command = MSG_SEND_CLIENT_READY;
 			msg.arg[0] = (server->player[i].status == PLAYER_READY_TO_START) ? 1 : 0;
-			msg.arg[1] = 0;
+			msg.arg[1] = server->player[i].map_progress;
 			msg.extra = NULL;
 			messageBufferPush(server->player[player].msg_buf, &msg);
 		}
@@ -66,19 +59,18 @@ void messageHandlerChat(unsigned int player, MESSAGE *message) {
 }
 
 
-void messageHandlerMapProgress(unsigned int player, MESSAGE *message) {
-	playerMessageBroadcast(player, MSG_SEND_MAP_PROGRESS, message->arg[0], 0, NULL);
-	server->player[player].map_progress = message->arg[0];
-
-	if (message->arg[0] == 100)
-		gameAttemptStart();
+void messageHandlerPlayerInfo(unsigned int player, MESSAGE *message) {
+	playerMessageBroadcast(player, MSG_SEND_PLAYER_INFO, message->arg[0], 0, NULL);
+	
+	server->player[player].team = message->arg[0] - 1;
 
 	return;
 }
 
 
 void messageHandlerPlayerReady(unsigned int player, MESSAGE *message) {
-	playerMessageBroadcast(player, MSG_SEND_CLIENT_READY, message->arg[0], 0, NULL);
+	playerMessageBroadcast(player, MSG_SEND_CLIENT_READY, message->arg[0], message->arg[1], NULL);
+	server->player[player].map_progress = message->arg[1];
 
 	if (!message->arg[0]) {
 		server->player[player].status = PLAYER_IN_LOBBY;
@@ -109,7 +101,7 @@ int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
 	server->message_handler.handle[MSG_RECV_IDENTIFY] 	= messageHandlerIdentify;
-	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerMapProgress;
+	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerPlayerInfo;
 	server->message_handler.handle[MSG_RECV_READY] 		= messageHandlerPlayerReady;
 	server->message_handler.handle[5] 			= messageHandlerDummy;
 	server->message_handler.handle[6] 			= messageHandlerDummy;
