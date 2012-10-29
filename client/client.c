@@ -69,13 +69,19 @@ int client_check_incomming() {
 }
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
+	char *chatmsg;
 	switch(msg->command) {
 		case MSG_RECV_PING:
 			printf("PING!\n");
 			client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL);
 			break;
 		case MSG_RECV_CHAT:
-			printf("Chat: \n");
+			chatmsg=(char *)malloc(msg->arg_2+1);
+			memcpy(chatmsg, payload, msg->arg_2);
+			chatmsg[msg->arg_2]=0;
+			printf("<%s> %s\n", &player_names[msg->player_id*32], chatmsg);
+			free(chatmsg);
+			break;
 	}
 }
 
@@ -89,6 +95,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			printf("Game starts in %i\n", msg->arg_1);
 			UI_PROPERTY_VALUE v={.p=countdown_text};
 			countdown_text[0]=(char)(msg->arg_1)+0x30;
+			countdown_text[1]=0;
 			panelist_countdown.pane->root_widget->set_prop(panelist_countdown.pane->root_widget, UI_LABEL_PROP_TEXT, v);
 			if(!msg->arg_1) {
 				state=GAME_STATE_GAME;
@@ -99,18 +106,22 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 }
 
 void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
+	static int filesize_bytes=0, downloaded_bytes=0;
 	static char *filename=NULL;
 	static DARNIT_FILE *f;
 	switch(msg->command) {
 		case MSG_RECV_JOIN:
-			memcpy(players[msg->player_id*32], payload, msg->arg_2);
-			printf("Player %s joined the game\n", players[msg->player_id*32]);
+			if(!payload)
+				break;
+			memcpy(&player_names[msg->player_id*32], payload, msg->arg_2);
+			printf("Player %s joined the game\n", &player_names[msg->player_id*32]);
 			break;
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
 				break;
 			if(!filename)
 				free(filename);
+			filesize_bytes=msg->arg_1;
 			filename=malloc(msg->arg_2+1);
 			memcpy(filename, payload, msg->arg_2);
 			filename[msg->arg_2]=0;
@@ -118,13 +129,18 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			printf("Started map download of file %s\n", filename);
 			break;
 		case MSG_RECV_MAP_CHUNK:
+			if(!payload)
+				break;
+			downloaded_bytes+=msg->arg_2;
 			darnitFileWrite(payload, msg->arg_2, f);
+			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
+			printf("Map progress %i%%\n", 100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
 			darnitFileClose(f);
 			printf("Map %s successfully downloaded!\n", filename);
-			client_message_send(player_id, MSG_SEND_MAP_PROGRESS, 100, 0, NULL);
-			client_message_send(player_id, MSG_SEND_READY, 1, 0, NULL);
+			//client_message_send(player_id, MSG_SEND_MAP_PROGRESS, 100, 0, NULL);
+			client_message_send(player_id, MSG_SEND_READY, 1, 100, NULL);
 			darnitFSMount(filename);
 			map=darnitMapLoad("maps/map.ldmz");
 			map_w=map->layer->tilemap->w*map->layer->tile_w;
@@ -137,7 +153,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 
 void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	player_id=msg->player_id;
-	players=(char **)calloc(msg->arg_2, 32);
+	player_names=(char *)calloc(msg->arg_2, 32);
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strnlen(player_name, 32), player_name);
 	client_message_handler=client_download_map;
 }

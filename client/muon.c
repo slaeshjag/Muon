@@ -29,7 +29,7 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 }
 
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	
+	client_message_send(player_id, MSG_SEND_CHAT, 0, 8, "ostkaka!");
 }
 
 int main() {

@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "muon.h"
 #include "view.h"
 
@@ -35,8 +37,7 @@ void view_init() {
 	
 	//Countdown
 	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
-	countdown_text[0]='5';
-	countdown_text[1]=0;
+	strcpy(countdown_text, "Downloading map");
 	ui_pane_set_root_widget(panelist_countdown.pane, ui_widget_create_label(font_std, countdown_text));
 	panelist_game_sidebar.next=NULL;
 	
