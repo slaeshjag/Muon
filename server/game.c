@@ -52,9 +52,9 @@ void gameStart() {
 		if (server->player[i].status < PLAYER_IN_GAME)
 			continue;
 		unitSpawn(i, UNIT_GENERATOR, server->player[i].spawn.x, server->player[i].spawn.y);
-		server->accept = networkSocketDisconnect(server->accept);
-
 	}
+
+	server->accept = networkSocketDisconnect(server->accept);
 
 	return;
 }
@@ -74,7 +74,7 @@ void gameLoop(int msec) {
 	if (server->game.countdown < SERVER_GAME_COUNTDOWN) {
 		playerMessageBroadcast(0, MSG_SEND_GAME_START, 0, 0, NULL);
 		server->game.countdown = SERVER_GAME_COUNTDOWN;
-		//gameStart();
+		gameStart();
 	}
 
 	return;

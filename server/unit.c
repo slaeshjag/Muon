@@ -28,7 +28,7 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
-	if (server->player[player].map[index].fog && unit != UNIT_GENERATOR)
+	if (!server->player[player].map[index].fog && unit != UNIT_GENERATOR)
 		return -1;
 	unitAdd(player, unit, x, y);
 
