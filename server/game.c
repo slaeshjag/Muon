@@ -52,6 +52,7 @@ void gameStart() {
 		if (server->player[i].status < PLAYER_IN_GAME)
 			continue;
 		unitSpawn(i, UNIT_GENERATOR, server->player[i].spawn.x, server->player[i].spawn.y);
+		server->accept = networkSocketDisconnect(server->accept);
 
 	}
 

@@ -28,7 +28,7 @@ int serverInitMap(const char *path) {
 	fclose(fp);
 
 	for (i = 0; i < server->players; i++) {
-		sprintf(buff, "player_%i", i);
+		sprintf(buff, "player_%i", i + 1);
 		sscanf(ldmzFindProp(server->map_data, buff), "%i, %i", &server->player[i].spawn.x, &server->player[i].spawn.y);
 	}
 
