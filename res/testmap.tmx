@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="32" height="32" tilewidth="32" tileheight="32">
  <properties>
+  <property name="max_players" value="2"/>
+  <property name="player_1" value="1, 1"/>
+  <property name="player_2" value="30, 30"/>
   <property name="tileset" value="maps/default.png"/>
  </properties>
  <tileset firstgid="1" name="lol" tilewidth="32" tileheight="32">
