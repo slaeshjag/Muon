@@ -67,7 +67,7 @@ int unitAdd(int owner, int type, int x, int y) {
 	server->unit = unit;
 
 	server->map[x + y * server->w] = unit;
-	playerCalcLOS(server->player[owner].team, owner, x + y * server->w);
+	playerCalcLOS(server->player[owner].team, owner, x + y * server->w, 1);
 
 	return 0;
 }
