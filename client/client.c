@@ -75,7 +75,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL);
 			break;
 		case MSG_RECV_CHAT:
-			printf();
+			printf("Chat: \n");
 	}
 }
 
@@ -103,8 +103,8 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static DARNIT_FILE *f;
 	switch(msg->command) {
 		case MSG_RECV_JOIN:
-			memcpy(players[msg->player_id], payload, msg->arg_2);
-			printf("Player %s joined the game\n", players[msg->player_id]);
+			memcpy(players[msg->player_id*32], payload, msg->arg_2);
+			printf("Player %s joined the game\n", players[msg->player_id*32]);
 			break;
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
