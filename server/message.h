@@ -73,6 +73,8 @@ MESSAGE_BUFFER *messageBufferDelete(MESSAGE_BUFFER *msg_buf);
 int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message);
 int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message);
 int messageBufferFlush(MESSAGE_BUFFER *msg_buf);
+int messageBufferPushDirect(unsigned int to, unsigned int player, unsigned int message, unsigned int arg_1, unsigned int arg_2, void *data);
+
 
 int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message, int arg1, int arg2, void *data);
 int messageExecute(unsigned int player, MESSAGE *message);

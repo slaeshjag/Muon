@@ -56,6 +56,20 @@ int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 }
 
 
+int messageBufferPushDirect(unsigned int to, unsigned int player, unsigned int message, unsigned int arg_1, unsigned int arg_2, void *data) {
+	MESSAGE msg;
+
+	msg.player_ID = player;
+	msg.command = message;
+	msg.arg[0] = arg_1;
+	msg.arg[1] = arg_2;
+	msg.extra = data;
+
+	return messageBufferPush(server->player[to].msg_buf, &msg);
+}
+
+
+
 int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 	if (msg_buf == NULL) {
 		fprintf(stderr, "Message buffer is NULL, unable to pop message\n");

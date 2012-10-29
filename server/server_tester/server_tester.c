@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 	send(sock, &message, 16, 0);
 	send(sock, "Testspelare", strlen("Testspelare"), 0);
 
-	for (j = 0;j < 20; j++) {
+	for (j = 0;j < 30; j++) {
 		if (recv(sock, &message, 16, 0) <= 0)
 			break;
 		messageConvert(&message);

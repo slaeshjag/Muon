@@ -17,8 +17,8 @@
 
 
 typedef struct {
-	unsigned int		power 	: 1;
-	unsigned int		fog	: 1;
+	unsigned int		power 	: 16;
+	unsigned int		fog	: 16;
 } PLAYER_MAP;
 
 
@@ -31,6 +31,7 @@ typedef struct {
 typedef struct {
 	PLAYER_MAP		*map;
 	unsigned int		map_progress;
+	int			team;
 	int			status;
 	SERVER_SOCKET		*socket;
 	time_t			id_req_send;

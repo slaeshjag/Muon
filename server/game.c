@@ -39,7 +39,6 @@ int gameAttemptStart() {
 		server->player[i].status = PLAYER_IN_GAME;
 	}
 
-	playerMessageBroadcast(0, MSG_SEND_GAME_START, 0, 0, NULL);
 	server->game.started = 1;
 
 	return 0;
@@ -47,6 +46,15 @@ int gameAttemptStart() {
 
 
 void gameStart() {
+	int i;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status < PLAYER_IN_GAME)
+			continue;
+		unitSpawn(i, UNIT_GENERATOR, server->player[i].spawn.x, server->player[i].spawn.y);
+
+	}
+
 	return;
 }
 

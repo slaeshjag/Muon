@@ -68,7 +68,7 @@ typedef struct {
 /* arg_1 is 1 if the player is ready, 0 if not. No data. */
 #define	MSG_RECV_PLAYER_READY		0x009
 
-/* No arguments. No data. When you get this message, you should switch from lobby to game play mode */
+/* arg_1 is the number of seconds left until the game starts. 0 means the game has started. No data. */
 #define	MSG_RECV_GAME_START		0x00A
 
 /* arg_1 is building type, arg_2 is index on the map (x + y * map_w). */

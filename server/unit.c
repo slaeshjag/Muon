@@ -1,15 +1,35 @@
 #include "server.h"
 
 
+int unitLOS(int type) {
+	return 1;
+}
+
+
 int unitHPMax(int type) {
 	return 1;
 }
 
 
-SERVER_UNIT *unitInit(SERVER *server, int owner, int type, int x, int y) {
+int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y) {
+	unsigned int index;
+
+	index = x + server->w * y;
+	if (server->map[index])
+		return -1;
+	if (server->player[player].map[index].fog && unit != UNIT_GENERATOR)
+		return -1;
+	unitAdd(player, unit, x, y);
+
+	return 0;
+}
+	
+
+SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	SERVER_UNIT *unit;
 
 	if ((unit = malloc(sizeof(SERVER_UNIT))) == NULL) {
+		errorPush(SERVER_ERROR_NO_MEMORY);
 		fprintf(stderr, "Unable to alloc unit\n");
 		return NULL;
 	}
@@ -22,11 +42,12 @@ SERVER_UNIT *unitInit(SERVER *server, int owner, int type, int x, int y) {
 	unit->status = 0;		/* Nothing yet? */
 	unit->next = NULL;
 
+
 	return unit;
 }
 
 
-int unitAdd(SERVER *server, int owner, int type, int x, int y) {
+int unitAdd(int owner, int type, int x, int y) {
 	SERVER_UNIT *unit;
 	
 	if (x >= server->w || y >= server->h) {
@@ -39,19 +60,20 @@ int unitAdd(SERVER *server, int owner, int type, int x, int y) {
 		return -1;
 	}
 
-	if ((unit = unitInit(server, owner, type, x, y)) == NULL)
+	if ((unit = unitInit(owner, type, x, y)) == NULL)
 		return -1;
 	
 	unit->next = server->unit;
 	server->unit = unit;
 
-	server->map[x + y * server->h] = unit;
+	server->map[x + y * server->w] = unit;
+	//playerCalcLOS(server->player[owner].team, owner, x + y * server->w);
 
 	return 0;
 }
 
 
-int unitRemove(SERVER *server, int x, int y) {
+int unitRemove(int x, int y) {
 	SERVER_UNIT *unit, *next, **parent;
 
 	if (x >= server->w || y >= server->h) {

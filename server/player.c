@@ -117,3 +117,38 @@ int playerSlot() {
 			return i;
 	return -1;
 }
+
+#if 0
+int playerCalcLOS(unsigned int team, unsigned int player, unsigned int index) {
+	int i, j, k, los, x, y, building, index;
+
+	x = index % server->w;
+	y = index / server->h;
+
+	if ((los = unitLOS(server->map[index]->type)) == 0)
+		return 0;
+
+	for (j = -1 * los; j <= los; i++) {
+		if (x + j < 0 || x + j >= map->w)
+			continue;
+		for (k = -1 * los; k <= los; k++) {
+			if (y + k < 0 || y + k >= map->h)
+				continue;
+			index = y * server->w + x;
+			haz_los = (sqrtf(j*j + k*k) <= los) ? 1 : 0;
+			building = server->map[index]->
+			if (team > -1)
+				for (i = 0; i < server->players; i++) {
+					if (server->player[i].team != team)
+						continue;
+					messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, haz_los << 1, 0, NULL);
+					building = (haz_los) ? server->map[index]->type : 0;
+//					messageBufferPushDirect(i, server->map[index]
+				}
+		}
+	}
+
+	return 0;
+}
+	i}
+#endif
