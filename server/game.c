@@ -73,7 +73,7 @@ void gameLoop(int msec) {
 	if (server->game.countdown < SERVER_GAME_COUNTDOWN) {
 		playerMessageBroadcast(0, MSG_SEND_GAME_START, 0, 0, NULL);
 		server->game.countdown = SERVER_GAME_COUNTDOWN;
-		gameStart();
+		//gameStart();
 	}
 
 	return;

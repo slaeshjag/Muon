@@ -16,7 +16,6 @@ OBJFILES=$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)
-	@darnit-fsimage maps map.ldi
 	@echo ""
 	@echo " [ CD ] client/ui/"
 	@make -C ui/
