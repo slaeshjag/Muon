@@ -3,6 +3,8 @@
 
 int gameInit() {
 	server->game.started = 0;
+	server->game.time_elapsed = 0;
+	server->game.countdown = 0;
 
 	return 0;
 }
@@ -41,4 +43,30 @@ int gameAttemptStart() {
 	server->game.started = 1;
 
 	return 0;
+}
+
+
+void gameStart() {
+	return;
+}
+
+
+void gameLoop(int msec) {
+	server->game.time_elapsed += msec;
+
+	if (server->game.time_elapsed < SERVER_GAME_START_DELAY) {
+		if (server->game.countdown != server->game.time_elapsed / 1000) {
+			server->game.countdown = server->game.time_elapsed / 1000;
+			playerMessageBroadcast(0, MSG_SEND_GAME_START, SERVER_GAME_COUNTDOWN - server->game.countdown, 0, NULL);
+		}
+		return;
+	}
+
+	if (server->game.countdown < SERVER_GAME_COUNTDOWN) {
+		playerMessageBroadcast(0, MSG_SEND_GAME_START, 0, 0, NULL);
+		server->game.countdown = SERVER_GAME_COUNTDOWN;
+		gameStart();
+	}
+
+	return;
 }

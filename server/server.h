@@ -18,6 +18,7 @@
 #include "player.h"
 #include "game.h"
 #include "lobby.h"
+#include "error.h"
 #ifndef __TTMZ_H__
 #include "map.h"
 #endif
@@ -52,7 +53,6 @@ typedef struct {
 	SERVER_UNIT		**map;
 	unsigned int		*power_grid;
 	UNIT_DEF		*unit_def;
-	MESSAGE_BUFFER		*message_buffer;
 	PLAYER			*player;
 	unsigned int		players;
 	GAME			game;
@@ -65,8 +65,8 @@ SERVER *server;
 
 
 int serverPowerGet(int owner, int x, int y);
-SERVER *serverInit(const char *fname, unsigned int players, int port);
-SERVER *serverDestroy();
+SERVER *serverStart(const char *fname, unsigned int players, int port);
+SERVER *serverStop();
 int serverLoop(unsigned int d_ms);
 
 #endif

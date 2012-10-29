@@ -3,10 +3,13 @@
 
 int serverInitMap(const char *path) {
 	FILE *fp;
+	int i, j, x, y;
+	char buff[32];
 
 
 	if ((fp = fopen(path, "rb")) == NULL) {
 		fprintf(stderr, "Unable to open map %s for cache", path);
+		errorPush(SERVER_ERROR_CANT_OPEN_MAP);
 		return -1;
 	}
 
@@ -14,14 +17,36 @@ int serverInitMap(const char *path) {
 	server->map_c.data_len = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	if ((server->map_c.data = malloc(server->map_c.data_len)) == NULL) {
+	if ((server->map_c.data = malloc(server->map_c.data_len)) == NULL) {		
 		fprintf(stderr, "Unable to malloc for map cache\n");
+		errorPush(SERVER_ERROR_NO_MEMORY);
 		fclose(fp);
 		return -1;
 	}
 
 	fread(server->map_c.data, server->map_c.data_len, 1, fp);
 	fclose(fp);
+
+	for (i = 0; i < server->players; i++) {
+		sprintf(buff, "player_%i", i);
+		sscanf(ldmzFindProp(server->map_data, buff), "%i, %i", &server->player[i].spawn.x, &server->player[i].spawn.y);
+	}
+
+	for (i = 0; i < server->players; i++) {
+		x = server->player[i].spawn.x;
+		y = server->player[i].spawn.y;
+		for (j = 0; j < server->players; j++) {
+			if (j == i)
+				continue;
+			if (x == server->player[j].spawn.x && y == server->player[j].spawn.y) {
+				fprintf(stderr, "Overlapping spawn points is not allowed: Bad map!\n");
+				errorPush(SERVER_ERROR_SPAWNS_OVERLAP);
+				free(server->map_c.data);
+				server->map_c.data = NULL;
+				return -1;
+			}
+		}
+	}
 
 	for (;;) {
 		if (strstr(path, "/") != NULL)
@@ -48,12 +73,33 @@ int serverPowerGet(int owner, int x, int y) {
 }
 
 
+void serverInit() {
+	server = NULL;
+
+	errorInit();
+	
+	return;
+}
+
+
+int serverIsRunning() {
+	return (server) ? 0 : -1;
+}
+
+
 /* TODO: Expand with arguments */
-SERVER *serverInit(const char *fname, unsigned int players, int port) {
+SERVER *serverStart(const char *fname, unsigned int players, int port) {
 	int i, map_w, map_h;
+	const char *tmp;
+
+	if (server)
+		return server;
+	
+	errorInit();
 
 	if ((server = malloc(sizeof(SERVER))) == NULL) {
 		fprintf(stderr, "Unable to allocate a server\n");
+		errorPush(SERVER_ERROR_NO_MEMORY);
 		return NULL;
 	}
 
@@ -64,18 +110,27 @@ SERVER *serverInit(const char *fname, unsigned int players, int port) {
 		free(server);
 		server = NULL;
 		fprintf(stderr, "Unable to load map %s\n", fname);
+		errorPush(SERVER_ERROR_INVALID_MAP);
 		return NULL;
+	}
+
+	if (strcmp((tmp = ldmzFindProp(server->map_data, "max_players")), "NO SUCH KEY") == 0) {
+		tmp = NULL;
+		fprintf(stderr, "Missing map property max_players in mapfile\n");
+		errorPush(SERVER_ERROR_MAP_NO_MAX_PLAYERS);
 	}
 
 	ldmzGetSize(server->map_data, &map_w, &map_h);
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
-	server->message_buffer = messageBufferInit();
-	server->player = playerInit(players, map_w, map_h);
+	playerInit(players, map_w, map_h);
 	server->accept = networkListen(port);
 
-	if (!server->map || !server->message_buffer || !server->player || !server->accept) {
+	if (!server->map || !server->player || !server->accept || !tmp) {
+		if (!server->map)
+			errorPush(SERVER_ERROR_NO_MEMORY);
+		if (!server->accept)
+			errorPush(SERVER_ERROR_UNABLE_TO_LISTEN);
 		fprintf(stderr, "Unable to allocate a server\n");
-		messageBufferDelete(server->message_buffer);
 		playerDestroy(server->player, server->players);
 		networkSocketDisconnect(server->accept);
 		ldmzFree(server->map_data);
@@ -90,15 +145,19 @@ SERVER *serverInit(const char *fname, unsigned int players, int port) {
 	server->unit = NULL;
 	server->w = map_w;
 	server->h = map_h;
-	server->players = players;
 	if (serverInitMap(fname) < 0)
-		server = serverDestroy();
+		server = serverStop();
+	if (atoi(tmp) < players) {
+		fprintf(stderr, "Map file is only defined for %i players (%i player slots requested)\n", atoi(tmp), players);
+		errorPush(SERVER_ERROR_TOO_MANY_PLAYERS);
+		server = serverStop();
+	}
 
 	return server;
 }
 
 
-SERVER *serverDestroy() {
+SERVER *serverStop() {
 	int i;
 	
 	if (!server)
@@ -110,9 +169,9 @@ SERVER *serverDestroy() {
 	
 	playerDestroy(server->player, server->players);
 	free(server->map);
-	messageBufferDelete(server->message_buffer);
 	networkSocketDisconnect(server->accept);
 	ldmzFree(server->map_data);
+	free(server->map_c.data);
 
 	free(server);
 	server = NULL;
@@ -183,8 +242,9 @@ void serverProcessNetwork() {
 				
 				if ((msg.extra = malloc(msg.arg[1] + 1)) == NULL) {
 					fprintf(stderr, "Fatal error: System seems to be out of RAM. Server is dieing\n");
-					serverDestroy();
-					exit(-1);
+					errorPush(SERVER_ERROR_NO_MEMORY);
+					serverStop();
+					return;
 				}
 
 				if ((t = networkReceiveTry(server->player[i].socket, (void *) msg.extra, msg.arg[1])) > 0) {
@@ -299,13 +359,19 @@ void serverProcessNetwork() {
 
 int serverLoop(unsigned int d_ms) {
 	/* FIXME: STUB */
+	if (!server)
+		return -1;
+
 	if (!server->game.started) {
 		lobbyPoll();
 		playerCheckIdentify();
-	}
+	} else 
+		gameLoop(d_ms);
 
-	serverProcessNetwork();
 	serverSendPing();
+	
+	/* This call must ALWAYS be LAST in serverLoop */
+	serverProcessNetwork();
 
 	return 0;
 }

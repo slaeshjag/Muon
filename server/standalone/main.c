@@ -1,3 +1,6 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "server.h"
 
 int main(int argc, char **argv) {
@@ -11,9 +14,11 @@ int main(int argc, char **argv) {
 	if (argc >= 4)
 		port = atoi(argv[3]);
 	else
-		port = SERVER_PORT;
+		port = SERVER_PORT_DEFAULT;
 	
-	if (serverInit(argv[1], atoi(argv[2]), port) == NULL)
+	serverInit();
+
+	if (serverStart(argv[1], atoi(argv[2]), port) == NULL)
 		return -1;
 	for (;;) {
 		sleep(1);

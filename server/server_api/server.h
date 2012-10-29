@@ -2,14 +2,18 @@
 #define	__SERVER_H__
 
 #define	API_VERSION			0x10000
+#define	SERVER_PORT_DEFAULT		56789
 
 #include "message.h"
+#include "error.h"
 
 typedef void SERVER;
 
-SERVER *serverInit(const char *map, unsigned int players, int port);
+void serverInit();
+SERVER *serverStart(const char *map, unsigned int players, int port);
 void serverLoop(unsigned int msec);
-void serverDestroy();
+void serverStop();
+int serverIsRunning();
 
 
 #endif

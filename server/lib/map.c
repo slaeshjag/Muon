@@ -30,3 +30,10 @@ unsigned int *ldmzGetData(void *map) {
 void *ldmzFree(void *map) {
 	return darnitMapUnload(map);
 }
+
+
+const char *ldmzFindProp(void *map, const char *key) {
+	DARNIT_MAP *dmap = map;
+
+	return darnitMapPropGet(dmap->prop, key);
+}

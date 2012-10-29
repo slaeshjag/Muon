@@ -70,3 +70,8 @@ unsigned int *ldmzGetData(LDMZ_MAP *map) {
 LDMZ_MAP *ldmzFree(LDMZ_MAP *map) {
 	return mapDestroy(map);
 }
+
+
+const char *ldmzFindProp(LDMZ_MAP *map, const char *key) {
+	return mapPropSearch(map->prop, key);
+}

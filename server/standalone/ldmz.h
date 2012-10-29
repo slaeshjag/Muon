@@ -1,6 +1,10 @@
 #ifndef __TTMZ_H__
 #define	__TTMZ_H__
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "server.h"
 
 #ifndef DARNIT_MAP

@@ -23,6 +23,12 @@ typedef struct {
 
 
 typedef struct {
+	int			x;
+	int			y;
+} PLAYER_SPAWN;
+
+
+typedef struct {
 	PLAYER_MAP		*map;
 	unsigned int		map_progress;
 	int			status;
@@ -36,6 +42,7 @@ typedef struct {
 	MESSAGE			process_msg_send;
 	int			process_byte_send;
 	char			name[PLAYER_NAME_LEN];
+	PLAYER_SPAWN		spawn;
 } PLAYER;
 
 PLAYER *playerInit(unsigned int players, int map_w, int map_h);

@@ -92,6 +92,12 @@ void messageHandlerPlayerReady(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerPong(unsigned int player, MESSAGE *message) {
+	/* TODO: Implement */
+	return;
+}
+
+
 void messageHandlerDummy(unsigned int player, MESSAGE *message) {
 	fprintf(stderr, "MSG_RECV: %i  - Not implemented yet!\n", message->command);
 
@@ -100,7 +106,7 @@ void messageHandlerDummy(unsigned int player, MESSAGE *message) {
 
 
 int messageHandlerInit() {
-	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerDummy;
+	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
 	server->message_handler.handle[MSG_RECV_IDENTIFY] 	= messageHandlerIdentify;
 	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerMapProgress;

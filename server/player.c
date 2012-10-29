@@ -8,6 +8,9 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 	if ((player = malloc(sizeof(PLAYER) * players)) == NULL)
 		return NULL;
 	err = 0;
+	server->players = 0;
+	server->player = NULL;
+
 	for (i = 0; i < players; i++) {
 		if ((player[i].map = malloc(sizeof(PLAYER_MAP) * map_w * map_h)) == NULL)
 			err = 1;
@@ -25,11 +28,15 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 	if (err) {
 		for (i = 0; i < players; i++)
 			free(player[i].map);
+		errorPush(SERVER_ERROR_NO_MEMORY);
 		free(player);
 		return NULL;
 	}
 
-	return player;
+	server->player = player;
+	server->players = players;
+
+	return server->player;
 }
 
 
