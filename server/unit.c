@@ -22,6 +22,70 @@ int unitRange(int type) {
 }
 
 
+int unitPylonListAdd(UNIT_PYLON_LIST **list, UNIT_PYLON *add) {
+	UNIT_PYLON_LIST *new;
+
+	if ((new = malloc(sizeof(UNIT_PYLON_LIST))) == NULL) {
+		errorPush(SERVER_ERROR_NO_MEMORY);
+		return -1;
+	}
+
+	new->next = *list;
+	new->pylon = add;
+	*list = new;
+
+	return 0;
+}
+
+
+void unitPylonPulseClimb(UNIT_PYLON *pylon) {
+	UNIT_PYLON_LIST *list;
+	if (pylon->pulse)
+		return;
+	pylon->pulse = 1;
+	list = pylon->next;
+
+	while (list != NULL) {
+		unitPylonPulseClimb(list->pylon);
+		list = list->next;
+	}
+
+	return;
+}
+
+
+void unitPylonPulse() {
+	int i;
+	UNIT_PYLON_LIST *list;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME)
+			continue;
+		unitPylonPulseClimb(&server->map[server->player[i].spawn.index]->pylon);
+	}
+	
+	list = server->pylons;
+	while (list != NULL) {
+		if (list->pylon->pulse) {
+			if (list->pylon->power);
+			else {
+				list->pylon->power = 1;
+				playerCalcSetPower(list->pylon->unit->owner, list->pylon->x, list->pylon->y, 1);
+			}
+		} else {
+			if (list->pylon->power) {
+				list->pylon->power = 0;
+				playerCalcSetPower(list->pylon->unit->owner, list->pylon->x, list->pylon->y, -1);
+			}
+		}
+
+		list = list->next;
+	}
+
+	return;
+}
+
+
 void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 	int j, k, owner, team, radius, index;
 
@@ -33,6 +97,7 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 	unit->pylon.y = y;
 	unit->pylon.power = 0;
 	unit->pylon.pulse = 0;
+	unit->pylon.unit = unit;
 	unit->pylon.next = NULL;
 
 	for (j = -1 * radius; j <= radius; j++) {
@@ -41,7 +106,7 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 		for (k = -1 * radius; k <= radius; k++) {
 			if (k + y < 0 || k + y > server->w)
 				continue;
-			index = y * server->w + x;
+			index = (y + k) * server->w + (x + j);
 			if (!server->map[index])		/* No building here - don't bother */
 				continue;
 			if (server->map[index]->type != UNIT_DEF_GENERATOR && server->map[index]->type != UNIT_DEF_PYLON)
@@ -54,12 +119,14 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 			} else if (server->map[index]->owner != owner)	/* We don't own it */
 				continue;
 			if (server->map[index]->pylon.power) {
-				playerCalcSetPower(team, owner, j + x, k + y, 1);
+				playerCalcSetPower(owner, j + x, k + y, 1);
 				unit->pylon.power = 1;
 			}
 
-			//unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
-			//unitPylonListAdd(&server->pylons, &server->map[index]->pylon);
+			fprintf(stderr, "Filling out lists\n");
+			unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
+			unitPylonListAdd(&server->map[index]->pylon.next, &server->map[index]->pylon);
+			unitPylonListAdd(&server->pylons, &unit->pylon);
 		}
 	}
 
@@ -75,6 +142,7 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 		return -1;
 	if (!server->player[player].map[index].fog && unit != UNIT_DEF_GENERATOR)
 		return -1;
+	fprintf(stderr, "Adding unit %i\n", unit);
 	unitAdd(player, unit, x, y);
 
 	return 0;
@@ -126,9 +194,9 @@ int unitAdd(int owner, int type, int x, int y) {
 	server->unit = unit;
 
 	server->map[x + y * server->w] = unit;
-	playerCalcLOS(server->player[owner].team, owner, x , y, 1);
+	playerCalcLOS(owner, x , y, 1);
 	if (type == UNIT_DEF_GENERATOR)
-		playerCalcSetPower(server->player[owner].team, owner, x, y, 1);
+		playerCalcSetPower(owner, x, y, 1);
 
 	return 0;
 }

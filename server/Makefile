@@ -22,6 +22,8 @@ all: $(OBJFILES)
 	@echo ""
 	@echo " [ CD ] server/lib/"
 	+@make -C lib/
+	@echo " [ CD ] server/server_tester/"
+	+@make -C server_tester/
 	@echo " [ LD ]	$(BIN)"
 	@$(CC) $(CFLAGS) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " [ AR ] $(LIBOUT)"
@@ -38,9 +40,11 @@ clean:
 	@$(RM) $(LIBOUT)
 	@echo ""
 	@echo " [ CD ] server/standalone/"
-	@make -C standalone/ clean
+	+@make -C standalone/ clean
 	@echo " [ CD ] server/lib/"
-	@make -C lib/ clean
+	+@make -C lib/ clean
+	@echo " [ CD ] server/server_tester/"
+	+@make -C server_tester/ clean
 
 %.o: %.c %.h
 	@echo " [ CC ]	server/$<"

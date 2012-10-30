@@ -25,7 +25,7 @@
 #endif
 
 
-struct SERVER_UNIT {
+typedef struct SERVER_UNIT {
 	unsigned int		owner;
 	unsigned int		type;
 	unsigned int		hp;
@@ -34,9 +34,7 @@ struct SERVER_UNIT {
 	unsigned int		target;
 	UNIT_PYLON		pylon;
 	struct SERVER_UNIT	*next;
-};
-
-typedef struct SERVER_UNIT SERVER_UNIT;
+} SERVER_UNIT;
 
 
 typedef struct {

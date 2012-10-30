@@ -25,6 +25,7 @@ typedef struct {
 typedef struct {
 	int			x;
 	int			y;
+	unsigned int		index;
 } PLAYER_SPAWN;
 
 
@@ -44,6 +45,7 @@ typedef struct {
 	int			process_byte_send;
 	char			name[PLAYER_NAME_LEN];
 	PLAYER_SPAWN		spawn;
+	unsigned int	generator;
 } PLAYER;
 
 PLAYER *playerInit(unsigned int players, int map_w, int map_h);
@@ -52,8 +54,8 @@ void playerDisconnect(unsigned int player);
 void playerCheckIdentify();
 void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned int arg1, unsigned int arg2, void *data);
 int playerSlot();
-int playerCalcLOS(unsigned int team, unsigned int player, int x, int y, int mode);
-int playerCalcSetPower(unsigned int team, unsigned int player, int x, int y, int mode);
+int playerCalcLOS(unsigned int player, int x, int y, int mode);
+int playerCalcSetPower(unsigned int player, int x, int y, int mode);
 
 
 #endif
