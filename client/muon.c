@@ -31,6 +31,8 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 }
 
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
+		return;
 	int i;
 	for(i=0; i<4; i++) {
 		if(widget==game_sidebar_button_build[i]) {
@@ -38,6 +40,18 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 		}
 	}
 	//client_message_send(player_id, MSG_SEND_CHAT, 0, 8, "ostkaka!");
+}
+
+void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
+		return;
+
+	if(widget==game_menu_button[0]) {
+		state=GAME_STATE_QUIT;
+	} else if(widget==game_menu_button[1]) {
+		state=GAME_STATE_GAME;
+		darnitInputGrab();
+	}
 }
 
 int main() {
@@ -58,8 +72,6 @@ int main() {
 	while(1) {
 		serverLoop(darnitTimeLastFrameTook());
 		DARNIT_KEYS buttons=darnitButtonGet();
-		if(buttons.select)
-			state=GAME_STATE_QUIT;
 		switch(state) {
 			case GAME_STATE_INPUT_NAME:
 				darnitRenderBegin();
@@ -67,6 +79,8 @@ int main() {
 				ui_events(&panelist_input_name, 1);
 				darnitRenderTint(1, 1, 1, 1);
 				darnitRenderEnd();
+				if(buttons.select)
+					state=GAME_STATE_QUIT;
 				break;
 			case GAME_STATE_CONNECT_SERVER:
 				darnitRenderBegin();
@@ -74,6 +88,8 @@ int main() {
 				ui_events(&panelist_connect_server, 1);
 				darnitRenderTint(1, 1, 1, 1);
 				darnitRenderEnd();
+				if(buttons.select)
+					state=GAME_STATE_QUIT;
 				break;
 			case GAME_STATE_COUNTDOWN:
 				if(client_check_incomming()==-1) {
@@ -91,6 +107,7 @@ int main() {
 				if(client_check_incomming()==-1) {
 					fprintf(stderr, "Server disconnected!\n");
 					state=GAME_STATE_CONNECT_SERVER;
+					darnitInputUngrab();
 					break;
 				}
 				mouse=darnitMouseGet();
@@ -101,8 +118,27 @@ int main() {
 				ui_events(&panelist_game_sidebar, 1);
 				darnitRenderTint(1, 1, 1, 1);
 				darnitRenderEnd();
+				if(buttons.select) {
+					state=GAME_STATE_GAME_MENU;
+					darnitInputUngrab();
+				}
+				break;
+			case GAME_STATE_GAME_MENU:
+				if(client_check_incomming()==-1) {
+					fprintf(stderr, "Server disconnected!\n");
+					state=GAME_STATE_CONNECT_SERVER;
+					break;
+				}
+				darnitRenderBegin();
+				view_draw();
+				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
+				ui_pane_render(panelist_game_sidebar.pane);
+				ui_events(&panelist_game_menu, 1);
+				darnitRenderTint(1, 1, 1, 1);
+				darnitRenderEnd();
 				break;
 			case GAME_STATE_QUIT:
+				darnitInputUngrab();
 				return 0;
 		}
 		

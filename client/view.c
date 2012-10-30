@@ -62,6 +62,18 @@ void view_init() {
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
 		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
 	}
+	
+	//Game menu
+	panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);
+	ui_pane_set_root_widget(panelist_game_menu.pane, ui_widget_create_vbox());
+	panelist_game_menu.next=NULL;
+	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
+	game_menu_button[0]=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
+	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, "Return to game"));
+	for(i=0; i<2; i++) {
+		ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[i], 0);
+		game_menu_button[i]->event_handler->add(game_menu_button[i], game_menu_button_click, UI_EVENT_TYPE_UI);
+	}
 }
 
 void view_scroll(DARNIT_MOUSE mouse) {

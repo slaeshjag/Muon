@@ -102,9 +102,11 @@ void ui_progressbar_request_size(UI_WIDGET *widget, int *w, int *h) {
 void ui_progressbar_render(UI_WIDGET *widget) {
 	struct UI_PROGRESSBAR_PROPERTIES *p=widget->properties;
 	darnitRenderLineDraw(p->border, 4);
-	darnitRenderRectDraw(p->bar, 1);
 	
 	darnitRenderBlendingEnable();
 	darnitTextSurfaceDraw(p->surface);
 	darnitRenderBlendingDisable();
+	darnitRenderLogicOp(DARNIT_RENDER_LOGIC_OP_XOR);
+	darnitRenderRectDraw(p->bar, 1);
+	darnitRenderLogicOp(DARNIT_RENDER_LOGIC_OP_NONE);
 }

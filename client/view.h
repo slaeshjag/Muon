@@ -29,8 +29,12 @@ char countdown_text[16];
 struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_button_build[4];
 
+struct UI_PANE_LIST panelist_game_menu;
+UI_WIDGET *game_menu_button[2];
+
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif
