@@ -187,7 +187,6 @@ int playerCalcLOS(unsigned int team, unsigned int player, int x, int y, int mode
 					messageBufferPushDirect(i, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
 				}
 			else {
-				fprintf(stderr, "Fog: %i\n", server->player[player].map[index].fog);
 				server->player[player].map[index].fog += haz_los * mode;
 				t = (server->player[player].map[index].fog) ? 0 : 1;
 				messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << 1, index, NULL);
