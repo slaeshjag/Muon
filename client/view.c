@@ -47,15 +47,16 @@ void view_init() {
 	panelist_game_sidebar.next=NULL;
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Buildings:"), 0);
-	game_sidebar_button_build_1=ui_widget_create_button(ui_widget_create_label(font_std, "Repeater"));
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build_1, 0);
-	game_sidebar_button_build_1->event_handler->add(game_sidebar_button_build_1, game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
-	game_sidebar_button_build_2=ui_widget_create_button(ui_widget_create_label(font_std, "Scout"));
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build_2, 0);
-	game_sidebar_button_build_2->event_handler->add(game_sidebar_button_build_2, game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
-	game_sidebar_button_build_3=ui_widget_create_button(ui_widget_create_label(font_std, "Pizza hut"));
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build_3, 0);
-	game_sidebar_button_build_3->event_handler->add(game_sidebar_button_build_3, game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
+	game_sidebar_button_build[0]=ui_widget_create_button(ui_widget_create_label(font_std, "Scout"));
+	game_sidebar_button_build[1]=ui_widget_create_button(ui_widget_create_label(font_std, "Attacker"));
+	game_sidebar_button_build[2]=ui_widget_create_button(ui_widget_create_label(font_std, "Pylon"));
+	game_sidebar_button_build[3]=ui_widget_create_button(ui_widget_create_label(font_std, "Wall"));
+	int i;
+	for(i=0; i<4; i++) {
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
+		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
+	}
+	
 }
 
 void view_scroll(DARNIT_MOUSE mouse) {

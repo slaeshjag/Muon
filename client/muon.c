@@ -11,6 +11,8 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
 	memset(player_name, 0, 32);
 	strncpy(player_name, v.p, 31);
+	if(!strnlen(player_name, 32))
+		return;
 	printf("Player name: %s\n", player_name);
 	state=GAME_STATE_CONNECT_SERVER;
 }
@@ -29,7 +31,13 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 }
 
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	client_message_send(player_id, MSG_SEND_CHAT, 0, 8, "ostkaka!");
+	int i;
+	for(i=0; i<4; i++) {
+		if(widget==game_sidebar_button_build[i]) {
+			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_START, NULL);
+		}
+	}
+	//client_message_send(player_id, MSG_SEND_CHAT, 0, 8, "ostkaka!");
 }
 
 int main() {
