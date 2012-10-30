@@ -60,7 +60,7 @@ int client_check_incomming() {
 					return -1;
 				}
 				client_message_convert_recv(&msg_recv);
-				printf("message: 0x%x\n", msg_recv.command);
+				printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
 				if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
 					client_message_handler(&msg_recv, NULL);
 			}
@@ -79,6 +79,11 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			chatmsg[msg->arg_2]=0;
 			printf("<%s> %s\n", &player_names[msg->player_id*32], chatmsg);
 			free(chatmsg);
+			break;
+		case MSG_RECV_MAP_TILE_ATTRIB:
+			printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map_w, msg->arg_2/map_w );
+			map->layer->tilemap->data[msg->arg_2]=56;
+			darnitRenderTilemapRecalculate(map->layer->tilemap);
 			break;
 	}
 }
