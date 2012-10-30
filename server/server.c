@@ -30,6 +30,7 @@ int serverInitMap(const char *path) {
 	for (i = 0; i < server->players; i++) {
 		sprintf(buff, "player_%i", i + 1);
 		sscanf(ldmzFindProp(server->map_data, buff), "%i, %i", &server->player[i].spawn.x, &server->player[i].spawn.y);
+		server->player[i].spawn.index = server->player[i].spawn.y * server->w + server->player[i].spawn.x;
 	}
 
 	for (i = 0; i < server->players; i++) {

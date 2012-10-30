@@ -16,6 +16,8 @@ static const int unit_maxshield[] = 	{ 0, 5000, 50, 500, 500, 4000 };
 static const int unit_shieldrec[] = 	{ 0, 40, 1, 10, 10, 5 };
 static const int unit_range[] = 	{ 0, 4, 0, 3, 4, 1 };
 
+struct SERVER_UNIT;
+
 
 struct UNIT_PYLON;
 
@@ -29,6 +31,7 @@ typedef struct UNIT_PYLON {
 	unsigned int			pulse	: 1;
 	unsigned int			x;
 	unsigned int			y;
+	struct SERVER_UNIT		*unit;
 	struct UNIT_PYLON_LIST		*next;
 } UNIT_PYLON;
 

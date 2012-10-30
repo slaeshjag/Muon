@@ -24,6 +24,7 @@ clean:
 	@$(RM) $(OBJFILES)
 	@echo " [ RM ]	$(BIN)"
 	@$(RM) $(BIN)
+	@echo
 
 %.o: %.c %.h
 	@echo " [ CC ]	server/$<"

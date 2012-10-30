@@ -119,10 +119,11 @@ int playerSlot() {
 }
 
 
-int playerCalcSetPower(unsigned int team, unsigned int player, int x, int y, int mode) {
-	int i, j, k, index, range, old;
+int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
+	int i, j, k, index, range, old, team;
 
 	index = y * server->w + x;
+	team = server->player[player].team;
 
 	range = unitRange(server->map[index]->type);
 
@@ -158,10 +159,11 @@ int playerCalcSetPower(unsigned int team, unsigned int player, int x, int y, int
 }
 
 
-int playerCalcLOS(unsigned int team, unsigned int player, int x, int y, int mode) {
-	int i, j, k, los, index, building, owner, haz_los, t;
+int playerCalcLOS(unsigned int player, int x, int y, int mode) {
+	int i, j, k, los, index, building, owner, haz_los, t, team;
 
 	index = y * server->w + x;
+	team = server->player[player].team;
 
 	if ((los = unitLOS(server->map[index]->type)) == 0)
 		return 0;
