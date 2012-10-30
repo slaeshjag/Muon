@@ -63,6 +63,7 @@ int serverInitMap(const char *path) {
 	}
 
 	server->map_c.path = path;
+	server->pylons = NULL;
 
 	return 0;
 }

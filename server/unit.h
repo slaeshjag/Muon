@@ -3,18 +3,34 @@
 
 #define	UNITS_DEFINED			5
 
-#define	UNIT_NOTHING			0
-#define	UNIT_GENERATOR			1
-#define	UNIT_SCOUT			2
-#define	UNIT_ATTACKER			3
-#define	UNIT_PYLON			4
-#define	UNIT_WALL			5
+#define	UNIT_DEF_NOTHING		0
+#define	UNIT_DEF_GENERATOR		1
+#define	UNIT_DEF_SCOUT			2
+#define	UNIT_DEF_ATTACKER		3
+#define	UNIT_DEF_PYLON			4
+#define	UNIT_DEF_WALL			5
 
 static const int unit_los[] = 		{ 0, 7, 6, 3, 4, 1 };
 static const int unit_maxhp[] = 	{ 0, 5000, 100, 1000, 500, 4000 };
 static const int unit_maxshield[] = 	{ 0, 5000, 50, 500, 500, 4000 };
 static const int unit_shieldrec[] = 	{ 0, 40, 1, 10, 10, 5 };
 static const int unit_range[] = 	{ 0, 4, 0, 3, 4, 1 };
+
+
+struct UNIT_PYLON;
+
+typedef struct UNIT_PYLON_LIST {
+	struct UNIT_PYLON		*pylon;
+	struct UNIT_PYLON_LIST		*next;
+} UNIT_PYLON_LIST;
+
+typedef struct UNIT_PYLON {
+	unsigned int			power	: 1;
+	unsigned int			pulse	: 1;
+	unsigned int			x;
+	unsigned int			y;
+	struct UNIT_PYLON_LIST		*next;
+} UNIT_PYLON;
 
 
 typedef struct {

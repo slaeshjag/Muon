@@ -74,10 +74,10 @@ typedef struct {
 /* arg_1 is building type, arg_2 is index on the map (x + y * map_w). */
 #define	MSG_RECV_BUILDING_PLACE		0x00B
 
-/* arg_1 is index on the map that the building is at, arg_2 is the shield value */
+/* arg_1 is the shield value (0..1000), arg_2 is index on the map that the building is at. */
 #define	MSG_RECV_BUILDING_SHIELD	0x00C
 
-/* arg_1 is index on the map that the building is at, arg_2 is the HP value */
+/* arg_1 is the HP value (0..1000), arg_2 is index on the map that the building is at. */
 #define	MSG_RECV_BUILDING_HP		0x00D
 
 /* arg_1 is the index on the map that the building is at, arg_2 is the index of the building attacking */
@@ -86,7 +86,7 @@ typedef struct {
 /* arg_1 is the building type that is being built, arg_2 is the progress in the range 0..1000 */
 #define	MSG_RECV_BUILDING_PROGRESS	0x00F
 
-/* arg_1 is tile index on the map, arg_2 is the attribute bitmask for that tile */
+/* arg_1 is the attribute bitmask for that tile, arg_2 is the index on the map */
 #define	MSG_RECV_MAP_TILE_ATTRIB	0x010
 
 /* No arguemnts. No data. */

@@ -50,7 +50,7 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 
 void messageHandlerChat(unsigned int player, MESSAGE *message) {
 	fprintf(stdout, "Debug: CHAT: <%s> ", server->player[player].name);
-	fwrite(message, message->arg[1], 1, stdout);
+	fwrite(message->extra, message->arg[1], 1, stdout);
 	fprintf(stdout, "\n");
 
 	playerMessageBroadcast(player, MSG_SEND_CHAT, 0, message->arg[1], message->extra);

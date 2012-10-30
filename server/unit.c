@@ -22,13 +22,58 @@ int unitRange(int type) {
 }
 
 
+void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
+	int j, k, owner, team, radius, index;
+
+	owner = unit->owner;
+	team = server->player[owner].team;
+	radius = unitRange(unit->type);
+
+	unit->pylon.x = x;
+	unit->pylon.y = y;
+	unit->pylon.power = 0;
+	unit->pylon.pulse = 0;
+	unit->pylon.next = NULL;
+
+	for (j = -1 * radius; j <= radius; j++) {
+		if (j + x < 0 || j + x > server->w)
+			continue;
+		for (k = -1 * radius; k <= radius; k++) {
+			if (k + y < 0 || k + y > server->w)
+				continue;
+			index = y * server->w + x;
+			if (!server->map[index])		/* No building here - don't bother */
+				continue;
+			if (server->map[index]->type != UNIT_DEF_GENERATOR && server->map[index]->type != UNIT_DEF_PYLON)
+				/* Wrong type of building. We have no business to do here */
+				continue;
+			if (team > -1) {
+				if (server->player[server->map[index]->owner].team != team)
+					/* Building is not on our team */
+					continue;
+			} else if (server->map[index]->owner != owner)	/* We don't own it */
+				continue;
+			if (server->map[index]->pylon.power) {
+				playerCalcSetPower(team, owner, j + x, k + y, 1);
+				unit->pylon.power = 1;
+			}
+
+			unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
+			unitPylonListAdd(&server->pylons, &server->map[index]->pylon);
+		}
+	}
+
+	return;
+}
+
+
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y) {
 	unsigned int index;
 
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
-	if (!server->player[player].map[index].fog && unit != UNIT_GENERATOR)
+	if (!server->player[player].map[index].fog && unit != UNIT_DEF_GENERATOR)
 		return -1;
 	unitAdd(player, unit, x, y);
 
@@ -49,11 +94,13 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->type = type;
 	unit->hp = unitHPMax(type);
 	unit->shield = 0;		/* Don't spawn with any shield! */
-	unit->powered = serverPowerGet(owner, x, y);
 	unit->status = 0;		/* Nothing yet? */
-	unit->updating = 0;
 	unit->next = NULL;
-
+	
+	if (unit->type == UNIT_DEF_PYLON)
+		unitPylonInit(unit, x, y);
+	else
+		unit->pylon.next = NULL;
 
 	return unit;
 }
@@ -79,9 +126,9 @@ int unitAdd(int owner, int type, int x, int y) {
 	server->unit = unit;
 
 	server->map[x + y * server->w] = unit;
-	playerCalcLOS(server->player[owner].team, owner, x + y * server->w, 1);
-	if (type == UNIT_GENERATOR)
-		playerCalcSetPower(server->player[owner].team, owner, x + y * server->w, 1);
+	playerCalcLOS(server->player[owner].team, owner, x , y, 1);
+	if (type == UNIT_DEF_GENERATOR)
+		playerCalcSetPower(server->player[owner].team, owner, x, y, 1);
 
 	return 0;
 }

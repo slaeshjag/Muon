@@ -30,10 +30,9 @@ struct SERVER_UNIT {
 	unsigned int		type;
 	unsigned int		hp;
 	unsigned int		shield;
-	unsigned int		powered;
 	unsigned int		status;
 	unsigned int		target;
-	unsigned int		updating;
+	UNIT_PYLON		pylon;
 	struct SERVER_UNIT	*next;
 };
 
@@ -61,6 +60,7 @@ typedef struct {
 	SERVER_SOCKET		*accept;
 	void			*map_data;
 	SERVER_MAP		map_c;
+	UNIT_PYLON_LIST		*pylons;
 } SERVER;
 
 SERVER *server;
