@@ -58,8 +58,8 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 				unit->pylon.power = 1;
 			}
 
-			unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
-			unitPylonListAdd(&server->pylons, &server->map[index]->pylon);
+			//unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
+			//unitPylonListAdd(&server->pylons, &server->map[index]->pylon);
 		}
 	}
 
