@@ -1,8 +1,8 @@
 # Project: muon
 
 INCS =  -I../server_api
-DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS += $(INCS) -O0 $(DEBUGFLAGS)
+DEBUGFLAGS = -O0 -g -D__DEBUG__
+CFLAGS += $(INCS) $(DEBUGFLAGS)
 LDFLAGS += 
 RM = rm -f
 

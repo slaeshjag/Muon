@@ -73,5 +73,7 @@ void view_scroll(DARNIT_MOUSE mouse) {
 }
 
 void view_draw() {
-	darnitRenderTilemap(map->layer->tilemap);
+	int i;
+	for(i=0; i<map->layers; i++)
+		darnitRenderTilemap(map->layer[i].tilemap);
 }

@@ -18,7 +18,7 @@ OBJFILES=$(SRCFILES:.c=.o)
 all: $(OBJFILES)
 	@echo ""
 	@echo " [ CD ] client/ui/"
-	@make -C ui/
+	+@make -C ui/
 	@echo " [ LD ]	client/$(BIN)"
 	@$(CC) $(OBJFILES) ui/*.o $(SERVER) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " Done."

@@ -2,7 +2,7 @@
 
 LIBS =  -L"/usr/lib"
 INCS =  -I"/usr/include" -I../
-DEBUGFLAGS = -g -D__DEBUG__
+DEBUGFLAGS = -O0 -g -D__DEBUG__
 CFLAGS += $(INCS) $(DEBUGFLAGS)
 LDFLAGS += 
 RM = rm -f

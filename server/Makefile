@@ -6,8 +6,8 @@ BIN  = server
 LIBOUT = server.a
 STANDALONE = standalone/*.o
 LIBOBJ = lib/*.o
-DEBUGFLAGS = -g -D__DEBUG__
-CFLAGS += $(INCS) -O0 -g -Wall
+DEBUGFLAGS = -O0 -g -D__DEBUG__
+CFLAGS += $(INCS) $(DEBUGFLAGS) -Wall
 LDFLAGS +=  -lm
 RM = rm -f
 
@@ -18,10 +18,10 @@ OBJFILES=$(SRCFILES:.c=.o)
 all: $(OBJFILES)
 	@echo ""
 	@echo " [ CD ] server/standalone/"
-	@make -C standalone/
+	+@make -C standalone/
 	@echo ""
 	@echo " [ CD ] server/lib/"
-	@make -C lib/
+	+@make -C lib/
 	@echo " [ LD ]	$(BIN)"
 	@$(CC) $(CFLAGS) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " [ AR ] $(LIBOUT)"
