@@ -17,7 +17,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		else
 			for (j = 0; j < map_w * map_h; j++) {
 				player[i].map[j].power = 0;
-				player[i].map[j].fog = 1;
+				player[i].map[j].fog = 0;
 			}
 		player[i].status = PLAYER_UNUSED;
 		player[i].msg_buf = messageBufferInit();
@@ -173,7 +173,7 @@ int playerCalcLOS(unsigned int team, unsigned int player, int x, int y, int mode
 			if (y + k < 0 || y + k >= server->h)
 				continue;
 			index = (y + k) * server->w + (y + j);
-			haz_los = (sqrtf(j*j + k*k) <= los) ? 1 : 0;
+			haz_los = (j*j + k*k <= los*los) ? 1 : 0;
 			building = (server->map[index]) ? server->map[index]->type : 0;
 			owner = (server->map[index]) ? server->map[index]->owner : 0;
 
@@ -187,6 +187,7 @@ int playerCalcLOS(unsigned int team, unsigned int player, int x, int y, int mode
 					messageBufferPushDirect(i, owner, MSG_SEND_BUILDING_PLACE, (t) ? building : 0, index, NULL);
 				}
 			else {
+				fprintf(stderr, "Fog: %i\n", server->player[player].map[index].fog);
 				server->player[player].map[index].fog += haz_los * mode;
 				t = (server->player[player].map[index].fog) ? 0 : 1;
 				messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << 1, index, NULL);
