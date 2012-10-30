@@ -22,6 +22,8 @@ UI_WIDGET *connect_server_entry_port;
 UI_WIDGET *connect_server_button;
 
 struct UI_PANE_LIST panelist_countdown;
+UI_WIDGET *countdown_label;
+UI_WIDGET *pbar;
 char countdown_text[16];
 
 struct UI_PANE_LIST panelist_game_sidebar;

@@ -38,7 +38,13 @@ void view_init() {
 	//Countdown
 	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
 	strcpy(countdown_text, "Downloading map");
-	ui_pane_set_root_widget(panelist_countdown.pane, ui_widget_create_label(font_std, countdown_text));
+	ui_pane_set_root_widget(panelist_countdown.pane, ui_widget_create_vbox());
+	countdown_label=ui_widget_create_label(font_std, countdown_text);
+	pbar=ui_widget_create_progressbar(font_std);
+	ui_vbox_add_child(panelist_countdown.pane->root_widget, countdown_label, 1);
+	ui_vbox_add_child(panelist_countdown.pane->root_widget, pbar, 0);
+	v.i=0;
+	ui_progressbar_set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);	
 	panelist_game_sidebar.next=NULL;
 	
 	//Game
@@ -56,7 +62,6 @@ void view_init() {
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
 		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
 	}
-	
 }
 
 void view_scroll(DARNIT_MOUSE mouse) {

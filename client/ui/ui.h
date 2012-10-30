@@ -37,6 +37,7 @@ UI_WIDGET *ui_selected_widget;
 #include "vbox.h"
 #include "button.h"
 #include "entry.h"
+#include "progressbar.h"
 
 void ui_init();
 

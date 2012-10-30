@@ -57,6 +57,9 @@ int main() {
 	
 	while(1) {
 		serverLoop(darnitTimeLastFrameTook());
+		DARNIT_KEYS buttons=darnitButtonGet();
+		if(buttons.select)
+			state=GAME_STATE_QUIT;
 		switch(state) {
 			case GAME_STATE_INPUT_NAME:
 				darnitRenderBegin();
@@ -74,7 +77,7 @@ int main() {
 				break;
 			case GAME_STATE_COUNTDOWN:
 				if(client_check_incomming()==-1) {
-					printf("Server disconnected!\n");
+					fprintf(stderr, "Server disconnected!\n");
 					state=GAME_STATE_CONNECT_SERVER;
 					break;
 				}
@@ -86,7 +89,7 @@ int main() {
 				break;
 			case GAME_STATE_GAME:
 				if(client_check_incomming()==-1) {
-					printf("Server disconnected!\n");
+					fprintf(stderr, "Server disconnected!\n");
 					state=GAME_STATE_CONNECT_SERVER;
 					break;
 				}
@@ -94,11 +97,13 @@ int main() {
 				view_scroll(mouse);
 				darnitRenderBegin();
 				view_draw();
-				darnitRenderTint(1, 0, 0, 1);
+				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 				ui_events(&panelist_game_sidebar, 1);
 				darnitRenderTint(1, 1, 1, 1);
 				darnitRenderEnd();
 				break;
+			case GAME_STATE_QUIT:
+				return 0;
 		}
 		
 		darnitLoop();

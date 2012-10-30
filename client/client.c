@@ -7,6 +7,8 @@
 
 #define PONG case MSG_RECV_PING: client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL); break
 
+unsigned int recalc_map=0;
+
 void client_message_convert_send(MESSAGE_RAW *message) {
 	message->player_id=darnitUtilHtonl(message->player_id);
 	message->command=darnitUtilHtonl(message->command);
@@ -40,12 +42,12 @@ int client_check_incomming() {
 			//download message payload
 			if((s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2))) {
 				if(s==0)
-					return 0;
+					break;
 				if(s==-1) {
 					sock=darnitSocketClose(sock);
 					return -1;
 				}
-				printf("payload size %i\n", msg_recv.arg_2);
+				//printf("payload size %i\n", msg_recv.arg_2);
 				if(client_message_handler)
 					client_message_handler(&msg_recv, msg_recv_payload);
 				msg_recv.command=0;
@@ -54,18 +56,22 @@ int client_check_incomming() {
 			//download message
 			if((s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW)))) {
 				if(s==0)
-					return 0;
+					break;
 				if(s==-1) {
 					sock=darnitSocketClose(sock);
 					return -1;
 				}
 				client_message_convert_recv(&msg_recv);
-				printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
+				//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
 				if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
 					client_message_handler(&msg_recv, NULL);
 			}
 		}
 	}
+	
+	for(i=0; recalc_map; recalc_map>>=1, i++)
+		if(recalc_map&1)
+			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
 	return 0;
 }
 
@@ -83,11 +89,11 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			//printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
 			map->layer[map->layers-1].tilemap->data[msg->arg_2]=(msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW;
-			darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
+			recalc_map|=1<<(map->layers-1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
-			darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
+			recalc_map|=1<<(map->layers-2);
 			break;
 	}
 }
@@ -100,7 +106,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			UI_PROPERTY_VALUE v={.p=countdown_text};
 			countdown_text[0]=(char)(msg->arg_1)+0x30;
 			countdown_text[1]=0;
-			panelist_countdown.pane->root_widget->set_prop(panelist_countdown.pane->root_widget, UI_LABEL_PROP_TEXT, v);
+			countdown_label->set_prop(countdown_label, UI_LABEL_PROP_TEXT, v);
 			if(!msg->arg_1) {
 				state=GAME_STATE_GAME;
 				client_message_handler=client_game_handler;
@@ -139,6 +145,8 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			downloaded_bytes+=msg->arg_2;
 			darnitFileWrite(payload, msg->arg_2, f);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
+			UI_PROPERTY_VALUE v={.i=100*downloaded_bytes/filesize_bytes};
+			ui_progressbar_set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);
 			printf("Map progress %i%%\n", 100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
