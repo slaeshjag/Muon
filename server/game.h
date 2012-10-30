@@ -2,7 +2,12 @@
 #define	__GAME_H__
 
 
+#ifdef __DEBUG__
+#define	SERVER_GAME_START_DELAY	1000
+#else
 #define	SERVER_GAME_START_DELAY	5000
+#endif
+
 #define	SERVER_GAME_COUNTDOWN	(SERVER_GAME_START_DELAY/1000)
 
 
