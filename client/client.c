@@ -81,12 +81,12 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			free(chatmsg);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
-			printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
+			//printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
 			map->layer[map->layers-1].tilemap->data[msg->arg_2]=(msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW;
 			darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
-			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*msg->arg_1-1);
+			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
 			darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
 			break;
 	}
