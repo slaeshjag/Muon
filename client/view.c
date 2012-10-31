@@ -3,11 +3,14 @@
 #include "muon.h"
 #include "view.h"
 #include "client.h"
+#include "engine.h"
 
 void view_init() {
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
 	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGBA8);
 	building_place=-1;
+	powergrid=NULL;
+	powergrid_lines=0;
 	
 	//Input player name
 	panelist_input_name.pane=ui_pane_create(16, 16, 256, 96, NULL);
@@ -100,6 +103,9 @@ void view_scroll(DARNIT_MOUSE mouse) {
 			scroll_y=SCROLL_SPEED;
 		darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 		
+		if(scroll_x||scroll_y);
+			engine_move_powergrid(scroll_x, scroll_y);
+		
 		if(mouse.x>platform.screen_w-SIDEBAR_WIDTH)
 			return;
 		if(mouse.rmb)
@@ -121,4 +127,6 @@ void view_draw() {
 	int i;
 	for(i=0; i<map->layers; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
+	if(powergrid)
+	darnitRenderLineDraw(powergrid, powergrid_lines);
 }

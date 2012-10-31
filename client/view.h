@@ -33,6 +33,9 @@ UI_WIDGET *game_sidebar_button_build[4];
 UI_WIDGET *game_sidebar_label_build[4];
 UI_WIDGET *game_sidebar_progress_build;
 
+DARNIT_LINE *powergrid;
+int powergrid_lines;
+
 struct UI_PANE_LIST panelist_game_menu;
 UI_WIDGET *game_menu_button[2];
 
