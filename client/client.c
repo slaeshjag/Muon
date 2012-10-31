@@ -36,7 +36,7 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 }
 
 int client_check_incomming() {
-	int s, i;
+	int s, i, j;
 	for(i=0; i<1000; i++) {
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
@@ -70,14 +70,19 @@ int client_check_incomming() {
 	}
 	
 	for(i=0; recalc_map; recalc_map>>=1, i++)
-		if(recalc_map&1)
+		if(recalc_map&1) {
+			for(j=0; j<map->layer[map->layers-1].tilemap->w*map->layer[map->layers-1].tilemap->h; j++) {
+				if(map->layer[map->layers-1].tilemap->data[j]&0x1000000&&!map->layer[map->layers-2].tilemap->data[j])
+					map->layer[map->layers-1].tilemap->data[j]=2;
+			}
 			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
+		}
 	return 0;
 }
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	char *chatmsg;
-	int layerbits;
+	int layerbits, i;
 	UI_PROPERTY_VALUE v;
 	switch(msg->command) {
 		PONG;
@@ -94,10 +99,19 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
 			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
 			recalc_map|=1<<(map->layers-1);
+			if(msg->arg_1&MSG_TILE_ATTRIB_POWER)
+				printf("set power to index %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
 			recalc_map|=1<<(map->layers-2);
+			if(msg->player_id==player_id) {
+				for(i=0; i<4; i++) {
+					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
+					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
+					client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
+				}
+			}
 			break;
 		case MSG_RECV_BUILDING_PROGRESS:
 			v.i=msg->arg_2;

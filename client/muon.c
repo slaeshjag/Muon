@@ -68,7 +68,7 @@ void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		state=GAME_STATE_QUIT;
 	} else if(widget==game_menu_button[1]) {
 		state=GAME_STATE_GAME;
-		darnitInputGrab();
+		//darnitInputGrab();
 	}
 }
 
