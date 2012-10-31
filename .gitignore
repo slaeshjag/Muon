@@ -1,6 +1,7 @@
 *.o
 client/muon
 server/server
+server/server_tester/server-tester
 *.swp
 *.a
 *.ldi
