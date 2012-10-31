@@ -103,11 +103,14 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_BUILDING_PLACE:
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
 			recalc_map|=1<<(map->layers-2);
+			recalc_map|=1<<(map->layers-1);
 			if(msg->player_id==player_id) {
 				for(i=0; i<4; i++) {
 					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 					client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
+					v.i=0;
+					game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
 				}
 			}
 			break;
