@@ -33,19 +33,19 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
-	int i, do_build=0;
+	int i, do_build=-1;
 	UI_PROPERTY_VALUE wv=widget->get_prop(widget, UI_BUTTON_PROP_CHILD);
 	for(i=0; i<4; i++) {
 		if(widget==game_sidebar_button_build[i]&&wv.p!=game_sidebar_progress_build) {
-			do_build=1; //just make sure to cancel all other buildings first
+			do_build=i; //just make sure to cancel all other buildings first
 		} else {
 			UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 			game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
 		}
 	}
-	if(do_build) {
-		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_START, NULL);
+	if(do_build!=-1) {
+		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+do_build, MSG_BUILDING_START, NULL);
 		UI_PROPERTY_VALUE v={.p=game_sidebar_progress_build};
 		widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 		v.i=0;
