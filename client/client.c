@@ -109,8 +109,8 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 					client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
-					v.i=0;
-					game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
+					//v.i=0;
+					//game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
 				}
 			}
 			break;
