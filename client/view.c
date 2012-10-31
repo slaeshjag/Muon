@@ -103,9 +103,6 @@ void view_scroll(DARNIT_MOUSE mouse) {
 			scroll_y=SCROLL_SPEED;
 		darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 		
-		if(scroll_x||scroll_y);
-			engine_move_powergrid(scroll_x, scroll_y);
-		
 		if(mouse.x>platform.screen_w-SIDEBAR_WIDTH)
 			return;
 		if(mouse.rmb)
@@ -128,5 +125,7 @@ void view_draw() {
 	for(i=0; i<map->layers; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
 	if(powergrid)
+	darnitRenderOffset(map->cam_x, map->cam_y);
 	darnitRenderLineDraw(powergrid, powergrid_lines);
+	darnitRenderOffset(0, 0);
 }
