@@ -142,6 +142,8 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 			if (y + k < 0 || y + k >= server->h)
 				continue;
 			index = (y + k) * server->w + (x + j);
+			if (j*j + k*k > range*range)
+				continue;
 			if (team > -1) {
 				for (i = 0; i < server->players; i++) {
 					if (server->player[i].team != team)

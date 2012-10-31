@@ -157,7 +157,7 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 			} else if (server->map[index]->owner != owner)	/* We don't own it */
 				continue;
 			if (server->map[index]->pylon.power && !unit->pylon.power) {
-				playerCalcSetPower(owner, j + x, k + y, 1);
+				playerCalcSetPower(owner, x, y, 1);
 				fprintf(stderr, "Setting power...\n");
 				unit->pylon.power = 1;
 			} else if (!server->map[index]->pylon.power) 
@@ -206,6 +206,7 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->shield = 0;		/* Don't spawn with any shield! */
 	unit->status = 0;		/* Nothing yet? */
 	unit->next = NULL;
+	server->map[x + y * server->w] = unit;
 	
 	if (unit->type == UNIT_DEF_PYLON || unit->type == UNIT_DEF_GENERATOR)
 		unitPylonInit(unit, x, y);
@@ -240,7 +241,6 @@ int unitAdd(int owner, int type, int x, int y) {
 	unit->next = server->unit;
 	server->unit = unit;
 
-	server->map[x + y * server->w] = unit;
 	playerCalcLOS(owner, x , y, 1);
 	if (type == UNIT_DEF_GENERATOR)
 		playerCalcSetPower(owner, x, y, 1);

@@ -7,7 +7,7 @@ int gameInit() {
 	server->game.countdown = 0;
 
 	/* FIXME: Make this variable */
-	server->game.gamespeed = 1;
+	server->game.gamespeed = 2;
 
 	return 0;
 }
