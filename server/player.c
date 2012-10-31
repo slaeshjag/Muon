@@ -23,14 +23,19 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].msg_buf = messageBufferInit();
 		player[i].socket = NULL;
 		player[i].process_recv = PLAYER_PROCESS_NOTHING;
-		if (playerBuildQueueInit() < 0)
-			err = 1;
 	}
+	
+	server->players = players;
+	server->player = player;
+	if (playerBuildQueueInit() < 0)
+		err = 1;
 
 	if (err) {
 		for (i = 0; i < players; i++)
 			free(player[i].map);
 		errorPush(SERVER_ERROR_NO_MEMORY);
+		server->players = 0;
+		server->player = NULL;
 		free(player);
 		return NULL;
 	}
@@ -226,6 +231,7 @@ int playerBuildQueueInit() {
 
 	for (i = 0; i < server->players; i++) {
 		for (j = 0; j < server->build_spots; j++) {
+			fprintf(stderr, "initializing %i\n", j);
 			server->player[i].queue.queue[j].building = 0;
 			server->player[i].queue.queue[j].time = 0;
 			server->player[i].queue.queue[j].progress = 0;

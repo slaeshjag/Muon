@@ -66,8 +66,6 @@ int serverInitMap(const char *path) {
 	server->map_c.path = path;
 	server->pylons = NULL;
 
-	/* FIXME: Parse this value from map */
-	server->build_spots = 1;
 
 	return 0;
 }
@@ -127,6 +125,10 @@ SERVER *serverStart(const char *fname, unsigned int players, int port) {
 
 	ldmzGetSize(server->map_data, &map_w, &map_h);
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
+	
+	/* FIXME: Parse this value from map */
+	server->build_spots = 1;
+	
 	playerInit(players, map_w, map_h);
 	server->accept = networkListen(port);
 

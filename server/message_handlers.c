@@ -91,9 +91,10 @@ void messageHandlerPong(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerStartBuild(unsigned int player, MESSAGE *message) {
-	if (message->arg[1])
+	if (message->arg[1]) {
+		fprintf(stderr, "Building %i...\n", message->arg[0]);
 		playerBuildQueueStart(player, message->arg[0]);
-	else
+	} else
 		playerBuildQueueStop(player, message->arg[0]);
 	
 	return;
