@@ -6,6 +6,9 @@ int gameInit() {
 	server->game.time_elapsed = 0;
 	server->game.countdown = 0;
 
+	/* FIXME: Make this variable */
+	server->game.gamespeed = 1;
+
 	return 0;
 }
 

@@ -90,6 +90,17 @@ void messageHandlerPong(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerStartBuild(unsigned int player, MESSAGE *message) {
+	if (message->arg[1]) {
+		fprintf(stderr, "Building %i...\n", message->arg[0]);
+		playerBuildQueueStart(player, message->arg[0]);
+	} else
+		playerBuildQueueStop(player, message->arg[0]);
+	
+	return;
+}
+
+
 void messageHandlerDummy(unsigned int player, MESSAGE *message) {
 	fprintf(stderr, "MSG_RECV: %i  - Not implemented yet!\n", message->command);
 
@@ -103,7 +114,7 @@ int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_IDENTIFY] 	= messageHandlerIdentify;
 	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerPlayerInfo;
 	server->message_handler.handle[MSG_RECV_READY] 		= messageHandlerPlayerReady;
-	server->message_handler.handle[5] 			= messageHandlerDummy;
+	server->message_handler.handle[MSG_RECV_START_BUILD]	= messageHandlerStartBuild;
 	server->message_handler.handle[6] 			= messageHandlerDummy;
 	server->message_handler.handle[7] 			= messageHandlerDummy;
 

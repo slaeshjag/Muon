@@ -10,11 +10,14 @@
 #define	UNIT_DEF_PYLON			4
 #define	UNIT_DEF_WALL			5
 
+#define	UNIT_ATTACKER_DMGP		5
+
 static const int unit_los[] = 		{ 0, 7, 6, 3, 4, 1 };
-static const int unit_maxhp[] = 	{ 0, 5000, 100, 1000, 500, 4000 };
-static const int unit_maxshield[] = 	{ 0, 5000, 50, 500, 500, 4000 };
-static const int unit_shieldrec[] = 	{ 0, 40, 1, 10, 10, 5 };
+static const int unit_maxhp[] = 	{ 0, 50000, 1000, 1000, 5000, 1000 };
+static const int unit_maxshield[] = 	{ 0, 50000, 0, 5000, 5000, 40000 };
+static const int unit_shieldreg[] = 	{ 0, 40, 1, 10, 10, 5 };
 static const int unit_range[] = 	{ 0, 4, 0, 3, 4, 1 };
+static const int unit_buildtime[] =	{ 0, 0, 5000, 20000, 20000, 10000 };
 
 struct SERVER_UNIT;
 

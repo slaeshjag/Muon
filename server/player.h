@@ -30,6 +30,20 @@ typedef struct {
 
 
 typedef struct {
+	int			building;
+	int			time;
+	int			progress;
+	int			index;
+	int			in_use;
+} PLAYER_BUILDQUEUE_E;
+
+
+typedef struct {
+	PLAYER_BUILDQUEUE_E	*queue;
+} PLAYER_BUILDQUEUE;
+
+
+typedef struct {
 	PLAYER_MAP		*map;
 	unsigned int		map_progress;
 	int			team;
@@ -45,7 +59,7 @@ typedef struct {
 	int			process_byte_send;
 	char			name[PLAYER_NAME_LEN];
 	PLAYER_SPAWN		spawn;
-	unsigned int	generator;
+	PLAYER_BUILDQUEUE	queue;
 } PLAYER;
 
 PLAYER *playerInit(unsigned int players, int map_w, int map_h);
@@ -56,6 +70,12 @@ void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned 
 int playerSlot();
 int playerCalcLOS(unsigned int player, int x, int y, int mode);
 int playerCalcSetPower(unsigned int player, int x, int y, int mode);
+
+int playerBuildQueueInit();
+int playerBuildQueueDestroy();
+int playerBuildQueueLoop(int msec);
+int playerBuildQueueStart(int player, int building);
+int playerBuildQueueStop(int player, int building);
 
 
 #endif

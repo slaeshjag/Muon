@@ -66,6 +66,7 @@ int serverInitMap(const char *path) {
 	server->map_c.path = path;
 	server->pylons = NULL;
 
+
 	return 0;
 }
 
@@ -124,6 +125,10 @@ SERVER *serverStart(const char *fname, unsigned int players, int port) {
 
 	ldmzGetSize(server->map_data, &map_w, &map_h);
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
+	
+	/* FIXME: Parse this value from map */
+	server->build_spots = 1;
+	
 	playerInit(players, map_w, map_h);
 	server->accept = networkListen(port);
 
@@ -367,8 +372,10 @@ int serverLoop(unsigned int d_ms) {
 	if (!server->game.started) {
 		lobbyPoll();
 		playerCheckIdentify();
-	} else 
+	} else {
+		playerBuildQueueLoop(d_ms);
 		gameLoop(d_ms);
+	}
 
 	serverSendPing();
 	
