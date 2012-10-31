@@ -22,10 +22,11 @@ UI_WIDGET *connect_server_entry_host;
 UI_WIDGET *connect_server_entry_port;
 UI_WIDGET *connect_server_button;
 
-struct UI_PANE_LIST panelist_countdown;
+struct UI_PANE_LIST panelist_countdown, panelist_countdown_ready;
 UI_WIDGET *countdown_label;
 UI_WIDGET *pbar;
 char countdown_text[16];
+UI_WIDGET *countdown_ready;
 
 struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_button_build[4];
@@ -37,6 +38,7 @@ UI_WIDGET *game_menu_button[2];
 
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 

@@ -32,6 +32,12 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	state=GAME_STATE_COUNTDOWN;
 }
 
+void ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
+	v=widget->get_prop(widget, UI_CHECKBOX_PROP_ACTIVATED);
+	client_message_send(player_id, MSG_SEND_READY, v.i, 100, NULL);
+}
+
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;

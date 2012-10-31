@@ -95,13 +95,10 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			//printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
-			//layerbits=map->layer[map->layers-1].tilemap->data[msg->arg_2];
 			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
 			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
 			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
 			recalc_map|=1<<(map->layers-1);
-			if(msg->arg_1&MSG_TILE_ATTRIB_POWER)
-				printf("set power to index %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
@@ -177,14 +174,17 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			darnitFileClose(f);
 			//printf("Map %s successfully downloaded!\n", filename);
 			//client_message_send(player_id, MSG_SEND_MAP_PROGRESS, 100, 0, NULL);
-			client_message_send(player_id, MSG_SEND_READY, 1, 100, NULL);
+			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
 			map=darnitMapLoad("maps/map.ldmz");
 			map_w=map->layer->tilemap->w*map->layer->tile_w;
 			map_h=map->layer->tilemap->h*map->layer->tile_h;
+			countdown_ready->event_handler->add(countdown_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
+			break;
+		case MSG_RECV_GAME_START:
 			state=GAME_STATE_COUNTDOWN;
 			client_message_handler=client_countdown_handler;
-			break;
+			client_countdown_handler(msg, payload);
 	}
 }
 

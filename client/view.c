@@ -48,7 +48,13 @@ void view_init() {
 	ui_vbox_add_child(panelist_countdown.pane->root_widget, pbar, 0);
 	v.i=0;
 	pbar->set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);	
-	panelist_game_sidebar.next=NULL;
+	panelist_countdown.next=&panelist_countdown_ready;
+	panelist_countdown_ready.pane=ui_pane_create(16, 16, 64, 32, NULL);
+	ui_pane_set_root_widget(panelist_countdown_ready.pane, ui_widget_create_hbox());
+	countdown_ready=ui_widget_create_checkbox();
+	ui_hbox_add_child(panelist_countdown_ready.pane->root_widget, countdown_ready, 0);
+	ui_hbox_add_child(panelist_countdown_ready.pane->root_widget, ui_widget_create_label(font_std, "Ready"), 1);
+	panelist_countdown_ready.next=NULL;
 	
 	//Game
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
