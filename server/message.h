@@ -10,7 +10,7 @@
 #define	MESSAGE_LOBBY_MAX		4
 
 #define	MESSAGE_GAME_MIN		5
-#define	MESSAGE_GAME_MAX		5
+#define	MESSAGE_GAME_MAX		7
 
 /* Messages we can always get */
 #define	MSG_RECV_PONG			0

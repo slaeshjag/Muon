@@ -90,6 +90,20 @@ int serverIsRunning() {
 }
 
 
+int serverParseMapFirst() {
+	int i, buildspots;
+
+	buildspots = 1;		/* Player's generator counts! */
+	for (i = 0; i < server->w * server->h; i++)
+		if (server->map_c.tile_data[i] == UNIT_BUILDSITE)
+			buildspots++;
+	server->build_spots = buildspots;
+	
+	return 0;
+}
+
+
+
 /* TODO: Expand with arguments */
 SERVER *serverStart(const char *fname, unsigned int players, int port) {
 	int i, map_w, map_h;
@@ -125,9 +139,10 @@ SERVER *serverStart(const char *fname, unsigned int players, int port) {
 
 	ldmzGetSize(server->map_data, &map_w, &map_h);
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
-	
-	/* FIXME: Parse this value from map */
-	server->build_spots = 1;
+	server->map_c.tile_data = ldmzGetData(server->map_data);
+	server->w = map_w;
+	server->h = map_h;
+	serverParseMapFirst();
 	
 	playerInit(players, map_w, map_h);
 	server->accept = networkListen(port);
@@ -150,8 +165,6 @@ SERVER *serverStart(const char *fname, unsigned int players, int port) {
 		server->map[i] = NULL;
 
 	server->unit = NULL;
-	server->w = map_w;
-	server->h = map_h;
 	if (serverInitMap(fname) < 0)
 		server = serverStop();
 	if (atoi(tmp) < players) {

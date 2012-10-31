@@ -133,8 +133,8 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 
 	unit->pylon.x = x;
 	unit->pylon.y = y;
-	unit->pylon.power = 0;
 	unit->pylon.pulse = 0;
+	unit->pylon.power = 0;
 	unit->pylon.unit = unit;
 	unit->pylon.next = NULL;
 
@@ -156,17 +156,20 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 					continue;
 			} else if (server->map[index]->owner != owner)	/* We don't own it */
 				continue;
-			if (server->map[index]->pylon.power) {
+			if (server->map[index]->pylon.power && !unit->pylon.power) {
 				playerCalcSetPower(owner, j + x, k + y, 1);
+				fprintf(stderr, "Setting power...\n");
 				unit->pylon.power = 1;
-			}
+			} else if (!server->map[index]->pylon.power) 
+				fprintf(stderr, "Pylon at %i %i is unpowered\n", j + x, k + y);
 
-			fprintf(stderr, "Filling out lists\n");
 			unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
 			unitPylonListAdd(&server->map[index]->pylon.next, &server->map[index]->pylon);
 			unitPylonListAdd(&server->pylons, &unit->pylon);
 		}
 	}
+	
+	unit->pylon.power = (unit->type == UNIT_DEF_GENERATOR) ? 1 : unit->pylon.power;
 
 	return;
 }
@@ -181,7 +184,8 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 	if (!server->player[player].map[index].fog && unit != UNIT_DEF_GENERATOR)
 		return -1;
 	fprintf(stderr, "Adding unit %i\n", unit);
-	unitAdd(player, unit, x, y);
+	if (unitAdd(player, unit, x, y) >= 0)
+		playerBuildQueueStop(player, unit);
 
 	return 0;
 }
@@ -203,7 +207,7 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->status = 0;		/* Nothing yet? */
 	unit->next = NULL;
 	
-	if (unit->type == UNIT_DEF_PYLON)
+	if (unit->type == UNIT_DEF_PYLON || unit->type == UNIT_DEF_GENERATOR)
 		unitPylonInit(unit, x, y);
 	else
 		unit->pylon.next = NULL;
@@ -227,6 +231,11 @@ int unitAdd(int owner, int type, int x, int y) {
 
 	if ((unit = unitInit(owner, type, x, y)) == NULL)
 		return -1;
+	
+	if (unit->type == UNIT_DEF_BUILDSITE) {
+		if (server->map_c.tile_data[x + server->w * y] != UNIT_BUILDSITE)
+			return -1;
+	}
 	
 	unit->next = server->unit;
 	server->unit = unit;

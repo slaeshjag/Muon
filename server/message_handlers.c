@@ -40,8 +40,6 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 			messageBufferPush(server->player[player].msg_buf, &msg);
 		}
 	
-	fprintf(stderr, "Debug: Player '%s' joined the game\n", server->player[player].name);
-
 	lobbyMapSend(player);
 
 	return;
@@ -91,12 +89,31 @@ void messageHandlerPong(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerStartBuild(unsigned int player, MESSAGE *message) {
-	if (message->arg[1]) {
-		fprintf(stderr, "Building %i...\n", message->arg[0]);
+	if (message->arg[1])
 		playerBuildQueueStart(player, message->arg[0]);
-	} else
+	else
 		playerBuildQueueStop(player, message->arg[0]);
 	
+	return;
+}
+
+
+void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
+	if (message->arg[1] > server->w * server->h)			/* Meh, nice try :P */
+		return;
+	if (!server->player[player].map[message->arg[1]].power)		/* Sorry! :x */
+		return;
+	if (!server->player[player].map[message->arg[1]].fog)		/* Nope. */
+		return;
+	if (server->map[message->arg[1]])				/* Even more nope. */
+		return;
+	if (playerBuildQueueUnitReady(player, message->arg[0]) < 0)	/* Pff. lol. */
+		return;
+	
+	/* Congratulations great commander, you have passed the five trials! */
+	/* Now, your building is being placed and you can enjoy the havoc it may cause */
+	unitSpawn(player, message->arg[0], message->arg[1] % server->w, message->arg[1] / server->w);
+
 	return;
 }
 
@@ -115,7 +132,7 @@ int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerPlayerInfo;
 	server->message_handler.handle[MSG_RECV_READY] 		= messageHandlerPlayerReady;
 	server->message_handler.handle[MSG_RECV_START_BUILD]	= messageHandlerStartBuild;
-	server->message_handler.handle[6] 			= messageHandlerDummy;
+	server->message_handler.handle[MSG_RECV_PLACE_BUILDING]	= messageHandlerPlaceBuilding;
 	server->message_handler.handle[7] 			= messageHandlerDummy;
 
 	return 0;

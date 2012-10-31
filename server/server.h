@@ -41,6 +41,7 @@ typedef struct {
 	const char		*path;
 	void			*data;
 	unsigned int		data_len;
+	unsigned int		*tile_data;
 } SERVER_MAP;
 
 

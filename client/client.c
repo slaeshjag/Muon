@@ -118,7 +118,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			if(!msg->arg_1) {
 				state=GAME_STATE_GAME;
 				client_message_handler=client_game_handler;
-				darnitInputGrab();
+			//	darnitInputGrab();
 			}
 			break;
 	}

@@ -9,6 +9,10 @@
 #define	UNIT_DEF_ATTACKER		3
 #define	UNIT_DEF_PYLON			4
 #define	UNIT_DEF_WALL			5
+#define	UNIT_DEF_BUILDSITE		6
+#define	UNIT_DEF_BUILDSITE_FREE		0x100
+
+#define	UNIT_BUILDSITE			5
 
 #define	UNIT_ATTACKER_DMGP		5
 

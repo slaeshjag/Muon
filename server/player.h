@@ -76,6 +76,7 @@ int playerBuildQueueDestroy();
 int playerBuildQueueLoop(int msec);
 int playerBuildQueueStart(int player, int building);
 int playerBuildQueueStop(int player, int building);
+int playerBuildQueueUnitReady(int player, int building);
 
 
 #endif

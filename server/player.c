@@ -170,7 +170,7 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 
 
 int playerCalcLOS(unsigned int player, int x, int y, int mode) {
-	int i, j, k, los, index, building, owner, haz_los, t, team;
+	int i, j, k, los, index, building, owner, haz_los, t, team, oldfog, fogdiff;
 
 	index = y * server->w + x;
 	team = server->player[player].team;
@@ -184,10 +184,12 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 		for (k = -1 * los; k <= los; k++) {
 			if (y + k < 0 || y + k >= server->h)
 				continue;
-			index = (y + k) * server->w + (y + j);
+			index = (y + k) * server->w + (x + j);
 			haz_los = (j*j + k*k <= los*los) ? 1 : 0;
 			building = (server->map[index]) ? server->map[index]->type : 0;
 			owner = (server->map[index]) ? server->map[index]->owner : 0;
+			if (!building && server->map_c.tile_data[index] == UNIT_BUILDSITE)
+				building = UNIT_DEF_BUILDSITE_FREE;
 
 			if (team > -1)
 				for (i = 0; i < server->players; i++) {
@@ -195,16 +197,26 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 						continue;
 					if (server->player[i].status != PLAYER_IN_GAME)
 						continue;
-					server->player[i].map[index].fog += haz_los * mode;
-					t = (server->player[i].map[index].fog) ? 0 : 1;
-					messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, i << 1, 0, NULL);
-					messageBufferPushDirect(i, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
+					oldfog = (server->player[player].map[index].fog > 0);
+					server->player[player].map[index].fog += haz_los * mode;
+					t = (server->player[player].map[index].fog) ? 0 : 1;
+					fogdiff = (server->player[player].map[index].fog > 0);
+					fogdiff = (oldfog ^ fogdiff);
+					if (((t && mode == -1) || (!t && mode == 1)) || (j == 0 && k == 0)) {
+						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, i << 1, 0, NULL);
+						messageBufferPushDirect(i, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
+					}
 				}
 			else {
+				oldfog = (server->player[player].map[index].fog > 0);
 				server->player[player].map[index].fog += haz_los * mode;
 				t = (server->player[player].map[index].fog) ? 0 : 1;
-				messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << 1, index, NULL);
-				messageBufferPushDirect(player, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
+				fogdiff = (server->player[player].map[index].fog > 0);
+				fogdiff = (oldfog ^ fogdiff);
+				if (fogdiff || (j == 0 && k == 0)) {
+					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << 1, index, NULL);
+					messageBufferPushDirect(player, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
+				}
 			}
 		}
 	}
@@ -231,7 +243,6 @@ int playerBuildQueueInit() {
 
 	for (i = 0; i < server->players; i++) {
 		for (j = 0; j < server->build_spots; j++) {
-			fprintf(stderr, "initializing %i\n", j);
 			server->player[i].queue.queue[j].building = 0;
 			server->player[i].queue.queue[j].time = 0;
 			server->player[i].queue.queue[j].progress = 0;
@@ -276,9 +287,9 @@ int playerBuildQueueLoop(int msec) {
 			progress = server->player[i].queue.queue[j].time;
 			progress *= 100;
 			progress /= unit_buildtime[building];
+			if (progress != server->player[i].queue.queue[j].progress)
+				messageBufferPushDirect(i, i, MSG_SEND_BUILDING_PROGRESS, building, progress, NULL);
 			server->player[i].queue.queue[j].progress = progress;
-
-			messageBufferPushDirect(i, i, MSG_SEND_BUILDING_PROGRESS, building, progress, NULL);
 		}
 	}
 	
@@ -289,7 +300,7 @@ int playerBuildQueueLoop(int msec) {
 int playerBuildQueueStart(int player, int building) {
 	int i;
 
-	if (building == 0 || building > UNITS_DEFINED)
+	if (building <= UNIT_DEF_GENERATOR || building > UNITS_DEFINED)
 		return -1;
 
 	for (i = 0; i < server->build_spots; i++) {
@@ -308,10 +319,28 @@ int playerBuildQueueStart(int player, int building) {
 }
 
 
+int playerBuildQueueUnitReady(int player, int building) {
+	int i;
+
+	if (building <= UNIT_DEF_GENERATOR || building > UNITS_DEFINED)
+		return -1;
+
+	for (i = 0; i < server->build_spots; i++) {
+		if (server->player[player].queue.queue[i].building != building)
+			continue;
+		if (server->player[player].queue.queue[i].progress < 100)
+			return -1;
+		return 0;
+	}
+
+	return -1;
+}
+
+
 int playerBuildQueueStop(int player, int building) {
 	int i;
 
-	if (building == 0 || building > UNITS_DEFINED)
+	if (building <= UNIT_DEF_GENERATOR || building > UNITS_DEFINED)
 		return -1;
 	for (i = 0; i < server->build_spots; i++) {
 		if (!server->player[player].queue.queue[i].in_use)

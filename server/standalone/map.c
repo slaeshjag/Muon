@@ -75,3 +75,4 @@ LDMZ_MAP *ldmzFree(LDMZ_MAP *map) {
 const char *ldmzFindProp(LDMZ_MAP *map, const char *key) {
 	return mapPropSearch(map->prop, key);
 }
+
