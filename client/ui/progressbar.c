@@ -36,6 +36,7 @@ void ui_progressbar_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE valu
 		case UI_PROGRESSBAR_PROP_PROGRESS:
 			if(value.i<0||value.i>100)
 				break;
+			p->progress=value.i;
 			sprintf(p->text, "%i%%", value.i);
 			darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+2+((widget->w-4)*value.i/100), widget->y+widget->h-2);
 			if(p->surface!=NULL)
@@ -52,6 +53,9 @@ UI_PROPERTY_VALUE ui_progressbar_get_prop(UI_WIDGET *widget, int prop) {
 	UI_PROPERTY_VALUE v={.p=NULL};
 	struct UI_PROGRESSBAR_PROPERTIES *p=widget->properties;
 	switch(prop) {
+		case UI_PROGRESSBAR_PROP_PROGRESS:
+			v.i=p->progress;
+			break;
 		case UI_PROGRESSBAR_PROP_FONT:
 			v.p=p->font;
 			break;

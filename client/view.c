@@ -2,10 +2,12 @@
 
 #include "muon.h"
 #include "view.h"
+#include "client.h"
 
 void view_init() {
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
 	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGBA8);
+	building_place=-1;
 	
 	//Input player name
 	panelist_input_name.pane=ui_pane_create(16, 16, 256, 96, NULL);
@@ -91,6 +93,22 @@ void view_scroll(DARNIT_MOUSE mouse) {
 		else if(mouse.y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-platform.screen_h)
 			scroll_y=SCROLL_SPEED;
 		darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+		
+		if(mouse.x>platform.screen_w-SIDEBAR_WIDTH)
+			return;
+		if(mouse.rmb)
+			building_place=-1;
+		else if(mouse.lmb&&building_place>-1) {
+			int map_offset=((mouse.y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse.x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
+			printf("Building placed at %i\n", map_offset);
+			//map->layer[map->layers-1].tilemap->data[map_offset]=2;
+			//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
+			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
+			building_place=-1;
+		}else if(mouse.lmb) {
+			//status about clicked building, etc
+		}
+		
 }
 
 void view_draw() {
