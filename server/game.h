@@ -15,6 +15,7 @@ typedef struct {
 	int			started;
 	unsigned int		time_elapsed;
 	unsigned int		countdown;
+	unsigned int		gamespeed;
 } GAME;
 
 int gameInit();

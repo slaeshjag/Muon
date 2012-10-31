@@ -83,7 +83,7 @@ typedef struct {
 /* arg_1 is the index on the map that the building is at, arg_2 is the index of the building attacking */
 #define	MSG_RECV_BUILDING_ATTACK	0x00E
 
-/* arg_1 is the building type that is being built, arg_2 is the progress in the range 0..1000 */
+/* arg_1 is the building type that is being built, arg_2 is the progress in the range 0..100 */
 #define	MSG_RECV_BUILDING_PROGRESS	0x00F
 
 /* arg_1 is the attribute bitmask for that tile, arg_2 is the index on the map */

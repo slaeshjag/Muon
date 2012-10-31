@@ -22,6 +22,24 @@ int unitRange(int type) {
 }
 
 
+int unitPylonListRemove(UNIT_PYLON_LIST **list, UNIT_PYLON *del) {
+	UNIT_PYLON_LIST *tmp;
+
+	while ((*list) != NULL) {
+		if ((*list)->pylon == del) {
+			tmp = *list;
+			*list = (*list)->next;
+			free(tmp);
+			return 0;
+		}
+		list = &(*list)->next;
+	}
+
+	return -1;
+}
+
+
+
 int unitPylonListAdd(UNIT_PYLON_LIST **list, UNIT_PYLON *add) {
 	UNIT_PYLON_LIST *new;
 
@@ -80,6 +98,26 @@ void unitPylonPulse() {
 		}
 
 		list = list->next;
+	}
+
+	return;
+}
+
+
+void unitPylonDelete(SERVER_UNIT *unit) {
+	UNIT_PYLON_LIST *list, *tmp;
+
+	if (unit->pylon.power)
+		playerCalcSetPower(unit->owner, unit->pylon.x, unit->pylon.y, -1);
+	
+	list = unit->pylon.next;
+	unit->pylon.next = NULL;
+	
+	while (list != NULL) {
+		unitPylonListRemove(&list->pylon->next, &unit->pylon);
+		tmp = list;
+		list = list->next;
+		free(tmp);
 	}
 
 	return;
@@ -223,6 +261,12 @@ int unitRemove(int x, int y) {
 
 	if (next == unit) {
 		*parent = next->next;
+		if (next->type == UNIT_DEF_PYLON) {
+			unitPylonDelete(next);
+			unitPylonPulse();
+		} else if (next->type == UNIT_DEF_GENERATOR) {
+			/* TODO: Handle player loss */
+		}
 		free(next);
 		return 0;
 	}

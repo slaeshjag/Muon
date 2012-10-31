@@ -66,6 +66,9 @@ int serverInitMap(const char *path) {
 	server->map_c.path = path;
 	server->pylons = NULL;
 
+	/* FIXME: Parse this value from map */
+	server->build_spots = 1;
+
 	return 0;
 }
 
@@ -367,8 +370,10 @@ int serverLoop(unsigned int d_ms) {
 	if (!server->game.started) {
 		lobbyPoll();
 		playerCheckIdentify();
-	} else 
+	} else {
+		playerBuildQueueLoop(d_ms);
 		gameLoop(d_ms);
+	}
 
 	serverSendPing();
 	
