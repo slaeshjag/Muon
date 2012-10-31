@@ -73,13 +73,15 @@ void ui_label_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 }
 
 void ui_label_request_size(UI_WIDGET *widget, int *w, int *h) {
-	int ww=w==NULL?32:*w;
-	if((ww|*h)==0)
+	int ww=((w==NULL)||(*w==-1))?32:*w;
+	if(ww==0||*h==0)
 		return;
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
 	int text_w;
 	int text_h=darnitTextStringGeometrics(p->font, p->text, ww, &text_w);
 	*h=text_h;
+	if(w&&*w==-1)
+		*w=text_w;
 }
 
 void ui_label_render(UI_WIDGET *widget) {

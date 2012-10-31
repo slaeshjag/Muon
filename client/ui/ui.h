@@ -35,6 +35,7 @@ UI_WIDGET *ui_selected_widget;
 #include "pane.h"
 #include "label.h"
 #include "vbox.h"
+#include "hbox.h"
 #include "button.h"
 #include "entry.h"
 #include "progressbar.h"
