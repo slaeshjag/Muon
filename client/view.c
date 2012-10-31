@@ -124,8 +124,9 @@ void view_draw() {
 	int i;
 	for(i=0; i<map->layers; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
-	if(powergrid)
-	darnitRenderOffset(map->cam_x, map->cam_y);
-	darnitRenderLineDraw(powergrid, powergrid_lines);
-	darnitRenderOffset(0, 0);
+	if(powergrid&&building_place!=-1) {
+		darnitRenderOffset(map->cam_x, map->cam_y);
+		darnitRenderLineDraw(powergrid, powergrid_lines);
+		darnitRenderOffset(0, 0);
+	}
 }
