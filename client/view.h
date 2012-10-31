@@ -11,6 +11,7 @@ void view_draw();
 void view_scroll(DARNIT_MOUSE mouse);
 
 DARNIT_FONT *font_std;
+DARNIT_TILESHEET *mouse_tilesheet;
 
 struct UI_PANE_LIST panelist_input_name;
 UI_WIDGET *input_name_entry;

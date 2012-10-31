@@ -4,6 +4,8 @@
 #include "view.h"
 #include "client.h"
 
+#define RENDER_MOUSE darnitRenderBlendingEnable(); darnitRenderTileBlit(mouse_tilesheet, 0, mouse.x, mouse.y); darnitRenderBlendingDisable()
+
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;	
@@ -73,7 +75,6 @@ int main() {
 	}
 	platform=darnitPlatformGet();
 	DARNIT_MOUSE mouse;
-	
 	serverInit();
 	serverStart("map.ldi", 1, 1337);
 	state=GAME_STATE_INPUT_NAME;
@@ -84,12 +85,14 @@ int main() {
 	while(1) {
 		serverLoop(darnitTimeLastFrameTook());
 		DARNIT_KEYS buttons=darnitButtonGet();
+		mouse=darnitMouseGet();
 		switch(state) {
 			case GAME_STATE_INPUT_NAME:
 				darnitRenderBegin();
 				darnitRenderTint(1, 0, 0, 1);
 				ui_events(&panelist_input_name, 1);
 				darnitRenderTint(1, 1, 1, 1);
+				RENDER_MOUSE;
 				darnitRenderEnd();
 				if(buttons.select)
 					state=GAME_STATE_QUIT;
@@ -99,6 +102,7 @@ int main() {
 				darnitRenderTint(1, 0, 0, 1);
 				ui_events(&panelist_connect_server, 1);
 				darnitRenderTint(1, 1, 1, 1);
+				RENDER_MOUSE;
 				darnitRenderEnd();
 				if(buttons.select)
 					state=GAME_STATE_QUIT;
@@ -113,6 +117,7 @@ int main() {
 				darnitRenderTint(1, 0, 0, 1);
 				ui_events(&panelist_countdown, 1);
 				darnitRenderTint(1, 1, 1, 1);
+				RENDER_MOUSE;
 				darnitRenderEnd();
 				break;
 			case GAME_STATE_GAME:
@@ -122,13 +127,13 @@ int main() {
 					darnitInputUngrab();
 					break;
 				}
-				mouse=darnitMouseGet();
 				view_scroll(mouse);
 				darnitRenderBegin();
 				view_draw();
 				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 				ui_events(&panelist_game_sidebar, 1);
 				darnitRenderTint(1, 1, 1, 1);
+				RENDER_MOUSE;
 				darnitRenderEnd();
 				if(buttons.select) {
 					state=GAME_STATE_GAME_MENU;
@@ -147,6 +152,7 @@ int main() {
 				ui_pane_render(panelist_game_sidebar.pane);
 				ui_events(&panelist_game_menu, 1);
 				darnitRenderTint(1, 1, 1, 1);
+				RENDER_MOUSE;
 				darnitRenderEnd();
 				break;
 			case GAME_STATE_QUIT:

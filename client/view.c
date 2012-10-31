@@ -5,6 +5,7 @@
 
 void view_init() {
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
+	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGBA8);
 	
 	//Input player name
 	panelist_input_name.pane=ui_pane_create(16, 16, 256, 96, NULL);
