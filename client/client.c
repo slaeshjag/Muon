@@ -95,7 +95,8 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			//printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
-			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW);
+			//layerbits=map->layer[map->layers-1].tilemap->data[msg->arg_2];
+			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
 			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
 			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
 			recalc_map|=1<<(map->layers-1);
