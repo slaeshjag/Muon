@@ -89,8 +89,12 @@ void ui_button_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void ui_button_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
+	UI_WIDGET *old_child;
 	switch(prop) {
 		case UI_BUTTON_PROP_CHILD:
+			old_child=p->child;
+			p->child=value.p;
+			p->child->resize(p->child, old_child->x, old_child->y, old_child->w, old_child->h);
 			break;
 		case UI_BUTTON_PROP_ACTIVATED:
 			p->activated=value.i;

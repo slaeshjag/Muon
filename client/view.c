@@ -44,7 +44,7 @@ void view_init() {
 	ui_vbox_add_child(panelist_countdown.pane->root_widget, countdown_label, 1);
 	ui_vbox_add_child(panelist_countdown.pane->root_widget, pbar, 0);
 	v.i=0;
-	ui_progressbar_set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);	
+	pbar->set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);	
 	panelist_game_sidebar.next=NULL;
 	
 	//Game
@@ -53,15 +53,17 @@ void view_init() {
 	panelist_game_sidebar.next=NULL;
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Buildings:"), 0);
-	game_sidebar_button_build[0]=ui_widget_create_button(ui_widget_create_label(font_std, "Scout"));
-	game_sidebar_button_build[1]=ui_widget_create_button(ui_widget_create_label(font_std, "Attacker"));
-	game_sidebar_button_build[2]=ui_widget_create_button(ui_widget_create_label(font_std, "Pylon"));
-	game_sidebar_button_build[3]=ui_widget_create_button(ui_widget_create_label(font_std, "Wall"));
+	game_sidebar_label_build[0]=ui_widget_create_label(font_std, "Scout");
+	game_sidebar_label_build[1]=ui_widget_create_label(font_std, "Attacker");
+	game_sidebar_label_build[2]=ui_widget_create_label(font_std, "Pylon");
+	game_sidebar_label_build[3]=ui_widget_create_label(font_std, "Wall");
 	int i;
 	for(i=0; i<4; i++) {
+		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
 		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
 	}
+	game_sidebar_progress_build=ui_widget_create_progressbar(font_std);
 	
 	//Game menu
 	panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);

@@ -77,6 +77,8 @@ int client_check_incomming() {
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	char *chatmsg;
+	int layerbits;
+	UI_PROPERTY_VALUE v;
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
@@ -88,12 +90,18 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			//printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
-			map->layer[map->layers-1].tilemap->data[msg->arg_2]=(msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW;
+			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW);
+			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
+			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
 			recalc_map|=1<<(map->layers-1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
 			recalc_map|=1<<(map->layers-2);
+			break;
+		case MSG_RECV_BUILDING_PROGRESS:
+			v.i=msg->arg_2;
+			game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
 			break;
 	}
 }
@@ -138,7 +146,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			memcpy(filename, payload, msg->arg_2);
 			filename[msg->arg_2]=0;
 			f=darnitFileOpen(filename, "wb");
-			printf("Started map download of file %s\n", filename);
+			//printf("Started map download of file %s\n", filename);
 			break;
 		case MSG_RECV_MAP_CHUNK:
 			if(!payload)
@@ -148,11 +156,11 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
 			UI_PROPERTY_VALUE v={.i=100*downloaded_bytes/filesize_bytes};
 			ui_progressbar_set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);
-			printf("Map progress %i%%\n", 100*downloaded_bytes/filesize_bytes);
+			//printf("Map progress %i%%\n", 100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
 			darnitFileClose(f);
-			printf("Map %s successfully downloaded!\n", filename);
+			//printf("Map %s successfully downloaded!\n", filename);
 			//client_message_send(player_id, MSG_SEND_MAP_PROGRESS, 100, 0, NULL);
 			client_message_send(player_id, MSG_SEND_READY, 1, 100, NULL);
 			darnitFSMount(filename);

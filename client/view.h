@@ -28,6 +28,8 @@ char countdown_text[16];
 
 struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_button_build[4];
+UI_WIDGET *game_sidebar_label_build[4];
+UI_WIDGET *game_sidebar_progress_build;
 
 struct UI_PANE_LIST panelist_game_menu;
 UI_WIDGET *game_menu_button[2];
