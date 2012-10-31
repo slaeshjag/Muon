@@ -139,10 +139,10 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 	unit->pylon.next = NULL;
 
 	for (j = -1 * radius; j <= radius; j++) {
-		if (j + x < 0 || j + x > server->w)
+		if (j + x < 0 || j + x >= server->w)
 			continue;
 		for (k = -1 * radius; k <= radius; k++) {
-			if (k + y < 0 || k + y > server->w)
+			if (k + y < 0 || k + y >= server->w)
 				continue;
 			index = (y + k) * server->w + (x + j);
 			if (!server->map[index])		/* No building here - don't bother */
@@ -177,15 +177,23 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y) {
 	unsigned int index;
+	int i;
 
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
 	if (!server->player[player].map[index].fog && unit != UNIT_DEF_GENERATOR)
 		return -1;
-	fprintf(stderr, "Adding unit %i\n", unit);
 	if (unitAdd(player, unit, x, y) >= 0)
 		playerBuildQueueStop(player, unit);
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME)
+			continue;
+		if (server->player[i].map[index].fog) {
+			messageBufferPushDirect(i, player, MSG_SEND_BUILDING_PLACE, unit, index, NULL);
+		}
+	}
 
 	return 0;
 }
@@ -274,6 +282,8 @@ int unitRemove(int x, int y) {
 			unitPylonDelete(next);
 			unitPylonPulse();
 		} else if (next->type == UNIT_DEF_GENERATOR) {
+			fprintf(stderr, "Generator lost! Player needs to die!\n");
+			playerMessageBroadcast(next->owner, MSG_SEND_PLAYER_DEFEATED, 0, 0, NULL);
 			/* TODO: Handle player loss */
 		}
 		free(next);
@@ -282,3 +292,6 @@ int unitRemove(int x, int y) {
 
 	return 0;
 }
+
+
+//void unitLoop(int x, int y) {

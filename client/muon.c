@@ -86,7 +86,7 @@ int main() {
 	platform=darnitPlatformGet();
 	DARNIT_MOUSE mouse;
 	serverInit();
-	serverStart("map.ldi", 1, 1337);
+	serverStart("map.ldi", 2, 1337);
 	state=GAME_STATE_INPUT_NAME;
 	
 	ui_init();

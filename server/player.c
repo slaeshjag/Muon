@@ -220,6 +220,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					messageBufferPushDirect(player, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
 				}
 			}
+
 		}
 	}
 
