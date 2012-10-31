@@ -37,7 +37,7 @@ void ui_progressbar_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE valu
 			if(value.i<0||value.i>100)
 				break;
 			sprintf(p->text, "%i%%", value.i);
-			darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+(widget->w*value.i/100)-2, widget->y+widget->h-2);
+			darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+2+((widget->w-4)*value.i/100), widget->y+widget->h-2);
 			if(p->surface!=NULL)
 				darnitTextSurfaceFree(p->surface);
 			int text_w;
