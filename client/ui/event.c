@@ -1,5 +1,6 @@
 #include "ui.h"
 
+//higher value for lower speed, yeah it's stupid but whatever
 #define KEYBOARD_REPEAT_SPEED 3
 #define KEYBOARD_REPEAT_DELAY 20
 

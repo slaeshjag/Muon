@@ -8,7 +8,7 @@
 
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;	
+		return;
 	UI_PROPERTY_VALUE v;
 	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
 	memset(player_name, 0, 32);
@@ -150,9 +150,9 @@ int main() {
 					darnitInputUngrab();
 					break;
 				}
-				view_scroll(mouse);
+				view_scroll(&mouse);
 				darnitRenderBegin();
-				view_draw();
+				view_draw(&mouse);
 				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 				ui_events(&panelist_game_sidebar, 1);
 				darnitRenderTint(1, 1, 1, 1);
@@ -170,7 +170,7 @@ int main() {
 					break;
 				}
 				darnitRenderBegin();
-				view_draw();
+				view_draw(&mouse);
 				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 				ui_pane_render(panelist_game_sidebar.pane);
 				ui_events(&panelist_game_menu, 1);
