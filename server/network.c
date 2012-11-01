@@ -26,10 +26,11 @@ SERVER_SOCKET *networkSocketDisconnect(SERVER_SOCKET *sock) {
 	if (!sock)
 		return NULL;
 	#ifndef _WIN32
-
 	close(sock->socket);
-	
+	#else
+	closesocket(sock->socket);
 	#endif
+	
 
 	free(sock);
 	return NULL;
@@ -46,13 +47,17 @@ SERVER_SOCKET *networkListen(int port) {
 
 	#ifndef _WIN32
 	struct sockaddr_in address;
+	#else
+	u_long iMode = 1;
+	#endif
 	
 	if ((sock->socket = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		fprintf(stderr, "Unable to create a socket\n");
 		free(sock);
 		return NULL;
 	}
-
+	
+	memset(&sin, 0, sizeof(struct sockaddr_in));
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);
 	address.sin_addr.s_addr = 0x0;		/* Listen on ALL the interfaces! */
@@ -65,17 +70,23 @@ SERVER_SOCKET *networkListen(int port) {
 
 	if (listen(sock->socket, 2) < 0) {
 		fprintf(stderr, "Unable to listen on *:%i\n", port);
+		#ifdef _WIN32
+		closesocket(sock->socket);
+		#else
 		close(sock->socket);
+		#endif
 		free(sock);
 		return NULL;
 	}
-
+	#ifndef _WIN32
 	if ((flags = fcntl(sock->socket, F_GETFL, 0)) < 0)
 		flags = 0;
 	if (fcntl(sock->socket, F_SETFL, flags | O_NONBLOCK) < 0)
 		return networkSocketDisconnect(sock);
-
+	#else
+	ioctlsocket(sock->socket, FIONBIO, &iMode);
 	#endif
+
 
 	return sock;
 }
@@ -88,24 +99,30 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 		return NULL;
 
 	#ifndef _WIN32
-	int socket, address_len, flags;
+	int socket;
+	#else
+	SOCKET socket;
+	u_long iMode = 1;
+	#endif
+	int address_len, flags;
 	struct sockaddr_in address;
 	address_len = sizeof(struct sockaddr_in);
 
 	if ((socket = accept(sock->socket, (struct sockaddr *) &address, (unsigned int *) &address_len)) <= 0)
 		return NULL;
-	#endif
 
 	if ((sock_a = malloc(sizeof(SERVER_SOCKET))) == NULL)
 		goto error;
 
-	#ifndef _WIN32
 	sock_a->socket = socket;
+	#ifndef _WIN32
 	
 	if ((flags = fcntl(sock_a->socket, F_GETFL, 0)) < 0)
 		flags = 0;
 	if (fcntl(sock_a->socket, F_SETFL, flags | O_NONBLOCK) < 0)
 		return networkSocketDisconnect(sock_a);
+	#else
+	ioctlsocket(sock->socket, FIONBIO, &iMode);
 	#endif
 
 	return sock_a;
@@ -114,6 +131,8 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 
 	#ifndef _WIN32
 	close(socket);
+	#else
+	closesocket(socket);
 	#endif
 	
 	return NULL;
