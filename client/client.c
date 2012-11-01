@@ -99,24 +99,18 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			free(chatmsg);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
-			//printf("fov or some shit at offset %i (%i, %i)\n", msg->arg_2, msg->arg_2%map->layer->tilemap->w, msg->arg_2/map->layer->tilemap->h );
 			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
 			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
-			//layerbits|=((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)*2;
 			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
 			recalc_map|=1<<(map->layers-1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
 			recalc_map|=1<<(map->layers-2);
-			//recalc_map|=1<<(map->layers-1);
 			if(msg->player_id==player_id&&msg->arg_1) {
 				for(i=0; i<4; i++) {
 					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
-					//client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
-					//v.i=0;
-					//game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
 				}
 			}
 			break;
@@ -148,7 +142,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static int filesize_bytes=0, downloaded_bytes=0;
 	static char *filename=NULL;
-	static DARNIT_FILE *f;
+	static DARNIT_FILE *f=NULL;
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_JOIN:
@@ -160,8 +154,11 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
 				break;
-			if(!filename)
+			if(filename) {
+				darnitFSUnmount(filename);
 				free(filename);
+				darnitFileClose(f);
+			}
 			filesize_bytes=msg->arg_1;
 			filename=malloc(msg->arg_2+1);
 			memcpy(filename, payload, msg->arg_2);
@@ -182,7 +179,6 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_END:
 			darnitFileClose(f);
 			//printf("Map %s successfully downloaded!\n", filename);
-			//client_message_send(player_id, MSG_SEND_MAP_PROGRESS, 100, 0, NULL);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
 			map=darnitMapLoad("maps/map.ldmz");
