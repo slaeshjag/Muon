@@ -41,7 +41,7 @@ int client_check_incomming() {
 	for(i=0; i<1000; i++) {
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
-			if((s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2))) {
+			s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2);
 				if(s==0)
 					break;
 				if(s==-1) {
@@ -52,21 +52,19 @@ int client_check_incomming() {
 				if(client_message_handler)
 					client_message_handler(&msg_recv, msg_recv_payload);
 				msg_recv.command=0;
-			}
 		} else {
 			//download message
-			if((s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW)))) {
-				if(s==0)
-					break;
-				if(s==-1) {
-					sock=darnitSocketClose(sock);
-					return -1;
-				}
-				client_message_convert_recv(&msg_recv);
-				//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
-				if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
-					client_message_handler(&msg_recv, NULL);
+			s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
+			if(s==0)
+				break;
+			if(s==-1) {
+				sock=darnitSocketClose(sock);
+				return -1;
 			}
+			client_message_convert_recv(&msg_recv);
+			//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
+			if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
+				client_message_handler(&msg_recv, NULL);
 		}
 	}
 	
