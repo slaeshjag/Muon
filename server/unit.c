@@ -407,7 +407,7 @@ void unitAttackerScan(int x, int y) {
 	owner = server->map[x + y * server->w]->owner;
 
 	for (i = -1 * range; i <= range; i++) {
-		if ((i + x) < 0 || (j + x) >= server->w)
+		if ((i + x) < 0 || (i + x) >= server->w)
 			continue;
 		for (j = -1 * range; j <= range; j++) {
 			if ((j + y) < 0 || (j + y) >= server->h)
@@ -421,6 +421,7 @@ void unitAttackerScan(int x, int y) {
 				continue;
 			if (team > -1 && server->player[server->map[index]->owner].team == team)
 				continue;
+			fprintf(stderr, "Attacking building\n");
 			unitAttackSet(x + y * server->w, index);
 			return;
 		}
@@ -441,6 +442,8 @@ void unitShieldAnnounce(int index) {
 		if (server->player[i].map[index].fog)
 			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
 	}
+
+	fprintf(stderr, "Unit at %i has sheild %i\n", index, shield);
 		
 	return;
 }
@@ -468,7 +471,7 @@ void unitLoop(int msec) {
 					unitRemove(next->target % server->w, next->target / server->w);
 			}
 		} else if (next->type == UNIT_DEF_ATTACKER) {
-			/* FIXME: Look for enemies */
+			unitAttackerScan(next->x, next->y);
 		}
 
 		next = next->next;
