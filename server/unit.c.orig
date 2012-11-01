@@ -323,43 +323,38 @@ int unitRemove(int x, int y) {
 }
 
 
+<<<<<<< HEAD
 void unitAttackSet(int index_src, int index_dst) {
 	int i, from;
 
 	from = server->map[index_src]->owner;
-
-	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
-			continue;
-		if (!server->player[i].map[index_src].fog && !server->player[i].map[index_dst].fog)
-			continue;
-		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_src, index_dst, NULL);
-	}
-
-	return;
-}
-
-
+=======
 void unitDamageAnnounce(int index) {
 	int i, hp;
 
 	hp = server->map[index]->hp * 100 / unitHPMax(server->map[index]->type);
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
+<<<<<<< HEAD
+		if (!server->player[i].map[index_src].fog && !server->player[i].map[index_dst].fog)
+			continue;
+		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_src, index_dst, NULL);
+=======
 		if (server->player[i].map[index].fog)
 			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_HP, hp, index, NULL);
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20
 	}
 
 	return;
 }
 
 
+<<<<<<< HEAD
 int unitAttackValidate(int index_src, int owner, int index_dst) {
 	int team;
-
-	team = server->player[owner].team;
 
 	if (index_src < 0 || index_src >= server->w * server->h)
 		return -1;
@@ -378,11 +373,10 @@ int unitAttackValidate(int index_src, int owner, int index_dst) {
 	if (team > -1 && server->player[server->map[index_dst]->owner].team == team)
 		return -1;
 	return 0;
-}
 
 
 void unitAttackerScan(int x, int y) {
-	int team, i, j, index, range, owner;
+	int team, i, j, index, range, owner, src;
 	
 	range = unitRange(UNIT_DEF_ATTACKER);
 	team = server->player[server->map[x + y * server->w]->owner].team;
@@ -406,12 +400,7 @@ void unitAttackerScan(int x, int y) {
 			unitAttackSet(x + y * server->w, index);
 			return;
 		}
-	}
-
-	return;
-}
-
-
+=======
 void unitShieldAnnounce(int index) {
 	int i, shield;
 
@@ -454,7 +443,14 @@ void unitLoop(int msec) {
 		}
 
 		next = next->next;
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20
 	}
 
 	return;
 }
+<<<<<<< HEAD
+
+
+//void unitLoop(int x, int y) {
+=======
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20

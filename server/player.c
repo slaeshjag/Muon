@@ -206,7 +206,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					fogdiff = (oldfog ^ fogdiff);
 					if (((t && mode == -1) || (!t && mode == 1)) || (j == 0 && k == 0)) {
 						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, i << 1, 0, NULL);
-						messageBufferPushDirect(i, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
+						unitAnnounce(owner, i, (!t) ? building : 0, index);
 					}
 				}
 			else {
@@ -217,7 +217,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				fogdiff = (oldfog ^ fogdiff);
 				if (fogdiff || (j == 0 && k == 0)) {
 					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << 1, index, NULL);
-					messageBufferPushDirect(player, owner, MSG_SEND_BUILDING_PLACE, (!t) ? building : 0, index, NULL);
+					unitAnnounce(owner, owner, (!t) ? building : 0, index);
 				}
 			}
 

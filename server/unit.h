@@ -18,7 +18,7 @@
 
 static const int unit_los[] = 		{ 0, 7, 6, 3, 4, 1 };
 static const int unit_maxhp[] = 	{ 0, 50000, 1000, 1000, 5000, 1000 };
-static const int unit_maxshield[] = 	{ 0, 50000, 0, 5000, 5000, 40000 };
+static const int unit_maxshield[] = 	{ 0, 50000, 1, 5000, 5000, 40000 };		/* Shield must not be 0 for any existing building! */
 static const int unit_shieldreg[] = 	{ 0, 40, 1, 10, 10, 5 };
 static const int unit_range[] = 	{ 0, 4, 0, 3, 4, 1 };
 static const int unit_buildtime[] =	{ 0, 0, 5000, 20000, 20000, 10000 };
@@ -50,11 +50,14 @@ typedef struct {
 
 int unitLOS(int unit);
 int unitMaxHP(int unit);
+int unitShieldMax(int type);
 int unitRange(int type);
+void unitAnnounce(int from, int to, int building, int index);
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y);
 int unitAdd(int owner, int type, int x, int y);
 int unitRemove(int x, int y);
 
+void unitLoop(int msec);
 
 
 #endif
