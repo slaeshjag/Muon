@@ -203,8 +203,9 @@ void unitAnnounce(int from, int to, int building, int index) {
 
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y) {
 	unsigned int index;
-	int i;
+	int i, team;
 
+	team = server->player[player].team;
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
@@ -215,6 +216,10 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
+			continue;
+		if (server->player[i].team == team && team != -1)
+			continue;
+		if (i == player)
 			continue;
 		if (server->player[i].map[index].fog) {
 			unitAnnounce(player, i, unit, index);
