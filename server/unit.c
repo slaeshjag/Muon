@@ -188,7 +188,7 @@ void unitAnnounce(int from, int to, int building, int index) {
 
 	messageBufferPushDirect(to, from, MSG_SEND_BUILDING_PLACE, building, index, NULL);
 
-	if (building) {
+	if (building && building != UNIT_DEF_BUILDSITE_FREE) {
 		progress = server->map[index]->hp * 100 / unitHPMax(building);
 		messageBufferPushDirect(from, to, MSG_SEND_BUILDING_HP, progress, 0, NULL);
 		progress = server->map[index]->shield * 100 / unitShieldMax(building);

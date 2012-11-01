@@ -1,7 +1,7 @@
 #ifndef __UNIT_H__
 #define	__UNIT_H__
 
-#define	UNITS_DEFINED			5
+#define	UNITS_DEFINED			6
 
 #define	UNIT_DEF_NOTHING		0
 #define	UNIT_DEF_GENERATOR		1
