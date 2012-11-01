@@ -99,6 +99,11 @@ void messageHandlerStartBuild(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
+	if (message->arg[0] == 0) {
+		unitDestroy(player, message->arg[1]);
+		return;
+	}
+
 	if (message->arg[1] > server->w * server->h)			/* Meh, nice try :P */
 		return;
 	if (!server->player[player].map[message->arg[1]].power)		/* Sorry! :x */

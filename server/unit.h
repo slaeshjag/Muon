@@ -1,7 +1,7 @@
 #ifndef __UNIT_H__
 #define	__UNIT_H__
 
-#define	UNITS_DEFINED			5
+#define	UNITS_DEFINED			6
 
 #define	UNIT_DEF_NOTHING		0
 #define	UNIT_DEF_GENERATOR		1
@@ -56,7 +56,9 @@ void unitAnnounce(int from, int to, int building, int index);
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y);
 int unitAdd(int owner, int type, int x, int y);
 int unitRemove(int x, int y);
+void unitDestroy(int player, unsigned int index);
 
+void unitLoop(int msec);
 
 
 #endif

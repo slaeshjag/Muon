@@ -61,7 +61,7 @@ int lobbyPoll() {
 	server->player[slot].last_ping_sent = 0;
 	server->player[slot].team = -1;
 
-	messageSend(socket, 0, MSG_SEND_REQUEST_IDENTIFY, slot, server->players, NULL);
+	messageSend(socket, slot, MSG_SEND_REQUEST_IDENTIFY, slot, server->players, NULL);
 
 	return 0;
 }

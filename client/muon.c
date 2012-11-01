@@ -8,7 +8,7 @@
 
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;	
+		return;
 	UI_PROPERTY_VALUE v;
 	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
 	memset(player_name, 0, 32);
@@ -28,8 +28,12 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	v=connect_server_entry_port->get_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT);
 	int port=atoi(v.p);
 	printf("Server: %s:%i\n", host, port);
-	client_init(host, port);
-	state=GAME_STATE_COUNTDOWN;
+	if(client_init(host, port)==0)
+		state=GAME_STATE_CONNECTING;
+}
+
+void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	client_disconnect();
 }
 
 void ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -117,6 +121,15 @@ int main() {
 				if(buttons.select)
 					state=GAME_STATE_QUIT;
 				break;
+			case GAME_STATE_CONNECTING:
+				darnitRenderBegin();
+				darnitRenderTint(1, 0, 0, 1);
+				ui_pane_render(panelist_connect_server.pane);
+				ui_events(&panelist_connecting, 1);
+				darnitRenderTint(1, 1, 1, 1);
+				RENDER_MOUSE;
+				darnitRenderEnd();
+				break;
 			case GAME_STATE_COUNTDOWN:
 				if(client_check_incomming()==-1) {
 					fprintf(stderr, "Server disconnected!\n");
@@ -137,9 +150,9 @@ int main() {
 					darnitInputUngrab();
 					break;
 				}
-				view_scroll(mouse);
+				view_scroll(&mouse);
 				darnitRenderBegin();
-				view_draw();
+				view_draw(&mouse);
 				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 				ui_events(&panelist_game_sidebar, 1);
 				darnitRenderTint(1, 1, 1, 1);
@@ -157,7 +170,7 @@ int main() {
 					break;
 				}
 				darnitRenderBegin();
-				view_draw();
+				view_draw(&mouse);
 				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 				ui_pane_render(panelist_game_sidebar.pane);
 				ui_events(&panelist_game_menu, 1);

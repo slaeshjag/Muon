@@ -41,6 +41,15 @@ void view_init() {
 	v.p="1337";
 	connect_server_entry_port->set_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT, v);
 	
+	//Connecting
+	panelist_connecting.pane=ui_pane_create(platform.screen_w/2-90, platform.screen_h/2-32, 180, 64, NULL);
+	panelist_connecting.next=NULL;
+	ui_pane_set_root_widget(panelist_connecting.pane, ui_widget_create_vbox());
+	ui_vbox_add_child(panelist_connecting.pane->root_widget, ui_widget_create_label(font_std, "Connecting to server"), 1);
+	connecting_button_cancel=ui_widget_create_button_text("Cancel");
+	ui_vbox_add_child(panelist_connecting.pane->root_widget, connecting_button_cancel, 0);
+	connecting_button_cancel->event_handler->add(connecting_button_cancel, connecting_button_cancel_click, UI_EVENT_TYPE_UI);
+	
 	//Countdown
 	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
 	strcpy(countdown_text, "Downloading map");
@@ -90,42 +99,46 @@ void view_init() {
 	}
 }
 
-void view_scroll(DARNIT_MOUSE mouse) {
+void view_scroll(DARNIT_MOUSE *mouse) {
 		register int scroll_x=0, scroll_y=0;
 		
-		if(mouse.x<SCROLL_OFFSET&&map->cam_x>0)
+		if(mouse->x<SCROLL_OFFSET&&map->cam_x>0)
 			scroll_x=-SCROLL_SPEED;
-		else if(mouse.x>platform.screen_w-SIDEBAR_WIDTH-SCROLL_OFFSET&&mouse.x<platform.screen_w-SIDEBAR_WIDTH&&map->cam_x<map_w-platform.screen_w+SIDEBAR_WIDTH)
+		else if(mouse->x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-platform.screen_w+SIDEBAR_WIDTH)
 			scroll_x=SCROLL_SPEED;
-		if(mouse.y<SCROLL_OFFSET&&map->cam_y>0)
+		if(mouse->y<SCROLL_OFFSET&&map->cam_y>0)
 			scroll_y=-SCROLL_SPEED;
-		else if(mouse.y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-platform.screen_h)
+		else if(mouse->y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-platform.screen_h)
 			scroll_y=SCROLL_SPEED;
 		darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 		
-		if(mouse.x>platform.screen_w-SIDEBAR_WIDTH)
+		if(mouse->x>platform.screen_w-SIDEBAR_WIDTH)
 			return;
-		if(mouse.rmb)
+		if(mouse->rmb)
 			building_place=-1;
-		else if(mouse.lmb&&building_place>-1) {
-			int map_offset=((mouse.y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse.x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
+		else if(mouse->lmb&&building_place>-1) {
+			int map_offset=((mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
 			printf("Building placed at %i\n", map_offset);
 			//map->layer[map->layers-1].tilemap->data[map_offset]=2;
 			//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
 			building_place=-1;
-		}else if(mouse.lmb) {
+		}else if(mouse->lmb) {
 			//status about clicked building, etc
 		}
 		
 }
 
-void view_draw() {
+void view_draw(DARNIT_MOUSE *mouse) {
 	int i;
 	for(i=0; i<map->layers; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
 	if(powergrid&&building_place!=-1) {
 		darnitRenderOffset(map->cam_x, map->cam_y);
+		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
+		darnitRenderBlendingEnable();
+		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, (mouse->x+map->cam_x)/l->tile_w*l->tile_w, (mouse->y+map->cam_y)/l->tile_h*l->tile_h);
+		darnitRenderBlendingDisable();
 		darnitRenderLineDraw(powergrid, powergrid_lines);
 		darnitRenderOffset(0, 0);
 	}

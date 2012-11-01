@@ -8,7 +8,7 @@
 
 #include "ui/ui.h"
 
-#define SCROLL_OFFSET 32
+#define SCROLL_OFFSET 8
 #define SCROLL_SPEED 4
 
 DARNIT_PLATFORM platform;
@@ -21,6 +21,7 @@ int building_place;
 typedef enum {
 	GAME_STATE_INPUT_NAME,
 	GAME_STATE_CONNECT_SERVER,
+	GAME_STATE_CONNECTING,
 	GAME_STATE_COUNTDOWN,
 	GAME_STATE_GAME,
 	GAME_STATE_GAME_MENU,

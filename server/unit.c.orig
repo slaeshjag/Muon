@@ -188,7 +188,7 @@ void unitAnnounce(int from, int to, int building, int index) {
 
 	messageBufferPushDirect(to, from, MSG_SEND_BUILDING_PLACE, building, index, NULL);
 
-	if (building && building != UNIT_DEF_BUILDSITE_FREE) {
+	if (building) {
 		progress = server->map[index]->hp * 100 / unitHPMax(building);
 		messageBufferPushDirect(from, to, MSG_SEND_BUILDING_HP, progress, 0, NULL);
 		progress = server->map[index]->shield * 100 / unitShieldMax(building);
@@ -203,9 +203,8 @@ void unitAnnounce(int from, int to, int building, int index) {
 
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y) {
 	unsigned int index;
-	int i, team;
+	int i;
 
-	team = server->player[player].team;
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
@@ -216,10 +215,6 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
-			continue;
-		if (server->player[i].team == team && team != -1)
-			continue;
-		if (i == player)
 			continue;
 		if (server->player[i].map[index].fog) {
 			unitAnnounce(player, i, unit, index);
@@ -328,56 +323,38 @@ int unitRemove(int x, int y) {
 }
 
 
-void unitDestroy(int player, unsigned int index) {
-	if (index > server->w * server->h)
-		return;
-	if (server->map[index]->owner != player)
-		return;
-	if (server->map[index]->type == UNIT_DEF_GENERATOR)
-		return;
-	unitRemove(index % server->w, index / server->w);
-
-	return;
-}
-
-
+<<<<<<< HEAD
 void unitAttackSet(int index_src, int index_dst) {
 	int i, from;
 
 	from = server->map[index_src]->owner;
-
-	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
-			continue;
-		if (!server->player[i].map[index_src].fog && !server->player[i].map[index_dst].fog)
-			continue;
-		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_src, index_dst, NULL);
-	}
-
-	return;
-}
-
-
+=======
 void unitDamageAnnounce(int index) {
 	int i, hp;
 
 	hp = server->map[index]->hp * 100 / unitHPMax(server->map[index]->type);
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
+<<<<<<< HEAD
+		if (!server->player[i].map[index_src].fog && !server->player[i].map[index_dst].fog)
+			continue;
+		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_src, index_dst, NULL);
+=======
 		if (server->player[i].map[index].fog)
 			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_HP, hp, index, NULL);
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20
 	}
 
 	return;
 }
 
 
+<<<<<<< HEAD
 int unitAttackValidate(int index_src, int owner, int index_dst) {
 	int team;
-
-	team = server->player[owner].team;
 
 	if (index_src < 0 || index_src >= server->w * server->h)
 		return -1;
@@ -396,18 +373,17 @@ int unitAttackValidate(int index_src, int owner, int index_dst) {
 	if (team > -1 && server->player[server->map[index_dst]->owner].team == team)
 		return -1;
 	return 0;
-}
 
 
 void unitAttackerScan(int x, int y) {
-	int team, i, j, index, range, owner;
+	int team, i, j, index, range, owner, src;
 	
 	range = unitRange(UNIT_DEF_ATTACKER);
 	team = server->player[server->map[x + y * server->w]->owner].team;
 	owner = server->map[x + y * server->w]->owner;
 
 	for (i = -1 * range; i <= range; i++) {
-		if ((i + x) < 0 || (i + x) >= server->w)
+		if ((i + x) < 0 || (j + x) >= server->w)
 			continue;
 		for (j = -1 * range; j <= range; j++) {
 			if ((j + y) < 0 || (j + y) >= server->h)
@@ -421,16 +397,10 @@ void unitAttackerScan(int x, int y) {
 				continue;
 			if (team > -1 && server->player[server->map[index]->owner].team == team)
 				continue;
-			fprintf(stderr, "Attacking building\n");
 			unitAttackSet(x + y * server->w, index);
 			return;
 		}
-	}
-
-	return;
-}
-
-
+=======
 void unitShieldAnnounce(int index) {
 	int i, shield;
 
@@ -442,8 +412,6 @@ void unitShieldAnnounce(int index) {
 		if (server->player[i].map[index].fog)
 			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
 	}
-
-	fprintf(stderr, "Unit at %i has sheild %i\n", index, shield);
 		
 	return;
 }
@@ -471,11 +439,18 @@ void unitLoop(int msec) {
 					unitRemove(next->target % server->w, next->target / server->w);
 			}
 		} else if (next->type == UNIT_DEF_ATTACKER) {
-			unitAttackerScan(next->x, next->y);
+			/* FIXME: Look for enemies */
 		}
 
 		next = next->next;
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20
 	}
 
 	return;
 }
+<<<<<<< HEAD
+
+
+//void unitLoop(int x, int y) {
+=======
+>>>>>>> 9715c7973d4585a51ce6ed369048c2c39a1d3d20
