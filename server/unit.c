@@ -294,4 +294,52 @@ int unitRemove(int x, int y) {
 }
 
 
+void unitAttackSet(int index_src, int index_dst) {
+	int i, from;
+
+	from = server->map[index_src]->owner;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME)
+			continue;
+		if (!server->player[i].map[index_src].fog && !server->player[i].map[index_dst].fog)
+			continue;
+		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_src, index_dst, NULL);
+	}
+
+	return;
+}
+
+
+void unitAttackerScan(int x, int y) {
+	int team, i, j, index, range, owner;
+	
+	range = unitRange(UNIT_DEF_ATTACKER);
+	team = server->player[server->map[x + y * server->w]->owner].team;
+	owner = server->map[x + y * server->w]->owner;
+
+	for (i = -1 * range; i <= range; i++) {
+		if ((i + x) < 0 || (j + x) >= server->w)
+			continue;
+		for (j = -1 * range; j <= range; j++) {
+			if ((j + y) < 0 || (j + y) >= server->h)
+				continue;
+			index = (j + y) * server->w + (i + x);
+			if (!server->map[index])
+				continue;
+			if (!server->player[owner].map[index].fog)
+				continue;
+			if (server->map[index]->owner == owner)
+				continue;
+			if (team > -1 && server->player[server->map[index]->owner].team == team)
+				continue;
+			unitAttackSet(x + y * server->w, index);
+			return;
+		}
+	}
+
+	return;
+}
+
+
 //void unitLoop(int x, int y) {
