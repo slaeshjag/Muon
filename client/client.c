@@ -196,7 +196,8 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	player_id=msg->player_id;
 	player_names=(char *)calloc(msg->arg_2, 32);
-	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strnlen(player_name, 32), player_name);
+	player_name[31]=0;
+	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(player_name), player_name);
 	client_message_handler=client_download_map;
 }
 

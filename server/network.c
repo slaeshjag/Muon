@@ -45,9 +45,8 @@ SERVER_SOCKET *networkListen(int port) {
 		return NULL;
 	
 
-	#ifndef _WIN32
 	struct sockaddr_in address;
-	#else
+	#ifdef _WIN32
 	u_long iMode = 1;
 	#endif
 	
@@ -57,7 +56,7 @@ SERVER_SOCKET *networkListen(int port) {
 		return NULL;
 	}
 	
-	memset(&sin, 0, sizeof(struct sockaddr_in));
+	memset(&address, 0, sizeof(struct sockaddr_in));
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);
 	address.sin_addr.s_addr = 0x0;		/* Listen on ALL the interfaces! */
