@@ -387,6 +387,7 @@ int serverLoop(unsigned int d_ms) {
 		playerCheckIdentify();
 	} else {
 		playerBuildQueueLoop(d_ms);
+		unitLoop(d_ms);
 		gameLoop(d_ms);
 	}
 

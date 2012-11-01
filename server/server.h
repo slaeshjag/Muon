@@ -26,12 +26,14 @@
 
 
 typedef struct SERVER_UNIT {
+	unsigned int		x;
+	unsigned int		y;
 	unsigned int		owner;
 	unsigned int		type;
-	unsigned int		hp;
-	unsigned int		shield;
+	int			hp;
+	int			shield;
 	unsigned int		status;
-	unsigned int		target;
+	int			target;
 	UNIT_PYLON		pylon;
 	struct SERVER_UNIT	*next;
 } SERVER_UNIT;

@@ -15,6 +15,14 @@ int unitHPMax(int type) {
 }
 
 
+
+int unitShieldMax(int type) {
+	if (type < 0 || type > UNITS_DEFINED)
+		return 0;
+	return unit_maxshield[type];
+}
+
+
 int unitRange(int type) {
 	if (type < 0 || type > UNITS_DEFINED)
 		return 0;
@@ -175,6 +183,24 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 }
 
 
+void unitAnnounce(int from, int to, int building, int index) {
+	int progress;
+
+	messageBufferPushDirect(to, from, MSG_SEND_BUILDING_PLACE, building, index, NULL);
+
+	if (building) {
+		progress = server->map[index]->hp * 100 / unitHPMax(building);
+		messageBufferPushDirect(from, to, MSG_SEND_BUILDING_HP, progress, 0, NULL);
+		progress = server->map[index]->shield * 100 / unitShieldMax(building);
+		messageBufferPushDirect(from, to, MSG_SEND_BUILDING_SHIELD, progress, 0, NULL);
+		if (server->map[index]->target)
+			messageBufferPushDirect(from, to, MSG_SEND_BUILDING_ATTACKING, index, server->map[index]->target, NULL);
+	}
+
+	return;
+}
+
+
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y) {
 	unsigned int index;
 	int i;
@@ -191,7 +217,7 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
 		if (server->player[i].map[index].fog) {
-			messageBufferPushDirect(i, player, MSG_SEND_BUILDING_PLACE, unit, index, NULL);
+			unitAnnounce(player, i, unit, index);
 		}
 	}
 
@@ -211,9 +237,12 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->owner = owner;
 	unit->type = type;
 	unit->hp = unitHPMax(type);
-	unit->shield = 0;		/* Don't spawn with any shield! */
-	unit->status = 0;		/* Nothing yet? */
+	unit->shield = unitShieldMax(unit->type);		/* Don't spawn with any shield! */
+	unit->status = 0;				/* Nothing yet? */
 	unit->next = NULL;
+	unit->target = -1;
+	unit->x = x;
+	unit->y = y;
 	server->map[x + y * server->w] = unit;
 	
 	if (unit->type == UNIT_DEF_PYLON || unit->type == UNIT_DEF_GENERATOR)
@@ -240,7 +269,7 @@ int unitAdd(int owner, int type, int x, int y) {
 
 	if ((unit = unitInit(owner, type, x, y)) == NULL)
 		return -1;
-	
+
 	if (unit->type == UNIT_DEF_BUILDSITE) {
 		if (server->map_c.tile_data[x + server->w * y] != UNIT_BUILDSITE)
 			return -1;
@@ -294,4 +323,65 @@ int unitRemove(int x, int y) {
 }
 
 
-//void unitLoop(int x, int y) {
+void unitDamageAnnounce(int index) {
+	int i, hp;
+
+	hp = server->map[index]->hp * 100 / unitHPMax(server->map[index]->type);
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME)
+			continue;
+		if (server->player[i].map[index].fog)
+			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_HP, hp, index, NULL);
+	}
+
+	return;
+}
+
+
+void unitShieldAnnounce(int index) {
+	int i, shield;
+
+	shield = server->map[index]->shield * 100 / unitShieldMax(server->map[index]->type);
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME)
+			continue;
+		if (server->player[i].map[index].fog)
+			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
+	}
+		
+	return;
+}
+
+
+void unitLoop(int msec) {
+	SERVER_UNIT *next;
+
+	next = server->unit;
+	while (next != NULL) {
+		if (next->shield < unit_maxshield[next->type]) {
+			next->shield += unit_shieldreg[next->type] * msec * server->game.gamespeed;
+			if (next->shield > unit_maxshield[next->type])
+				next->shield = unit_maxshield[next->type];
+			unitShieldAnnounce(next->target);
+		}
+		
+		if (next->type == UNIT_DEF_ATTACKER && next->target > -1) {
+			server->map[next->target]->shield -= UNIT_ATTACKER_DMGP * msec * server->game.gamespeed;
+			if (server->map[next->target]->shield < 0) {
+				server->map[next->target]->hp += server->map[next->target]->shield;
+				server->map[next->target]->shield = 0;
+				unitDamageAnnounce(next->target);
+				if (server->map[next->target]->hp <= 0)
+					unitRemove(next->target % server->w, next->target / server->w);
+			}
+		} else if (next->type == UNIT_DEF_ATTACKER) {
+			/* FIXME: Look for enemies */
+		}
+
+		next = next->next;
+	}
+
+	return;
+}
