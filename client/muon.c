@@ -21,7 +21,7 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;	
+		return;
 	UI_PROPERTY_VALUE v;
 	v=connect_server_entry_host->get_prop(connect_server_entry_host, UI_ENTRY_PROP_TEXT);
 	char *host=v.p;
@@ -33,7 +33,20 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 }
 
 void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
+		return;
 	client_disconnect();
+}
+
+void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type!=UI_EVENT_TYPE_KEYBOARD&&e->keyboard->keysym==KEY(ENTER)))
+	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
+		return;
+	UI_PROPERTY_VALUE v;
+	v=chat_entry->get_prop(chat_entry, UI_ENTRY_PROP_TEXT);
+	client_message_send(player_id, MSG_SEND_CHAT, 0, strlen(v.p), v.p);
+	v.p="";
+	chat_entry->set_prop(chat_entry, UI_ENTRY_PROP_TEXT, v);
 }
 
 void ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

@@ -6,7 +6,7 @@
 #define UI_VBOX_PROP_CHILDREN 0
 #define UI_VBOX_PROP_SIZE 1
 
-struct UI_VBOX_PROPERTIES{
+struct UI_VBOX_PROPERTIES {
 	UI_WIDGET_LIST *children;
 	int size;
 };

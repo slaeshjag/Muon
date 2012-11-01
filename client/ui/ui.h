@@ -40,6 +40,7 @@ UI_WIDGET *ui_selected_widget;
 #include "checkbox.h"
 #include "entry.h"
 #include "progressbar.h"
+#include "listbox.h"
 
 void ui_init();
 

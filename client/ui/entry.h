@@ -11,7 +11,7 @@
 #define UI_ENTRY_PROP_CURSOR 5
 #define UI_ENTRY_PROP_TEXT 6
 
-struct UI_ENTRY_PROPERTIES{
+struct UI_ENTRY_PROPERTIES {
 	DARNIT_FONT *font;
 	DARNIT_TEXT_SURFACE *surface;
 	int cursor_pos;

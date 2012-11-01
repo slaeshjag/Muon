@@ -41,11 +41,18 @@ int powergrid_lines;
 struct UI_PANE_LIST panelist_game_menu;
 UI_WIDGET *game_menu_button[2];
 
+struct UI_PANE_LIST panelist_chat;
+UI_WIDGET *chat_listbox;
+UI_WIDGET *chat_hbox;
+UI_WIDGET *chat_entry;
+UI_WIDGET *chat_button_send;
+
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif

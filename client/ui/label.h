@@ -5,7 +5,7 @@
 #define UI_LABEL_PROP_SURFACE 1
 #define UI_LABEL_PROP_TEXT 2
 
-struct UI_LABEL_PROPERTIES{
+struct UI_LABEL_PROPERTIES {
 	DARNIT_FONT *font;
 	DARNIT_TEXT_SURFACE *surface;
 	char *text;

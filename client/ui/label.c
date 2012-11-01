@@ -81,7 +81,7 @@ void ui_label_request_size(UI_WIDGET *widget, int *w, int *h) {
 	int text_h=darnitTextStringGeometrics(p->font, p->text, ww, &text_w);
 	*h=text_h;
 	if(w&&*w==-1)
-		*w=text_w;
+		*w=text_w+UI_PADDING;
 }
 
 void ui_label_render(UI_WIDGET *widget) {

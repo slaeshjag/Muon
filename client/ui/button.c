@@ -150,8 +150,8 @@ void ui_button_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 void ui_button_request_size(UI_WIDGET *widget, int *w, int *h) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	p->child->request_size(p->child, w, h);
-	(*w)+=4+UI_PADDING*2;
-	(*h)+=4+UI_PADDING*2;
+	(*w)+=8+UI_PADDING*2;
+	(*h)+=8+UI_PADDING*2;
 }
 
 void ui_button_render(UI_WIDGET *widget) {

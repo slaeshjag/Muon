@@ -6,7 +6,7 @@
 #define UI_HBOX_PROP_CHILDREN 0
 #define UI_HBOX_PROP_SIZE 1
 
-struct UI_HBOX_PROPERTIES{
+struct UI_HBOX_PROPERTIES {
 	UI_WIDGET_LIST *children;
 	int size;
 };

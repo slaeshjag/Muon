@@ -109,9 +109,10 @@ void ui_hbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 		exp_w=w/(p->size-i);
 	else
 		exp_w=0;
+	x+=UI_PADDING;
 	for(c=p->children, i=0; c; c=c->next) {
 		if(c->expand) {
-			c->widget->resize(c->widget, x, y+UI_PADDING, exp_w, h-UI_PADDING*2);
+			c->widget->resize(c->widget, x, y+UI_PADDING, exp_w-UI_PADDING, h-UI_PADDING*2);
 			x+=exp_w;
 		} else {
 			c->widget->resize(c->widget, x, y+UI_PADDING, requested[i], h-UI_PADDING*2);
@@ -135,6 +136,7 @@ void ui_hbox_request_size(UI_WIDGET *widget, int *w, int *h) {
 			hh=req_h>hh?req_h:hh;
 		}
 	}
+	printf("hh %i\n", hh);
 	if(w)
 		*w=ww;
 	if(h)

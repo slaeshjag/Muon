@@ -9,4 +9,7 @@
 #define	BUILDING_WALL			5
 
 
+#define	BUILDING_BUILDSITE		256
+
+
 #endif

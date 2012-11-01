@@ -6,7 +6,7 @@
 #define UI_BUTTON_PROP_BORDER 2
 #define UI_BUTTON_PROP_ACTIVE_BORDER 3
 
-struct UI_BUTTON_PROPERTIES{
+struct UI_BUTTON_PROPERTIES {
 	UI_WIDGET *child;
 	int activated;
 	DARNIT_LINE *border;

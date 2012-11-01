@@ -50,6 +50,23 @@ void view_init() {
 	ui_vbox_add_child(panelist_connecting.pane->root_widget, connecting_button_cancel, 0);
 	connecting_button_cancel->event_handler->add(connecting_button_cancel, connecting_button_cancel_click, UI_EVENT_TYPE_UI);
 	
+	//Chat
+	panelist_chat.pane=ui_pane_create(16, platform.screen_h-256-16, 180, 256, NULL);
+	panelist_chat.next=NULL;
+	ui_pane_set_root_widget(panelist_chat.pane, ui_widget_create_vbox());
+	ui_vbox_add_child(panelist_chat.pane->root_widget, ui_widget_create_label(font_std, "Chat"), 0);
+	chat_listbox=ui_widget_create_listbox(font_std);
+	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_listbox, 1);
+	chat_hbox=ui_widget_create_hbox();
+	chat_button_send=ui_widget_create_button_text("Send");
+	chat_entry=ui_widget_create_entry(font_std);
+	ui_hbox_add_child(chat_hbox, chat_entry, 1);
+	ui_hbox_add_child(chat_hbox, chat_button_send, 0);
+	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_hbox, 0);
+	chat_button_send->event_handler->add(chat_button_send, chat_button_send_click, UI_EVENT_TYPE_UI);
+	chat_entry->event_handler->add(chat_entry, chat_button_send_click, UI_EVENT_TYPE_KEYBOARD);
+	
+	
 	//Countdown
 	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
 	strcpy(countdown_text, "Downloading map");
@@ -66,7 +83,7 @@ void view_init() {
 	countdown_ready=ui_widget_create_checkbox();
 	ui_hbox_add_child(panelist_countdown_ready.pane->root_widget, countdown_ready, 0);
 	ui_hbox_add_child(panelist_countdown_ready.pane->root_widget, ui_widget_create_label(font_std, "Ready"), 1);
-	panelist_countdown_ready.next=NULL;
+	panelist_countdown_ready.next=&panelist_chat;
 	
 	//Game
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
@@ -116,15 +133,17 @@ void view_scroll(DARNIT_MOUSE *mouse) {
 			return;
 		if(mouse->rmb)
 			building_place=-1;
-		else if(mouse->lmb&&building_place>-1) {
+		else if(mouse->lmb) {
 			int map_offset=((mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
-			printf("Building placed at %i\n", map_offset);
-			//map->layer[map->layers-1].tilemap->data[map_offset]=2;
-			//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
-			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
-			building_place=-1;
-		}else if(mouse->lmb) {
-			//status about clicked building, etc
+			if(building_place>-1) {
+				printf("Building placed at %i\n", map_offset);
+				//map->layer[map->layers-1].tilemap->data[map_offset]=2;
+				//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
+				client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
+				building_place=-1;
+			} else {
+				//status about clicked building, etc
+			}
 		}
 		
 }

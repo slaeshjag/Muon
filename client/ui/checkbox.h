@@ -5,7 +5,7 @@
 #define UI_CHECKBOX_PROP_BORDER 1
 #define UI_CHECKBOX_PROP_ACTIVE_BORDER 2
 
-struct UI_CHECKBOX_PROPERTIES{
+struct UI_CHECKBOX_PROPERTIES {
 	int activated;
 	DARNIT_LINE *border;
 	DARNIT_LINE *active_border;
