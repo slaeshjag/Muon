@@ -13,8 +13,7 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
 	memset(player_name, 0, 32);
 	strncpy(player_name, v.p, 31);
-	if(!strnlen(player_name, 32))
-		return;
+	player_name[31]=0;
 	printf("Player name: %s\n", player_name);
 	state=GAME_STATE_CONNECT_SERVER;
 }

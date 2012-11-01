@@ -6,6 +6,12 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#else
+#include <windows.h>
+#include <winsock2.h>
+
+#define	EWOULDBLOCK			WSAEWOULDBLOCK
+#define	MSG_NOSIGNAL			0
 #endif
 #include <errno.h>
 
@@ -13,6 +19,8 @@
 typedef struct {
 	#ifndef _WIN32
 	int				socket;
+	#else
+	SOCKET				socket;
 	#endif
 } SERVER_SOCKET;
 

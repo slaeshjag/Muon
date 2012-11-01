@@ -3,7 +3,7 @@
 
 struct UI_PANE_LIST;
 
-#include <SDL/SDL.h>
+#include <SDL/SDL_keysym.h>
 #define KEY(k) SDLK_##k
 
 #define PINR(px, py, x, y, w, h) ((px)>(x)&&(py)>(y)&&(px)<((x)+(w))&&(py)<((y)+(h)))
