@@ -41,6 +41,15 @@ void view_init() {
 	v.p="1337";
 	connect_server_entry_port->set_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT, v);
 	
+	//Connecting
+	panelist_connecting.pane=ui_pane_create(platform.screen_w/2-90, platform.screen_h/2-32, 180, 64, NULL);
+	panelist_connecting.next=NULL;
+	ui_pane_set_root_widget(panelist_connecting.pane, ui_widget_create_vbox());
+	ui_vbox_add_child(panelist_connecting.pane->root_widget, ui_widget_create_label(font_std, "Connecting to server"), 1);
+	connecting_button_cancel=ui_widget_create_button_text("Cancel");
+	ui_vbox_add_child(panelist_connecting.pane->root_widget, connecting_button_cancel, 0);
+	connecting_button_cancel->event_handler->add(connecting_button_cancel, connecting_button_cancel_click, UI_EVENT_TYPE_UI);
+	
 	//Countdown
 	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
 	strcpy(countdown_text, "Downloading map");

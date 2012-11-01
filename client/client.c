@@ -10,6 +10,14 @@
 
 unsigned int recalc_map=0;
 
+void client_connect_callback(int ret, void *data, void *socket) {
+	if(ret) {
+		state=GAME_STATE_CONNECT_SERVER;
+		darnitSocketClose(socket);
+	} else
+		state=GAME_STATE_COUNTDOWN;
+}
+
 void client_message_convert_send(MESSAGE_RAW *message) {
 	message->player_id=darnitUtilHtonl(message->player_id);
 	message->command=darnitUtilHtonl(message->command);
@@ -197,11 +205,16 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 }
 
 int client_init(char *host, int port) {
-	if((sock=darnitSocketConnect(host, port))==NULL)
+	if((sock=darnitSocketConnect(host, port, client_connect_callback, NULL))==NULL)
 		return -1;
 	msg_recv.command=0;
 	msg_recv_payload_offset=msg_recv_payload;
 	msg_recv_offset=&msg_recv;
 	client_message_handler=client_identify;
 	return 0;
+}
+
+void client_disconnect() {
+	client_connect_callback(-1, NULL, sock);
+	sock=NULL;
 }
