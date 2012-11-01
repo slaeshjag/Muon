@@ -217,7 +217,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				fogdiff = (oldfog ^ fogdiff);
 				if (fogdiff || (j == 0 && k == 0)) {
 					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << 1, index, NULL);
-					unitAnnounce(owner, owner, (!t) ? building : 0, index);
+					unitAnnounce(owner, player, (!t) ? building : 0, index);
 				}
 			}
 
