@@ -7,7 +7,7 @@ int gameInit() {
 	server->game.countdown = 0;
 
 	/* FIXME: Make this variable */
-	server->game.gamespeed = 2;
+	server->game.gamespeed = 10;
 
 	return 0;
 }
@@ -56,8 +56,6 @@ void gameStart() {
 			continue;
 		unitSpawn(i, UNIT_DEF_GENERATOR, server->player[i].spawn.x, server->player[i].spawn.y);
 
-		/* Just testing... */
-		unitSpawn(i, UNIT_DEF_PYLON, server->player[i].spawn.x + 1, server->player[i].spawn.y + 1);
 	}
 
 	server->accept = networkSocketDisconnect(server->accept);
