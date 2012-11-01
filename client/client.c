@@ -41,7 +41,7 @@ int client_check_incomming() {
 	for(i=0; i<1000; i++) {
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
-			if((s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2))) {
+			s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2);
 				if(s==0)
 					break;
 				if(s==-1) {
@@ -52,21 +52,19 @@ int client_check_incomming() {
 				if(client_message_handler)
 					client_message_handler(&msg_recv, msg_recv_payload);
 				msg_recv.command=0;
-			}
 		} else {
 			//download message
-			if((s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW)))) {
-				if(s==0)
-					break;
-				if(s==-1) {
-					sock=darnitSocketClose(sock);
-					return -1;
-				}
-				client_message_convert_recv(&msg_recv);
-				//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
-				if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
-					client_message_handler(&msg_recv, NULL);
+			s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
+			if(s==0)
+				break;
+			if(s==-1) {
+				sock=darnitSocketClose(sock);
+				return -1;
 			}
+			client_message_convert_recv(&msg_recv);
+			//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
+			if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
+				client_message_handler(&msg_recv, NULL);
 		}
 	}
 	
@@ -104,11 +102,11 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
 			recalc_map|=1<<(map->layers-2);
 			//recalc_map|=1<<(map->layers-1);
-			if(msg->player_id==player_id) {
+			if(msg->player_id==player_id&&msg->arg_1) {
 				for(i=0; i<4; i++) {
 					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
-					client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
+					//client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
 					//v.i=0;
 					//game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
 				}
