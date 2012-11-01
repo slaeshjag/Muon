@@ -56,6 +56,7 @@ void unitAnnounce(int from, int to, int building, int index);
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y);
 int unitAdd(int owner, int type, int x, int y);
 int unitRemove(int x, int y);
+void unitDestroy(int player, unsigned int index);
 
 void unitLoop(int msec);
 

@@ -328,6 +328,19 @@ int unitRemove(int x, int y) {
 }
 
 
+void unitDestroy(int player, unsigned int index) {
+	if (index > server->w * server->h)
+		return;
+	if (server->map[index]->owner != player)
+		return;
+	if (server->map[index]->type == UNIT_DEF_GENERATOR)
+		return;
+	unitRemove(index % server->w, index / server->w);
+
+	return;
+}
+
+
 void unitAttackSet(int index_src, int index_dst) {
 	int i, from;
 
