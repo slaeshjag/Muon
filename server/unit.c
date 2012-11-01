@@ -311,8 +311,30 @@ void unitAttackSet(int index_src, int index_dst) {
 }
 
 
+int unitAttackValidate(int index_src, int owner, int index_dst) {
+	int team;
+
+	if (index_src < 0 || index_src >= server->w * server->h)
+		return -1;
+	if (index_dst < 0 || index_dst >= server->w * server->h)
+		return -1;
+	if (!server->map[index_dst])
+		return -1;
+	if (!server->map[index_src])
+		return -1;
+	if (server->map[index_src]->owner != owner)
+		return -1;
+	if (!server->player[owner].map[index_dst].fog)
+		return -1;
+	if (server->map[index_dst]->owner == owner)
+		return -1;
+	if (team > -1 && server->player[server->map[index_dst]->owner].team == team)
+		return -1;
+	return 0;
+
+
 void unitAttackerScan(int x, int y) {
-	int team, i, j, index, range, owner;
+	int team, i, j, index, range, owner, src;
 	
 	range = unitRange(UNIT_DEF_ATTACKER);
 	team = server->player[server->map[x + y * server->w]->owner].team;
