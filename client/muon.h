@@ -8,7 +8,7 @@
 
 #include "ui/ui.h"
 
-#define SCROLL_OFFSET 32
+#define SCROLL_OFFSET 8
 #define SCROLL_SPEED 4
 
 DARNIT_PLATFORM platform;

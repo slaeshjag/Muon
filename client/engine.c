@@ -31,14 +31,3 @@ void engine_calculate_powergrid() {
 	}
 	powergrid_lines=i;
 }
-
-void engine_move_powergrid(int cam_x, int cam_y) {
-	int i;
-	int x1, x2, y1, y2;
-	if(!powergrid)
-		return;
-	for(i=0; i<powergrid_lines; i++) {
-		darnitRenderLineGet(powergrid, i, &x1, &y1, &x2, &y2);
-		darnitRenderLineMove(powergrid, i, x1-cam_x, y1-cam_y, x2-cam_x, y2-cam_y);
-	}
-}

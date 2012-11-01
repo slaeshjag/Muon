@@ -95,7 +95,7 @@ void view_scroll(DARNIT_MOUSE mouse) {
 		
 		if(mouse.x<SCROLL_OFFSET&&map->cam_x>0)
 			scroll_x=-SCROLL_SPEED;
-		else if(mouse.x>platform.screen_w-SIDEBAR_WIDTH-SCROLL_OFFSET&&mouse.x<platform.screen_w-SIDEBAR_WIDTH&&map->cam_x<map_w-platform.screen_w+SIDEBAR_WIDTH)
+		else if(mouse.x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-platform.screen_w+SIDEBAR_WIDTH)
 			scroll_x=SCROLL_SPEED;
 		if(mouse.y<SCROLL_OFFSET&&map->cam_y>0)
 			scroll_y=-SCROLL_SPEED;
