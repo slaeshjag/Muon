@@ -25,6 +25,7 @@ UI_WIDGET *ui_widget_create_vbox() {
 	widget->set_prop=ui_vbox_set_prop;
 	widget->get_prop=ui_vbox_get_prop;
 	widget->resize=ui_vbox_resize;
+	widget->request_size=ui_vbox_request_size;
 	widget->render=ui_vbox_render;
 	widget->x=widget->y=widget->w=widget->h=0;
 	
@@ -119,6 +120,25 @@ void ui_vbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 		}
 	}
 	free(requested);
+}
+
+void ui_vbox_request_size(UI_WIDGET *widget, int *w, int *h) {
+	int ww=0, hh=0;
+	int req_w, req_h;
+	UI_WIDGET_LIST *c;
+	struct UI_HBOX_PROPERTIES *p=widget->properties;
+	for(c=p->children; c; c=c->next) {
+		if(!c->expand) {
+			req_h=*h; req_w=-1;
+			c->widget->request_size(c->widget, &req_w, &req_h);
+			h+=req_h;
+			ww=req_w>ww?req_w:ww;
+		}
+	}
+	if(w)
+		*w=ww;
+	if(h)
+		*h=hh;
 }
 
 void ui_vbox_render(UI_WIDGET *widget) {
