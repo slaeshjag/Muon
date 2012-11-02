@@ -51,6 +51,7 @@
 #define	MSG_SEND_BUILDING_PROGRESS	0x00F
 #define	MSG_SEND_MAP_TILE_ATTRIB	0x010
 #define	MSG_SEND_PLAYER_DEFEATED	0x011
+#define	MSG_SEND_NAME_IN_USE		0x012
 
 typedef struct {
 	unsigned int		player_ID;

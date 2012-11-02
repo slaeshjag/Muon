@@ -92,6 +92,8 @@ typedef struct {
 /* No arguemnts. No data. */
 #define	MSG_RECV_PLAYER_DEFEATED	0x011
 
+/* No arguments. No data. */
+#define	MSG_RECV_NAME_IN_USE		0x012
 
 /* These commands actually have data after them */
 
