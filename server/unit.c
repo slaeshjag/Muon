@@ -298,6 +298,7 @@ int unitAdd(int owner, int type, int x, int y) {
 
 int unitRemove(int x, int y) {
 	SERVER_UNIT *unit, *next, **parent;
+	int i;
 
 	if (x >= server->w || y >= server->h) {
 		fprintf(stderr, "Unable to remove unit at %i %i: Tile is outside of the map\n", x, y);
