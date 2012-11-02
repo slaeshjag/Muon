@@ -7,7 +7,7 @@ void engine_calculate_powergrid() {
 	DARNIT_MAP_LAYER *toplayer=&map->layer[map->layers-1];
 	DARNIT_TILEMAP *toplayer_tilemap=map->layer[map->layers-1].tilemap;
 	unsigned int *toplayer_data=map->layer[map->layers-1].tilemap->data;
-	//int *building_tilemap=map->layer[map->layers-2].tilemap;
+	//DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
 	
 	int tile_w=toplayer->tile_w;
 	int tile_h=toplayer->tile_h;

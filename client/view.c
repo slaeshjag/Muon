@@ -12,6 +12,8 @@ void view_init() {
 	building_place=-1;
 	powergrid=NULL;
 	powergrid_lines=0;
+	selected_border=darnitRenderLineAlloc(4, 1);
+	selected_index=-1;
 	map_border=NULL;
 	
 	darnitRenderClearColorSet(0x0, 0x0, 0x0);
@@ -109,7 +111,7 @@ void view_init() {
 }
 
 void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
-	register int scroll_x=0, scroll_y=0;
+	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	
 	if((mouse->x<SCROLL_OFFSET||buttons->left)&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
@@ -128,8 +130,10 @@ void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
 		building_place=-1;
 	else if(mouse->lmb) {
 		int map_offset=((mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
+		if(map_offset<0||map_offset>map->layer->tilemap->w*map->layer->tilemap->h)
+			return;
 		if(building_place>-1) {
-			printf("Building placed at %i\n", map_offset);
+			//printf("Building placed at %i\n", map_offset);
 			//map->layer[map->layers-1].tilemap->data[map_offset]=2;
 			//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
@@ -141,6 +145,8 @@ void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
 			game_sidebar_progress_shield->set_prop(game_sidebar_progress_shield, UI_PROGRESSBAR_PROP_PROGRESS, v);
 			v.i=engine_get_building_health(map_offset);
 			game_sidebar_progress_health->set_prop(game_sidebar_progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
+			selected_index=map_offset;
+			//printf("Selected building at %i, %i (%i, %i)\n", map->cam_x, 0, map->layer[map->layers-2].tile_w*(selected_index%map->layer[map->layers-2].tilemap->w)-map->cam_x, selected_index/map->layer[map->layers-2].tilemap->w);
 		}
 	}
 }
@@ -162,9 +168,15 @@ void view_draw(DARNIT_MOUSE *mouse) {
 		darnitRenderLineDraw(powergrid, powergrid_lines);
 		darnitRenderOffset(0, 0);
 	}
-	if(map_border) {
-		darnitRenderOffset(map->cam_x, map->cam_y);
+	darnitRenderOffset(map->cam_x, map->cam_y);
+	if(map_border)
 		darnitRenderLineDraw(map_border, 4);
-		darnitRenderOffset(0, 0);
+	if(selected_index>-1) {
+		register int x=map->layer[map->layers-2].tile_w*(selected_index%map->layer[map->layers-2].tilemap->w);
+		register int y=map->layer[map->layers-2].tile_h*(selected_index/map->layer[map->layers-2].tilemap->w);
+		//printf("(%i, %i) (%i, %i)\n", x, y, map->cam_x, map->cam_y);
+		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
+		darnitRenderLineDraw(selected_border, 4);
 	}
+	darnitRenderOffset(0, 0);
 }

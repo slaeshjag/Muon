@@ -123,9 +123,11 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_BUILDING_HP:
 			engine_set_building_health(msg->arg_2, msg->arg_1);
+			//printf("Set health of %i to %i\n", msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_SHIELD:
 			engine_set_building_shield(msg->arg_2, msg->arg_1);
+			//printf("Set shield of %i to %i\n", msg->arg_2, msg->arg_1);
 			break;
 	}
 }
@@ -206,6 +208,11 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			darnitRenderLineMove(map_border, 1, 0, 0, 0, map_h);
 			darnitRenderLineMove(map_border, 2, map_w, 0, map_w, map_h);
 			darnitRenderLineMove(map_border, 3, 0, map_h, map_w, map_h);
+			DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
+			darnitRenderLineMove(selected_border, 0, 0, 0, building_layer->tile_w, 0);
+			darnitRenderLineMove(selected_border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
+			darnitRenderLineMove(selected_border, 2, 0, 0, 0, building_layer->tile_h);
+			darnitRenderLineMove(selected_border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
 			countdown_ready->event_handler->add(countdown_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 			break;
 		case MSG_RECV_GAME_START:

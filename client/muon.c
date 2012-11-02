@@ -95,7 +95,7 @@ int main() {
 	chat_open=0;
 	home_x=home_y=0;
 	serverInit();
-	serverStart("map.ldi", 2, 1337, 10);
+	serverStart("map.ldi", 2, 1337, 3);
 	state=GAME_STATE_INPUT_NAME;
 	
 	ui_init();

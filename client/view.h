@@ -41,6 +41,9 @@ UI_WIDGET *game_sidebar_progress_health;
 
 DARNIT_LINE *powergrid;
 int powergrid_lines;
+DARNIT_LINE *selected_border;
+int selected_index;
+int selected_building;
 
 struct UI_PANE_LIST panelist_game_menu;
 UI_WIDGET *game_menu_button[2];
