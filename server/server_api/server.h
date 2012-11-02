@@ -11,7 +11,7 @@
 typedef void SERVER;
 
 void serverInit();
-SERVER *serverStart(const char *map, unsigned int players, int port);
+SERVER *serverStart(const char *map, unsigned int players, int port, int gamespeed);
 void serverLoop(unsigned int msec);
 void serverStop();
 int serverIsRunning();

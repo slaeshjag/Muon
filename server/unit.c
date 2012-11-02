@@ -261,6 +261,7 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 
 int unitAdd(int owner, int type, int x, int y) {
 	SERVER_UNIT *unit;
+	int index = x + server->w * y;
 	
 	if (x >= server->w || y >= server->h) {
 		fprintf(stderr, "Warning: Unable to create unit at %i %i: Coordinate is outside the map\n", x, y);
@@ -275,8 +276,12 @@ int unitAdd(int owner, int type, int x, int y) {
 	if ((unit = unitInit(owner, type, x, y)) == NULL)
 		return -1;
 
+	if (server->map_c.tile_data[index] & 0x10000)
+		return -1;
+	if ((server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE && unit->type != UNIT_DEF_BUILDSITE)
+		return -1;
 	if (unit->type == UNIT_DEF_BUILDSITE) {
-		if (server->map_c.tile_data[x + server->w * y] != UNIT_BUILDSITE)
+		if ((server->map_c.tile_data[index] & 0xFFF) != UNIT_BUILDSITE)
 			return -1;
 	}
 	
@@ -345,6 +350,8 @@ void unitAttackSet(int index_src, int index_dst) {
 	int i, from;
 
 	from = server->map[index_src]->owner;
+	server->map[index_src]->target = index_dst;
+	fprintf(stderr, "Attacking %i->%i\n", index_src, index_dst);
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
@@ -353,6 +360,7 @@ void unitAttackSet(int index_src, int index_dst) {
 			continue;
 		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_src, index_dst, NULL);
 	}
+
 
 	return;
 }
@@ -421,7 +429,7 @@ void unitAttackerScan(int x, int y) {
 				continue;
 			if (team > -1 && server->player[server->map[index]->owner].team == team)
 				continue;
-			fprintf(stderr, "Attacking building\n");
+			fprintf(stderr, "Attacking building, %i\n", index);
 			unitAttackSet(x + y * server->w, index);
 			return;
 		}
@@ -451,13 +459,18 @@ void unitShieldAnnounce(int index) {
 
 void unitLoop(int msec) {
 	SERVER_UNIT *next;
+	int index;
 
 	next = server->unit;
 	while (next != NULL) {
-		if (next->shield < unit_maxshield[next->type]) {
-			next->shield += unit_shieldreg[next->type] * msec * server->game.gamespeed;
-			if (next->shield > unit_maxshield[next->type])
-				next->shield = unit_maxshield[next->type];
+		index = next->x + next->y * server->w;
+		if (next->shield < unit_maxshield[next->type] && server->player[next->owner].map[index].power) {
+			if (next->last_no_shield >= server->game.time_elapsed + UNIT_REGEN_DELAY/server->game.gamespeed) {
+				next->shield += unit_shieldreg[next->type] * msec * server->game.gamespeed;
+				if (next->shield > unit_maxshield[next->type])
+					next->shield = unit_maxshield[next->type];
+			}
+			
 			unitShieldAnnounce(next->target);
 		}
 		
@@ -466,10 +479,14 @@ void unitLoop(int msec) {
 			if (server->map[next->target]->shield < 0) {
 				server->map[next->target]->hp += server->map[next->target]->shield;
 				server->map[next->target]->shield = 0;
+				server->map[next->target]->last_no_shield = server->game.time_elapsed;
 				unitDamageAnnounce(next->target);
-				if (server->map[next->target]->hp <= 0)
+				if (server->map[next->target]->hp <= 0) {
 					unitRemove(next->target % server->w, next->target / server->w);
+					next->target = -1;
+				}
 			}
+
 		} else if (next->type == UNIT_DEF_ATTACKER) {
 			unitAttackerScan(next->x, next->y);
 		}

@@ -23,7 +23,7 @@ void ldmzGetSize(void *map, int *x, int *y) {
 unsigned int *ldmzGetData(void *map) {
 	DARNIT_MAP *dmap = map;
 	
-	return dmap->layer->tilemap->data;
+	return dmap->layer[dmap->layers-2].tilemap->data;
 }
 
 

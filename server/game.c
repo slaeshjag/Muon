@@ -1,13 +1,13 @@
 #include "server.h"
 
 
-int gameInit() {
+int gameInit(int gamespeed) {
 	server->game.started = 0;
 	server->game.time_elapsed = 0;
 	server->game.countdown = 0;
 
 	/* FIXME: Make this variable */
-	server->game.gamespeed = 10;
+	server->game.gamespeed = gamespeed;
 
 	return 0;
 }
