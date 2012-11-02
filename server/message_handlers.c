@@ -17,10 +17,18 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 		return;
 	}
 
+
 	memcpy(server->player[player].name, (char *) message->extra, message->arg[1]);
 	server->player[player].name[message->arg[1]] = 0;
-	server->player[player].status = PLAYER_IN_LOBBY;
+	for (i = 0; i < server->players; i++)
+		if (server->player[i].status >= PLAYER_IN_LOBBY)
+			if (strcmp(server->player[i].name, server->player[player].name) == 0) {
+				messageSend(server->player[player].socket, player, MSG_SEND_NAME_IN_USE, 0, 0, NULL);
+				playerDisconnect(player);
+				return;
+			}
 
+	server->player[player].status = PLAYER_IN_LOBBY;
 	playerMessageBroadcast(player, MSG_SEND_JOIN, 0, strlen(server->player[player].name), server->player[player].name);
 
 	for (i = 0; i < server->players; i++)
