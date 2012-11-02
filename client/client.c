@@ -121,6 +121,12 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			v.i=msg->arg_2;
 			game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
 			break;
+		case MSG_RECV_BUILDING_HP:
+			engine_set_building_health(msg->arg_2, msg->arg_1);
+			break;
+		case MSG_RECV_BUILDING_SHIELD:
+			engine_set_building_shield(msg->arg_2, msg->arg_1);
+			break;
 	}
 }
 

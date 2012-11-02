@@ -36,6 +36,8 @@ struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_button_build[4];
 UI_WIDGET *game_sidebar_label_build[4];
 UI_WIDGET *game_sidebar_progress_build;
+UI_WIDGET *game_sidebar_progress_shield;
+UI_WIDGET *game_sidebar_progress_health;
 
 DARNIT_LINE *powergrid;
 int powergrid_lines;

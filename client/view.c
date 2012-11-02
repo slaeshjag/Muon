@@ -89,6 +89,11 @@ void view_init() {
 		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
 	}
 	game_sidebar_progress_build=ui_widget_create_progressbar(font_std);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
+	game_sidebar_progress_shield=ui_widget_create_progressbar(font_std);
+	game_sidebar_progress_health=ui_widget_create_progressbar(font_std);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
 	
 	//Game menu
 	panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);
@@ -131,6 +136,11 @@ void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
 			building_place=-1;
 		} else {
 			//status about clicked building, etc
+			UI_PROPERTY_VALUE v;
+			v.i=engine_get_building_shield(map_offset);
+			game_sidebar_progress_shield->set_prop(game_sidebar_progress_shield, UI_PROGRESSBAR_PROP_PROGRESS, v);
+			v.i=engine_get_building_health(map_offset);
+			game_sidebar_progress_health->set_prop(game_sidebar_progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
 		}
 	}
 }

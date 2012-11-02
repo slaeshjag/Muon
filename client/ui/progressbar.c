@@ -81,7 +81,8 @@ void ui_progressbar_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	darnitRenderLineMove(p->border, 2, x, y, x, y+h);
 	darnitRenderLineMove(p->border, 3, x+w, y, x+w, y+h);
 	
-	darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+widget->w-2, widget->y+widget->h-2);
+	//darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+widget->w-2, widget->y+widget->h-2);
+	darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+2+((widget->w-4)*p->progress/100), widget->y+widget->h-2);
 	
 	if(p->surface!=NULL)
 		darnitTextSurfaceFree(p->surface);
