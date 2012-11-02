@@ -18,10 +18,10 @@ typedef struct {
 	unsigned int		gamespeed;
 } GAME;
 
-int gameInit();
+int gameInit(int gamespeed);
 void gameLoop(int msec);
 int gameKillPlayerUnits(unsigned int player);
 int gameAttemptStart();
-void gameeStart();
+void gameStart();
 
 #endif
