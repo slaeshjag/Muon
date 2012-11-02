@@ -12,6 +12,7 @@ unsigned int recalc_map=0;
 
 void client_chat(int id, char *buf, int len) {
 	char *chatmsg=(char *)malloc(len+36);
+	memcpy(chatmsg, buf, len);
 	buf[len]=0;
 	//sprintf(chatmsg, "<%s> %s\n", &player_names[id*32], buf);
 	ui_listbox_add(chat_listbox, chatmsg);

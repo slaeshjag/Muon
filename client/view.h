@@ -49,6 +49,8 @@ UI_WIDGET *chat_hbox;
 UI_WIDGET *chat_entry;
 UI_WIDGET *chat_button_send;
 
+void view_scroll_to(int x, int y);
+
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
