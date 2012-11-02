@@ -105,13 +105,18 @@ int serverParseMapFirst() {
 
 
 /* TODO: Expand with arguments */
-SERVER *serverStart(const char *fname, unsigned int players, int port) {
+SERVER *serverStart(const char *fname, unsigned int players, int port, int gamespeed) {
 	int i, map_w, map_h;
 	const char *tmp;
 
 	if (server)
 		return server;
 	
+	if (gamespeed < 0) {
+		errorPush(SERVER_ERROR_GAMESPEED_TOO_SMALL);
+		return NULL;
+	}
+
 	errorInit();
 
 	if ((server = malloc(sizeof(SERVER))) == NULL) {

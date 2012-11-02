@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 	
 	serverInit();
 
-	if (serverStart(argv[1], atoi(argv[2]), port) == NULL)
+	if (serverStart(argv[1], atoi(argv[2]), port, 10) == NULL)
 		return -1;
 	for (;;) {
 		sleep(1);

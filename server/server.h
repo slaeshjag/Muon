@@ -33,6 +33,7 @@ typedef struct SERVER_UNIT {
 	int			hp;
 	int			shield;
 	unsigned int		status;
+	unsigned int		last_no_shield;
 	int			target;
 	UNIT_PYLON		pylon;
 	struct SERVER_UNIT	*next;
@@ -69,7 +70,7 @@ SERVER *server;
 
 
 int serverPowerGet(int owner, int x, int y);
-SERVER *serverStart(const char *fname, unsigned int players, int port);
+SERVER *serverStart(const char *fname, unsigned int players, int port, int gamespeed);
 SERVER *serverStop();
 int serverLoop(unsigned int d_ms);
 

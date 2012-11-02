@@ -8,6 +8,7 @@
 #define	SERVER_ERROR_MAP_NO_MAX_PLAYERS		5
 #define	SERVER_ERROR_UNABLE_TO_LISTEN		6
 #define	SERVER_ERROR_TOO_MANY_PLAYERS		7
+#define	SERVER_ERROR_GAMESPEED_TOO_SMALL	8
 
 #ifdef WITH_SERVER_ERROR
 
@@ -20,7 +21,8 @@ const char *server_errors[] = { NULL,
 				"The map file is invalid.",
 				"The map is missing the property 'max_players'",
 				"The server was unable to bind the requested port. It's either in use or blocked by a firewall.",
-				"The map is not defined for this many players"};
+				"The map is not defined for this many players",
+				"Gamespeed must be bigger than 0"};
 
 typedef struct {
 	int			read_pos;

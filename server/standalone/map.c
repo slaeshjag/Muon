@@ -63,7 +63,7 @@ void ldmzGetSize(LDMZ_MAP *map, int *x, int *y) {
 }
 
 unsigned int *ldmzGetData(LDMZ_MAP *map) {
-	return map->layer->tilemap->data;
+	return map->layer[map->layers-2].tilemap->data;
 }
 
 

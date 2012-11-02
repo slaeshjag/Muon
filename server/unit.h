@@ -15,13 +15,14 @@
 #define	UNIT_BUILDSITE			5
 
 #define	UNIT_ATTACKER_DMGP		5
+#define	UNIT_REGEN_DELAY		5000
 
-static const int unit_los[] = 		{ 0, 7, 6, 3, 4, 1 };
-static const int unit_maxhp[] = 	{ 0, 50000, 1000, 1000, 5000, 1000 };
-static const int unit_maxshield[] = 	{ 0, 50000, 1, 5000, 5000, 40000 };		/* Shield must not be 0 for any existing building! */
-static const int unit_shieldreg[] = 	{ 0, 40, 1, 10, 10, 5 };
-static const int unit_range[] = 	{ 0, 4, 0, 3, 4, 1 };
-static const int unit_buildtime[] =	{ 0, 0, 5000, 20000, 20000, 10000 };
+static const int unit_los[] = 		{ 0, 7, 6, 3, 4, 1, 2};
+static const int unit_maxhp[] = 	{ 0, 50000, 1000, 1000, 5000, 1000, 1000 };
+static const int unit_maxshield[] = 	{ 0, 50000, 1, 5000, 5000, 40000, 1000 };		/* Shield must not be 0 for any existing building! */
+static const int unit_shieldreg[] = 	{ 0, 40, 1, 10, 10, 5, 2 };
+static const int unit_range[] = 	{ 0, 4, 0, 3, 4, 1, 1 };
+static const int unit_buildtime[] =	{ 0, 0, 5000, 20000, 20000, 10000, 10000 };
 
 struct SERVER_UNIT;
 
