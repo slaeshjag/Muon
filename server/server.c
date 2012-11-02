@@ -126,7 +126,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 	}
 
 	messageHandlerInit(server);
-	gameInit();
+	gameInit(gamespeed);
 
 	if ((server->map_data = ldmzLoad(fname)) == NULL) {
 		free(server);
@@ -258,7 +258,7 @@ void serverProcessNetwork() {
 			msg.arg[0] = ntohl(msg.arg[0]);
 			msg.arg[1] = ntohl(msg.arg[1]);
 
-			if (messageHasData(msg.command, msg.arg[1]) == 0) {
+			if (messageHasData(msg.command, msg.arg[1]) == 0 && msg.arg[1]) {
 				if (msg.arg[1] > MESSAGE_MAX_PAYLOAD) {
 					messageSend(server->player[i].socket, i, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 					playerDisconnect(i);

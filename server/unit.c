@@ -306,9 +306,16 @@ int unitRemove(int x, int y) {
 
 	if ((unit = server->map[x + y * server->h]) == NULL)
 		return -1;
-	server->map[x + y * server->h] = NULL;
 	parent = &server->unit;
 	next = *parent;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME)
+			continue;
+		if (!server->player[i].map[x + y * server->h].fog)
+			continue;
+		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
+	}
 
 	while (next != unit) {
 		parent = &next->next;
@@ -326,8 +333,11 @@ int unitRemove(int x, int y) {
 			/* TODO: Handle player loss */
 		}
 		free(next);
+		server->map[x + y * server->h] = NULL;
 		return 0;
 	}
+	
+	server->map[x + y * server->h] = NULL;
 
 	return 0;
 }
@@ -471,7 +481,7 @@ void unitLoop(int msec) {
 					next->shield = unit_maxshield[next->type];
 			}
 			
-			unitShieldAnnounce(next->target);
+			unitShieldAnnounce(index);
 		}
 		
 		if (next->type == UNIT_DEF_ATTACKER && next->target > -1) {
