@@ -249,7 +249,7 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->x = x;
 	unit->y = y;
 	server->map[x + y * server->w] = unit;
-	unit->lastr_no_shield = 0;
+	unit->last_no_shield = 0;
 	
 	if (unit->type == UNIT_DEF_PYLON || unit->type == UNIT_DEF_GENERATOR)
 		unitPylonInit(unit, x, y);
