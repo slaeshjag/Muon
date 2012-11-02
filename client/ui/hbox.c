@@ -136,7 +136,6 @@ void ui_hbox_request_size(UI_WIDGET *widget, int *w, int *h) {
 			hh=req_h>hh?req_h:hh;
 		}
 	}
-	printf("hh %i\n", hh);
 	if(w)
 		*w=ww;
 	if(h)

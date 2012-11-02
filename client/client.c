@@ -9,7 +9,15 @@
 #define PONG case MSG_RECV_PING: client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL); break
 
 unsigned int recalc_map=0;
-char *chatmsg;
+
+void client_chat(int id, char *buf, int len) {
+	char *chatmsg=(char *)malloc(len+36);
+	buf[len]=0;
+	sprintf(chatmsg, "<%s> %s\n", &player_names[id*32], buf);
+	ui_listbox_add(chat_listbox, chatmsg);
+	ui_listbox_scroll(chat_listbox, -1);
+	free(chatmsg);
+}
 
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
@@ -92,11 +100,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
-			chatmsg=(char *)malloc(msg->arg_2+1);
-			memcpy(chatmsg, payload, msg->arg_2);
-			chatmsg[msg->arg_2]=0;
-			printf("<%s> %s\n", &player_names[msg->player_id*32], chatmsg);
-			free(chatmsg);
+			client_chat(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
@@ -125,11 +129,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
-			chatmsg=(char *)malloc(msg->arg_2+1);
-			memcpy(chatmsg, payload, msg->arg_2);
-			chatmsg[msg->arg_2]=0;
-			printf("<%s> %s\n", &player_names[msg->player_id*32], chatmsg);
-			free(chatmsg);
+			client_chat(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_GAME_START:
 			printf("Game starts in %i\n", msg->arg_1);
@@ -153,12 +153,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
-			chatmsg=(char *)malloc(msg->arg_2+1);
-			memcpy(chatmsg, payload, msg->arg_2);
-			chatmsg[msg->arg_2]=0;
-			printf("<%s> %s\n", &player_names[msg->player_id*32], chatmsg);
-			ui_listbox_add(chat_listbox, chatmsg);
-			free(chatmsg);
+			client_chat(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_JOIN:
 			if(!payload)

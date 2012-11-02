@@ -51,7 +51,7 @@ void view_init() {
 	connecting_button_cancel->event_handler->add(connecting_button_cancel, connecting_button_cancel_click, UI_EVENT_TYPE_UI);
 	
 	//Chat
-	panelist_chat.pane=ui_pane_create(16, platform.screen_h-256-16, 180, 256, NULL);
+	panelist_chat.pane=ui_pane_create(16, platform.screen_h-256-16, 200, 256, NULL);
 	panelist_chat.next=NULL;
 	ui_pane_set_root_widget(panelist_chat.pane, ui_widget_create_vbox());
 	ui_vbox_add_child(panelist_chat.pane->root_widget, ui_widget_create_label(font_std, "Chat"), 0);
@@ -106,7 +106,7 @@ void view_init() {
 	//Game menu
 	panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);
 	ui_pane_set_root_widget(panelist_game_menu.pane, ui_widget_create_vbox());
-	panelist_game_menu.next=NULL;
+	panelist_game_menu.next=&panelist_chat;
 	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
 	game_menu_button[0]=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
 	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, "Return to game"));

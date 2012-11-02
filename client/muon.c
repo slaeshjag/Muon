@@ -6,6 +6,8 @@
 
 #define RENDER_MOUSE darnitRenderBlendingEnable(); darnitRenderTileBlit(mouse_tilesheet, 0, mouse.x, mouse.y); darnitRenderBlendingDisable()
 
+int chat_open;
+
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
@@ -101,6 +103,7 @@ int main() {
 	}
 	platform=darnitPlatformGet();
 	DARNIT_MOUSE mouse;
+	chat_open=0;
 	serverInit();
 	serverStart("map.ldi", 2, 1337);
 	state=GAME_STATE_INPUT_NAME;
@@ -173,6 +176,13 @@ int main() {
 				if(buttons.select) {
 					state=GAME_STATE_GAME_MENU;
 					darnitInputUngrab();
+				}
+				if(buttons.start) {
+					if(!chat_open)
+						panelist_game_sidebar.next=panelist_game_sidebar.next?NULL:&panelist_chat;
+					chat_open=1;
+				} else {
+					chat_open=0;
 				}
 				break;
 			case GAME_STATE_GAME_MENU:

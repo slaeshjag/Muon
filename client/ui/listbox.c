@@ -15,6 +15,7 @@ UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font) {
 	p->offset=NULL;
 	p->font=font;
 	p->border=darnitRenderLineAlloc(4, 1);
+	p->size=0;
 	widget->event_handler=NULL;
 	widget->set_prop=ui_listbox_set_prop;
 	widget->get_prop=ui_listbox_get_prop;
@@ -39,6 +40,22 @@ void ui_listbox_add(UI_WIDGET *widget, char *text) {
 	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
 
+void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
+	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
+	int text_h=darnitFontGetGlyphH(p->font)+2;
+	struct UI_LISTBOX_LIST *l;
+	int i=0;
+	for(l=p->list; l; l=l->next) {
+		if(pos>=0&&i>=pos)
+			break;
+		if(text_h*(p->size-i)<widget->h)
+			break;
+		i++;
+	}
+	p->offset=l;
+	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
+}
+
 void ui_listbox_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	switch(prop) {
@@ -54,6 +71,9 @@ UI_PROPERTY_VALUE ui_listbox_get_prop(UI_WIDGET *widget, int prop) {
 	switch(prop) {
 		case UI_LISTBOX_PROP_FONT:
 			v.p=p->font;
+			break;
+		case UI_LISTBOX_PROP_SIZE:
+			v.i=p->size;
 			break;
 	}
 	return v;
