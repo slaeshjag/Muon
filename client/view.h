@@ -12,6 +12,8 @@ void view_scroll(DARNIT_MOUSE *mouse);
 DARNIT_FONT *font_std;
 DARNIT_TILESHEET *mouse_tilesheet;
 
+DARNIT_LINE *map_border;
+
 struct UI_PANE_LIST panelist_input_name;
 UI_WIDGET *input_name_entry;
 UI_WIDGET *input_name_button;

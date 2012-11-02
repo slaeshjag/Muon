@@ -7,10 +7,13 @@
 
 void view_init() {
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
-	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGBA8);
+	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	building_place=-1;
 	powergrid=NULL;
 	powergrid_lines=0;
+	map_border=NULL;
+	
+	darnitRenderClearColorSet(0x0, 0x0, 0x0);
 	
 	//Input player name
 	panelist_input_name.pane=ui_pane_create(16, 16, 256, 96, NULL);
@@ -117,35 +120,39 @@ void view_init() {
 }
 
 void view_scroll(DARNIT_MOUSE *mouse) {
-		register int scroll_x=0, scroll_y=0;
-		
-		if(mouse->x<SCROLL_OFFSET&&map->cam_x>0)
-			scroll_x=-SCROLL_SPEED;
-		else if(mouse->x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-platform.screen_w+SIDEBAR_WIDTH)
-			scroll_x=SCROLL_SPEED;
-		if(mouse->y<SCROLL_OFFSET&&map->cam_y>0)
-			scroll_y=-SCROLL_SPEED;
-		else if(mouse->y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-platform.screen_h)
-			scroll_y=SCROLL_SPEED;
-		darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
-		
-		if(mouse->x>platform.screen_w-SIDEBAR_WIDTH)
-			return;
-		if(mouse->rmb)
+	register int scroll_x=0, scroll_y=0;
+	int screen_w=platform.screen_w, screen_h=platform.screen_h;
+	
+	if(mouse->x<SCROLL_OFFSET&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
+		scroll_x=-SCROLL_SPEED;
+	else if(mouse->x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
+		scroll_x=SCROLL_SPEED;
+	if(mouse->y<SCROLL_OFFSET&&map->cam_y>-(screen_h)/2)
+		scroll_y=-SCROLL_SPEED;
+	else if(mouse->y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-screen_h/2)
+		scroll_y=SCROLL_SPEED;
+	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+	
+	if(mouse->x>platform.screen_w-SIDEBAR_WIDTH)
+		return;
+	if(mouse->rmb)
+		building_place=-1;
+	else if(mouse->lmb) {
+		int map_offset=((mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
+		if(building_place>-1) {
+			printf("Building placed at %i\n", map_offset);
+			//map->layer[map->layers-1].tilemap->data[map_offset]=2;
+			//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
+			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
 			building_place=-1;
-		else if(mouse->lmb) {
-			int map_offset=((mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
-			if(building_place>-1) {
-				printf("Building placed at %i\n", map_offset);
-				//map->layer[map->layers-1].tilemap->data[map_offset]=2;
-				//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
-				client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
-				building_place=-1;
-			} else {
-				//status about clicked building, etc
-			}
+		} else {
+			//status about clicked building, etc
 		}
-		
+	}
+}
+
+void view_scroll_to(int x, int y) {
+	darnitMapCameraMove(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, x*map->layer[map->layers-2].tile_h-platform.screen_h/2);
 }
 
 void view_draw(DARNIT_MOUSE *mouse) {
@@ -159,6 +166,11 @@ void view_draw(DARNIT_MOUSE *mouse) {
 		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, (mouse->x+map->cam_x)/l->tile_w*l->tile_w, (mouse->y+map->cam_y)/l->tile_h*l->tile_h);
 		darnitRenderBlendingDisable();
 		darnitRenderLineDraw(powergrid, powergrid_lines);
+		darnitRenderOffset(0, 0);
+	}
+	if(map_border) {
+		darnitRenderOffset(map->cam_x, map->cam_y);
+		darnitRenderLineDraw(map_border, 4);
 		darnitRenderOffset(0, 0);
 	}
 }

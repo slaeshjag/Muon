@@ -89,6 +89,7 @@ void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		return;
 
 	if(widget==game_menu_button[0]) {
+		darnitRenderClearColorSet(0x0, 0x0, 0x0);
 		state=GAME_STATE_QUIT;
 	} else if(widget==game_menu_button[1]) {
 		state=GAME_STATE_GAME;
@@ -104,6 +105,7 @@ int main() {
 	platform=darnitPlatformGet();
 	DARNIT_MOUSE mouse;
 	chat_open=0;
+	home_x=home_y=0;
 	serverInit();
 	serverStart("map.ldi", 2, 1337);
 	state=GAME_STATE_INPUT_NAME;

@@ -61,8 +61,10 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 			repeat++;
 		}
 		if(key_action==DARNIT_KEYACTION_PRESS) {
-			if(e_k.character||e_k.keysym==8)
+			if(e_k.character||e_k.keysym==8) {
 				e_k_repeat=e_k;
+				repeat=0;
+			}
 			ui_selected_widget->event_handler->send(ui_selected_widget, UI_EVENT_TYPE_KEYBOARD_PRESS, &e);
 		} else if(key_action==DARNIT_KEYACTION_RELEASE) {
 			if(e_k.keysym==e_k_repeat.keysym) {

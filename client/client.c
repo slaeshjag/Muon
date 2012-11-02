@@ -13,7 +13,7 @@ unsigned int recalc_map=0;
 void client_chat(int id, char *buf, int len) {
 	char *chatmsg=(char *)malloc(len+36);
 	buf[len]=0;
-	sprintf(chatmsg, "<%s> %s\n", &player_names[id*32], buf);
+	//sprintf(chatmsg, "<%s> %s\n", &player_names[id*32], buf);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
@@ -21,6 +21,7 @@ void client_chat(int id, char *buf, int len) {
 
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
+		darnitRenderClearColorSet(0x0, 0x0, 0x0);
 		state=GAME_STATE_CONNECT_SERVER;
 		darnitSocketClose(socket);
 	} else
@@ -112,6 +113,12 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1==BUILDING_BUILDSITE)?5:(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
 			recalc_map|=1<<(map->layers-2);
 			if(msg->player_id==player_id&&msg->arg_1) {
+				if(msg->arg_1==BUILDING_GENERATOR) {
+					home_y=msg->arg_2/map->layer[map->layers-2].tilemap->w;
+					home_x=msg->arg_2%map->layer[map->layers-2].tilemap->w;
+					printf("Home base at (%i, %i)\n", home_x, home_y);
+					view_scroll_to(home_x, home_y);
+				}
 				for(i=0; i<4; i++) {
 					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
@@ -141,6 +148,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 				state=GAME_STATE_GAME;
 				client_message_handler=client_game_handler;
 			//	darnitInputGrab();
+				darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
 			}
 			break;
 	}
@@ -194,6 +202,12 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			map=darnitMapLoad("maps/map.ldmz");
 			map_w=map->layer->tilemap->w*map->layer->tile_w;
 			map_h=map->layer->tilemap->h*map->layer->tile_h;
+			darnitRenderLineFree(map_border);
+			map_border=darnitRenderLineAlloc(4, 1);
+			darnitRenderLineMove(map_border, 0, 0, 0, map_w, 0);
+			darnitRenderLineMove(map_border, 1, 0, 0, 0, map_h);
+			darnitRenderLineMove(map_border, 2, map_w, 0, map_w, map_h);
+			darnitRenderLineMove(map_border, 3, 0, map_h, map_w, map_h);
 			countdown_ready->event_handler->add(countdown_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 			break;
 		case MSG_RECV_GAME_START:

@@ -17,6 +17,7 @@ DARNIT_MAP *map;
 int map_w, map_h;
 char player_name[32];
 int building_place;
+int home_x, home_y;
 
 typedef enum {
 	GAME_STATE_INPUT_NAME,
