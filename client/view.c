@@ -94,7 +94,9 @@ void view_init() {
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
 	game_sidebar_progress_shield=ui_widget_create_progressbar(font_std);
 	game_sidebar_progress_health=ui_widget_create_progressbar(font_std);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Shield"), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Health"), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
 	
 	//Game menu
@@ -122,6 +124,11 @@ void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
 		scroll_y=-SCROLL_SPEED;
 	else if((mouse->y>platform.screen_h-SCROLL_OFFSET||buttons->down)&&map->cam_y<map_h-screen_h/2)
 		scroll_y=SCROLL_SPEED;
+		
+	if(buttons->y) {
+		scroll_x*=2;
+		scroll_y*=2;
+	}
 	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 	
 	if(mouse->x>platform.screen_w-SIDEBAR_WIDTH)
@@ -146,6 +153,11 @@ void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
 			v.i=engine_get_building_health(map_offset);
 			game_sidebar_progress_health->set_prop(game_sidebar_progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
 			selected_index=map_offset;
+			selected_building=map->layer[map->layers-2].tilemap->data[map_offset]&0xFFFF;
+			selected_building-=(player_id+1)*8-1;
+			if(selected_building<0||selected_building>7)
+				selected_building=0;
+			//printf("selected building type %i\n", selected_building);
 			//printf("Selected building at %i, %i (%i, %i)\n", map->cam_x, 0, map->layer[map->layers-2].tile_w*(selected_index%map->layer[map->layers-2].tilemap->w)-map->cam_x, selected_index/map->layer[map->layers-2].tilemap->w);
 		}
 	}
@@ -159,24 +171,27 @@ void view_draw(DARNIT_MOUSE *mouse) {
 	int i;
 	for(i=0; i<map->layers; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
-	if(powergrid&&building_place!=-1) {
-		darnitRenderOffset(map->cam_x, map->cam_y);
-		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
+
+	DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
+	darnitRenderOffset(map->cam_x, map->cam_y);
+	if(powergrid&&(building_place!=-1||selected_building==BUILDING_PYLON||selected_building==BUILDING_GENERATOR)) {
+		darnitRenderLineDraw(powergrid, powergrid_lines);
+	}
+	if(building_place!=-1) {
 		darnitRenderBlendingEnable();
 		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, (mouse->x+map->cam_x)/l->tile_w*l->tile_w, (mouse->y+map->cam_y)/l->tile_h*l->tile_h);
 		darnitRenderBlendingDisable();
-		darnitRenderLineDraw(powergrid, powergrid_lines);
-		darnitRenderOffset(0, 0);
 	}
-	darnitRenderOffset(map->cam_x, map->cam_y);
 	if(map_border)
 		darnitRenderLineDraw(map_border, 4);
-	if(selected_index>-1) {
+	if(selected_index>-1&&selected_building) {
 		register int x=map->layer[map->layers-2].tile_w*(selected_index%map->layer[map->layers-2].tilemap->w);
 		register int y=map->layer[map->layers-2].tile_h*(selected_index/map->layer[map->layers-2].tilemap->w);
 		//printf("(%i, %i) (%i, %i)\n", x, y, map->cam_x, map->cam_y);
+		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
 		darnitRenderLineDraw(selected_border, 4);
+		darnitRenderTint(1, 1, 1, 1);
 	}
 	darnitRenderOffset(0, 0);
 }

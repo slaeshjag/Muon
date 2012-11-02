@@ -9,12 +9,12 @@ void platform_init() {
 	} else {
 		darnitInitRest("Muon", 800, 600, 0);
 		DARNIT_INPUT_MAP keymap={
-			KEY(UP),
-			KEY(DOWN),
-			KEY(LEFT),
-			KEY(RIGHT),
+			KEY(w),
+			KEY(s),
+			KEY(a),
+			KEY(d),
 			KEY(TAB),
-			KEY(LALT),
+			KEY(LSHIFT),
 			KEY(SPACE),
 			KEY(BACKSPACE),
 			KEY(ESCAPE),

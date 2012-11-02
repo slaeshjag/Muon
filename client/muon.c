@@ -143,7 +143,8 @@ int main() {
 					break;
 				}
 				darnitRenderBegin();
-				darnitRenderTint(1, 0, 0, 1);
+				//darnitRenderTint(1, 0, 0, 1);
+				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 				ui_events(&panelist_countdown, 1);
 				darnitRenderTint(1, 1, 1, 1);
 				RENDER_MOUSE;
