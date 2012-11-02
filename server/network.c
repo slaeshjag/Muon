@@ -177,7 +177,8 @@ int networkReceiveTry(SERVER_SOCKET *sock, char *buff, int buff_len) {
 	if (errno == EAGAIN || errno == EWOULDBLOCK)
 		return 0;
 	#else
-	if (WSAGetLastError() == WSAEWOULDBLOCK)
+	int error_n = WSAGetLastError();
+	if (error_n == WSAEWOULDBLOCK || error_n == WSAEINPROGRESS || error_n == WSAEALREADY)
 		return 0;
 	#endif
 	return -1;
@@ -198,7 +199,8 @@ int networkSend(SERVER_SOCKET *sock, char *buff, int buff_len) {
 	if (errno != EAGAIN && errno != EWOULDBLOCK)
 		return -1;
 	#else
-	if (WSAGetLastError() != WSAEWOULDBLOCK)
+	int error_n = WSAGetLastError();
+	if (error_n != WSAEWOULDBLOCK && error_n != WSAEINPROGRESS)
 		return -1;
 	#endif
 	return 0;
