@@ -107,7 +107,7 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 	struct sockaddr_in address;
 	address_len = sizeof(struct sockaddr_in);
 
-	if ((socket = accept(sock->socket, (struct sockaddr *) &address, (unsigned int *) &address_len)) <= 0)
+	if ((socket = accept(sock->socket, (struct sockaddr *) &address, (unsigned int *) &address_len)) == INVALID_SOCKET)
 		return NULL;
 
 	if ((sock_a = malloc(sizeof(SERVER_SOCKET))) == NULL)
@@ -145,8 +145,13 @@ int networkReceive(SERVER_SOCKET *sock, char *buff, int buff_len) {
 		return -1;
 
 	if ((t = recv(sock->socket, buff, buff_len, 0)) < 0) {
-		if (t != EAGAIN && t != EWOULDBLOCK)
+		#ifndef _WIN32
+		if (errno != EAGAIN && errno != EWOULDBLOCK)
 			return -1;
+		#else
+		if (WSAGetLastError() != WSAEWOULDBLOCK)
+			return -1;
+		#endif
 		else
 			return 0;
 	}
@@ -168,8 +173,13 @@ int networkReceiveTry(SERVER_SOCKET *sock, char *buff, int buff_len) {
 
 	if (t > -1)		/* Should be impossible */
 		return 0;
+	#ifndef _WIN32
 	if (errno == EAGAIN || errno == EWOULDBLOCK)
 		return 0;
+	#else
+	if (WSAGetLastError() == WSAEWOULDBLOCK)
+		return 0;
+	#endif
 	return -1;
 }
 
@@ -184,8 +194,13 @@ int networkSend(SERVER_SOCKET *sock, char *buff, int buff_len) {
 
 	if (t >= 0)
 		return t;
+	#ifndef _WIN32
 	if (errno != EAGAIN && errno != EWOULDBLOCK)
 		return -1;
+	#else
+	if (WSAGetLastError() != WSAEWOULDBLOCK)
+		return -1;
+	#endif
 	return 0;
 }
 

@@ -6,6 +6,7 @@
 #include <netdb.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#define	INVALID_SOCKET			-1
 #else
 #include <windows.h>
 #include <winsock2.h>
