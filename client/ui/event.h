@@ -72,15 +72,22 @@ struct UI_EVENT_HANDLER_LIST {
 
 typedef struct UI_EVENT_HANDLER {
 	void (*add)(UI_WIDGET *, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int);
-	void (*remove)(UI_WIDGET *, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *));
+	void (*remove)(UI_WIDGET *, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int);
 	void (*send)(UI_WIDGET *, unsigned int, UI_EVENT *);
 	struct UI_EVENT_HANDLER_LIST *handlers;
 } UI_EVENT_HANDLER;
 
 UI_EVENT_MOUSE ui_e_m_prev;
 
+struct UI_EVENT_HANDLER_LIST *ui_event_global_handlers;
+
 void ui_events(struct UI_PANE_LIST *panes, int render);
 void ui_event_add(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask);
+void ui_event_remove(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask);
 void ui_event_send(UI_WIDGET *widget , unsigned int type, UI_EVENT *e);
+
+void ui_event_global_add(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask);
+void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask);
+void ui_event_global_send(unsigned int type, UI_EVENT *e);
 
 #endif
