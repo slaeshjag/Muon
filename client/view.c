@@ -4,6 +4,7 @@
 #include "view.h"
 #include "client.h"
 #include "engine.h"
+#include "chat.h"
 
 void view_init() {
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
@@ -52,23 +53,6 @@ void view_init() {
 	connecting_button_cancel=ui_widget_create_button_text("Cancel");
 	ui_vbox_add_child(panelist_connecting.pane->root_widget, connecting_button_cancel, 0);
 	connecting_button_cancel->event_handler->add(connecting_button_cancel, connecting_button_cancel_click, UI_EVENT_TYPE_UI);
-	
-	//Chat
-	panelist_chat.pane=ui_pane_create(16, platform.screen_h-256-16, 200, 256, NULL);
-	panelist_chat.next=NULL;
-	ui_pane_set_root_widget(panelist_chat.pane, ui_widget_create_vbox());
-	ui_vbox_add_child(panelist_chat.pane->root_widget, ui_widget_create_label(font_std, "Chat"), 0);
-	chat_listbox=ui_widget_create_listbox(font_std);
-	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_listbox, 1);
-	chat_hbox=ui_widget_create_hbox();
-	chat_button_send=ui_widget_create_button_text("Send");
-	chat_entry=ui_widget_create_entry(font_std);
-	ui_hbox_add_child(chat_hbox, chat_entry, 1);
-	ui_hbox_add_child(chat_hbox, chat_button_send, 0);
-	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_hbox, 0);
-	chat_button_send->event_handler->add(chat_button_send, chat_button_send_click, UI_EVENT_TYPE_UI);
-	chat_entry->event_handler->add(chat_entry, chat_button_send_click, UI_EVENT_TYPE_KEYBOARD);
-	
 	
 	//Countdown
 	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
@@ -119,17 +103,17 @@ void view_init() {
 	}
 }
 
-void view_scroll(DARNIT_MOUSE *mouse) {
+void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
 	register int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	
-	if(mouse->x<SCROLL_OFFSET&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
+	if((mouse->x<SCROLL_OFFSET||buttons->left)&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
 		scroll_x=-SCROLL_SPEED;
-	else if(mouse->x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
+	else if((mouse->x>platform.screen_w-SCROLL_OFFSET||buttons->right)&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
 		scroll_x=SCROLL_SPEED;
-	if(mouse->y<SCROLL_OFFSET&&map->cam_y>-(screen_h)/2)
+	if((mouse->y<SCROLL_OFFSET||buttons->up)&&map->cam_y>-(screen_h)/2)
 		scroll_y=-SCROLL_SPEED;
-	else if(mouse->y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-screen_h/2)
+	else if((mouse->y>platform.screen_h-SCROLL_OFFSET||buttons->down)&&map->cam_y<map_h-screen_h/2)
 		scroll_y=SCROLL_SPEED;
 	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 	

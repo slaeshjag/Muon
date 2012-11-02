@@ -5,19 +5,11 @@
 #include "client.h"
 #include "view.h"
 #include "engine.h"
+#include "chat.h"
 
 #define PONG case MSG_RECV_PING: client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL); break
 
 unsigned int recalc_map=0;
-
-void client_chat(int id, char *buf, int len) {
-	char *chatmsg=(char *)malloc(len+36);
-	buf[len]=0;
-	sprintf(chatmsg, "<%s> %s\n", &player_names[id*32], buf);
-	ui_listbox_add(chat_listbox, chatmsg);
-	ui_listbox_scroll(chat_listbox, -1);
-	free(chatmsg);
-}
 
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
@@ -101,7 +93,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
-			client_chat(msg->player_id, (char *)payload, msg->arg_2);
+			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
@@ -136,7 +128,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
-			client_chat(msg->player_id, (char *)payload, msg->arg_2);
+			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_GAME_START:
 			printf("Game starts in %i\n", msg->arg_1);
@@ -161,13 +153,13 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
-			client_chat(msg->player_id, (char *)payload, msg->arg_2);
+			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_JOIN:
 			if(!payload)
 				break;
 			memcpy(&player_names[msg->player_id*32], payload, msg->arg_2);
-			printf("Player %s joined the game\n", &player_names[msg->player_id*32]);
+			chat_join(msg->player_id);
 			break;
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)

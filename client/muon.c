@@ -3,6 +3,7 @@
 #include "muon.h"
 #include "view.h"
 #include "client.h"
+#include "chat.h"
 
 #define RENDER_MOUSE darnitRenderBlendingEnable(); darnitRenderTileBlit(mouse_tilesheet, 0, mouse.x, mouse.y); darnitRenderBlendingDisable()
 
@@ -37,17 +38,6 @@ void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
 	client_disconnect();
-}
-
-void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	//if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type!=UI_EVENT_TYPE_KEYBOARD&&e->keyboard->keysym==KEY(ENTER)))
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
-	UI_PROPERTY_VALUE v;
-	v=chat_entry->get_prop(chat_entry, UI_ENTRY_PROP_TEXT);
-	client_message_send(player_id, MSG_SEND_CHAT, 0, strlen(v.p), v.p);
-	v.p="";
-	chat_entry->set_prop(chat_entry, UI_ENTRY_PROP_TEXT, v);
 }
 
 void ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -98,12 +88,10 @@ void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 }
 
 int main() {
-	if(darnitInit("Muon", "muon")==NULL) {
-		fprintf(stderr, "Failed to initialize libdarnit!\n");
-		return 1;
-	}
-	platform=darnitPlatformGet();
+	platform_init();
+	
 	DARNIT_MOUSE mouse;
+	DARNIT_KEYS buttons;
 	chat_open=0;
 	home_x=home_y=0;
 	serverInit();
@@ -112,10 +100,11 @@ int main() {
 	
 	ui_init();
 	view_init();
+	chat_init();
 	
 	while(1) {
 		serverLoop(darnitTimeLastFrameTook());
-		DARNIT_KEYS buttons=darnitButtonGet();
+		buttons=darnitButtonGet();
 		mouse=darnitMouseGet();
 		switch(state) {
 			case GAME_STATE_INPUT_NAME:
@@ -125,7 +114,7 @@ int main() {
 				darnitRenderTint(1, 1, 1, 1);
 				RENDER_MOUSE;
 				darnitRenderEnd();
-				if(buttons.select)
+				if(buttons.start)
 					state=GAME_STATE_QUIT;
 				break;
 			case GAME_STATE_CONNECT_SERVER:
@@ -135,7 +124,7 @@ int main() {
 				darnitRenderTint(1, 1, 1, 1);
 				RENDER_MOUSE;
 				darnitRenderEnd();
-				if(buttons.select)
+				if(buttons.start)
 					state=GAME_STATE_QUIT;
 				break;
 			case GAME_STATE_CONNECTING:
@@ -167,7 +156,7 @@ int main() {
 					darnitInputUngrab();
 					break;
 				}
-				view_scroll(&mouse);
+				view_scroll(&mouse, &buttons);
 				darnitRenderBegin();
 				view_draw(&mouse);
 				darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
@@ -175,13 +164,13 @@ int main() {
 				darnitRenderTint(1, 1, 1, 1);
 				RENDER_MOUSE;
 				darnitRenderEnd();
-				if(buttons.select) {
+				if(buttons.start) {
 					state=GAME_STATE_GAME_MENU;
 					darnitInputUngrab();
 				}
-				if(buttons.start) {
+				if(buttons.x) {
 					if(!chat_open)
-						panelist_game_sidebar.next=panelist_game_sidebar.next?NULL:&panelist_chat;
+						chat_toggle(&panelist_game_sidebar);
 					chat_open=1;
 				} else {
 					chat_open=0;

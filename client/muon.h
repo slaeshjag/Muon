@@ -6,12 +6,11 @@
 
 #include <darnit/darnit.h>
 
+#include "platform.h"
 #include "ui/ui.h"
 
 #define SCROLL_OFFSET 8
 #define SCROLL_SPEED 4
-
-DARNIT_PLATFORM platform;
 
 DARNIT_MAP *map;
 int map_w, map_h;
