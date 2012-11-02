@@ -190,11 +190,11 @@ void unitAnnounce(int from, int to, int building, int index) {
 
 	if (building && building != UNIT_DEF_BUILDSITE_FREE) {
 		progress = server->map[index]->hp * 100 / unitHPMax(building);
-		messageBufferPushDirect(from, to, MSG_SEND_BUILDING_HP, progress, 0, NULL);
+		messageBufferPushDirect(to, from, MSG_SEND_BUILDING_HP, progress, index, NULL);
 		progress = server->map[index]->shield * 100 / unitShieldMax(building);
-		messageBufferPushDirect(from, to, MSG_SEND_BUILDING_SHIELD, progress, 0, NULL);
+		messageBufferPushDirect(to, from, MSG_SEND_BUILDING_SHIELD, progress, index, NULL);
 		if (server->map[index]->target)
-			messageBufferPushDirect(from, to, MSG_SEND_BUILDING_ATTACKING, index, server->map[index]->target, NULL);
+			messageBufferPushDirect(to, from, MSG_SEND_BUILDING_ATTACKING, index, server->map[index]->target, NULL);
 	}
 
 	return;
@@ -387,7 +387,7 @@ void unitDamageAnnounce(int index) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
 		if (server->player[i].map[index].fog)
-			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_HP, hp, index, NULL);
+			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_HP, hp, index, NULL);
 	}
 
 	return;
@@ -460,7 +460,7 @@ void unitShieldAnnounce(int index) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
 		if (server->player[i].map[index].fog)
-			messageBufferPushDirect(server->map[index]->owner, i, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
+			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
 	}
 
 	fprintf(stderr, "Unit at %i has sheild %i\n", index, shield);
