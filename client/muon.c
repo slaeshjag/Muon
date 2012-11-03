@@ -14,7 +14,7 @@ void game_state(GAME_STATE state) {
 		ui_event_global_remove(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_DOWN);
 		ui_event_global_remove(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
 		ui_event_global_remove(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
-		ui_event_global_add(view_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
+		ui_event_global_remove(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
 	}
 	//Game state constructors
 	switch(state) {
@@ -29,10 +29,10 @@ void game_state(GAME_STATE state) {
 			break;
 		case GAME_STATE_GAME:
 			darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
-			ui_event_global_remove(view_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_add(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_DOWN);
 			ui_event_global_add(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_add(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_add(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
 			//darnitInputGrab();
 		case GAME_STATE_CONNECTING:
 			ui_selected_widget=NULL;
@@ -110,7 +110,7 @@ int main() {
 	view_init();
 	chat_init();
 	
-	ui_event_global_add(view_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
+	ui_event_global_add(view_draw_mouse, UI_EVENT_TYPE_UI);
 	
 	game_state(GAME_STATE_INPUT_NAME);
 	
@@ -127,6 +127,8 @@ int main() {
 			game_view_draw();
 			
 		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
+		if(gamestate==GAME_STATE_GAME_MENU)
+			ui_pane_render(panelist_game_sidebar.pane);
 		ui_events(gamestate_pane[gamestate], 1);
 		darnitRenderTint(1, 1, 1, 1);
 		

@@ -1,6 +1,9 @@
+#include <string.h>
+
 #include "muon.h"
 #include "client.h"
 #include "map.h"
+#include "chat.h"
 #include "game.h"
 
 void game_view_init() {
@@ -58,26 +61,51 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	}
 }
 
+void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int scroll_x=0, scroll_y=0;
+	int screen_w=platform.screen_w, screen_h=platform.screen_h;
+	//darnit buttons have no press or release events, we have to handle this ourself
+	static UI_EVENT_BUTTONS prevbuttons={0};
+	
+	//View movement
+	if(!chat_is_visible(&panelist_game_sidebar)) {
+		if(e->buttons->left&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
+			scroll_x=-SCROLL_SPEED;
+		else if(e->buttons->right&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
+			scroll_x=SCROLL_SPEED;
+		if(e->buttons->up&&map->cam_y>-(screen_h)/2)
+			scroll_y=-SCROLL_SPEED;
+		else if(e->buttons->down&&map->cam_y<map_h-screen_h/2)
+			scroll_y=SCROLL_SPEED;
+			
+		if(e->buttons->y) {
+			scroll_x*=2;
+			scroll_y*=2;
+		}
+		darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+	}
+	//Interaction keys
+	if(e->buttons->start&&!prevbuttons.start)
+		game_state(GAME_STATE_GAME_MENU);
+	if(e->buttons->x&&!prevbuttons.x)
+		chat_toggle(&panelist_game_sidebar);
+	
+	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));
+}
+
 void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	//Map movement should be broken out to separate function, keyboard movement should be broken out to separate handler
-	DARNIT_KEYS keys=darnitButtonGet();
-	DARNIT_KEYS *buttons=&keys;
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	
-	if((e->mouse->x<SCROLL_OFFSET||buttons->left)&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
+	if(e->mouse->x<SCROLL_OFFSET&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
 		scroll_x=-SCROLL_SPEED;
-	else if((e->mouse->x>platform.screen_w-SCROLL_OFFSET||buttons->right)&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
+	else if(e->mouse->x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
 		scroll_x=SCROLL_SPEED;
-	if((e->mouse->y<SCROLL_OFFSET||buttons->up)&&map->cam_y>-(screen_h)/2)
+	if(e->mouse->y<SCROLL_OFFSET&&map->cam_y>-(screen_h)/2)
 		scroll_y=-SCROLL_SPEED;
-	else if((e->mouse->y>platform.screen_h-SCROLL_OFFSET||buttons->down)&&map->cam_y<map_h-screen_h/2)
+	else if(e->mouse->y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-screen_h/2)
 		scroll_y=SCROLL_SPEED;
-		
-	if(buttons->y) {
-		scroll_x*=2;
-		scroll_y*=2;
-	}
+	
 	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 }
 

@@ -12,6 +12,7 @@ UI_WIDGET *game_sidebar_progress_health;
 
 void game_view_init();
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_scroll_to(int x, int y);

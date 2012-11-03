@@ -3,6 +3,7 @@
 
 void chat_init();
 void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+int chat_is_visible(struct UI_PANE_LIST *panelist);
 void chat_show(struct UI_PANE_LIST *panelist);
 void chat_hide(struct UI_PANE_LIST *panelist);
 void chat_toggle(struct UI_PANE_LIST *panelist);

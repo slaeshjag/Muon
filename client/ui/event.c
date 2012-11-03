@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "ui.h"
 
 //higher value for lower speed, yeah it's stupid but whatever
@@ -9,9 +11,14 @@
 void ui_events(struct UI_PANE_LIST *panes, int render) {
 	UI_EVENT e;
 	UI_EVENT_MOUSE e_m;
+	UI_EVENT_BUTTONS e_b;
 	UI_EVENT_UI e_u;
 	static UI_EVENT_KEYBOARD e_k={0, 0, 0}, e_k_repeat={0, 0, 0};
 	static int repeat=0;
+	
+	DARNIT_KEYS buttons;
+	buttons=darnitButtonGet();
+	memcpy(&e_b, &buttons, sizeof(UI_EVENT_BUTTONS));
 	
 	DARNIT_MOUSE mouse;
 	mouse=darnitMouseGet();
@@ -33,7 +40,7 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 		case KEY(RSUPER): SETMOD(RSUPER); break;
 	}
 	
-	//This should be replaced by a real keymap
+	//TODO: this should be replaced by a real keymap
 	e_k.character=(e_k.keysym>=32&&e_k.keysym<127)?e_k.keysym-0x20*((e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT)>0&&(e_k.keysym>=0x61&&e_k.keysym<0x7b)):0;
 	
 	e.keyboard=&e_k;
@@ -67,6 +74,14 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 			ui_event_global_send(UI_EVENT_TYPE_KEYBOARD_RELEASE, &e);
 	}
 	
+	//Global mouse events
+	e.mouse=&e_m;	
+	if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_DOWN, &e);
+	if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_UP, &e);
+	ui_event_global_send(UI_EVENT_TYPE_MOUSE_ENTER, &e);
+	
 	//Mouse events for widgets
 	struct UI_PANE_LIST *p;
 	for(p=panes; p; p=p->next) {
@@ -74,7 +89,7 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 			UI_WIDGET *w=p->pane->root_widget;
 			
 			e.ui=&e_u;
-			e.mouse=&e_m; //yep, ugly hack here
+			e.mouse=&e_m; //ui events get sent the mouse value to be able to track mouse movement for child widgets
 			w->event_handler->send(w, UI_EVENT_TYPE_UI_EVENT, &e);
 			
 			if(PINR(e_m.x, e_m.y, w->x, w->y, w->w, w->h)) {
@@ -92,13 +107,10 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 			ui_pane_render(p->pane);
 	}
 	
-	//Global mouse events
-	e.mouse=&e_m;	
-	if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
-		ui_event_global_send(UI_EVENT_TYPE_MOUSE_DOWN, &e);
-	if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
-		ui_event_global_send(UI_EVENT_TYPE_MOUSE_UP, &e);
-	ui_event_global_send(UI_EVENT_TYPE_MOUSE_ENTER, &e);
+	e.buttons=&e_b;
+	ui_event_global_send(UI_EVENT_TYPE_BUTTONS, &e);
+	e.mouse=&e_m;
+	ui_event_global_send(UI_EVENT_TYPE_UI, &e);
 	
 	ui_e_m_prev=e_m;
 }
