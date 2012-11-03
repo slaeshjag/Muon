@@ -27,11 +27,12 @@ void chat_show(struct UI_PANE_LIST *panelist) {
 		return;
 	struct UI_PANE_LIST *p;
 	for(p=panelist; p->next; p=p->next) {
-		if(p==&panelist_chat) {
+		if(p->next==&panelist_chat||p==&panelist_chat) {
 			ui_selected_widget=chat_entry;
 			return;
 		}
 	}
+	printf("show chat\n");
 	p->next=&panelist_chat;
 	ui_selected_widget=chat_entry;
 }

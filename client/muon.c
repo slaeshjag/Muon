@@ -23,8 +23,8 @@ void game_state(GAME_STATE state) {
 			ui_selected_widget=NULL;
 		case GAME_STATE_LOBBY:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
-			//chat_show(gamestate_pane[GAME_STATE_LOBBY]);
-			//ui_selected_widget=chat_entry;
+			chat_show(gamestate_pane[GAME_STATE_LOBBY]);
+			ui_selected_widget=chat_entry;
 			break;
 		case GAME_STATE_GAME:
 			darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
