@@ -23,40 +23,18 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 	int key_action;
 	e_k.keysym=darnitKeyboardRawPop(&key_action);
 	switch(e_k.keysym) {
-		case KEY(LCTRL):
-			SETMOD(LCTRL);
-			break;
-		case KEY(RCTRL):
-			SETMOD(RCTRL);
-			break;
-		case KEY(LSHIFT):
-			SETMOD(LSHIFT);
-			break;
-		case KEY(RSHIFT):
-			SETMOD(RSHIFT);
-			break;
-		case KEY(LALT):
-			SETMOD(LALT);
-			break;
-		case KEY(RALT):
-			SETMOD(RALT);
-			break;
-		case KEY(LSUPER):
-			SETMOD(LSUPER);
-			break;
-		case KEY(RSUPER):
-			SETMOD(RSUPER);
-			break;
+		case KEY(LCTRL): SETMOD(LCTRL); break;
+		case KEY(RCTRL): SETMOD(RCTRL); break;
+		case KEY(LSHIFT): SETMOD(LSHIFT); break;
+		case KEY(RSHIFT): SETMOD(RSHIFT); break;
+		case KEY(LALT): SETMOD(LALT); break;
+		case KEY(RALT): SETMOD(RALT); break;
+		case KEY(LSUPER): SETMOD(LSUPER); break;
+		case KEY(RSUPER): SETMOD(RSUPER); break;
 	}
 	
+	//This should be replaced by a real keymap
 	e_k.character=(e_k.keysym>=32&&e_k.keysym<127)?e_k.keysym-0x20*((e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT)>0&&(e_k.keysym>=0x61&&e_k.keysym<0x7b)):0;
-	
-	//Global mouse events
-	e.mouse=&e_m;	
-	if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
-		ui_event_global_send(UI_EVENT_TYPE_MOUSE_DOWN, &e);
-	if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
-		ui_event_global_send(UI_EVENT_TYPE_MOUSE_UP, &e);
 	
 	e.keyboard=&e_k;
 	if(ui_selected_widget) {
@@ -113,6 +91,15 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 		if(render)
 			ui_pane_render(p->pane);
 	}
+	
+	//Global mouse events
+	e.mouse=&e_m;	
+	if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_DOWN, &e);
+	if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_UP, &e);
+	ui_event_global_send(UI_EVENT_TYPE_MOUSE_ENTER, &e);
+	
 	ui_e_m_prev=e_m;
 }
 
@@ -133,6 +120,7 @@ void ui_event_remove(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned in
 		if((*h)->handler==handler&&((*h)->mask&mask)) {
 			free(*h);
 			*h=(*h)->next;
+			break;
 		}
 	}
 }
@@ -140,8 +128,8 @@ void ui_event_remove(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned in
 void ui_event_send(UI_WIDGET *widget , unsigned int type, UI_EVENT *e) {
 	struct UI_EVENT_HANDLER_LIST *h;
 	for(h=widget->event_handler->handlers; h; h=h->next)
-		if(type&h->mask)
-			h->handler(widget, type&(h->mask|0xFF), e);
+		if((type&h->mask)==type)
+			h->handler(widget, type&h->mask, e);
 }
 
 void ui_event_global_add(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask) {
@@ -161,6 +149,7 @@ void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT 
 		if((*h)->handler==handler&&((*h)->mask&mask)) {
 			free(*h);
 			*h=(*h)->next;
+			break;
 		}
 	}
 }
@@ -168,6 +157,7 @@ void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT 
 void ui_event_global_send(unsigned int type, UI_EVENT *e) {
 	struct UI_EVENT_HANDLER_LIST *h;
 	for(h=ui_event_global_handlers; h; h=h->next)
-		if(type&h->mask)
-			h->handler(NULL, type&(h->mask|0xFF), e);
+		if((type&h->mask)==type) {
+			h->handler(NULL, type&h->mask, e);
+		}
 }

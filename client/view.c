@@ -2,21 +2,16 @@
 
 #include "muon.h"
 #include "view.h"
-#include "client.h"
-#include "engine.h"
+#include "game.h"
+//#include "client.h"
+//#include "engine.h"
 #include "chat.h"
 
 void view_init() {
+	//TODO: lots of breaking out to separate functions, game menu and lobby for example
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
 	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
-	building_place=-1;
-	powergrid=NULL;
-	powergrid_lines=0;
-	selected_border=darnitRenderLineAlloc(4, 1);
-	selected_index=-1;
-	map_border=NULL;
-	
-	darnitRenderClearColorSet(0x0, 0x0, 0x0);
+	int i;
 	
 	//Input player name
 	panelist_input_name.pane=ui_pane_create(16, 16, 256, 96, NULL);
@@ -56,7 +51,7 @@ void view_init() {
 	ui_vbox_add_child(panelist_connecting.pane->root_widget, connecting_button_cancel, 0);
 	connecting_button_cancel->event_handler->add(connecting_button_cancel, connecting_button_cancel_click, UI_EVENT_TYPE_UI);
 	
-	//Countdown
+	//Lobby
 	panelist_lobby.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
 	strcpy(lobby_countdown_text, "Downloading map");
 	ui_pane_set_root_widget(panelist_lobby.pane, ui_widget_create_vbox());
@@ -74,29 +69,7 @@ void view_init() {
 	ui_hbox_add_child(panelist_lobby_ready.pane->root_widget, ui_widget_create_label(font_std, "Ready"), 1);
 	
 	//Game
-	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
-	ui_pane_set_root_widget(panelist_game_sidebar.pane, ui_widget_create_vbox());
-	panelist_game_sidebar.next=NULL;
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Buildings:"), 0);
-	game_sidebar_label_build[0]=ui_widget_create_label(font_std, "Scout");
-	game_sidebar_label_build[1]=ui_widget_create_label(font_std, "Attacker");
-	game_sidebar_label_build[2]=ui_widget_create_label(font_std, "Pylon");
-	game_sidebar_label_build[3]=ui_widget_create_label(font_std, "Wall");
-	int i;
-	for(i=0; i<4; i++) {
-		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
-		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
-		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
-	}
-	game_sidebar_progress_build=ui_widget_create_progressbar(font_std);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
-	game_sidebar_progress_shield=ui_widget_create_progressbar(font_std);
-	game_sidebar_progress_health=ui_widget_create_progressbar(font_std);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Shield"), 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Health"), 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
+	game_view_init();
 	
 	//Game menu
 	panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);
@@ -109,88 +82,22 @@ void view_init() {
 		ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[i], 0);
 		game_menu_button[i]->event_handler->add(game_menu_button[i], game_menu_button_click, UI_EVENT_TYPE_UI);
 	}
-}
-
-void view_scroll(DARNIT_MOUSE *mouse, DARNIT_KEYS *buttons) {
-	int scroll_x=0, scroll_y=0;
-	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	
-	if((mouse->x<SCROLL_OFFSET||buttons->left)&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
-		scroll_x=-SCROLL_SPEED;
-	else if((mouse->x>platform.screen_w-SCROLL_OFFSET||buttons->right)&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
-		scroll_x=SCROLL_SPEED;
-	if((mouse->y<SCROLL_OFFSET||buttons->up)&&map->cam_y>-(screen_h)/2)
-		scroll_y=-SCROLL_SPEED;
-	else if((mouse->y>platform.screen_h-SCROLL_OFFSET||buttons->down)&&map->cam_y<map_h-screen_h/2)
-		scroll_y=SCROLL_SPEED;
-		
-	if(buttons->y) {
-		scroll_x*=2;
-		scroll_y*=2;
-	}
-	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
-	
-	if(mouse->x>platform.screen_w-SIDEBAR_WIDTH)
-		return;
-	if(mouse->rmb)
-		building_place=-1;
-	else if(mouse->lmb) {
-		int map_offset=((mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
-		if(map_offset<0||map_offset>map->layer->tilemap->w*map->layer->tilemap->h)
-			return;
-		if(building_place>-1) {
-			//printf("Building placed at %i\n", map_offset);
-			//map->layer[map->layers-1].tilemap->data[map_offset]=2;
-			//darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
-			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
-			building_place=-1;
-		} else {
-			//status about clicked building, etc
-			UI_PROPERTY_VALUE v;
-			v.i=engine_get_building_shield(map_offset);
-			game_sidebar_progress_shield->set_prop(game_sidebar_progress_shield, UI_PROGRESSBAR_PROP_PROGRESS, v);
-			v.i=engine_get_building_health(map_offset);
-			game_sidebar_progress_health->set_prop(game_sidebar_progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
-			selected_index=map_offset;
-			selected_building=map->layer[map->layers-2].tilemap->data[map_offset]&0xFFFF;
-			selected_building-=(player_id+1)*8-1;
-			if(selected_building<0||selected_building>7)
-				selected_building=0;
-			//printf("selected building type %i\n", selected_building);
-			//printf("Selected building at %i, %i (%i, %i)\n", map->cam_x, 0, map->layer[map->layers-2].tile_w*(selected_index%map->layer[map->layers-2].tilemap->w)-map->cam_x, selected_index/map->layer[map->layers-2].tilemap->w);
-		}
-	}
+	gamestate_pane[0]=&panelist_input_name;
+	gamestate_pane[1]=&panelist_connect_server;
+	gamestate_pane[2]=&panelist_connecting;
+	gamestate_pane[3]=&panelist_lobby;
+	gamestate_pane[4]=&panelist_game_sidebar;
+	gamestate_pane[5]=&panelist_game_menu;
+	gamestate_pane[6]=NULL;
 }
 
-void view_scroll_to(int x, int y) {
-	darnitMapCameraMove(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, x*map->layer[map->layers-2].tile_h-platform.screen_h/2);
-}
-
-void view_draw(DARNIT_MOUSE *mouse) {
-	int i;
-	for(i=0; i<map->layers; i++)
-		darnitRenderTilemap(map->layer[i].tilemap);
-
-	DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
-	darnitRenderOffset(map->cam_x, map->cam_y);
-	if(powergrid&&(building_place!=-1||selected_building==BUILDING_PYLON||selected_building==BUILDING_GENERATOR)) {
-		darnitRenderLineDraw(powergrid, powergrid_lines);
-	}
-	if(building_place!=-1) {
-		darnitRenderBlendingEnable();
-		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, (mouse->x+map->cam_x)/l->tile_w*l->tile_w, (mouse->y+map->cam_y)/l->tile_h*l->tile_h);
-		darnitRenderBlendingDisable();
-	}
-	if(map_border)
-		darnitRenderLineDraw(map_border, 4);
-	if(selected_index>-1&&selected_building) {
-		register int x=map->layer[map->layers-2].tile_w*(selected_index%map->layer[map->layers-2].tilemap->w);
-		register int y=map->layer[map->layers-2].tile_h*(selected_index/map->layer[map->layers-2].tilemap->w);
-		//printf("(%i, %i) (%i, %i)\n", x, y, map->cam_x, map->cam_y);
-		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
-		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
-		darnitRenderLineDraw(selected_border, 4);
-		darnitRenderTint(1, 1, 1, 1);
-	}
-	darnitRenderOffset(0, 0);
+void view_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	float r, g, b, a;
+	darnitRenderTintGet(&r, &g, &b, &a);
+	darnitRenderTint(1, 1, 1, 1);
+	darnitRenderBlendingEnable();
+	darnitRenderTileBlit(mouse_tilesheet, 0, e->mouse->x, e->mouse->y);
+	darnitRenderBlendingDisable();
+	darnitRenderTint(r, g, b, a);
 }

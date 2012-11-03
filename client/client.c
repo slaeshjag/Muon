@@ -4,7 +4,8 @@
 #include "muon.h"
 #include "client.h"
 #include "view.h"
-#include "engine.h"
+#include "map.h"
+#include "game.h"
 #include "chat.h"
 
 #define PONG case MSG_RECV_PING: client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL); break
@@ -45,7 +46,7 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 		darnitSocketSend(sock, payload, arg_2);
 }
 
-int client_check_incomming() {
+void client_check_incomming() {
 	int s, i;
 	for(i=0; i<1000; i++) {
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
@@ -54,8 +55,8 @@ int client_check_incomming() {
 				if(s==0)
 					break;
 				if(s==-1) {
-					sock=darnitSocketClose(sock);
-					return -1;
+					client_connect_callback(-1, NULL, sock);
+					return;
 				}
 				//printf("payload size %i\n", msg_recv.arg_2);
 				if(client_message_handler)
@@ -67,8 +68,8 @@ int client_check_incomming() {
 			if(s==0)
 				break;
 			if(s==-1) {
-				sock=darnitSocketClose(sock);
-				return -1;
+				client_connect_callback(-1, NULL, sock);
+				return;
 			}
 			client_message_convert_recv(&msg_recv);
 			//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
@@ -80,52 +81,46 @@ int client_check_incomming() {
 	for(i=0; recalc_map; recalc_map>>=1, i++)
 		if(recalc_map&1) {
 			if(i==map->layers-1)
-				engine_calculate_powergrid();
+				map_calculate_powergrid();
 			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
 		}
-	return 0;
+	return;
 }
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
-	int layerbits, i;
-	UI_PROPERTY_VALUE v;
+	int layerbits;
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
+			//TODO: break out the dirty work to a function in game engine and just make a function call here
 			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
 			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
 			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
 			recalc_map|=1<<(map->layers-1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
-			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1==BUILDING_BUILDSITE)?5:(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
+			map_building_place(msg->player_id, msg->arg_1, msg->arg_2);
 			recalc_map|=1<<(map->layers-2);
 			if(msg->player_id==player_id&&msg->arg_1) {
 				if(msg->arg_1==BUILDING_GENERATOR) {
-					home_y=msg->arg_2/map->layer[map->layers-2].tilemap->w;
-					home_x=msg->arg_2%map->layer[map->layers-2].tilemap->w;
-					printf("Home base at (%i, %i)\n", home_x, home_y);
-					view_scroll_to(home_x, home_y);
+					map_set_home(msg->arg_2);
+					game_view_scroll_to(home_x, home_y);
 				}
-				for(i=0; i<4; i++) {
-					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
-					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
-				}
+				game_reset_building_progress();
 			}
 			break;
 		case MSG_RECV_BUILDING_PROGRESS:
-			v.i=msg->arg_2;
-			game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
+			game_set_building_progress(0, msg->arg_2);
 			break;
 		case MSG_RECV_BUILDING_HP:
-			engine_set_building_health(msg->arg_2, msg->arg_1);
+			map_set_building_health(msg->arg_2, msg->arg_1);
 			//printf("Set health of %i to %i\n", msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_SHIELD:
-			engine_set_building_shield(msg->arg_2, msg->arg_1);
+			map_set_building_shield(msg->arg_2, msg->arg_1);
 			//printf("Set shield of %i to %i\n", msg->arg_2, msg->arg_1);
 			break;
 	}
@@ -196,20 +191,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			//printf("Map %s successfully downloaded!\n", filename);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
-			map=darnitMapLoad("maps/map.ldmz");
-			map_w=map->layer->tilemap->w*map->layer->tile_w;
-			map_h=map->layer->tilemap->h*map->layer->tile_h;
-			darnitRenderLineFree(map_border);
-			map_border=darnitRenderLineAlloc(4, 1);
-			darnitRenderLineMove(map_border, 0, 0, 0, map_w, 0);
-			darnitRenderLineMove(map_border, 1, 0, 0, 0, map_h);
-			darnitRenderLineMove(map_border, 2, map_w, 0, map_w, map_h);
-			darnitRenderLineMove(map_border, 3, 0, map_h, map_w, map_h);
-			DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
-			darnitRenderLineMove(selected_border, 0, 0, 0, building_layer->tile_w, 0);
-			darnitRenderLineMove(selected_border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
-			darnitRenderLineMove(selected_border, 2, 0, 0, 0, building_layer->tile_h);
-			darnitRenderLineMove(selected_border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
+			map_init("maps/map.ldmz");
 			lobby_checkbox_ready->event_handler->add(lobby_checkbox_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 			break;
 		case MSG_RECV_GAME_START:

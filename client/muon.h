@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 #include <darnit/darnit.h>
+#include "../server/server_api/server.h"
 
 #include "platform.h"
 #include "ui/ui.h"
@@ -30,15 +31,7 @@ typedef enum {
 } GAME_STATE;
 
 GAME_STATE gamestate;
-static struct UI_PANE_LIST *gamestate_pane[7]={
-	&panelist_input_name,
-	&panelist_connect_server,
-	&panelist_connecting,
-	&panelist_lobby,
-	&panelist_game_sidebar,
-	&panelist_game_menu,
-	NULL,
-};
+struct UI_PANE_LIST *gamestate_pane[7];
 
 void game_state(GAME_STATE state);
 

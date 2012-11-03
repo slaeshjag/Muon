@@ -32,7 +32,6 @@ void chat_show(struct UI_PANE_LIST *panelist) {
 			return;
 		}
 	}
-	printf("show chat\n");
 	p->next=&panelist_chat;
 	ui_selected_widget=chat_entry;
 }
