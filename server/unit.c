@@ -97,13 +97,16 @@ void unitPylonPulse() {
 			else {
 				list->pylon->power = 1;
 				playerCalcSetPower(list->pylon->unit->owner, list->pylon->x, list->pylon->y, 1);
+				fprintf(stderr, "Delta+power at %i,%i\n", list->pylon->x, list->pylon->y);
 			}
 		} else {
 			if (list->pylon->power) {
 				list->pylon->power = 0;
 				playerCalcSetPower(list->pylon->unit->owner, list->pylon->x, list->pylon->y, -1);
+				fprintf(stderr, "Delta-power at %i,%i\n", list->pylon->x, list->pylon->y);
 			}
 		}
+		list->pylon->pulse = 0;
 
 		list = list->next;
 	}
@@ -118,15 +121,17 @@ void unitPylonDelete(SERVER_UNIT *unit) {
 	if (unit->pylon.power)
 		playerCalcSetPower(unit->owner, unit->pylon.x, unit->pylon.y, -1);
 	
+	fprintf(stderr, "Pylon removal at %i,%i\n", unit->x, unit->y);
+
 	list = unit->pylon.next;
-	unit->pylon.next = NULL;
 	
 	while (list != NULL) {
-		unitPylonListRemove(&list->pylon->next, &unit->pylon);
+		unitPylonListRemove(&list, &unit->pylon);
 		tmp = list;
 		list = list->next;
 		free(tmp);
 	}
+	unit->pylon.next = NULL;
 
 	return;
 }
@@ -139,6 +144,7 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 	team = server->player[owner].team;
 	radius = unitRange(unit->type);
 
+	fprintf(stderr, "Pylon init at %i,%i\n", x, y);
 	unit->pylon.x = x;
 	unit->pylon.y = y;
 	unit->pylon.pulse = 0;
@@ -171,13 +177,13 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 			} else if (!server->map[index]->pylon.power) 
 				fprintf(stderr, "Pylon at %i %i is unpowered\n", j + x, k + y);
 
-			unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
 			unitPylonListAdd(&server->map[index]->pylon.next, &server->map[index]->pylon);
-			unitPylonListAdd(&server->pylons, &unit->pylon);
 		}
 	}
 	
 	unit->pylon.power = (unit->type == UNIT_DEF_GENERATOR) ? 1 : unit->pylon.power;
+	unitPylonListAdd(&server->pylons, &unit->pylon);
+	unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
 
 	return;
 }
