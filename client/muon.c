@@ -9,6 +9,37 @@
 
 int chat_open;
 
+void game_state(GAME_STATE state) {
+	switch(state) {
+		case GAME_STATE_INPUT_NAME:
+			darnitRenderClearColorSet(0x0, 0x0, 0x0);
+			ui_selected_widget=input_name_entry;
+			break;
+		case GAME_STATE_CONNECT_SERVER:
+			darnitRenderClearColorSet(0x0, 0x0, 0x0);
+			ui_selected_widget=connect_server_entry_host;
+			break;
+		case GAME_STATE_CONNECTING:
+			ui_selected_widget=NULL;
+		case GAME_STATE_LOBBY:
+			darnitRenderClearColorSet(0x0, 0x0, 0x0);
+			//chat_show(gamestate_pane[GAME_STATE_LOBBY]);
+			//ui_selected_widget=chat_entry;
+			break;
+		case GAME_STATE_GAME:
+			darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
+			ui_selected_widget=NULL;
+			//darnitInputGrab();
+			break;
+		case GAME_STATE_GAME_MENU:
+			darnitInputUngrab();
+			break;
+		case GAME_STATE_QUIT:
+			break;
+	}
+	gamestate=state;
+}
+
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
@@ -18,7 +49,7 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 	strncpy(player_name, v.p, 31);
 	player_name[31]=0;
 	printf("Player name: %s\n", player_name);
-	state=GAME_STATE_CONNECT_SERVER;
+	game_state(GAME_STATE_CONNECT_SERVER);
 }
 
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -31,7 +62,7 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	int port=atoi(v.p);
 	printf("Server: %s:%i\n", host, port);
 	if(client_init(host, port)==0)
-		state=GAME_STATE_CONNECTING;
+		game_state(GAME_STATE_CONNECTING);
 }
 
 void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -79,11 +110,9 @@ void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		return;
 
 	if(widget==game_menu_button[0]) {
-		darnitRenderClearColorSet(0x0, 0x0, 0x0);
-		state=GAME_STATE_QUIT;
+		game_state(GAME_STATE_QUIT);
 	} else if(widget==game_menu_button[1]) {
-		state=GAME_STATE_GAME;
-		//darnitInputGrab();
+		game_state(GAME_STATE_GAME);
 	}
 }
 
@@ -94,9 +123,10 @@ int main() {
 	DARNIT_KEYS buttons;
 	chat_open=0;
 	home_x=home_y=0;
+	player_id=0;
 	serverInit();
 	serverStart("map.ldi", 2, 1337, 3);
-	state=GAME_STATE_INPUT_NAME;
+	game_state(GAME_STATE_INPUT_NAME);
 	
 	ui_init();
 	view_init();
@@ -106,7 +136,30 @@ int main() {
 		serverLoop(darnitTimeLastFrameTook());
 		buttons=darnitButtonGet();
 		mouse=darnitMouseGet();
-		switch(state) {
+		
+		if(gamestate==GAME_STATE_QUIT)
+			return 0;
+		if(gamestate>=GAME_STATE_LOBBY) {
+			if(client_check_incomming()==-1) {
+				fprintf(stderr, "Server disconnected!\n");
+				game_state(GAME_STATE_CONNECT_SERVER);
+			}
+		}
+		
+		darnitRenderBegin();
+		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
+		
+		ui_events(gamestate_pane[gamestate], 1);
+		
+		darnitRenderTint(1, 1, 1, 1);
+		//render mouse
+		darnitRenderBlendingEnable();
+		darnitRenderTileBlit(mouse_tilesheet, 0, mouse.x, mouse.y);
+		darnitRenderBlendingDisable();
+		
+		darnitRenderEnd();
+		
+		/*switch(state) {
 			case GAME_STATE_INPUT_NAME:
 				darnitRenderBegin();
 				darnitRenderTint(1, 0, 0, 1);
@@ -136,7 +189,7 @@ int main() {
 				RENDER_MOUSE;
 				darnitRenderEnd();
 				break;
-			case GAME_STATE_COUNTDOWN:
+			case GAME_STATE_LOBBY:
 				if(client_check_incomming()==-1) {
 					fprintf(stderr, "Server disconnected!\n");
 					state=GAME_STATE_CONNECT_SERVER;
@@ -195,7 +248,7 @@ int main() {
 			case GAME_STATE_QUIT:
 				darnitInputUngrab();
 				return 0;
-		}
+		}*/
 		
 		darnitLoop();
 		//printf("%i           \r", darnitFPSGet());

@@ -13,11 +13,10 @@ unsigned int recalc_map=0;
 
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
-		darnitRenderClearColorSet(0x0, 0x0, 0x0);
-		state=GAME_STATE_CONNECT_SERVER;
+		game_state(GAME_STATE_CONNECT_SERVER);
 		darnitSocketClose(socket);
 	} else
-		state=GAME_STATE_COUNTDOWN;
+		game_state(GAME_STATE_LOBBY);
 }
 
 void client_message_convert_send(MESSAGE_RAW *message) {
@@ -140,15 +139,13 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_GAME_START:
 			printf("Game starts in %i\n", msg->arg_1);
-			UI_PROPERTY_VALUE v={.p=countdown_text};
-			countdown_text[0]=(char)(msg->arg_1)+0x30;
-			countdown_text[1]=0;
-			countdown_label->set_prop(countdown_label, UI_LABEL_PROP_TEXT, v);
+			UI_PROPERTY_VALUE v={.p=lobby_countdown_text};
+			lobby_countdown_text[0]=(char)(msg->arg_1)+0x30;
+			lobby_countdown_text[1]=0;
+			lobby_countdown_label->set_prop(lobby_countdown_label, UI_LABEL_PROP_TEXT, v);
 			if(!msg->arg_1) {
-				state=GAME_STATE_GAME;
+				game_state(GAME_STATE_GAME);
 				client_message_handler=client_game_handler;
-			//	darnitInputGrab();
-				darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
 			}
 			break;
 	}
@@ -191,7 +188,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			darnitFileWrite(payload, msg->arg_2, f);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
 			UI_PROPERTY_VALUE v={.i=100*downloaded_bytes/filesize_bytes};
-			ui_progressbar_set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);
+			ui_progressbar_set_prop(lobby_progress_map, UI_PROGRESSBAR_PROP_PROGRESS, v);
 			//printf("Map progress %i%%\n", 100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
@@ -213,10 +210,10 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			darnitRenderLineMove(selected_border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
 			darnitRenderLineMove(selected_border, 2, 0, 0, 0, building_layer->tile_h);
 			darnitRenderLineMove(selected_border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
-			countdown_ready->event_handler->add(countdown_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
+			lobby_checkbox_ready->event_handler->add(lobby_checkbox_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 			break;
 		case MSG_RECV_GAME_START:
-			state=GAME_STATE_COUNTDOWN;
+			game_state(GAME_STATE_LOBBY);
 			client_message_handler=client_countdown_handler;
 			client_countdown_handler(msg, payload);
 	}

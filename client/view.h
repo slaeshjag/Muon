@@ -26,11 +26,11 @@ UI_WIDGET *connect_server_button;
 struct UI_PANE_LIST panelist_connecting;
 UI_WIDGET *connecting_button_cancel;
 
-struct UI_PANE_LIST panelist_countdown, panelist_countdown_ready;
-UI_WIDGET *countdown_label;
-UI_WIDGET *pbar;
-char countdown_text[16];
-UI_WIDGET *countdown_ready;
+struct UI_PANE_LIST panelist_lobby, panelist_lobby_ready;
+UI_WIDGET *lobby_countdown_label;
+UI_WIDGET *lobby_progress_map;
+char lobby_countdown_text[16];
+UI_WIDGET *lobby_checkbox_ready;
 
 struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_button_build[4];

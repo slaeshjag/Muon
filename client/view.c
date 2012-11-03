@@ -57,22 +57,21 @@ void view_init() {
 	connecting_button_cancel->event_handler->add(connecting_button_cancel, connecting_button_cancel_click, UI_EVENT_TYPE_UI);
 	
 	//Countdown
-	panelist_countdown.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
-	strcpy(countdown_text, "Downloading map");
-	ui_pane_set_root_widget(panelist_countdown.pane, ui_widget_create_vbox());
-	countdown_label=ui_widget_create_label(font_std, countdown_text);
-	pbar=ui_widget_create_progressbar(font_std);
-	ui_vbox_add_child(panelist_countdown.pane->root_widget, countdown_label, 1);
-	ui_vbox_add_child(panelist_countdown.pane->root_widget, pbar, 0);
+	panelist_lobby.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
+	strcpy(lobby_countdown_text, "Downloading map");
+	ui_pane_set_root_widget(panelist_lobby.pane, ui_widget_create_vbox());
+	lobby_countdown_label=ui_widget_create_label(font_std, lobby_countdown_text);
+	lobby_progress_map=ui_widget_create_progressbar(font_std);
+	ui_vbox_add_child(panelist_lobby.pane->root_widget, lobby_countdown_label, 1);
+	ui_vbox_add_child(panelist_lobby.pane->root_widget, lobby_progress_map, 0);
 	v.i=0;
-	pbar->set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);	
-	panelist_countdown.next=&panelist_countdown_ready;
-	panelist_countdown_ready.pane=ui_pane_create(16, 16, 64, 32, NULL);
-	ui_pane_set_root_widget(panelist_countdown_ready.pane, ui_widget_create_hbox());
-	countdown_ready=ui_widget_create_checkbox();
-	ui_hbox_add_child(panelist_countdown_ready.pane->root_widget, countdown_ready, 0);
-	ui_hbox_add_child(panelist_countdown_ready.pane->root_widget, ui_widget_create_label(font_std, "Ready"), 1);
-	panelist_countdown_ready.next=&panelist_chat;
+	lobby_progress_map->set_prop(lobby_progress_map, UI_PROGRESSBAR_PROP_PROGRESS, v);	
+	panelist_lobby.next=&panelist_lobby_ready;
+	panelist_lobby_ready.pane=ui_pane_create(16, 16, 64, 32, NULL);
+	ui_pane_set_root_widget(panelist_lobby_ready.pane, ui_widget_create_hbox());
+	lobby_checkbox_ready=ui_widget_create_checkbox();
+	ui_hbox_add_child(panelist_lobby_ready.pane->root_widget, lobby_checkbox_ready, 0);
+	ui_hbox_add_child(panelist_lobby_ready.pane->root_widget, ui_widget_create_label(font_std, "Ready"), 1);
 	
 	//Game
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
