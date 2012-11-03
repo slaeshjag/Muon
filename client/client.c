@@ -130,6 +130,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_GAME_START:
 			chat_countdown(msg->arg_1);
 			if(!msg->arg_1) {
+				lobby_ready_checkbox_disable();
 				game_state(GAME_STATE_GAME);
 				client_message_handler=client_game_handler;
 			}

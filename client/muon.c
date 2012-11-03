@@ -50,8 +50,7 @@ void game_state(GAME_STATE state) {
 
 int main() {
 	platform_init();
-
-	home_x=home_y=0;
+	
 	player_id=0;
 	serverInit();
 	serverStart("map.ldi", 2, 1337, 3);

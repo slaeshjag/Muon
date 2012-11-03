@@ -9,6 +9,8 @@ void map_init(char *filename) {
 	powergrid=NULL;
 	powergrid_lines=0;
 	
+	home_x=home_y=0;
+	
 	map_selected.border=darnitRenderLineAlloc(4, 1);
 	map_selected.index=-1;
 	map_selected.building=0;

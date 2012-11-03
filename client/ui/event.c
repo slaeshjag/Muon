@@ -127,11 +127,12 @@ void ui_event_add(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, 
 }
 
 void ui_event_remove(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask) {
-	struct UI_EVENT_HANDLER_LIST **h;
+	struct UI_EVENT_HANDLER_LIST **h, *h_next;
 	for(h=&(widget->event_handler->handlers); *h; h=&((*h)->next)) {
 		if((*h)->handler==handler&&((*h)->mask&mask)) {
+			h_next=(*h)->next;
 			free(*h);
-			*h=(*h)->next;
+			*h=h_next;
 			break;
 		}
 	}
@@ -156,11 +157,12 @@ void ui_event_global_add(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *),
 }
 
 void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask) {
-	struct UI_EVENT_HANDLER_LIST **h;
+	struct UI_EVENT_HANDLER_LIST **h, *h_next;
 	for(h=&(ui_event_global_handlers); *h; h=&((*h)->next)) {
 		if((*h)->handler==handler&&((*h)->mask&mask)) {
+			h_next=(*h)->next;
 			free(*h);
-			*h=(*h)->next;
+			*h=h_next;
 			break;
 		}
 	}
@@ -169,7 +171,6 @@ void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT 
 void ui_event_global_send(unsigned int type, UI_EVENT *e) {
 	struct UI_EVENT_HANDLER_LIST *h;
 	for(h=ui_event_global_handlers; h; h=h->next)
-		if((type&h->mask)==type) {
+		if((type&h->mask)==type)
 			h->handler(NULL, type&h->mask, e);
-		}
 }

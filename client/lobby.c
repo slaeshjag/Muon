@@ -27,7 +27,6 @@ void lobby_ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	UI_PROPERTY_VALUE v;
 	v=widget->get_prop(widget, UI_CHECKBOX_PROP_ACTIVATED);
 	client_message_send(player_id, MSG_SEND_READY, v.i, 100, NULL);
-	lobby_checkbox_ready->event_handler->remove(lobby_checkbox_ready, lobby_ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 }
 
 void lobby_set_map_progress(int progress) {
@@ -37,4 +36,8 @@ void lobby_set_map_progress(int progress) {
 
 void lobby_ready_checkbox_enable() {
 	lobby_checkbox_ready->event_handler->add(lobby_checkbox_ready, lobby_ready_checkbox_toggle, UI_EVENT_TYPE_UI);
+}
+
+void lobby_ready_checkbox_disable() {
+	lobby_checkbox_ready->event_handler->remove(lobby_checkbox_ready, lobby_ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 }

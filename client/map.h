@@ -5,6 +5,10 @@ DARNIT_LINE *map_border;
 DARNIT_LINE *powergrid;
 int powergrid_lines;
 
+DARNIT_MAP *map;
+int map_w, map_h;
+int home_x, home_y;
+
 struct MAP_SELECTED {
 	DARNIT_LINE *border;
 	int index;
