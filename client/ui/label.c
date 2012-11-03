@@ -18,8 +18,7 @@ UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, char *text) {
 	widget->request_size=ui_label_request_size;
 	widget->render=ui_label_render;
 	widget->x=widget->y=widget->w=widget->h=0;
-	//v.p=darnitTextSurfaceAlloc(font, darnitUtf8UnicodeCharactersInString(text), widget->w, widget->x, widget->y);
-	//widget->set_prop(widget, UI_LABEL_PROP_SURFACE, v);
+	
 	UI_PROPERTY_VALUE v={.p=text};
 	widget->set_prop(widget, UI_LABEL_PROP_TEXT, v);
 	return widget;

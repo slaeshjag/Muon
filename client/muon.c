@@ -5,8 +5,7 @@
 #include "client.h"
 #include "chat.h"
 #include "game.h"
-
-int chat_open;
+#include "menu.h"
 
 void game_state(GAME_STATE state) {
 	//Game state destructors
@@ -49,58 +48,9 @@ void game_state(GAME_STATE state) {
 	gamestate=state;
 }
 
-void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
-	UI_PROPERTY_VALUE v;
-	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
-	memset(player_name, 0, 32);
-	strncpy(player_name, v.p, 31);
-	player_name[31]=0;
-	printf("Player name: %s\n", player_name);
-	game_state(GAME_STATE_CONNECT_SERVER);
-}
-
-void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
-	UI_PROPERTY_VALUE v;
-	v=connect_server_entry_host->get_prop(connect_server_entry_host, UI_ENTRY_PROP_TEXT);
-	char *host=v.p;
-	v=connect_server_entry_port->get_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT);
-	int port=atoi(v.p);
-	printf("Server: %s:%i\n", host, port);
-	if(client_init(host, port)==0)
-		game_state(GAME_STATE_CONNECTING);
-}
-
-void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
-	client_disconnect();
-}
-
-void ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	UI_PROPERTY_VALUE v;
-	v=widget->get_prop(widget, UI_CHECKBOX_PROP_ACTIVATED);
-	client_message_send(player_id, MSG_SEND_READY, v.i, 100, NULL);
-}
-
-void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
-
-	if(widget==game_menu_button[0]) {
-		game_state(GAME_STATE_QUIT);
-	} else if(widget==game_menu_button[1]) {
-		game_state(GAME_STATE_GAME);
-	}
-}
-
 int main() {
 	platform_init();
 
-	chat_open=0;
 	home_x=home_y=0;
 	player_id=0;
 	serverInit();

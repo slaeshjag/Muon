@@ -7,6 +7,7 @@
 #include "map.h"
 #include "game.h"
 #include "chat.h"
+#include "lobby.h"
 
 #define PONG case MSG_RECV_PING: client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL); break
 
@@ -94,7 +95,6 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
-			//TODO: break out the dirty work to a function in game engine and just make a function call here
 			map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			recalc_map|=1<<(map->layers-1);
 			break;
@@ -114,11 +114,9 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_BUILDING_HP:
 			map_set_building_health(msg->arg_2, msg->arg_1);
-			//printf("Set health of %i to %i\n", msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_SHIELD:
 			map_set_building_shield(msg->arg_2, msg->arg_1);
-			//printf("Set shield of %i to %i\n", msg->arg_2, msg->arg_1);
 			break;
 	}
 }
@@ -130,11 +128,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_GAME_START:
-			printf("Game starts in %i\n", msg->arg_1);
-			UI_PROPERTY_VALUE v={.p=lobby_countdown_text};
-			lobby_countdown_text[0]=(char)(msg->arg_1)+0x30;
-			lobby_countdown_text[1]=0;
-			lobby_countdown_label->set_prop(lobby_countdown_label, UI_LABEL_PROP_TEXT, v);
+			chat_countdown(msg->arg_1);
 			if(!msg->arg_1) {
 				game_state(GAME_STATE_GAME);
 				client_message_handler=client_game_handler;
@@ -171,7 +165,6 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			memcpy(filename, payload, msg->arg_2);
 			filename[msg->arg_2]=0;
 			f=darnitFileOpen(filename, "wb");
-			//printf("Started map download of file %s\n", filename);
 			break;
 		case MSG_RECV_MAP_CHUNK:
 			if(!payload)
@@ -179,17 +172,14 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			downloaded_bytes+=msg->arg_2;
 			darnitFileWrite(payload, msg->arg_2, f);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
-			UI_PROPERTY_VALUE v={.i=100*downloaded_bytes/filesize_bytes};
-			ui_progressbar_set_prop(lobby_progress_map, UI_PROGRESSBAR_PROP_PROGRESS, v);
-			//printf("Map progress %i%%\n", 100*downloaded_bytes/filesize_bytes);
+			lobby_set_map_progress(100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
 			darnitFileClose(f);
-			//printf("Map %s successfully downloaded!\n", filename);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
 			map_init("maps/map.ldmz");
-			lobby_checkbox_ready->event_handler->add(lobby_checkbox_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
+			lobby_ready_checkbox_enable();
 			break;
 		case MSG_RECV_GAME_START:
 			game_state(GAME_STATE_LOBBY);

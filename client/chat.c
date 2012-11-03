@@ -111,3 +111,11 @@ void chat_disconnect(int player) {
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
 }
+
+void chat_countdown(int countdown) {
+	char *chatmsg=malloc(32);
+	sprintf(chatmsg, " * Game starts in %i", countdown);
+	ui_listbox_add(chat_listbox, chatmsg);
+	ui_listbox_scroll(chat_listbox, -1);
+	free(chatmsg);
+}
