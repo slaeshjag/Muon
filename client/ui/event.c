@@ -51,8 +51,16 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 	
 	e_k.character=(e_k.keysym>=32&&e_k.keysym<127)?e_k.keysym-0x20*((e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT)>0&&(e_k.keysym>=0x61&&e_k.keysym<0x7b)):0;
 	
+	//Global mouse events
+	e.mouse=&e_m;	
+	if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_DOWN, &e);
+	if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_UP, &e);
+	
 	e.keyboard=&e_k;
 	if(ui_selected_widget) {
+		//Keyboard events for selected widget
 		if(e_k_repeat.character||e_k_repeat.keysym==8) {
 			if(repeat>KEYBOARD_REPEAT_DELAY&&!((repeat-KEYBOARD_REPEAT_DELAY)%KEYBOARD_REPEAT_SPEED)) {
 				UI_EVENT e_repeat={.keyboard=&e_k_repeat};
@@ -73,8 +81,15 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 			}
 			ui_selected_widget->event_handler->send(ui_selected_widget, UI_EVENT_TYPE_KEYBOARD_RELEASE, &e);
 		}
+	} else {
+		//Global keyboard events
+		if(key_action==DARNIT_KEYACTION_PRESS)
+			ui_event_global_send(UI_EVENT_TYPE_KEYBOARD_PRESS, &e);
+		else if(key_action==DARNIT_KEYACTION_RELEASE)
+			ui_event_global_send(UI_EVENT_TYPE_KEYBOARD_RELEASE, &e);
 	}
 	
+	//Mouse events for widgets
 	struct UI_PANE_LIST *p;
 	for(p=panes; p; p=p->next) {
 		if(p->pane->root_widget->event_handler) {
@@ -112,9 +127,47 @@ void ui_event_add(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, 
 	hh->next=NULL;
 }
 
+void ui_event_remove(UI_WIDGET *widget, void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask) {
+	struct UI_EVENT_HANDLER_LIST **h;
+	for(h=&(widget->event_handler->handlers); *h; h=&((*h)->next)) {
+		if((*h)->handler==handler&&((*h)->mask&mask)) {
+			free(*h);
+			*h=(*h)->next;
+		}
+	}
+}
+
 void ui_event_send(UI_WIDGET *widget , unsigned int type, UI_EVENT *e) {
 	struct UI_EVENT_HANDLER_LIST *h;
 	for(h=widget->event_handler->handlers; h; h=h->next)
 		if(type&h->mask)
 			h->handler(widget, type&(h->mask|0xFF), e);
+}
+
+void ui_event_global_add(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask) {
+	struct UI_EVENT_HANDLER_LIST **h, *hh;
+	for(h=&(ui_event_global_handlers); *h; h=&((*h)->next));
+	if((*h=malloc(sizeof(struct UI_EVENT_HANDLER_LIST)))==NULL)
+		return;
+	hh=*h;
+	hh->handler=handler;
+	hh->mask=mask;
+	hh->next=NULL;
+}
+
+void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT *), unsigned int mask) {
+	struct UI_EVENT_HANDLER_LIST **h;
+	for(h=&(ui_event_global_handlers); *h; h=&((*h)->next)) {
+		if((*h)->handler==handler&&((*h)->mask&mask)) {
+			free(*h);
+			*h=(*h)->next;
+		}
+	}
+}
+
+void ui_event_global_send(unsigned int type, UI_EVENT *e) {
+	struct UI_EVENT_HANDLER_LIST *h;
+	for(h=ui_event_global_handlers; h; h=h->next)
+		if(type&h->mask)
+			h->handler(NULL, type&(h->mask|0xFF), e);
 }
