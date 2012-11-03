@@ -20,7 +20,7 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 	e_m.buttons=(mouse.lmb)|(mouse.rmb<<2);
 	e_m.wheel=mouse.wheel;
 	
-	int key_action;
+	int key_action=0;
 	e_k.keysym=darnitKeyboardRawPop(&key_action);
 	switch(e_k.keysym) {
 		case KEY(LCTRL): SETMOD(LCTRL); break;

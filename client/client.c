@@ -88,7 +88,6 @@ void client_check_incomming() {
 }
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
-	int layerbits;
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
@@ -96,13 +95,11 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			//TODO: break out the dirty work to a function in game engine and just make a function call here
-			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
-			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
-			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
+			map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			recalc_map|=1<<(map->layers-1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
-			map_building_place(msg->player_id, msg->arg_1, msg->arg_2);
+			map_building_place(msg->arg_2, msg->player_id, msg->arg_1);
 			recalc_map|=1<<(map->layers-2);
 			if(msg->player_id==player_id&&msg->arg_1) {
 				if(msg->arg_1==BUILDING_GENERATOR) {

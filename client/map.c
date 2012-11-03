@@ -58,7 +58,7 @@ void map_calculate_powergrid() {
 	powergrid_lines=i;
 }
 
-void map_building_place(int player, int building, int index) {
+void map_building_place(int index, int player, int building) {
 	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_BUILDSITE)?5:(building!=0)*(player*8+building+7);
 }
 
@@ -89,6 +89,13 @@ void map_set_building_shield(int index, int shield) {
 		return;
 	map->layer[map->layers-2].tilemap->data[index]|=shield<<25;
 	darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
+}
+
+void map_set_tile_attributes(int index, int attrib) {
+	int layerbits;
+	layerbits=((attrib&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[index]&0x1000000);
+	layerbits|=(((attrib&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
+	map->layer[map->layers-1].tilemap->data[index]=layerbits;
 }
 
 void map_select_building(int offset) {

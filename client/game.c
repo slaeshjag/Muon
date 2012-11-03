@@ -133,13 +133,15 @@ void game_view_draw() {
 }
 
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
-	darnitRenderOffset(map->cam_x, map->cam_y);
-	darnitRenderBlendingEnable();
-	if(building_place!=-1) {
-		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, (e->mouse->x+map->cam_x)/l->tile_w*l->tile_w, (e->mouse->y+map->cam_y)/l->tile_h*l->tile_h);
+	if(building_place!=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
+		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
+		int x=(e->mouse->x+map->cam_x)/l->tile_w*l->tile_w;
+		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
+		darnitRenderOffset(map->cam_x, map->cam_y);
+		darnitRenderBlendingEnable();
+		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, x, y);
+		darnitRenderBlendingDisable();
+		darnitRenderOffset(0, 0);
 	}
-	darnitRenderBlendingDisable();
-	darnitRenderOffset(0, 0);
 	view_draw_mouse(widget, type, e);
 }

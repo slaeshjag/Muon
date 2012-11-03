@@ -13,12 +13,13 @@ struct MAP_SELECTED {
 
 void map_init(char *filename);
 void map_calculate_powergrid();
-void map_building_place(int player, int building, int index);
+void map_building_place(int index, int player, int building);
 void map_set_home(int index);
 int map_get_building_health(int index);
 int map_get_building_shield(int index);
 void map_set_building_health(int index, int health);
 void map_set_building_shield(int index, int shield);
+void map_set_tile_attributes(int index, int attrib);
 void map_select_building(int offset);
 int map_selected_building();
 int map_selected_index();
