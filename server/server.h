@@ -63,7 +63,7 @@ typedef struct {
 	void			*map_data;
 	SERVER_MAP		map_c;
 	int			build_spots;
-	UNIT_PYLON_LIST		*pylons;
+	UNIT_PYLON		*pylons;
 } SERVER;
 
 SERVER *server;

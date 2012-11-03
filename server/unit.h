@@ -18,9 +18,10 @@
 #define	UNIT_REGEN_DELAY		5000
 
 static const int unit_los[] = 		{ 0, 7, 6, 3, 4, 1, 2};
-static const int unit_maxhp[] = 	{ 0, 50000, 1000, 1000, 5000, 1000, 1000 };
-static const int unit_maxshield[] = 	{ 0, 50000, 1, 5000, 5000, 40000, 1000 };		/* Shield must not be 0 for any existing building! */
-static const int unit_shieldreg[] = 	{ 0, 40, 1, 10, 10, 5, 2 };
+static const int unit_maxhp[] = 	{ 0, 5000000, 100000, 100000, 500000, 100000, 100000 };
+static const int unit_maxshield[] = 	{ 0, 5000000, 1, 500000, 500000, 4000000, 100000 };		/* Shield must not be 0 for any existing building! */
+static const int unit_shieldreg[] = 	{ 0, 5, 5, 5, 5, 5, 5 };
+/* Pylons and generators must have the same distribution range... */
 static const int unit_range[] = 	{ 0, 4, 0, 3, 4, 1, 1 };
 static const int unit_buildtime[] =	{ 0, 0, 5000, 20000, 20000, 10000, 10000 };
 
@@ -29,18 +30,15 @@ struct SERVER_UNIT;
 
 struct UNIT_PYLON;
 
-typedef struct UNIT_PYLON_LIST {
-	struct UNIT_PYLON		*pylon;
-	struct UNIT_PYLON_LIST		*next;
-} UNIT_PYLON_LIST;
-
 typedef struct UNIT_PYLON {
 	unsigned int			power	: 1;
 	unsigned int			pulse	: 1;
 	unsigned int			x;
 	unsigned int			y;
 	struct SERVER_UNIT		*unit;
-	struct UNIT_PYLON_LIST		*next;
+	struct UNIT_PYLON		**neighbour;
+	unsigned int			neighbours;
+	struct UNIT_PYLON		*next;			/* Only used to keep track of 'em all */
 } UNIT_PYLON;
 
 
