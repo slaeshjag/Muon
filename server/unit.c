@@ -30,51 +30,51 @@ int unitRange(int type) {
 }
 
 
-int unitPylonListRemove(UNIT_PYLON_LIST **list, UNIT_PYLON *del) {
-	UNIT_PYLON_LIST *tmp;
+int unitNeighbours(const int radius) {
+	/* This will waste a lot of memory, but I just want to get this shit to work */
+	return (radius*2+1)*(radius*2+1);
+}
 
-	while ((*list) != NULL) {
-		if ((*list)->pylon == del) {
-			tmp = *list;
-			*list = (*list)->next;
-			free(tmp);
+
+int unitPylonListRemove(UNIT_PYLON *from, UNIT_PYLON *del) {
+	int i;
+
+	for (i = 0; i < from->neighbours; i++)
+		if (from->neighbour[i] == del) {
+			from->neighbour[i] = NULL;
 			return 0;
 		}
-		list = &(*list)->next;
-	}
-
 	return -1;
 }
 
 
 
-int unitPylonListAdd(UNIT_PYLON_LIST **list, UNIT_PYLON *add) {
-	UNIT_PYLON_LIST *new;
+int unitPylonListAdd(UNIT_PYLON *to, UNIT_PYLON *add) {
+	int i, range, dx, dy;
 
-	if ((new = malloc(sizeof(UNIT_PYLON_LIST))) == NULL) {
-		errorPush(SERVER_ERROR_NO_MEMORY);
-		return -1;
-	}
+	dx = add->x - to->x;
+	dy = add->y - to->y;
+	range = unit_range[to->unit->type];
+	dx += range;
+	dy += range;
+	i = dx + dy * (range + 1);
 
-	new->next = *list;
-	new->pylon = add;
-	*list = new;
+	to->neighbour[i] = add;
 
 	return 0;
 }
 
 
 void unitPylonPulseClimb(UNIT_PYLON *pylon) {
-	UNIT_PYLON_LIST *list;
+	int i;
+	
 	if (pylon->pulse)
 		return;
 	pylon->pulse = 1;
-	list = pylon->next;
-
-	while (list != NULL) {
-		unitPylonPulseClimb(list->pylon);
-		list = list->next;
-	}
+	
+	for (i = 0; i < pylon->neighbours; i++)
+		if (pylon->neighbour[i])
+			unitPylonPulseClimb(pylon->neighbour[i]);;
 
 	return;
 }
@@ -82,28 +82,30 @@ void unitPylonPulseClimb(UNIT_PYLON *pylon) {
 
 void unitPylonPulse() {
 	int i;
-	UNIT_PYLON_LIST *list;
+	UNIT_PYLON *list;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
 		unitPylonPulseClimb(&server->map[server->player[i].spawn.index]->pylon);
 	}
-	
+
 	list = server->pylons;
+	
 	while (list != NULL) {
-		if (list->pylon->pulse) {
-			if (list->pylon->power);
+		if (list->pulse) {
+			if (list->power);
 			else {
-				list->pylon->power = 1;
-				playerCalcSetPower(list->pylon->unit->owner, list->pylon->x, list->pylon->y, 1);
+				list->power = 1;
+				playerCalcSetPower(list->unit->owner, list->x, list->y, 1);
 			}
 		} else {
-			if (list->pylon->power) {
-				list->pylon->power = 0;
-				playerCalcSetPower(list->pylon->unit->owner, list->pylon->x, list->pylon->y, -1);
+			if (list->power) {
+				list->power = 0;
+				playerCalcSetPower(list->unit->owner, list->x, list->y, -1);
 			}
 		}
+		list->pulse = 0;
 
 		list = list->next;
 	}
@@ -113,19 +115,27 @@ void unitPylonPulse() {
 
 
 void unitPylonDelete(SERVER_UNIT *unit) {
-	UNIT_PYLON_LIST *list, *tmp;
+	UNIT_PYLON **list;
+	int i;
 
 	if (unit->pylon.power)
 		playerCalcSetPower(unit->owner, unit->pylon.x, unit->pylon.y, -1);
 	
-	list = unit->pylon.next;
-	unit->pylon.next = NULL;
-	
-	while (list != NULL) {
-		unitPylonListRemove(&list->pylon->next, &unit->pylon);
-		tmp = list;
-		list = list->next;
-		free(tmp);
+	for (i = 0; i < unit->pylon.neighbours; i++)
+		if (unit->pylon.neighbour[i])
+			unitPylonListRemove(unit->pylon.neighbour[i], &unit->pylon);
+	free(unit->pylon.neighbour);
+	unit->pylon.neighbour = NULL;
+
+	list = &server->pylons;
+
+	while (*list) {
+		if ((*list)->unit == unit) {
+			*list = (*list)->next;
+			return;
+		}
+
+		list = &(*list)->next;
 	}
 
 	return;
@@ -133,7 +143,7 @@ void unitPylonDelete(SERVER_UNIT *unit) {
 
 
 void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
-	int j, k, owner, team, radius, index;
+	int i, j, k, owner, team, radius, index;
 
 	owner = unit->owner;
 	team = server->player[owner].team;
@@ -144,7 +154,11 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 	unit->pylon.pulse = 0;
 	unit->pylon.power = 0;
 	unit->pylon.unit = unit;
-	unit->pylon.next = NULL;
+	unit->pylon.neighbours = unitNeighbours(unitRange(unit->type));
+	unit->pylon.neighbour = malloc(sizeof(UNIT_PYLON **) * unit->pylon.neighbours);
+
+	for (i = 0; i < unit->pylon.neighbours; i++)
+		unit->pylon.neighbour[i] = NULL;
 
 	for (j = -1 * radius; j <= radius; j++) {
 		if (j + x < 0 || j + x >= server->w)
@@ -166,18 +180,17 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 				continue;
 			if (server->map[index]->pylon.power && !unit->pylon.power) {
 				playerCalcSetPower(owner, x, y, 1);
-				fprintf(stderr, "Setting power...\n");
 				unit->pylon.power = 1;
-			} else if (!server->map[index]->pylon.power) 
-				fprintf(stderr, "Pylon at %i %i is unpowered\n", j + x, k + y);
+			}
 
-			unitPylonListAdd(&unit->pylon.next, &server->map[index]->pylon);
-			unitPylonListAdd(&server->map[index]->pylon.next, &server->map[index]->pylon);
-			unitPylonListAdd(&server->pylons, &unit->pylon);
+			unitPylonListAdd(&server->map[index]->pylon, &unit->pylon);
+			unitPylonListAdd(&unit->pylon, &server->map[index]->pylon);
 		}
 	}
 	
 	unit->pylon.power = (unit->type == UNIT_DEF_GENERATOR) ? 1 : unit->pylon.power;
+	unit->pylon.next = server->pylons;
+	server->pylons = &unit->pylon;
 
 	return;
 }
@@ -463,8 +476,6 @@ void unitShieldAnnounce(int index) {
 			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
 	}
 
-	fprintf(stderr, "Unit at %i has sheild %i\n", index, shield);
-		
 	return;
 }
 
@@ -477,7 +488,7 @@ void unitLoop(int msec) {
 	while (next != NULL) {
 		index = next->x + next->y * server->w;
 		if (next->shield < unit_maxshield[next->type] && server->player[next->owner].map[index].power) {
-			if (next->last_no_shield >= server->game.time_elapsed + UNIT_REGEN_DELAY/server->game.gamespeed) {
+			if (next->last_no_shield + UNIT_REGEN_DELAY/server->game.gamespeed <= server->game.time_elapsed) {
 				next->shield += unit_shieldreg[next->type] * msec * server->game.gamespeed;
 				if (next->shield > unit_maxshield[next->type])
 					next->shield = unit_maxshield[next->type];
@@ -487,18 +498,21 @@ void unitLoop(int msec) {
 		}
 		
 		if (next->type == UNIT_DEF_ATTACKER && next->target > -1) {
-			server->map[next->target]->shield -= UNIT_ATTACKER_DMGP * msec * server->game.gamespeed;
-			if (server->map[next->target]->shield < 0) {
-				server->map[next->target]->hp += server->map[next->target]->shield;
-				server->map[next->target]->shield = 0;
-				server->map[next->target]->last_no_shield = server->game.time_elapsed;
-				unitDamageAnnounce(next->target);
-				if (server->map[next->target]->hp <= 0) {
-					unitRemove(next->target % server->w, next->target / server->w);
-					next->target = -1;
+			if (!server->map[next->target])
+				next->target = -1;
+			else {
+				server->map[next->target]->shield -= UNIT_ATTACKER_DMGP * msec * server->game.gamespeed;
+				if (server->map[next->target]->shield < 0) {
+					server->map[next->target]->hp += server->map[next->target]->shield;
+					server->map[next->target]->shield = 0;
+					server->map[next->target]->last_no_shield = server->game.time_elapsed;
+					unitDamageAnnounce(next->target);
+					if (server->map[next->target]->hp <= 0) {
+						unitRemove(next->target % server->w, next->target / server->w);
+						next->target = -1;
+					}
 				}
 			}
-
 		} else if (next->type == UNIT_DEF_ATTACKER) {
 			unitAttackerScan(next->x, next->y);
 		}
