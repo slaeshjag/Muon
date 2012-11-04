@@ -154,7 +154,7 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 					server->player[i].map[index].power += mode;
 					if ((old && !server->player[i].map[index].power)
 							|| (!old && server->player[i].map[index].power))
-						messageBufferPushDirect(i, player, MSG_SEND_MAP_TILE_ATTRIB, !old, index, NULL);
+						messageBufferPushDirect(i, player, MSG_SEND_MAP_TILE_ATTRIB, !old << (2 * (!t)), index, NULL);
 
 				}
 			} else {
@@ -162,7 +162,7 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 				server->player[player].map[index].power += mode;
 				if ((old && !server->player[player].map[index].power)
 						|| (!old && server->player[player].map[index].power))
-					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, !old, index, NULL);
+					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, !old << (2 * (!t)), index, NULL);
 			}
 		}
 	}
@@ -205,7 +205,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					fogdiff = (server->player[player].map[index].fog > 0);
 					fogdiff = (oldfog ^ fogdiff);
 					if (((t && mode == -1) || (!t && mode == 1)) || (j == 0 && k == 0)) {
-						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, i << 1, 0, NULL);
+						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, i << (1 + 2*(!t)), 0, NULL);
 						unitAnnounce(owner, i, (!t) ? building : 0, index);
 					}
 				}
@@ -216,7 +216,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				fogdiff = (server->player[player].map[index].fog > 0);
 				fogdiff = (oldfog ^ fogdiff);
 				if (fogdiff || (j == 0 && k == 0)) {
-					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << 1, index, NULL);
+					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, t << (1 + 2*(!t)), index, NULL);
 					unitAnnounce(owner, player, (!t) ? building : 0, index);
 				}
 			}
