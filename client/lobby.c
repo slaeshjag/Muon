@@ -35,9 +35,13 @@ void lobby_set_map_progress(int progress) {
 }
 
 void lobby_ready_checkbox_enable() {
+	UI_PROPERTY_VALUE v={.i=0};
+	lobby_checkbox_ready->set_prop(lobby_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
 	lobby_checkbox_ready->event_handler->add(lobby_checkbox_ready, lobby_ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 }
 
 void lobby_ready_checkbox_disable() {
+	UI_PROPERTY_VALUE v={.i=0};
+	lobby_checkbox_ready->set_prop(lobby_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
 	lobby_checkbox_ready->event_handler->remove(lobby_checkbox_ready, lobby_ready_checkbox_toggle, UI_EVENT_TYPE_UI);
 }

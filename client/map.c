@@ -32,6 +32,14 @@ void map_init(char *filename) {
 	darnitRenderLineMove(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
 }
 
+void map_close(DARNIT_MAP *map) {
+	if(!map)
+		return;
+	darnitRenderLineFree(map_border);
+	darnitRenderLineFree(map_selected.border);
+	darnitMapUnload(map);
+}
+
 void map_calculate_powergrid() {
 	DARNIT_MAP_LAYER *toplayer=&map->layer[map->layers-1];
 	DARNIT_TILEMAP *toplayer_tilemap=map->layer[map->layers-1].tilemap;

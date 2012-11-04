@@ -156,6 +156,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
 				break;
+			map_close(map);
 			if(filename) {
 				darnitFSUnmount(filename);
 				free(filename);
@@ -198,6 +199,7 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 }
 
 int client_init(char *host, int port) {
+	map=NULL;
 	if((sock=darnitSocketConnect(host, port, client_connect_callback, NULL))==NULL)
 		return -1;
 	msg_recv.command=0;

@@ -22,7 +22,7 @@ void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 
 //In-game menu
 struct UI_PANE_LIST panelist_game_menu;
-UI_WIDGET *game_menu_button[2];
+UI_WIDGET *game_menu_button[3];
 
 void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 

@@ -51,12 +51,16 @@ void menu_init() {
 	ui_pane_set_root_widget(panelist_game_menu.pane, ui_widget_create_vbox());
 	panelist_game_menu.next=&panelist_chat;
 	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
-	game_menu_button[0]=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
-	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, "Return to game"));
+	game_menu_button[0]=ui_widget_create_button(ui_widget_create_label(font_std, "Disconnect"));
+	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
+	game_menu_button[2]=ui_widget_create_button(ui_widget_create_label(font_std, "Return to game"));
 	for(i=0; i<2; i++) {
 		ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[i], 0);
 		game_menu_button[i]->event_handler->add(game_menu_button[i], game_menu_button_click, UI_EVENT_TYPE_UI);
 	}
+	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_spacer(), 1);
+	ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[2], 0);
+	game_menu_button[2]->event_handler->add(game_menu_button[2], game_menu_button_click, UI_EVENT_TYPE_UI);
 }
 
 //Main menu
@@ -95,10 +99,12 @@ void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
-
 	if(widget==game_menu_button[0]) {
-		game_state(GAME_STATE_QUIT);
+		client_disconnect();
+		game_state(GAME_STATE_CONNECT_SERVER);
 	} else if(widget==game_menu_button[1]) {
+		game_state(GAME_STATE_QUIT);
+	} else if(widget==game_menu_button[2]) {
 		game_state(GAME_STATE_GAME);
 	}
 }
