@@ -319,7 +319,6 @@ int unitRemove(int x, int y) {
 
 	if ((unit = server->map[x + y * server->h]) == NULL)
 		return -1;
-	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
 	parent = &server->unit;
 	next = *parent;
 
@@ -330,6 +329,7 @@ int unitRemove(int x, int y) {
 			continue;
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
 	}
+	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
 
 	while (next != unit) {
 		parent = &next->next;
@@ -354,6 +354,45 @@ int unitRemove(int x, int y) {
 	server->map[x + y * server->h] = NULL;
 
 	return 0;
+}
+
+
+int unitWallTest(int index_src, int index_dst) {
+	int i, j, x1, x2, y1, y2;
+
+	/* I'll leave this as a stub for now... */
+
+	return 0;
+}
+
+
+int unitValidateWall(int index) {
+	int i, j, range, x, y, index_dst;
+
+	x = index % server->w;
+	y = index / server->w;
+	range = unitRange(UNIT_DEF_PYLON);
+
+	for (i = -1*range; i <= range; i++) {
+		if (x + i < 0 || x + i >= server->w)
+			continue;
+		for (j = -1*range; j <= range; j++) {
+			if (y + j < 0 || y + j >= server->w)
+				continue;
+			if ((x + i)*(x + i) + (y + j)*(y + j) > range*range)
+				continue;
+
+			index_dst = (x + i) + (y + j) * server->w;
+			if (!server->map[index_dst])
+				continue;
+			if (server->map[index_dst]->type != UNIT_DEF_GENERATOR && server->map[index_dst]->type != UNIT_DEF_PYLON)
+				continue;
+			if (unitWallTest(index, index_dst) == 0)
+				return 0;
+		}
+	}
+
+	return -1;
 }
 
 
@@ -394,6 +433,8 @@ void unitDamageAnnounce(int index) {
 	int i, hp;
 
 	hp = server->map[index]->hp * 100 / unitHPMax(server->map[index]->type);
+	if (!hp && server->map[index]->hp)
+		hp = 1;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
