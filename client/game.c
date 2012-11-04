@@ -18,8 +18,9 @@ void game_view_init() {
 	game_sidebar_label_build[1]=ui_widget_create_label(font_std, "Attacker");
 	game_sidebar_label_build[2]=ui_widget_create_label(font_std, "Pylon");
 	game_sidebar_label_build[3]=ui_widget_create_label(font_std, "Wall");
+	game_sidebar_label_build[4]=ui_widget_create_label(font_std, "Build site");
 	int i;
-	for(i=0; i<4; i++) {
+	for(i=0; i<5; i++) {
 		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
 		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
@@ -40,7 +41,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	int i, do_build=-1;
 	UI_PROPERTY_VALUE wv=widget->get_prop(widget, UI_BUTTON_PROP_CHILD);
 	UI_PROPERTY_VALUE pv=game_sidebar_progress_build->get_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS);
-	for(i=0; i<4; i++) {
+	for(i=0; i<5; i++) {
 		if(widget==game_sidebar_button_build[i]&&wv.p!=game_sidebar_progress_build) {
 			do_build=i; //just make sure to cancel all other buildings first
 		} else if(widget==game_sidebar_button_build[i]&&pv.i==100) {
@@ -64,9 +65,9 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) { 
 	if(type!=UI_EVENT_TYPE_KEYBOARD_PRESS)
 		return;
-	if(e->keyboard->character>='1'&&e->keyboard->character>='4') {
-		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->character-0x30], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
-	}	
+	if(e->keyboard->character>='1'&&e->keyboard->character<='5') {
+		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->character-0x31], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
+	}
 }
 
 void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -97,6 +98,10 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		game_state(GAME_STATE_GAME_MENU);
 	if(e->buttons->x&&!prevbuttons.x)
 		chat_toggle(&panelist_game_sidebar);
+	if(e->buttons->b&&!prevbuttons.b&&map_selected_building()) {
+		client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_NONE, map_selected_index(), NULL);
+		map_select_nothing();
+	}
 	
 	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));
 }
@@ -158,7 +163,7 @@ void game_set_building_progress(int building, int progress) {
 
 void game_reset_building_progress() {
 	int i;
-	for(i=0; i<4; i++) {
+	for(i=0; i<5; i++) {
 		UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 		game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 	}

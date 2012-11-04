@@ -16,7 +16,7 @@ void platform_init() {
 			KEY(TAB),
 			KEY(LSHIFT),
 			KEY(SPACE),
-			KEY(BACKSPACE),
+			KEY(DELETE),
 			KEY(ESCAPE),
 			KEY(RETURN),
 			KEY(F1),

@@ -127,13 +127,19 @@ void map_set_tile_attributes(int index, int attrib) {
 	map->layer[map->layers-1].tilemap->data[index]=layerbits;*/
 }
 
-void map_select_building(int offset) {
-	map_selected.index=offset;
-	int selected_building=map->layer[map->layers-2].tilemap->data[offset]&0xFFFF;
+void map_select_building(int index) {
+	map_selected.index=index;
+	int selected_building=map->layer[map->layers-2].tilemap->data[index]&0xFFFF;
 	selected_building-=(player_id+1)*8-1;
 	if(selected_building<0||selected_building>7)
 		selected_building=0;
 	map_selected.building=selected_building;
+}
+
+void map_select_nothing() {
+	map_selected.building=0;
+	map_selected.index=0;
+	game_update_building_status();
 }
 
 int map_selected_building() {
