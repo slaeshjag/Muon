@@ -154,7 +154,7 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 					server->player[i].map[index].power += mode;
 					if ((old && !server->player[i].map[index].power)
 							|| (!old && server->player[i].map[index].power))
-						messageBufferPushDirect(i, player, MSG_SEND_MAP_TILE_ATTRIB, !old << (2 * (!t)), index, NULL);
+						messageBufferPushDirect(i, player, MSG_SEND_MAP_TILE_ATTRIB, !old << (2 * (old)), index, NULL);
 
 				}
 			} else {
@@ -162,7 +162,7 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 				server->player[player].map[index].power += mode;
 				if ((old && !server->player[player].map[index].power)
 						|| (!old && server->player[player].map[index].power))
-					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, !old << (2 * (!t)), index, NULL);
+					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, !old << (2 * (old)), index, NULL);
 			}
 		}
 	}

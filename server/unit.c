@@ -472,8 +472,10 @@ void unitShieldAnnounce(int index) {
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
-		if (server->player[i].map[index].fog)
+		if (server->player[i].map[index].fog) {
 			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
+			fprintf(stderr, "Shield for %i: %i (%i/%i)\n", index, shield, server->map[index]->shield, unitShieldMax(server->map[index]->type));
+		}
 	}
 
 	return;
