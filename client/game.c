@@ -64,7 +64,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) { 
 	if(type!=UI_EVENT_TYPE_KEYBOARD_PRESS)
 		return;
-	if(e->keyboard->character>='1'&&e->keyboard->character>='4') {
+	if(e->keyboard->character>='1'&&e->keyboard->character<='4') {
 		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->character-0x30], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
 	}	
 }
