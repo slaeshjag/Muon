@@ -19,6 +19,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void game_update_building_status();
 void game_view_scroll_to(int x, int y);
 void game_set_building_progress(int building, int progress);
 void game_reset_building_progress();

@@ -122,16 +122,20 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
 			building_place=-1;
 		} else {
-			//status about clicked building, etc
-			UI_PROPERTY_VALUE v;
-			v.i=map_get_building_shield(map_offset);
-			game_sidebar_progress_shield->set_prop(game_sidebar_progress_shield, UI_PROGRESSBAR_PROP_PROGRESS, v);
-			v.i=map_get_building_health(map_offset);
-			game_sidebar_progress_health->set_prop(game_sidebar_progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
-			
+			//status selected clicked building, etc
 			map_select_building(map_offset);
+			game_update_building_status();
 		}
 	}
+}
+
+void game_update_building_status() {
+	int map_offset=map_selected.index;
+	UI_PROPERTY_VALUE v;
+	v.i=map_get_building_shield(map_offset);
+	game_sidebar_progress_shield->set_prop(game_sidebar_progress_shield, UI_PROGRESSBAR_PROP_PROGRESS, v);
+	v.i=map_get_building_health(map_offset);
+	game_sidebar_progress_health->set_prop(game_sidebar_progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
 }
 
 void game_view_scroll_to(int x, int y) {

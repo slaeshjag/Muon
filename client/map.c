@@ -1,6 +1,7 @@
 #include "muon.h"
 #include "view.h"
 #include "client.h"
+#include "game.h"
 #include "map.h"
 
 #define MAP_INDEX(x, y) ((y)*toplayer_tilemap->w+(x))
@@ -70,34 +71,52 @@ void map_set_home(int index) {
 }
 
 int map_get_building_health(int index) {
-	int health=(map->layer[map->layers-2].tilemap->data[index]>>18)&0xFE;
+	unsigned int health=(map->layer[map->layers-2].tilemap->data[index]>>18)&0xFE;
 	return health>100?100:health;
 }
 
 int map_get_building_shield(int index) {
-	int shield=(map->layer[map->layers-2].tilemap->data[index]>>24)&0xFE;
+	unsigned int shield=(map->layer[map->layers-2].tilemap->data[index]>>25)&0xFE;
 	return shield>100?100:shield;
 }
 
-void map_set_building_health(int index, int health) {
+void map_set_building_health(int index, unsigned int health) {
 	if(health<0||health>100)
 		return;
-	map->layer[map->layers-2].tilemap->data[index]|=health<<18;
-	darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
+	map->layer[map->layers-2].tilemap->data[index]=(map->layer[map->layers-2].tilemap->data[index]&0xFE03FFFF)|health<<18;
+	if(index==map_selected.index)
+		game_update_building_status();
+	//darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
 }
 
-void map_set_building_shield(int index, int shield) {
+void map_set_building_shield(int index, unsigned int shield) {
 	if(shield<0||shield>100)
 		return;
-	map->layer[map->layers-2].tilemap->data[index]|=shield<<25;
-	darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
+	map->layer[map->layers-2].tilemap->data[index]=(map->layer[map->layers-2].tilemap->data[index]&0x1FFFFFF)|shield<<25;
+	if(index==map_selected.index)
+		game_update_building_status();
+	//darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
 }
 
 void map_set_tile_attributes(int index, int attrib) {
-	int layerbits;
+	switch(attrib) {
+		case MSG_TILE_ATTRIB_FOW_CLEAR:
+			map->layer[map->layers-1].tilemap->data[index]&=~0xFFF;
+			break;
+		case MSG_TILE_ATTRIB_FOW_SET:
+			map->layer[map->layers-1].tilemap->data[index]=(map->layer[map->layers-1].tilemap->data[index]&~0xFFF)|0x1;
+			break;
+		case MSG_TILE_ATTRIB_POWER_CLEAR:
+			map->layer[map->layers-1].tilemap->data[index]&=~0x1000000;
+			break;
+		case MSG_TILE_ATTRIB_POWER_SET:
+			map->layer[map->layers-1].tilemap->data[index]|=0x1000000;
+			break;
+	}
+	/*int layerbits;
 	layerbits=((attrib&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[index]&0x1000000);
 	layerbits|=(((attrib&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
-	map->layer[map->layers-1].tilemap->data[index]=layerbits;
+	map->layer[map->layers-1].tilemap->data[index]=layerbits;*/
 }
 
 void map_select_building(int offset) {
