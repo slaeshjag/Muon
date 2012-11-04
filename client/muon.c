@@ -53,7 +53,7 @@ int main() {
 	
 	player_id=0;
 	serverInit();
-	serverStart("map.ldi", 2, 1337, 3);
+	serverStart("../res/map.ldi", 2, 1337, 3);
 	
 	ui_init();
 	view_init();

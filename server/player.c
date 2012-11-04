@@ -180,6 +180,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 	if ((los = unitLOS(server->map[index]->type)) == 0)
 		return 0;
 
+	fprintf(stderr, "Calculating LoS\n");
 	for (j = -1 * los; j <= los; j++) {
 		if (x + j < 0 || x + j >= server->w)
 			continue;

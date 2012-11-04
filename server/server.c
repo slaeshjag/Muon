@@ -3,8 +3,7 @@
 
 int serverInitMap(const char *path) {
 	FILE *fp;
-	int i, j, x, y;
-	char buff[32];
+	int i, n, t, building, owner;
 
 
 	if ((fp = fopen(path, "rb")) == NULL) {
@@ -27,27 +26,34 @@ int serverInitMap(const char *path) {
 	fread(server->map_c.data, server->map_c.data_len, 1, fp);
 	fclose(fp);
 
-	for (i = 0; i < server->players; i++) {
-		sprintf(buff, "player_%i", i + 1);
-		sscanf(ldmzFindProp(server->map_data, buff), "%i, %i", &server->player[i].spawn.x, &server->player[i].spawn.y);
-		server->player[i].spawn.index = server->player[i].spawn.y * server->w + server->player[i].spawn.x;
-	}
-
-	for (i = 0; i < server->players; i++) {
-		x = server->player[i].spawn.x;
-		y = server->player[i].spawn.y;
-		for (j = 0; j < server->players; j++) {
-			if (j == i)
+	for (i = 0; i < server->players; i++)
+		server->player[i].spawn.x = server->player[i].spawn.y = -1;
+	n = server->w * server->h;
+	for (i = 0; i < n; i++)
+		if (server->map_c.tile_data[i] != 0) {
+			t = server->map_c.tile_data[i] & 0xFFF;
+			building = (t % 8) + 1;
+			owner = (t / 8) - 1;
+			fprintf(stderr, "Found building %i (%i), %i %i\n", building, owner, i, t);
+			if (owner < 0 || owner >= server->players)
 				continue;
-			if (x == server->player[j].spawn.x && y == server->player[j].spawn.y) {
-				fprintf(stderr, "Overlapping spawn points is not allowed: Bad map!\n");
-				errorPush(SERVER_ERROR_SPAWNS_OVERLAP);
-				free(server->map_c.data);
-				server->map_c.data = NULL;
-				return -1;
+			if (building == UNIT_DEF_GENERATOR) {
+				server->player[owner].spawn.x = i % server->w;
+				server->player[owner].spawn.y = i / server->w;
+				server->player[owner].spawn.index = i;
 			}
+
 		}
-	}
+
+	for (i = 0; i < server->players; i++)
+		if (server->player[i].spawn.x == -1) {
+			fprintf(stderr, "Map is missing spawn point for player %i\n", i);
+			errorPush(SERVER_ERROR_SPAWN_MISSING);
+			free(server->map_c.data);
+			server->map_c.data = NULL;
+			return -1;
+		}
+
 
 	for (;;) {
 		if (strstr(path, "/") != NULL)
@@ -170,10 +176,13 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		server->map[i] = NULL;
 
 	server->unit = NULL;
-	if (serverInitMap(fname) < 0)
+	if (serverInitMap(fname) < 0) {
 		server = serverStop();
+		return server;
+	}
+
 	if (atoi(tmp) < players) {
-		fprintf(stderr, "Map file is only defined for %i players (%i player slots requested)\n", atoi(tmp), players);
+		fprintf(stderr, "Map file is only defined for %i players (%i player slots requested) %s\n", atoi(tmp), players, tmp);
 		errorPush(SERVER_ERROR_TOO_MANY_PLAYERS);
 		server = serverStop();
 	}

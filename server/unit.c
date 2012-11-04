@@ -222,8 +222,6 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
-	if (!server->player[player].map[index].fog && unit != UNIT_DEF_GENERATOR)
-		return -1;
 	if (unitAdd(player, unit, x, y) >= 0)
 		playerBuildQueueStop(player, unit);
 
@@ -321,6 +319,7 @@ int unitRemove(int x, int y) {
 
 	if ((unit = server->map[x + y * server->h]) == NULL)
 		return -1;
+	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
 	parent = &server->unit;
 	next = *parent;
 
@@ -472,10 +471,9 @@ void unitShieldAnnounce(int index) {
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
-		if (server->player[i].map[index].fog) {
+		if (server->player[i].map[index].fog)
 			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
-			fprintf(stderr, "Shield for %i: %i (%i/%i)\n", index, shield, server->map[index]->shield, unitShieldMax(server->map[index]->type));
-		}
+		
 	}
 
 	return;
@@ -509,6 +507,8 @@ void unitLoop(int msec) {
 					server->map[next->target]->shield = 0;
 					server->map[next->target]->last_no_shield = server->game.time_elapsed;
 					unitDamageAnnounce(next->target);
+					if (!server->player[server->map[next->target]->owner].map[next->target].power)
+						unitShieldAnnounce(index);
 					if (server->map[next->target]->hp <= 0) {
 						unitRemove(next->target % server->w, next->target / server->w);
 						next->target = -1;

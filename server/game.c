@@ -48,17 +48,49 @@ int gameAttemptStart() {
 }
 
 
+void gameSpawn() {
+	int n, i, t, building, owner;
+
+	n = server->w * server->h;
+	for (i = 0; i < n; i++)
+		if (server->map_c.tile_data[i]) {
+			t = server->map_c.tile_data[i] & 0xFFF;
+			if (!t)
+				continue;
+			building = (t % 8) + 1;
+			owner = (t / 8) - 1;
+			if (owner < 0 || owner >= server->players) {
+				fprintf(stderr, "Bad owner\n");
+				continue;
+			}
+			if (server->player[owner].status != PLAYER_IN_GAME) {
+				fprintf(stderr, "player not in game\n");
+				continue;
+			}
+			if (building >= UNITS_DEFINED) {
+				fprintf(stderr, "Unit undefined\n");
+				continue;
+			}
+			fprintf(stderr, "Spawning building %i for player %i at %i\n", building, owner, i);
+			unitSpawn(owner, building, i % server->w, i / server->w);
+		}
+	fprintf(stderr, "Pulsing pylons\n");
+	unitPylonPulse();
+	
+	return;
+}
+
+
 void gameStart() {
 	int i;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_IN_GAME)
 			continue;
-		unitSpawn(i, UNIT_DEF_GENERATOR, server->player[i].spawn.x, server->player[i].spawn.y);
-
 	}
 
 	server->accept = networkSocketDisconnect(server->accept);
+	gameSpawn();
 
 	return;
 }
