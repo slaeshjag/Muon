@@ -15,6 +15,7 @@ UI_WIDGET *ui_widget_create_hbox() {
 	}
 	widget->event_handler->handlers=NULL;
 	widget->event_handler->add=ui_event_add;
+	widget->event_handler->remove=ui_event_remove;
 	widget->event_handler->send=ui_event_send;
 	widget->event_handler->add(widget, ui_hbox_event_notify_children, UI_EVENT_TYPE_MOUSE|UI_EVENT_TYPE_UI);
 	

@@ -6,22 +6,24 @@ struct UI_PANE_LIST;
 #include <SDL/SDL_keysym.h>
 #define KEY(k) SDLK_##k
 
+//Check if point (px, py) is inside the bounds of a rectangle
 #define PINR(px, py, x, y, w, h) ((px)>(x)&&(py)>(y)&&(px)<((x)+(w))&&(py)<((y)+(h)))
 
-#define UI_EVENT_TYPE_KEYBOARD		0x100
+#define UI_EVENT_TYPE_KEYBOARD		0x1FF
 #define UI_EVENT_TYPE_KEYBOARD_PRESS	0x101
 #define UI_EVENT_TYPE_KEYBOARD_RELEASE	0x102
-#define UI_EVENT_TYPE_MOUSE		0x200
-#define UI_EVENT_TYPE_MOUSE_BUTTON	0x21C
+#define UI_EVENT_TYPE_MOUSE		0x2FF
+#define UI_EVENT_TYPE_MOUSE_BUTTON	0x20C
 #define UI_EVENT_TYPE_MOUSE_ENTER	0x201
 #define UI_EVENT_TYPE_MOUSE_LEAVE	0x202
 #define UI_EVENT_TYPE_MOUSE_UP		0x204
 #define UI_EVENT_TYPE_MOUSE_DOWN	0x208
 #define UI_EVENT_TYPE_MOUSE_CLICK	0x210
-#define UI_EVENT_TYPE_JOYSTICK		0x400
-#define UI_EVENT_TYPE_UI		0x800
-#define UI_EVENT_TYPE_UI_EVENT		0x801
-#define UI_EVENT_TYPE_UI_WIDGET_ACTIVATE	0x801
+#define UI_EVENT_TYPE_JOYSTICK		0x4FF
+#define UI_EVENT_TYPE_BUTTONS		0x801
+#define UI_EVENT_TYPE_UI		0x10FF
+#define UI_EVENT_TYPE_UI_EVENT		0x1001
+#define UI_EVENT_TYPE_UI_WIDGET_ACTIVATE	0x1001
 
 #define UI_EVENT_KEYBOARD_MOD_CTRL	0x03
 #define UI_EVENT_KEYBOARD_MOD_LCTRL	0x01
@@ -55,12 +57,35 @@ typedef struct {
 
 typedef struct {
 	
+} UI_EVENT_JOYSTICK;
+
+typedef struct {
+	unsigned int	left	: 1;
+	unsigned int	right	: 1;
+	unsigned int	up	: 1;
+	unsigned int	down	: 1;
+	unsigned int	x	: 1;
+	unsigned int	y	: 1;
+	unsigned int	a	: 1;
+	unsigned int	b	: 1;
+	unsigned int	start	: 1;
+	unsigned int	select	: 1;
+	unsigned int	l	: 1;
+	unsigned int	r	: 1;
+	unsigned int	lmb	: 1;
+	unsigned int	rmb	: 1;
+	unsigned int	padding	: 2;
+} UI_EVENT_BUTTONS;
+
+typedef struct {
+	
 } UI_EVENT_UI;
 
 typedef union {
 	UI_EVENT_KEYBOARD *keyboard;
 	UI_EVENT_MOUSE *mouse;
-	/*UI_EVENT_JOYSTICK *joystick;*/
+	UI_EVENT_JOYSTICK *joystick;
+	UI_EVENT_BUTTONS *buttons;
 	UI_EVENT_UI *ui;
 } UI_EVENT;
 

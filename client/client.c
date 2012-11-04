@@ -4,8 +4,10 @@
 #include "muon.h"
 #include "client.h"
 #include "view.h"
-#include "engine.h"
+#include "map.h"
+#include "game.h"
 #include "chat.h"
+#include "lobby.h"
 
 #define PONG case MSG_RECV_PING: client_message_send(player_id, MSG_SEND_PONG, 0, 0, NULL); break
 
@@ -13,11 +15,10 @@ unsigned int recalc_map=0;
 
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
-		darnitRenderClearColorSet(0x0, 0x0, 0x0);
-		state=GAME_STATE_CONNECT_SERVER;
+		game_state(GAME_STATE_CONNECT_SERVER);
 		darnitSocketClose(socket);
 	} else
-		state=GAME_STATE_COUNTDOWN;
+		game_state(GAME_STATE_LOBBY);
 }
 
 void client_message_convert_send(MESSAGE_RAW *message) {
@@ -46,7 +47,7 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 		darnitSocketSend(sock, payload, arg_2);
 }
 
-int client_check_incomming() {
+void client_check_incomming() {
 	int s, i;
 	for(i=0; i<1000; i++) {
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
@@ -55,8 +56,8 @@ int client_check_incomming() {
 				if(s==0)
 					break;
 				if(s==-1) {
-					sock=darnitSocketClose(sock);
-					return -1;
+					client_connect_callback(-1, NULL, sock);
+					return;
 				}
 				//printf("payload size %i\n", msg_recv.arg_2);
 				if(client_message_handler)
@@ -68,8 +69,8 @@ int client_check_incomming() {
 			if(s==0)
 				break;
 			if(s==-1) {
-				sock=darnitSocketClose(sock);
-				return -1;
+				client_connect_callback(-1, NULL, sock);
+				return;
 			}
 			client_message_convert_recv(&msg_recv);
 			//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
@@ -81,53 +82,41 @@ int client_check_incomming() {
 	for(i=0; recalc_map; recalc_map>>=1, i++)
 		if(recalc_map&1) {
 			if(i==map->layers-1)
-				engine_calculate_powergrid();
+				map_calculate_powergrid();
 			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
 		}
-	return 0;
+	return;
 }
 
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
-	int layerbits, i;
-	UI_PROPERTY_VALUE v;
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
-			layerbits=((msg->arg_1&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[msg->arg_2]&0x1000000);
-			layerbits|=(((msg->arg_1&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
-			map->layer[map->layers-1].tilemap->data[msg->arg_2]=layerbits;
+			map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			recalc_map|=1<<(map->layers-1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
-			map->layer[map->layers-2].tilemap->data[msg->arg_2]=(msg->arg_1==BUILDING_BUILDSITE)?5:(msg->arg_1!=0)*(msg->player_id*8+msg->arg_1+7);
+			map_building_place(msg->arg_2, msg->player_id, msg->arg_1);
 			recalc_map|=1<<(map->layers-2);
 			if(msg->player_id==player_id&&msg->arg_1) {
 				if(msg->arg_1==BUILDING_GENERATOR) {
-					home_y=msg->arg_2/map->layer[map->layers-2].tilemap->w;
-					home_x=msg->arg_2%map->layer[map->layers-2].tilemap->w;
-					printf("Home base at (%i, %i)\n", home_x, home_y);
-					view_scroll_to(home_x, home_y);
+					map_set_home(msg->arg_2);
+					game_view_scroll_to(home_x, home_y);
 				}
-				for(i=0; i<4; i++) {
-					UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
-					game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
-				}
+				game_reset_building_progress();
 			}
 			break;
 		case MSG_RECV_BUILDING_PROGRESS:
-			v.i=msg->arg_2;
-			game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
+			game_set_building_progress(0, msg->arg_2);
 			break;
 		case MSG_RECV_BUILDING_HP:
-			engine_set_building_health(msg->arg_2, msg->arg_1);
-			//printf("Set health of %i to %i\n", msg->arg_2, msg->arg_1);
+			map_set_building_health(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_SHIELD:
-			engine_set_building_shield(msg->arg_2, msg->arg_1);
-			//printf("Set shield of %i to %i\n", msg->arg_2, msg->arg_1);
+			map_set_building_shield(msg->arg_2, msg->arg_1);
 			break;
 	}
 }
@@ -139,16 +128,11 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_GAME_START:
-			printf("Game starts in %i\n", msg->arg_1);
-			UI_PROPERTY_VALUE v={.p=countdown_text};
-			countdown_text[0]=(char)(msg->arg_1)+0x30;
-			countdown_text[1]=0;
-			countdown_label->set_prop(countdown_label, UI_LABEL_PROP_TEXT, v);
+			chat_countdown(msg->arg_1);
 			if(!msg->arg_1) {
-				state=GAME_STATE_GAME;
+				lobby_ready_checkbox_disable();
+				game_state(GAME_STATE_GAME);
 				client_message_handler=client_game_handler;
-			//	darnitInputGrab();
-				darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
 			}
 			break;
 	}
@@ -182,7 +166,6 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			memcpy(filename, payload, msg->arg_2);
 			filename[msg->arg_2]=0;
 			f=darnitFileOpen(filename, "wb");
-			//printf("Started map download of file %s\n", filename);
 			break;
 		case MSG_RECV_MAP_CHUNK:
 			if(!payload)
@@ -190,33 +173,17 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			downloaded_bytes+=msg->arg_2;
 			darnitFileWrite(payload, msg->arg_2, f);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
-			UI_PROPERTY_VALUE v={.i=100*downloaded_bytes/filesize_bytes};
-			ui_progressbar_set_prop(pbar, UI_PROGRESSBAR_PROP_PROGRESS, v);
-			//printf("Map progress %i%%\n", 100*downloaded_bytes/filesize_bytes);
+			lobby_set_map_progress(100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
 			darnitFileClose(f);
-			//printf("Map %s successfully downloaded!\n", filename);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
-			map=darnitMapLoad("maps/map.ldmz");
-			map_w=map->layer->tilemap->w*map->layer->tile_w;
-			map_h=map->layer->tilemap->h*map->layer->tile_h;
-			darnitRenderLineFree(map_border);
-			map_border=darnitRenderLineAlloc(4, 1);
-			darnitRenderLineMove(map_border, 0, 0, 0, map_w, 0);
-			darnitRenderLineMove(map_border, 1, 0, 0, 0, map_h);
-			darnitRenderLineMove(map_border, 2, map_w, 0, map_w, map_h);
-			darnitRenderLineMove(map_border, 3, 0, map_h, map_w, map_h);
-			DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
-			darnitRenderLineMove(selected_border, 0, 0, 0, building_layer->tile_w, 0);
-			darnitRenderLineMove(selected_border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
-			darnitRenderLineMove(selected_border, 2, 0, 0, 0, building_layer->tile_h);
-			darnitRenderLineMove(selected_border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
-			countdown_ready->event_handler->add(countdown_ready, ready_checkbox_toggle, UI_EVENT_TYPE_UI);
+			map_init("maps/map.ldmz");
+			lobby_ready_checkbox_enable();
 			break;
 		case MSG_RECV_GAME_START:
-			state=GAME_STATE_COUNTDOWN;
+			game_state(GAME_STATE_LOBBY);
 			client_message_handler=client_countdown_handler;
 			client_countdown_handler(msg, payload);
 	}

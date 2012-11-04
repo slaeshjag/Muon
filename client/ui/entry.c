@@ -17,6 +17,7 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 	}
 	widget->event_handler->handlers=NULL;
 	widget->event_handler->add=ui_event_add;
+	widget->event_handler->remove=ui_event_remove;
 	widget->event_handler->send=ui_event_send;
 	widget->event_handler->add(widget, ui_entry_event_click, UI_EVENT_TYPE_MOUSE);
 	widget->event_handler->add(widget, ui_entry_event_key, UI_EVENT_TYPE_KEYBOARD);

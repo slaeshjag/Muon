@@ -22,12 +22,20 @@ void chat_init() {
 	chat_entry->event_handler->add(chat_entry, chat_button_send_click, UI_EVENT_TYPE_KEYBOARD);
 }
 
+int chat_is_visible(struct UI_PANE_LIST *panelist) {
+	struct UI_PANE_LIST *p;
+	for(p=panelist; p; p=p->next)
+		if(p==&panelist_chat)
+			return 1;
+	return 0;
+}
+
 void chat_show(struct UI_PANE_LIST *panelist) {
 	if(!panelist)
 		return;
 	struct UI_PANE_LIST *p;
 	for(p=panelist; p->next; p=p->next) {
-		if(p==&panelist_chat) {
+		if(p->next==&panelist_chat||p==&panelist_chat) {
 			ui_selected_widget=chat_entry;
 			return;
 		}
@@ -99,6 +107,14 @@ void chat_join(int player) {
 void chat_disconnect(int player) {
 	char *chatmsg=malloc(64);
 	sprintf(chatmsg, " * %s disconnected", &player_names[player*32]);
+	ui_listbox_add(chat_listbox, chatmsg);
+	ui_listbox_scroll(chat_listbox, -1);
+	free(chatmsg);
+}
+
+void chat_countdown(int countdown) {
+	char *chatmsg=malloc(32);
+	sprintf(chatmsg, " * Game starts in %i", countdown);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
