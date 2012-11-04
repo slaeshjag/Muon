@@ -30,6 +30,12 @@ void map_init(char *filename) {
 	darnitRenderLineMove(map_selected.border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
 	darnitRenderLineMove(map_selected.border, 2, 0, 0, 0, building_layer->tile_h);
 	darnitRenderLineMove(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
+	
+	unsigned int i;
+	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
+		((unsigned int *)minimap_data)[i]=0;
+	
+	minimap=darnitRenderTilesheetNew(1, 1, SIDEBAR_WIDTH, SIDEBAR_WIDTH, DARNIT_PFORMAT_RGBA8);
 }
 
 void map_close(DARNIT_MAP *map) {
@@ -169,4 +175,23 @@ void map_draw(int draw_powergrid) {
 		darnitRenderTint(1, 1, 1, 1);
 	}
 	darnitRenderOffset(0, 0);
+}
+
+void map_minimap_update() {
+	//This is really slow and retarded, but it works
+	int x, y;
+	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
+	DARNIT_TILEMAP *fow_tilemap=map->layer[map->layers-1].tilemap;
+	for(y=0; y<(SIDEBAR_WIDTH-8); y++)
+		for(x=0; x<(SIDEBAR_WIDTH-8); x++)
+			minimap_data[y*(SIDEBAR_WIDTH-8)+x]=minimap_colors[(fow_tilemap->data[(y*(building_tilemap->h)/(SIDEBAR_WIDTH-8))*(building_tilemap->w)+(x*(building_tilemap->w))/(SIDEBAR_WIDTH-8)]&0xFFF)==1];
+	
+	for(y=0; y<building_tilemap->h; y++)
+		for(x=0; x<building_tilemap->w; x++)
+			if((building_tilemap->data[(y*building_tilemap->w)+x]&~0xFFF)>0)
+				minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
+			else if(building_tilemap->data[(y*building_tilemap->w)+x]==5&&(fow_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==0)
+				minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[6];
+	
+	darnitRenderTilesheetUpdate(minimap, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);
 }

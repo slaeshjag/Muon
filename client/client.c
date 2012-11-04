@@ -84,6 +84,7 @@ void client_check_incomming() {
 			if(i==map->layers-1)
 				map_calculate_powergrid();
 			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
+			map_minimap_update();
 		}
 	return;
 }

@@ -175,6 +175,8 @@ void game_view_draw() {
 		map_draw(1);
 	else
 		map_draw(0);
+		
+	darnitRenderTileBlit(minimap, 0, 128, 32);
 }
 
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
