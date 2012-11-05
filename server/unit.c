@@ -471,7 +471,7 @@ void unitAttackSet(int index_src, int index_dst) {
 			continue;
 		if (!server->player[i].map[index_src].fog && !server->player[i].map[index_dst].fog)
 			continue;
-		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_src, index_dst, NULL);
+		messageBufferPushDirect(i, from, MSG_SEND_BUILDING_ATTACKING, index_dst, index_src, NULL);
 	}
 
 
