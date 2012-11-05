@@ -6,6 +6,9 @@
 
 #define MAP_INDEX(x, y) ((y)*toplayer_tilemap->w+(x))
 
+#define MIN(a, b) ((a)<(b)?(a):(b))
+#define MAX(a, b) ((a)>(b)?(a):(b))
+
 void map_init(char *filename) {
 	powergrid=NULL;
 	powergrid_lines=0;
@@ -31,6 +34,8 @@ void map_init(char *filename) {
 	darnitRenderLineMove(map_selected.border, 2, 0, 0, 0, building_layer->tile_h);
 	darnitRenderLineMove(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
 	
+	minimap_viewport=darnitRenderLineAlloc(4, 1);
+	
 	unsigned int i;
 	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
@@ -43,6 +48,7 @@ void map_close(DARNIT_MAP *map) {
 	map_border=darnitRenderLineFree(map_border);
 	map_selected.border=darnitRenderLineFree(map_selected.border);
 	powergrid=darnitRenderLineFree(powergrid);
+	minimap_viewport=darnitRenderLineFree(minimap_viewport);
 	map=darnitMapUnload(map);
 }
 
@@ -177,12 +183,29 @@ void map_draw(int draw_powergrid) {
 	darnitRenderOffset(0, 0);
 }
 
-void map_minimap_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_MOUSE_DOWN)
-		return;
-	int x=e->mouse->x-widget->x;
-	int y=e->mouse->y-widget->y;
-	darnitMapCameraMove(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
+void map_minimap_update_viewport() {
+	int x=game_sidebar_minimap->w*map->cam_x/map_w+game_sidebar_minimap->x;
+	int y=game_sidebar_minimap->h*map->cam_y/map_h+game_sidebar_minimap->y;
+	int w=game_sidebar_minimap->w*platform.screen_w/map_w;
+	int h=game_sidebar_minimap->h*platform.screen_h/map_h;
+	int x1=MAX(x, game_sidebar_minimap->x);
+	int x2=MIN(x+w, game_sidebar_minimap->x+game_sidebar_minimap->w);
+	int y1=MAX(y, game_sidebar_minimap->y);
+	int y2=MIN(y+h, game_sidebar_minimap->y+game_sidebar_minimap->h);
+	darnitRenderLineMove(minimap_viewport, 0, x1, y1, x2, y1);
+	darnitRenderLineMove(minimap_viewport, 1, x1, y2, x2, y2);
+	darnitRenderLineMove(minimap_viewport, 2, x1, y1, x1, y2);
+	darnitRenderLineMove(minimap_viewport, 3, x2, y1, x2, y2);
+}
+
+void map_minimap_render(UI_WIDGET *widget) {
+	//override for imagebox render, to render viewport border on minimap
+	ui_imageview_render(widget);
+	float r, g, b, a;
+	darnitRenderTintGet(&r, &g, &b, &a);
+	darnitRenderTint(1, 1, 1, 1);
+	darnitRenderLineDraw(minimap_viewport, 4);
+	darnitRenderTint(r, g, b, a);
 }
 
 void map_minimap_update() {

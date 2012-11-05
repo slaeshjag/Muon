@@ -12,6 +12,7 @@ int map_w, map_h;
 int home_x, home_y;
 
 unsigned int minimap_data[(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8)];
+DARNIT_LINE *minimap_viewport;
 
 static const unsigned int minimap_colors[]={
 	0xFF000000,
@@ -46,7 +47,8 @@ void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
 void map_draw(int draw_powergrid);
-void map_minimap_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void map_minimap_update_viewport();
+void map_minimap_render(UI_WIDGET *widget);
 void map_minimap_update();
 
 #endif
