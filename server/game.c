@@ -59,22 +59,16 @@ void gameSpawn() {
 				continue;
 			building = (t % 8) + 1;
 			owner = (t / 8) - 1;
-			if (owner < 0 || owner >= server->players) {
-				fprintf(stderr, "Bad owner\n");
+			if (owner < 0 || owner >= server->players)
 				continue;
-			}
-			if (server->player[owner].status != PLAYER_IN_GAME) {
-				fprintf(stderr, "player not in game\n");
+			if (server->player[owner].status != PLAYER_IN_GAME) 
 				continue;
-			}
-			if (building >= UNITS_DEFINED) {
-				fprintf(stderr, "Unit undefined\n");
+			if (building >= UNITS_DEFINED)
 				continue;
-			}
-			fprintf(stderr, "Spawning building %i for player %i at %i\n", building, owner, i);
+
 			unitSpawn(owner, building, i % server->w, i / server->w);
 		}
-	fprintf(stderr, "Pulsing pylons\n");
+	
 	unitPylonPulse();
 	
 	return;

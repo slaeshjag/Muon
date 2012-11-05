@@ -34,7 +34,6 @@ int serverInitMap(const char *path) {
 			t = server->map_c.tile_data[i] & 0xFFF;
 			building = (t % 8) + 1;
 			owner = (t / 8) - 1;
-			fprintf(stderr, "Found building %i (%i), %i %i\n", building, owner, i, t);
 			if (owner < 0 || owner >= server->players)
 				continue;
 			if (building == UNIT_DEF_GENERATOR) {
