@@ -119,3 +119,7 @@ void chat_countdown(int countdown) {
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
 }
+
+void chat_clear() {
+	ui_listbox_clear(chat_listbox);
+}

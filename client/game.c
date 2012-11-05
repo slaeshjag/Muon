@@ -114,9 +114,13 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		game_state(GAME_STATE_GAME_MENU);
 	if(e->buttons->x&&!prevbuttons.x)
 		chat_toggle(&panelist_game_sidebar);
-	if(e->buttons->b&&!prevbuttons.b&&map_selected_building()) {
-		client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_NONE, map_selected_index(), NULL);
-		map_select_nothing();
+	if(e->buttons->b&&!prevbuttons.b) {
+		if(building_place>-1) {
+			building_place=-1;
+		} else if(map_selected_building()) {
+			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_NONE, map_selected_index(), NULL);
+			map_select_nothing();
+		}
 	}
 	
 	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));

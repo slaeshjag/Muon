@@ -40,6 +40,19 @@ void ui_listbox_add(UI_WIDGET *widget, char *text) {
 	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
 
+void ui_listbox_clear(UI_WIDGET *widget) {
+	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
+	struct UI_LISTBOX_LIST *l, *next;
+	for(l=p->list; l; l=next) {
+		next=l->next;
+		free(l);
+	}
+	p->list=NULL;
+	p->offset=NULL;
+	p->size=0;
+	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
+}
+
 void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	int text_h=darnitFontGetGlyphH(p->font)+2;

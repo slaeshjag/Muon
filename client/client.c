@@ -218,6 +218,7 @@ int client_init(char *host, int port) {
 	msg_recv_payload_offset=msg_recv_payload;
 	msg_recv_offset=&msg_recv;
 	client_message_handler=client_identify;
+	chat_clear();
 	return 0;
 }
 
