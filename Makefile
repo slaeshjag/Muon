@@ -10,6 +10,6 @@ all:
 	
 clean:
 	@echo " [ CD ] server/"
-	@make -C server/ clean
+	+@make -C server/ clean
 	@echo " [ CD ] client/"
-	@make -C client/ clean
+	+@make -C client/ clean

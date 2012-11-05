@@ -31,7 +31,7 @@ clean:
 	@$(RM) $(BIN)
 	@echo ""
 	@echo " [ CD ] client/ui/"
-	@make -C ui/ clean
+	+@make -C ui/ clean
 
 %.o: %.c %.h
 	@echo " [ CC ]	client/$<"
