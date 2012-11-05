@@ -178,6 +178,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_MAP_END:
 			darnitFileClose(f);
+			f=NULL;
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
 			map_init("maps/map.ldmz");
