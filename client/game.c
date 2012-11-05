@@ -14,6 +14,8 @@ void game_view_init() {
 	panelist_game_sidebar.next=NULL;
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon"), 0);
 	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
+	game_sidebar_minimap->render=map_minimap_render;
+	game_sidebar_minimap->event_handler->add(game_sidebar_minimap, game_sidebar_minimap_click, UI_EVENT_TYPE_MOUSE_DOWN);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Buildings:"), 0);
 	game_sidebar_label_build[0]=ui_widget_create_label(font_std, "Scout");
@@ -35,6 +37,15 @@ void game_view_init() {
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Health"), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
+}
+
+void game_sidebar_minimap_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type!=UI_EVENT_TYPE_MOUSE_DOWN)
+		return;
+	int x=e->mouse->x-widget->x;
+	int y=e->mouse->y-widget->y;
+	darnitMapCameraMove(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
+	map_minimap_update_viewport();
 }
 
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -93,7 +104,10 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			scroll_x*=2;
 			scroll_y*=2;
 		}
-		darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+		if(scroll_x||scroll_y) {
+			darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+			map_minimap_update_viewport();
+		}
 	}
 	//Interaction keys
 	if(e->buttons->start&&!prevbuttons.start)
@@ -120,8 +134,12 @@ void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		scroll_y=-SCROLL_SPEED;
 	else if(e->mouse->y>platform.screen_h-SCROLL_OFFSET&&map->cam_y<map_h-screen_h/2)
 		scroll_y=SCROLL_SPEED;
+		
+	if(!scroll_x&&!scroll_y)
+		return;
 	
 	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+	map_minimap_update_viewport();
 }
 
 void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -155,6 +173,7 @@ void game_update_building_status() {
 
 void game_view_scroll_to(int x, int y) {
 	darnitMapCameraMove(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, x*map->layer[map->layers-2].tile_h-platform.screen_h/2);
+	map_minimap_update_viewport();
 }
 
 void game_set_building_progress(int building, int progress) {

@@ -8,6 +8,16 @@ UI_WIDGET *ui_widget_create_imageview() {
 		free(widget);
 		return NULL;
 	}
+	if((widget->event_handler=malloc(sizeof(UI_EVENT_HANDLER)))==NULL) {
+		free(widget->properties);
+		free(widget);
+		return NULL;
+	}
+	widget->event_handler->handlers=NULL;
+	widget->event_handler->add=ui_event_add;
+	widget->event_handler->remove=ui_event_remove;
+	widget->event_handler->send=ui_event_send;
+	
 	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
 	p->tile=NULL;
 	p->tilesheet=NULL;
@@ -15,7 +25,6 @@ UI_WIDGET *ui_widget_create_imageview() {
 	p->image_w=0;
 	p->image_h=0;
 	
-	widget->event_handler=NULL;
 	widget->set_prop=ui_imageview_set_prop;
 	widget->get_prop=ui_imageview_get_prop;
 	widget->resize=ui_imageview_resize;

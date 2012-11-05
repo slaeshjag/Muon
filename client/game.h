@@ -16,6 +16,7 @@ UI_WIDGET *game_sidebar_progress_health;
 int building_place;
 
 void game_view_init();
+void game_sidebar_minimap_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
