@@ -24,6 +24,7 @@ struct UI_LISTBOX_LIST {
 UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font);
 
 void ui_listbox_add(UI_WIDGET *widget, char *text);
+void ui_listbox_clear(UI_WIDGET *widget);
 void ui_listbox_scroll(UI_WIDGET *widget, int pos);
 
 void ui_listbox_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value);
