@@ -42,6 +42,7 @@ UI_WIDGET *ui_selected_widget;
 #include "progressbar.h"
 #include "listbox.h"
 #include "spacer.h"
+#include "imageview.h"
 
 void ui_init();
 

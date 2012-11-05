@@ -1,6 +1,8 @@
 #ifndef MAP_H
 #define MAP_H
 
+#include "game.h"
+
 DARNIT_LINE *map_border;
 DARNIT_LINE *powergrid;
 int powergrid_lines;
@@ -8,6 +10,20 @@ int powergrid_lines;
 DARNIT_MAP *map;
 int map_w, map_h;
 int home_x, home_y;
+
+unsigned int minimap_data[(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8)];
+
+static const unsigned int minimap_colors[]={
+	0xFF000000,
+	0xFF7F007F,
+	
+	0xFF0000FF,
+	0xFFFF0000,
+	0xFF00FF00,
+	0xFF00FFFF,
+	
+	0xFFFFFF,
+};
 
 struct MAP_SELECTED {
 	DARNIT_LINE *border;
@@ -30,5 +46,6 @@ void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
 void map_draw(int draw_powergrid);
+void map_minimap_update();
 
 #endif
