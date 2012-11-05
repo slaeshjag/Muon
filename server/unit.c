@@ -322,14 +322,14 @@ int unitRemove(int x, int y) {
 	parent = &server->unit;
 	next = *parent;
 
+	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
-		if (!server->player[i].map[x + y * server->h].fog)
+		if (!server->player[i].map[x + y * server->w].fog)
 			continue;
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
 	}
-	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
 
 	while (next != unit) {
 		parent = &next->next;
@@ -398,6 +398,8 @@ int unitValidateWall(int index) {
 
 void unitDestroy(int player, unsigned int index) {
 	if (index > server->w * server->h)
+		return;
+	if (!server->map[index])
 		return;
 	if (server->map[index]->owner != player)
 		return;
