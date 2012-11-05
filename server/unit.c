@@ -87,6 +87,10 @@ void unitPylonPulse() {
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME)
 			continue;
+		if (!server->map[server->player[i].spawn.index])
+			return;
+		if (server->map[server->player[i].spawn.index]->type != UNIT_DEF_GENERATOR)
+			continue;
 		unitPylonPulseClimb(&server->map[server->player[i].spawn.index]->pylon);
 	}
 
@@ -360,7 +364,7 @@ int unitRemove(int x, int y) {
 
 
 int unitWallTest(int index_src, int index_dst, int player) {
-	int p, x1, x2, y1, y2, dx, dy, x, y, y_dir, end, index, team;
+	int p, x1, x2, y1, y2, dx, dy, x, y, y_dir, end, index, team, y_max;
 
 	team = server->player[player].team;
 
@@ -375,9 +379,10 @@ int unitWallTest(int index_src, int index_dst, int player) {
 
 	x = (x1 < x2) ? x1 : x2;
 	y = (x1 < x2) ? y1 : y2;
+	y_max = (y1 < y2) ? y2 : y1;
 	end = (x1 < x2) ? x2 : x1;
 
-	y_dir = (y < y2) ? 1 : -1;
+	y_dir = (y < y_max) ? 1 : -1;
 
 	while (x < end) {
 		x++;
@@ -417,7 +422,7 @@ int unitValidateWall(int index, int player) {
 		for (j = -1*range; j <= range; j++) {
 			if (y + j < 0 || y + j >= server->w)
 				continue;
-			if ((x + i)*(x + i) + (y + j)*(y + j) > range*range)
+			if (i*i + j*j > range*range)
 				continue;
 
 			index_dst = (x + i) + (y + j) * server->w;
@@ -429,6 +434,7 @@ int unitValidateWall(int index, int player) {
 				continue;
 			if (server->map[index_dst]->owner != player && team == -1)
 				continue;
+			fprintf(stderr, "Testing wall\n");
 			if (unitWallTest(index, index_dst, player) == 0)
 				return 0;
 		}

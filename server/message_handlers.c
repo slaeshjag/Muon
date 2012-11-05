@@ -122,10 +122,10 @@ void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
 		return;
 	if (playerBuildQueueUnitReady(player, message->arg[0]) < 0)	/* Pff. lol. */
 		return;
-	if (unitValidateWall(message->arg[0], player) < 0)		/* D: */
+	if (unitValidateWall(message->arg[1], player) < 0)		/* D: */
 		return;
 	
-	/* Congratulations great commander, you have passed the five trials! */
+	/* Congratulations great commander, you have passed the six trials! */
 	/* Now, your building is being placed and you can enjoy the havoc it may cause */
 	unitSpawn(player, message->arg[0], message->arg[1] % server->w, message->arg[1] / server->w);
 

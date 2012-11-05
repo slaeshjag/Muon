@@ -27,7 +27,7 @@ all: $(OBJFILES)
 	@echo " [ LD ]	$(BIN)"
 	@$(CC) $(CFLAGS) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " [ AR ] $(LIBOUT)"
-	@$(AR) -cq $(LIBOUT) $(OBJFILES) $(LIBOBJ)
+	@$(AR) -cr $(LIBOUT) $(OBJFILES) $(LIBOBJ)
 	@echo " Done."
 	@echo
 
