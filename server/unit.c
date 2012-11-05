@@ -192,6 +192,8 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 	unit->pylon.next = server->pylons;
 	server->pylons = &unit->pylon;
 
+	unitPylonPulse();
+
 	return;
 }
 
