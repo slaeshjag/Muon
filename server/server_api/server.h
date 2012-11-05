@@ -15,6 +15,7 @@ SERVER *serverStart(const char *map, unsigned int players, int port, int gamespe
 void serverLoop(unsigned int msec);
 void serverStop();
 int serverIsRunning();
+int serverPlayersPlaying();
 
 
 #endif

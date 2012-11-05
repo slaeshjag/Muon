@@ -412,3 +412,14 @@ int serverLoop(unsigned int d_ms) {
 	return 0;
 }
 
+
+int serverPlayersPlaying() {
+	int i, p;
+
+	if (!server)
+		return 0;
+	for (i = p = 0; i < server->players; i++)
+		if (server->player[i].status == PLAYER_IN_GAME)
+			p++;
+	return p;
+}
