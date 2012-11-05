@@ -104,7 +104,7 @@ void chat_join(int player) {
 	free(chatmsg);
 }
 
-void chat_disconnect(int player) {
+void chat_leave(int player) {
 	char *chatmsg=malloc(64);
 	sprintf(chatmsg, " * %s disconnected", &player_names[player*32]);
 	ui_listbox_add(chat_listbox, chatmsg);

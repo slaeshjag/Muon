@@ -15,6 +15,7 @@ unsigned int recalc_map=0;
 
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
+		free(player_names);
 		game_state(GAME_STATE_CONNECT_SERVER);
 		darnitSocketClose(socket);
 	} else
@@ -95,6 +96,9 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
+		case MSG_RECV_LEAVE:
+			chat_leave(msg->player_id);
+			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			recalc_map|=1<<(map->layers-1);
@@ -128,6 +132,9 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
+		case MSG_RECV_LEAVE:
+			chat_leave(msg->player_id);
+			break;
 		case MSG_RECV_GAME_START:
 			chat_countdown(msg->arg_1);
 			if(!msg->arg_1) {
@@ -153,6 +160,9 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 				break;
 			memcpy(&player_names[msg->player_id*32], payload, msg->arg_2);
 			chat_join(msg->player_id);
+			break;
+		case MSG_RECV_LEAVE:
+			chat_leave(msg->player_id);
 			break;
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
@@ -201,7 +211,7 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 }
 
 int client_init(char *host, int port) {
-	map=NULL;
+	player_names=NULL;
 	if((sock=darnitSocketConnect(host, port, client_connect_callback, NULL))==NULL)
 		return -1;
 	msg_recv.command=0;

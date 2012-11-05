@@ -8,6 +8,7 @@
 #include "chat.h"
 #include "menu.h"
 #include "lobby.h"
+#include "map.h"
 
 void view_init() {
 	//TODO: lots of breaking out to separate functions, game menu and lobby for example
@@ -25,6 +26,8 @@ void view_init() {
 	gamestate_pane[4]=&panelist_game_sidebar;
 	gamestate_pane[5]=&panelist_game_menu;
 	gamestate_pane[6]=NULL;
+	
+	map=NULL;
 }
 
 void view_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

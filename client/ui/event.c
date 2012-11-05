@@ -8,6 +8,8 @@
 
 #define SETMOD(m) e_k.modifiers=(key_action==DARNIT_KEYACTION_PRESS)?e_k.modifiers|UI_EVENT_KEYBOARD_MOD_##m :e_k.modifiers&~UI_EVENT_KEYBOARD_MOD_##m
 
+int ui_event_global_removed=0;
+
 void ui_events(struct UI_PANE_LIST *panes, int render) {
 	UI_EVENT e;
 	UI_EVENT_MOUSE e_m;
@@ -163,14 +165,19 @@ void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT 
 			h_next=(*h)->next;
 			free(*h);
 			*h=h_next;
+			ui_event_global_removed=1;
 			break;
 		}
 	}
 }
 
 void ui_event_global_send(unsigned int type, UI_EVENT *e) {
-	struct UI_EVENT_HANDLER_LIST *h;
-	for(h=ui_event_global_handlers; h; h=h->next)
-		if((type&h->mask)==type)
-			h->handler(NULL, type&h->mask, e);
+	ui_event_global_removed=0;
+	struct UI_EVENT_HANDLER_LIST **h;
+	for(h=&ui_event_global_handlers; *h; h=&((*h)->next))
+		if((type&(*h)->mask)==type) {
+			(*h)->handler(NULL, type&(*h)->mask, e);
+			if(ui_event_global_removed)
+				break;
+		}
 }

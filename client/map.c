@@ -19,7 +19,7 @@ void map_init(char *filename) {
 	map=darnitMapLoad(filename);
 	map_w=map->layer->tilemap->w*map->layer->tile_w;
 	map_h=map->layer->tilemap->h*map->layer->tile_h;
-	darnitRenderLineFree(map_border);
+	map_border=darnitRenderLineFree(map_border);
 	map_border=darnitRenderLineAlloc(4, 1);
 	darnitRenderLineMove(map_border, 0, 0, 0, map_w, 0);
 	darnitRenderLineMove(map_border, 1, 0, 0, 0, map_h);
@@ -39,9 +39,11 @@ void map_init(char *filename) {
 void map_close(DARNIT_MAP *map) {
 	if(!map)
 		return;
-	darnitRenderLineFree(map_border);
-	darnitRenderLineFree(map_selected.border);
-	darnitMapUnload(map);
+	printf("lol\n");
+	map_border=darnitRenderLineFree(map_border);
+	map_selected.border=darnitRenderLineFree(map_selected.border);
+	powergrid=darnitRenderLineFree(powergrid);
+	map=darnitMapUnload(map);
 }
 
 void map_calculate_powergrid() {
