@@ -177,6 +177,14 @@ void map_draw(int draw_powergrid) {
 	darnitRenderOffset(0, 0);
 }
 
+void map_minimap_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type!=UI_EVENT_TYPE_MOUSE_DOWN)
+		return;
+	int x=e->mouse->x-widget->x;
+	int y=e->mouse->y-widget->y;
+	darnitMapCameraMove(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
+}
+
 void map_minimap_update() {
 	//This is really slow and retarded, but it works
 	int x, y;

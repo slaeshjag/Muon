@@ -46,6 +46,7 @@ void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
 void map_draw(int draw_powergrid);
+void map_minimap_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void map_minimap_update();
 
 #endif

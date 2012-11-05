@@ -14,6 +14,7 @@ void game_view_init() {
 	panelist_game_sidebar.next=NULL;
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon"), 0);
 	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
+	game_sidebar_minimap->event_handler->add(game_sidebar_minimap, map_minimap_click, UI_EVENT_TYPE_MOUSE_DOWN);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Buildings:"), 0);
 	game_sidebar_label_build[0]=ui_widget_create_label(font_std, "Scout");
