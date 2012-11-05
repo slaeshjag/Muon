@@ -121,6 +121,7 @@ int unitLOS(int unit);
 int unitMaxHP(int unit);
 int unitShieldMax(int type);
 int unitRange(int type);
+int unitValidateWall(int index, int player);
 void unitAnnounce(int from, int to, int building, int index);
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y);
 int unitAdd(int owner, int type, int x, int y);

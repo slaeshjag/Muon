@@ -359,20 +359,56 @@ int unitRemove(int x, int y) {
 }
 
 
-int unitWallTest(int index_src, int index_dst) {
-	int i, j, x1, x2, y1, y2;
+int unitWallTest(int index_src, int index_dst, int player) {
+	int p, x1, x2, y1, y2, dx, dy, x, y, y_dir, end, index, team;
 
-	/* I'll leave this as a stub for now... */
+	team = server->player[player].team;
+
+	x1 = index_src % server->w;
+	x2 = index_dst % server->w;
+	y1 = index_src / server->w;
+	y2 = index_dst / server->w;
+	
+	dx = abs(x1 - x2);
+	dy = abs(y1 - y2);
+	p = 2 * dy - dx;
+
+	x = (x1 < x2) ? x1 : x2;
+	y = (x1 < x2) ? y1 : y2;
+	end = (x1 < x2) ? x2 : x1;
+
+	y_dir = (y < y2) ? 1 : -1;
+
+	while (x < end) {
+		x++;
+		if (p < 0)
+			p += 2 * dy;
+		else {
+			y += y_dir;
+			p += 2 * (dy - dx);
+		}
+
+		index = x + y * server->w;
+		if (server->map[index])
+			if (server->map[index]->type == UNIT_DEF_WALL) {
+				if (team > -1 && server->player[player].team != team)
+					return -1;
+				if (team == -1 && server->map[index]->owner != player)
+					return -1;
+				continue;
+			}
+	}
 
 	return 0;
 }
 
 
-int unitValidateWall(int index) {
-	int i, j, range, x, y, index_dst;
+int unitValidateWall(int index, int player) {
+	int i, j, range, team, x, y, index_dst;
 
 	x = index % server->w;
 	y = index / server->w;
+	team = server->player[player].team;
 	range = unitRange(UNIT_DEF_PYLON);
 
 	for (i = -1*range; i <= range; i++) {
@@ -389,7 +425,11 @@ int unitValidateWall(int index) {
 				continue;
 			if (server->map[index_dst]->type != UNIT_DEF_GENERATOR && server->map[index_dst]->type != UNIT_DEF_PYLON)
 				continue;
-			if (unitWallTest(index, index_dst) == 0)
+			if (team > -1 && server->player[server->map[index_dst]->owner].team != team)
+				continue;
+			if (server->map[index_dst]->owner != player && team == -1)
+				continue;
+			if (unitWallTest(index, index_dst, player) == 0)
 				return 0;
 		}
 	}
