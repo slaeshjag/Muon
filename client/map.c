@@ -34,8 +34,6 @@ void map_init(char *filename) {
 	unsigned int i;
 	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
-	
-	minimap=darnitRenderTilesheetNew(1, 1, SIDEBAR_WIDTH, SIDEBAR_WIDTH, DARNIT_PFORMAT_RGBA8);
 }
 
 void map_close(DARNIT_MAP *map) {
@@ -193,5 +191,7 @@ void map_minimap_update() {
 			else if(building_tilemap->data[(y*building_tilemap->w)+x]==5&&(fow_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==0)
 				minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[6];
 	
-	darnitRenderTilesheetUpdate(minimap, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);
+	UI_PROPERTY_VALUE v;
+	v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
+	darnitRenderTilesheetUpdate(v.p, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);
 }

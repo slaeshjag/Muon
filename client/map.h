@@ -11,7 +11,6 @@ DARNIT_MAP *map;
 int map_w, map_h;
 int home_x, home_y;
 
-DARNIT_TILESHEET *minimap;
 unsigned int minimap_data[(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8)];
 
 static const unsigned int minimap_colors[]={
@@ -47,5 +46,6 @@ void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
 void map_draw(int draw_powergrid);
+void map_minimap_update();
 
 #endif

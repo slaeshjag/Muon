@@ -12,7 +12,9 @@ void game_view_init() {
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
 	ui_pane_set_root_widget(panelist_game_sidebar.pane, ui_widget_create_vbox());
 	panelist_game_sidebar.next=NULL;
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Muon"), 0);
+	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, "Buildings:"), 0);
 	game_sidebar_label_build[0]=ui_widget_create_label(font_std, "Scout");
 	game_sidebar_label_build[1]=ui_widget_create_label(font_std, "Attacker");
@@ -176,7 +178,7 @@ void game_view_draw() {
 	else
 		map_draw(0);
 		
-	darnitRenderTileBlit(minimap, 0, 128, 32);
+	//darnitRenderTileBlit(minimap, 0, 128, 32);
 }
 
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
