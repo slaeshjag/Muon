@@ -4,6 +4,13 @@ UI_WIDGET *ui_widget_create_spacer() {
 	UI_WIDGET *widget;
 	if((widget=malloc(sizeof(UI_WIDGET)))==NULL)
 		return NULL;
+	if((widget->properties=malloc(sizeof(struct UI_SPACER_PROPERTIES)))==NULL) {
+		free(widget);
+		return NULL;
+	}
+	struct UI_SPACER_PROPERTIES *p=widget->properties;
+	p->set_w=0;
+	p->set_h=0;
 	
 	widget->event_handler=NULL;
 	widget->set_prop=ui_spacer_set_prop;
@@ -13,6 +20,15 @@ UI_WIDGET *ui_widget_create_spacer() {
 	widget->render=ui_spacer_render;
 	widget->x=widget->y=widget->w=widget->h=0;
 	
+	return widget;
+}
+
+UI_WIDGET *ui_widget_create_spacer_size(int w, int h) {
+	UI_WIDGET *widget;
+	widget=ui_widget_create_spacer();
+	struct UI_SPACER_PROPERTIES *p=widget->properties;
+	p->set_w=w;
+	p->set_h=h;
 	return widget;
 }
 
@@ -26,10 +42,11 @@ void ui_spacer_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 }
 
 void ui_spacer_request_size(UI_WIDGET *widget, int *w, int *h) {
+	struct UI_SPACER_PROPERTIES *p=widget->properties;
 	if(w)
-		*w=0;
+		*w=p->set_w;
 	if(h)
-		*h=0;
+		*h=p->set_h;
 }
 
 void ui_spacer_resize(UI_WIDGET *widget, int x, int y, int w, int h) {

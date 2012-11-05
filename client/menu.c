@@ -69,6 +69,8 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 		return;
 	UI_PROPERTY_VALUE v;
 	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
+	if(!strlen(v.p))
+		return;
 	memset(player_name, 0, 32);
 	strncpy(player_name, v.p, 31);
 	player_name[31]=0;
