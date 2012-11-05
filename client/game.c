@@ -9,6 +9,8 @@
 void game_view_init() {
 	building_place=-1;
 	
+	game_attacklist_blink_semaphore=0;
+	
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
 	ui_pane_set_root_widget(panelist_game_sidebar.pane, ui_widget_create_vbox());
 	panelist_game_sidebar.next=NULL;
@@ -58,7 +60,6 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 		if(widget==game_sidebar_button_build[i]&&wv.p!=game_sidebar_progress_build) {
 			do_build=i; //just make sure to cancel all other buildings first
 		} else if(widget==game_sidebar_button_build[i]&&pv.i==100) {
-			printf("Place building\n");
 			building_place=i;
 		} else {
 			UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
@@ -194,12 +195,102 @@ void game_reset_building_progress() {
 	}
 }
 
+void game_attacklist_lines_recalculate() {
+	struct GAME_ATTACKLIST *l;
+	int i, x1, x2, y1, y2;
+	int map_wt=map->layer[map->layers-2].tilemap->w;
+	//int map_ht=map->layer[map->layers-2].tilemap->h;
+	int tw=map->layer[map->layers-2].tile_w;
+	int th=map->layer[map->layers-2].tile_h;
+	darnitRenderLineFree(game_attacklist_lines);
+	game_attacklist_lines=darnitRenderLineAlloc(game_attacklist_length, 1);
+	
+	for(l=game_attacklist, i=0; l; l=l->next, i++) {
+		x1=l->index%map_wt*tw+tw/2;
+		y1=l->index/map_wt*th+th/2;
+		x2=l->target%map_wt*tw+tw/2;
+		y2=l->target/map_wt*th+th/2;
+		darnitRenderLineMove(game_attacklist_lines, i, x1, y1, x2, y2);
+	}
+}
+
+void game_attacklist_add(int index) {
+	struct GAME_ATTACKLIST **l, *ll;
+	for(l=&(game_attacklist); *l; l=&((*l)->next));
+	if((*l=malloc(sizeof(struct GAME_ATTACKLIST)))==NULL)
+		return;
+	ll=*l;
+	ll->index=index;
+	ll->target=index;
+	ll->next=NULL;
+	game_attacklist_length++;
+	game_attacklist_lines_recalculate();
+}
+
+void game_attacklist_remove(int index) {
+	struct GAME_ATTACKLIST **l, *l_next;
+	for(l=&(game_attacklist); *l; l=&((*l)->next)) {
+		if((*l)->index==index) {
+			l_next=(*l)->next;
+			free(*l);
+			*l=l_next;
+			game_attacklist_length--;
+			game_attacklist_lines_recalculate();
+			break;
+		}
+	}
+}
+
+void game_attacklist_clear() {
+	struct GAME_ATTACKLIST *l, *next;
+	for(l=game_attacklist; l; l=next) {
+		next=l->next;
+		free(l);
+	}
+	game_attacklist=NULL;
+	game_attacklist_length=0;
+	game_attacklist_lines=darnitRenderLineFree(game_attacklist_lines);
+}
+
+void game_attacklist_untarget(int target) {
+	struct GAME_ATTACKLIST *l;
+	int recalc=0;
+	for(l=game_attacklist; l; l=l->next) {
+		if(l->target==target) {
+			l->target=l->index;
+			recalc=1;
+		}
+	}
+	if(recalc)
+		game_attacklist_lines_recalculate();
+}
+
+void game_attacklist_target(int index, int target) {
+	struct GAME_ATTACKLIST *l;
+	for(l=game_attacklist; l; l=l->next) {
+		if(l->index==index) {
+			l->target=target==-1?index:target;
+			game_attacklist_lines_recalculate();
+			break;
+		}
+	}
+}
+
 void game_view_draw() {
 	int selected=map_selected_building();	
 	if((building_place!=-1||selected==BUILDING_PYLON||selected==BUILDING_GENERATOR))
 		map_draw(1);
 	else
 		map_draw(0);
+	
+	if(game_attacklist_blink_semaphore>30) {
+		darnitRenderOffset(map->cam_x, map->cam_y);
+		darnitRenderLineDraw(game_attacklist_lines, game_attacklist_length);
+		darnitRenderOffset(0, 0);
+	}
+	if(game_attacklist_blink_semaphore>60)
+		game_attacklist_blink_semaphore=0;
+	game_attacklist_blink_semaphore++;
 		
 	//darnitRenderTileBlit(minimap, 0, 128, 32);
 }

@@ -19,6 +19,10 @@ void map_init(char *filename) {
 	map_selected.index=-1;
 	map_selected.building=0;
 	
+	game_attacklist=NULL;
+	game_attacklist_lines=NULL;
+	game_attacklist_length=0;
+	
 	map=darnitMapLoad(filename);
 	map_w=map->layer->tilemap->w*map->layer->tile_w;
 	map_h=map->layer->tilemap->h*map->layer->tile_h;
@@ -44,12 +48,13 @@ void map_init(char *filename) {
 void map_close(DARNIT_MAP *map) {
 	if(!map)
 		return;
-	printf("lol\n");
 	map_border=darnitRenderLineFree(map_border);
 	map_selected.border=darnitRenderLineFree(map_selected.border);
 	powergrid=darnitRenderLineFree(powergrid);
 	minimap_viewport=darnitRenderLineFree(minimap_viewport);
 	map=darnitMapUnload(map);
+	
+	game_attacklist_clear();
 }
 
 void map_calculate_powergrid() {
@@ -83,6 +88,12 @@ void map_calculate_powergrid() {
 
 void map_building_place(int index, int player, int building) {
 	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_BUILDSITE)?5:(building!=0)*(player*8+building+7);
+	if(building==BUILDING_ATTACKER||building==BUILDING_SCOUT) {
+		game_attacklist_add(index);
+	} else if(building==BUILDING_NONE) {
+		game_attacklist_remove(index);
+		game_attacklist_untarget(index);
+	}
 }
 
 void map_set_home(int index) {

@@ -99,6 +99,9 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_LEAVE:
 			chat_leave(msg->player_id);
 			break;
+		case MSG_RECV_BUILDING_ATTACK:
+			game_attacklist_target(msg->arg_2, msg->arg_1);
+			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
 			map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			recalc_map|=1<<(map->layers-1);
