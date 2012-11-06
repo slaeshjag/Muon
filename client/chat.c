@@ -3,6 +3,7 @@
 #include "muon.h"
 #include "client.h"
 #include "view.h"
+#include "game.h"
 #include "chat.h"
 
 void chat_init() {
@@ -20,6 +21,12 @@ void chat_init() {
 	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_hbox, 0);
 	chat_button_send->event_handler->add(chat_button_send, chat_button_send_click, UI_EVENT_TYPE_UI);
 	chat_entry->event_handler->add(chat_entry, chat_button_send_click, UI_EVENT_TYPE_KEYBOARD);
+	
+	panelist_chat_indicator.pane=ui_pane_create(0, platform.screen_h-(32+UI_PADDING*2), 32+UI_PADDING*2, 32+UI_PADDING*2, NULL);
+	panelist_chat_indicator.next=NULL;
+	chat_indicator_image=ui_widget_create_imageview_file("../res/chat.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	ui_pane_set_root_widget(panelist_chat_indicator.pane, chat_indicator_image);
+	chat_indicator_image->event_handler->add(chat_indicator_image, chat_indicator_image_click, UI_EVENT_TYPE_MOUSE_PRESS);
 }
 
 int chat_is_visible(struct UI_PANE_LIST *panelist) {
@@ -33,6 +40,7 @@ int chat_is_visible(struct UI_PANE_LIST *panelist) {
 void chat_show(struct UI_PANE_LIST *panelist) {
 	if(!panelist)
 		return;
+	chat_indicator_hide(panelist);
 	struct UI_PANE_LIST *p;
 	for(p=panelist; p->next; p=p->next) {
 		if(p->next==&panelist_chat||p==&panelist_chat) {
@@ -50,8 +58,8 @@ void chat_hide(struct UI_PANE_LIST *panelist) {
 	struct UI_PANE_LIST *p;
 	for(p=panelist; p->next; p=p->next) {
 		if(p->next==&panelist_chat) {
-			//p->next=panelist_chat.next;
-			p->next=NULL;
+			p->next=panelist_chat.next;
+			//p->next=NULL;
 			ui_selected_widget=NULL;
 			return;
 		}
@@ -67,11 +75,45 @@ void chat_toggle(struct UI_PANE_LIST *panelist) {
 			return;
 		}
 		if(p->next==NULL) {
-			p->next=&panelist_chat;
+			//p->next=&panelist_chat;
+			chat_show(panelist);
 			ui_selected_widget=chat_entry;
 			return;
 		}
 	}
+}
+
+void chat_indicator_show(struct UI_PANE_LIST *panelist) {
+	if(!panelist)
+		return;
+	struct UI_PANE_LIST *p;
+	for(p=panelist; p->next; p=p->next) {
+		if(p->next==&panelist_chat_indicator||p==&panelist_chat_indicator) {
+			return;
+		}
+	}
+	p->next=&panelist_chat_indicator;
+}
+
+void chat_indicator_hide(struct UI_PANE_LIST *panelist) {
+	if(!panelist)
+		return;
+	struct UI_PANE_LIST *p;
+	for(p=panelist; p->next; p=p->next) {
+		if(p->next==&panelist_chat_indicator) {
+			p->next=panelist_chat_indicator.next;
+			//p->next=NULL;
+			return;
+		}
+	}
+}
+
+void chat_indicator_image_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(!e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT)
+		return;
+	
+	chat_indicator_hide(&panelist_game_sidebar);
+	chat_show(&panelist_game_sidebar);
 }
 
 void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -94,6 +136,8 @@ void chat_recv(int player, char *buf, int len) {
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
+	if(gamestate==GAME_STATE_GAME&&!chat_is_visible(&panelist_game_sidebar))
+		chat_indicator_show(&panelist_game_sidebar);
 }
 
 void chat_join(int player) {

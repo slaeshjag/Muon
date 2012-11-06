@@ -10,6 +10,7 @@
 void game_state(GAME_STATE state) {
 	//Game state destructors
 	if(gamestate==GAME_STATE_GAME) {
+		chat_indicator_hide(&panelist_game_sidebar);
 		ui_event_global_remove(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
 		ui_event_global_remove(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
 		ui_event_global_remove(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
