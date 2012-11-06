@@ -74,6 +74,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 		v.i=0;
 		game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
 	}
+	ui_selected_widget=NULL;
 }
 
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) { 

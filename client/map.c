@@ -93,6 +93,8 @@ void map_building_place(int index, int player, int building) {
 	} else if(building==BUILDING_NONE) {
 		game_attacklist_remove(index);
 		game_attacklist_untarget(index);
+		if(index==map_selected_index())
+			map_select_nothing();
 	}
 }
 
