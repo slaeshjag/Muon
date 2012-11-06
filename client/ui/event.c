@@ -79,9 +79,11 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 	//Global mouse events
 	e.mouse=&e_m;	
 	if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
-		ui_event_global_send(UI_EVENT_TYPE_MOUSE_DOWN, &e);
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_PRESS, &e);
 	if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
-		ui_event_global_send(UI_EVENT_TYPE_MOUSE_UP, &e);
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_RELEASE, &e);
+	if(e_m.buttons)
+		ui_event_global_send(UI_EVENT_TYPE_MOUSE_DOWN, &e);
 	ui_event_global_send(UI_EVENT_TYPE_MOUSE_ENTER, &e);
 	
 	//Mouse events for widgets
@@ -98,9 +100,11 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 				if(!PINR(ui_e_m_prev.x, ui_e_m_prev.y, w->x, w->y, w->w, w->h))
 					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_ENTER, &e);
 				if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
-					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_DOWN, &e);
+					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_PRESS, &e);
 				if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
-					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_UP, &e);
+					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_RELEASE, &e);
+				if(e_m.buttons)
+					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_DOWN, &e);
 				
 			} else if(PINR(ui_e_m_prev.x, ui_e_m_prev.y, w->x, w->y, w->w, w->h))
 				w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_LEAVE, &e);

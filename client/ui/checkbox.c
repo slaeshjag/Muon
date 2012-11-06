@@ -52,7 +52,7 @@ void ui_checkbox_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 void ui_checkbox_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	struct UI_CHECKBOX_PROPERTIES *p=widget->properties;
 	switch(type) {
-		case UI_EVENT_TYPE_MOUSE_DOWN:
+		case UI_EVENT_TYPE_MOUSE_PRESS:
 			if(e->mouse->buttons==UI_EVENT_MOUSE_BUTTON_LEFT)
 				ui_selected_widget=widget;
 				p->activated=!p->activated;
@@ -61,7 +61,7 @@ void ui_checkbox_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 				ee.ui=&e_u;
 				widget->event_handler->send(widget, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, &ee);
 			break;
-		/*case UI_EVENT_TYPE_MOUSE_UP:
+		/*case UI_EVENT_TYPE_MOUSE_RELEASE:
 			if(((e->mouse->buttons)&UI_EVENT_MOUSE_BUTTON_LEFT)==UI_EVENT_MOUSE_BUTTON_LEFT)
 				break;
 		case UI_EVENT_TYPE_MOUSE_LEAVE:

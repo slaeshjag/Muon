@@ -69,7 +69,7 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void ui_entry_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	switch(type) {
-		case UI_EVENT_TYPE_MOUSE_DOWN:
+		case UI_EVENT_TYPE_MOUSE_PRESS:
 			if(e->mouse->buttons==UI_EVENT_MOUSE_BUTTON_LEFT)
 				ui_selected_widget=widget;
 			break;
