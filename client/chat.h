@@ -16,6 +16,7 @@ void chat_toggle(struct UI_PANE_LIST *panelist);
 void chat_recv(int player, char *buf, int len);
 void chat_join(int player);
 void chat_leave(int player);
+void chat_defeated(int player);
 void chat_countdown(int countdown);
 void chat_clear();
 

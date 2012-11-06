@@ -112,6 +112,14 @@ void chat_leave(int player) {
 	free(chatmsg);
 }
 
+void chat_defeated(int player) {
+	char *chatmsg=malloc(64);
+	sprintf(chatmsg, " * %s defeated", &player_names[player*32]);
+	ui_listbox_add(chat_listbox, chatmsg);
+	ui_listbox_scroll(chat_listbox, -1);
+	free(chatmsg);
+}
+
 void chat_countdown(int countdown) {
 	char *chatmsg=malloc(32);
 	sprintf(chatmsg, " * Game starts in %i", countdown);

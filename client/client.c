@@ -16,8 +16,9 @@ unsigned int recalc_map=0;
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
 		free(player_names);
+		player_names=NULL;
 		game_state(GAME_STATE_CONNECT_SERVER);
-		darnitSocketClose(socket);
+		sock=darnitSocketClose(socket);
 	} else
 		game_state(GAME_STATE_LOBBY);
 }
@@ -99,6 +100,8 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_LEAVE:
 			chat_leave(msg->player_id);
 			break;
+		case MSG_RECV_PLAYER_DEFEATED:
+			chat_defeated(msg->player_id);
 		case MSG_RECV_BUILDING_ATTACK:
 			game_attacklist_target(msg->arg_2, msg->arg_1);
 			break;
@@ -132,6 +135,11 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
+		case MSG_RECV_NAME_IN_USE:
+		case MSG_RECV_SERVER_FULL:
+		case MSG_RECV_BAD_CLIENT:
+			client_disconnect();
+			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
@@ -155,6 +163,11 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static DARNIT_FILE *f=NULL;
 	switch(msg->command) {
 		PONG;
+		case MSG_RECV_NAME_IN_USE:
+		case MSG_RECV_SERVER_FULL:
+		case MSG_RECV_BAD_CLIENT:
+			client_disconnect();
+			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
