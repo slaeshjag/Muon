@@ -28,7 +28,7 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 	memset(p->text, 0, UI_ENTRY_LENGTH+1);
 	p->offset=p->text;
 	p->cursor_pos=0;
-	p->cursor=0;
+	p->cursor=darnitRenderLineAlloc(1, 1);
 	p->border=darnitRenderLineAlloc(4, 1);
 	
 	widget->set_prop=ui_entry_set_prop;
@@ -43,25 +43,28 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 
 void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
+	int tw;
 	switch(type) {
 		case UI_EVENT_TYPE_KEYBOARD_PRESS:
 			if(e->keyboard->keysym==8&&p->cursor_pos>0) {
 				p->cursor_pos--;
 				p->text[p->cursor_pos]=0;
 				if(p->offset>p->text+1) {
-					for(; darnitFontGetStringWidthPixels(p->font, p->offset)<widget->w; p->offset--);
+					for(; darnitFontGetStringWidthPixels(p->font, p->offset)<widget->w-4; p->offset--);
 					p->offset++;
 				} else if(p->offset==p->text+1)
 					p->offset=p->text;
+				tw=darnitFontGetStringWidthPixels(p->font, p->offset);
 			} else if(p->cursor_pos>=UI_ENTRY_LENGTH-1||!e->keyboard->character) {
 				return;
 			} else {
 				p->text[p->cursor_pos]=e->keyboard->character;
-				for(; darnitFontGetStringWidthPixels(p->font, p->offset)>widget->w; p->offset++);
+				for(; (tw=darnitFontGetStringWidthPixels(p->font, p->offset))>widget->w-4; p->offset++);
 				p->cursor_pos++;
 			}
 			darnitTextSurfaceReset(p->surface);
 			darnitTextSurfaceStringAppend(p->surface, p->offset);
+			darnitRenderLineMove(p->cursor, 0, widget->x+tw+3, widget->y+2, widget->x+tw+3, widget->y+widget->h-2);
 			//darnitTextSurfaceCharAppend(p->surface, &e->keyboard->character);
 			break;
 	}
@@ -78,14 +81,16 @@ void ui_entry_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void ui_entry_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
+	int tw;
 	switch(prop) {
 		case UI_ENTRY_PROP_TEXT:
 			strncpy(p->text, value.p, UI_ENTRY_LENGTH);
 			p->offset=p->text;
-			for(; darnitFontGetStringWidthPixels(p->font, p->offset)>widget->w; p->offset++);
+			for(; (tw=darnitFontGetStringWidthPixels(p->font, p->offset))>widget->w-4; p->offset++);
 			p->cursor_pos=strlen(p->text);
 			darnitTextSurfaceReset(p->surface);
 			darnitTextSurfaceStringAppend(p->surface, p->offset);
+			darnitRenderLineMove(p->cursor, 0, widget->x+tw+3, widget->y+2, widget->x+tw+3, widget->y+widget->h-2);
 			break;
 	}
 }
@@ -110,6 +115,7 @@ UI_PROPERTY_VALUE ui_entry_get_prop(UI_WIDGET *widget, int prop) {
 void ui_entry_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	if(h==0||h==0)
 		return;
+	int tw;
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
@@ -124,6 +130,8 @@ void ui_entry_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	int text_h=darnitFontGetGlyphH(p->font);//darnitTextStringGeometrics(p->font, p->offset, w, &text_w);
 	p->surface=darnitTextSurfaceAlloc(p->font, UI_ENTRY_LENGTH, w, x+2, y+(h/2)-(text_h/2));
 	darnitTextSurfaceStringAppend(p->surface, p->offset);
+	tw=darnitFontGetStringWidthPixels(p->font, p->offset);
+	darnitRenderLineMove(p->cursor, 0, widget->x+tw+3, widget->y+2, widget->x+tw+3, widget->y+widget->h-2);
 }
 
 void ui_entry_request_size(UI_WIDGET *widget, int *w, int *h) {
@@ -139,10 +147,19 @@ void ui_entry_request_size(UI_WIDGET *widget, int *w, int *h) {
 }
 
 void ui_entry_render(UI_WIDGET *widget) {
+	static int blink_semaphore=0;
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
 	darnitRenderLineDraw(p->border, 4);
 	
 	darnitRenderBlendingEnable();
 	darnitTextSurfaceDraw(p->surface);
 	darnitRenderBlendingDisable();
+	
+	if(widget==ui_selected_widget) {
+		if(blink_semaphore>60)
+			blink_semaphore=0;
+		else if(blink_semaphore>30)
+			darnitRenderLineDraw(p->cursor, 1);
+		blink_semaphore++;
+	}
 }
