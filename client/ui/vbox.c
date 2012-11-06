@@ -45,6 +45,8 @@ void ui_vbox_event_notify_children(UI_WIDGET *widget, unsigned int type, UI_EVEN
 					c->widget->event_handler->send(c->widget, UI_EVENT_TYPE_MOUSE_ENTER, e);
 			} else if((type==UI_EVENT_TYPE_MOUSE_LEAVE||type==UI_EVENT_TYPE_UI_EVENT)&&PINR(ui_e_m_prev.x, ui_e_m_prev.y, c->widget->x, c->widget->y, c->widget->w, c->widget->h))
 				c->widget->event_handler->send(c->widget, UI_EVENT_TYPE_MOUSE_LEAVE, e);
+			if(type==UI_EVENT_TYPE_UI_EVENT)
+				c->widget->event_handler->send(c->widget, UI_EVENT_TYPE_UI_EVENT, e);
 		}
 }
 

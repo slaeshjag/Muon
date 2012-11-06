@@ -18,7 +18,7 @@ void menu_init() {
 	input_name_entry->event_handler->add(input_name_entry, input_name_button_click, UI_EVENT_TYPE_KEYBOARD);
 	input_name_button=ui_widget_create_button(ui_widget_create_label(font_std, "OK"));
 	ui_vbox_add_child(panelist_input_name.pane->root_widget, input_name_button, 0);
-	input_name_button->event_handler->add(input_name_button, input_name_button_click, UI_EVENT_TYPE_UI);
+	input_name_button->event_handler->add(input_name_button, input_name_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	//Connect to server
 	UI_PROPERTY_VALUE v={.p=NULL};
@@ -33,7 +33,7 @@ void menu_init() {
 	connect_server_entry_host->event_handler->add(connect_server_entry_host, connect_server_button_click, UI_EVENT_TYPE_KEYBOARD);
 	connect_server_button=ui_widget_create_button(ui_widget_create_label(font_std, "Connect"));
 	ui_vbox_add_child(panelist_connect_server.pane->root_widget, connect_server_button, 0);
-	connect_server_button->event_handler->add(connect_server_button, connect_server_button_click, UI_EVENT_TYPE_UI);
+	connect_server_button->event_handler->add(connect_server_button, connect_server_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	v.p="localhost";
 	connect_server_entry_host->set_prop(connect_server_entry_host, UI_ENTRY_PROP_TEXT, v);
 	v.p="1337";
@@ -67,7 +67,7 @@ void menu_init() {
 
 //Main menu
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE&&(type!=UI_EVENT_TYPE_KEYBOARD&&e->keyboard->keysym!=KEY(RETURN)))
+	if(!(type==UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym==KEY(RETURN))))
 		return;
 	UI_PROPERTY_VALUE v;
 	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
@@ -81,7 +81,7 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 }
 
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE&&(type!=UI_EVENT_TYPE_KEYBOARD&&e->keyboard->keysym!=KEY(RETURN)))
+	if(!(type==UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym==KEY(RETURN))))
 		return;
 	UI_PROPERTY_VALUE v;
 	v=connect_server_entry_host->get_prop(connect_server_entry_host, UI_ENTRY_PROP_TEXT);
