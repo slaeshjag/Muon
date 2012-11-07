@@ -39,7 +39,7 @@ int gameAttemptStart() {
 		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
 
-		server->player[i].status = PLAYER_IN_GAME;
+		server->player[i].status = PLAYER_IN_GAME_NOW;
 	}
 
 	server->game.started = 1;
@@ -61,7 +61,7 @@ void gameSpawn() {
 			owner = (t / 8) - 1;
 			if (owner < 0 || owner >= server->players)
 				continue;
-			if (server->player[owner].status != PLAYER_IN_GAME) 
+			if (server->player[owner].status != PLAYER_IN_GAME_NOW) 
 				continue;
 			if (building >= UNITS_DEFINED)
 				continue;
@@ -79,7 +79,7 @@ void gameStart() {
 	int i;
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status < PLAYER_IN_GAME)
+		if (server->player[i].status < PLAYER_IN_GAME_NOW)
 			continue;
 	}
 

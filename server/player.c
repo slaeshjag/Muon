@@ -148,7 +148,7 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 				for (i = 0; i < server->players; i++) {
 					if (server->player[i].team != team)
 						continue;
-					if (server->player[i].status  != PLAYER_IN_GAME)
+					if (server->player[i].status != PLAYER_IN_GAME_NOW)
 						continue;
 					old = (server->player[i].map[index].power) ? 1 : 0;
 					server->player[i].map[index].power += mode;
@@ -197,7 +197,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				for (i = 0; i < server->players; i++) {
 					if (server->player[i].team != team)
 						continue;
-					if (server->player[i].status != PLAYER_IN_GAME)
+					if (server->player[i].status >= PLAYER_IN_GAME_NOW)
 						continue;
 					oldfog = (server->player[player].map[index].fog > 0);
 					server->player[player].map[index].fog += haz_los * mode;
@@ -274,7 +274,7 @@ int playerBuildQueueLoop(int msec) {
 	int i, j, building, progress;
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
+		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
 		for (j = 0; j < server->build_spots; j++) {
 			if (!server->player[i].queue.queue[j].in_use)
@@ -357,4 +357,43 @@ int playerBuildQueueStop(int player, int building) {
 	}
 
 	return -1;
+}
+
+
+void playerClear(int player) {
+	int i;
+
+	messageBufferPushDirect(player, player, MSG_SEND_MAP_CLEAR, 0, 0, NULL);
+	for (i = 0; i < server->w * server->h; i++) {
+		server->player[player].map[i].fog = 1;
+		if (server->map[i])
+			unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
+	}
+
+	return;
+}
+
+
+void playerDefeatAnnounce(int player) {
+	int i, team;
+
+	team = server->player[player].team;
+	if (server->player[player].team > -1) {
+		for (i = 0; i < server->players; i++) {
+			if (server->player[i].team == team && team > -1) {
+				if (server->player[i].status == PLAYER_IN_GAME_NOW)
+					return;
+			} else if (team > -1)
+				continue;
+		}
+
+		for (i = 0; i < server->players; i++)
+			if (team == server->player[i].team)
+				playerClear(i);
+		return;
+	}
+
+	playerClear(player);
+
+	return;
 }
