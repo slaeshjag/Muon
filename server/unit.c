@@ -453,8 +453,6 @@ void unitDestroy(int player, unsigned int index) {
 		return;
 	if (server->map[index]->owner != player)
 		return;
-	if (server->map[index]->type == UNIT_DEF_GENERATOR)
-		return;
 	unitRemove(index % server->w, index / server->w);
 
 	return;
