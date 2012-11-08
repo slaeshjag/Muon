@@ -129,6 +129,7 @@ int unitRemove(int x, int y);
 void unitDestroy(int player, unsigned int index);
 void unitPylonPulse();
 
+void unitDestroyAll(int player);
 void unitLoop(int msec);
 
 

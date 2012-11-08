@@ -419,7 +419,7 @@ int serverPlayersPlaying() {
 	if (!server)
 		return 0;
 	for (i = p = 0; i < server->players; i++)
-		if (server->player[i].status == PLAYER_IN_GAME)
+		if (server->player[i].status == PLAYER_IN_GAME_NOW)
 			p++;
 	return p;
 }

@@ -1,7 +1,7 @@
 #ifndef __MESSAGE_H__
 #define	__MESSAGE_H__
 
-#define	MESSAGE_BUFFER_INITIAL		2048
+#define	MESSAGE_BUFFER_INITIAL		65536
 #define	MESSAGE_MAX_PAYLOAD		512
 
 #define	MESSAGE_ALWAYS_MAX		1
@@ -52,6 +52,7 @@
 #define	MSG_SEND_MAP_TILE_ATTRIB	0x010
 #define	MSG_SEND_PLAYER_DEFEATED	0x011
 #define	MSG_SEND_NAME_IN_USE		0x012
+#define	MSG_SEND_MAP_CLEAR		0x013
 
 typedef struct {
 	unsigned int		player_ID;

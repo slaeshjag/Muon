@@ -85,7 +85,7 @@ void unitPylonPulse() {
 	UNIT_PYLON *list;
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
+		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
 		if (!server->map[server->player[i].spawn.index])
 			return;
@@ -232,11 +232,11 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 		playerBuildQueueStop(player, unit);
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
+		if (server->player[i].status >= PLAYER_IN_GAME_NOW)
 			continue;
 		if (server->player[i].team == team && team != -1)
 			continue;
-		if (i == player)
+		if (i == player && server->player[i].status == PLAYER_IN_GAME_NOW)
 			continue;
 		if (server->player[i].map[index].fog) {
 			unitAnnounce(player, i, unit, index);
@@ -330,7 +330,7 @@ int unitRemove(int x, int y) {
 
 	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
+		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
 		if (!server->player[i].map[x + y * server->w].fog)
 			continue;
@@ -348,9 +348,11 @@ int unitRemove(int x, int y) {
 			unitPylonDelete(next);
 			unitPylonPulse();
 		} else if (next->type == UNIT_DEF_GENERATOR) {
-			fprintf(stderr, "Generator lost! Player needs to die!\n");
 			playerMessageBroadcast(next->owner, MSG_SEND_PLAYER_DEFEATED, 0, 0, NULL);
-			/* TODO: Handle player loss */
+			unitDestroyAll(next->owner);
+			unitPylonDelete(next);
+			server->player[next->owner].status = PLAYER_SPECTATING;
+			playerDefeatAnnounce(next->owner);
 		}
 		free(next);
 		server->map[x + y * server->h] = NULL;
@@ -467,7 +469,7 @@ void unitAttackSet(int index_src, int index_dst) {
 	fprintf(stderr, "Attacking %i->%i\n", index_src, index_dst);
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
+		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
 		if (!server->player[i].map[index_src].fog && !server->player[i].map[index_dst].fog)
 			continue;
@@ -487,9 +489,9 @@ void unitDamageAnnounce(int index) {
 		hp = 1;
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
+		if (server->player[i].status >= PLAYER_IN_GAME_NOW)
 			continue;
-		if (server->player[i].map[index].fog)
+		if (server->player[i].map[index].fog || server->player[i].status == PLAYER_SPECTATING)
 			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_HP, hp, index, NULL);
 	}
 
@@ -560,9 +562,9 @@ void unitShieldAnnounce(int index) {
 	shield = server->map[index]->shield * 100 / unitShieldMax(server->map[index]->type);
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME)
+		if (server->player[i].status >= PLAYER_IN_GAME_NOW)
 			continue;
-		if (server->player[i].map[index].fog)
+		if (server->player[i].map[index].fog || server->player[i].status == PLAYER_SPECTATING)
 			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
 		
 	}
@@ -611,6 +613,23 @@ void unitLoop(int msec) {
 		}
 
 		next = next->next;
+	}
+
+	return;
+}
+
+
+void unitDestroyAll(int player) {
+	int i;
+
+	for (i = 0; i < (const int) server->w * (const int) server->h; i++) {
+		if (!server->map[i])
+			continue;
+		if (server->map[i]->owner != player)
+			continue;
+		if (server->map[i]->type == UNIT_DEF_GENERATOR)
+			continue;
+		unitRemove(i % server->w, i / server->w);
 	}
 
 	return;
