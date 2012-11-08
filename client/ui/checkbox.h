@@ -12,6 +12,7 @@ struct UI_CHECKBOX_PROPERTIES {
 };
 
 UI_WIDGET *ui_widget_create_checkbox();
+void *ui_widget_destroy_checkbox(UI_WIDGET *widget);
 
 void ui_checkbox_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void ui_checkbox_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

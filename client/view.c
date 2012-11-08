@@ -19,7 +19,7 @@ void view_init() {
 	lobby_init();
 	game_view_init();
 	
-	gamestate_pane[0]=&panelist_input_name;
+	gamestate_pane[0]=&panelist_menu_sidebar;
 	gamestate_pane[1]=&panelist_connect_server;
 	gamestate_pane[2]=&panelist_connecting;
 	gamestate_pane[3]=&panelist_lobby;

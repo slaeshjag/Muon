@@ -18,6 +18,7 @@ struct UI_IMAGEVIEW_PROPERTIES {
 UI_WIDGET *ui_widget_create_imageview();
 UI_WIDGET *ui_widget_create_imageview_raw(int w, int h, int pixel_format);
 UI_WIDGET *ui_widget_create_imageview_file(const char *filename, int w, int h, int pixel_format);
+void *ui_widget_destroy_imageview(UI_WIDGET *widget);
 
 UI_PROPERTY_VALUE ui_imageview_get_prop(UI_WIDGET *widget, int prop);
 void ui_imageview_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value);

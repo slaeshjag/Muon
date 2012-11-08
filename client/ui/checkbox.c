@@ -25,6 +25,7 @@ UI_WIDGET *ui_widget_create_checkbox() {
 	p->activated=0;
 	p->border=darnitRenderLineAlloc(4, 1);
 	p->active_border=darnitRenderLineAlloc(2, 1);
+	widget->destroy=ui_widget_destroy_checkbox;
 	widget->set_prop=ui_checkbox_set_prop;
 	widget->get_prop=ui_checkbox_get_prop;
 	widget->resize=ui_checkbox_resize;
@@ -34,6 +35,13 @@ UI_WIDGET *ui_widget_create_checkbox() {
 	widget->x=widget->y=widget->w=widget->h=0;
 
 	return widget;
+}
+
+void *ui_widget_destroy_checkbox(UI_WIDGET *widget) {
+	struct UI_CHECKBOX_PROPERTIES *p=widget->properties;
+	darnitRenderLineFree(p->border);
+	darnitRenderLineFree(p->active_border);
+	return ui_widget_destroy(widget);
 }
 
 void ui_checkbox_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

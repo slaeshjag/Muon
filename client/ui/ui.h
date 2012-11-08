@@ -13,7 +13,7 @@ typedef union {
 } UI_PROPERTY_VALUE;
 
 typedef struct UI_WIDGET {
-	void (*destroy)(struct UI_WIDGET *);
+	void *(*destroy)(struct UI_WIDGET *);
 	void (*set_prop)(struct UI_WIDGET *, int, UI_PROPERTY_VALUE);
 	UI_PROPERTY_VALUE (*get_prop)(struct UI_WIDGET *, int);
 	/*void (*event)(struct UI_WIDGET *, int, int);*/
@@ -45,5 +45,6 @@ UI_WIDGET *ui_selected_widget;
 #include "imageview.h"
 
 void ui_init();
+void *ui_widget_destroy(UI_WIDGET *widget);
 
 #endif

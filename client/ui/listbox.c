@@ -17,6 +17,7 @@ UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font) {
 	p->border=darnitRenderLineAlloc(4, 1);
 	p->size=0;
 	widget->event_handler=NULL;
+	widget->destroy=ui_widget_destroy_listbox;
 	widget->set_prop=ui_listbox_set_prop;
 	widget->get_prop=ui_listbox_get_prop;
 	widget->resize=ui_listbox_resize;
@@ -24,6 +25,13 @@ UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font) {
 	widget->render=ui_listbox_render;
 	widget->x=widget->y=widget->w=widget->h=0;
 	return widget;
+}
+
+void *ui_widget_destroy_listbox(UI_WIDGET *widget) {
+	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
+	ui_listbox_clear(widget);
+	darnitRenderLineFree(p->border);
+	return ui_widget_destroy(widget);
 }
 
 void ui_listbox_add(UI_WIDGET *widget, char *text) {

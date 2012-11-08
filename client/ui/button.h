@@ -17,7 +17,8 @@ UI_WIDGET *ui_widget_create_button(UI_WIDGET *child);
 UI_WIDGET *ui_widget_create_button_text(char *);
 UI_WIDGET *ui_widget_create_button_image();
 
-void ui_widget_destroy_button_text(UI_WIDGET *widget);
+void *ui_widget_destroy_button(UI_WIDGET *widget);
+void *ui_widget_destroy_button_recursive(UI_WIDGET *widget);
 
 void ui_button_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void ui_button_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

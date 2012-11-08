@@ -12,6 +12,7 @@ struct UI_HBOX_PROPERTIES {
 };
 
 UI_WIDGET *ui_widget_create_hbox();
+void *ui_widget_hbox_destroy(UI_WIDGET* widget);
 
 void ui_hbox_event_notify_children(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 

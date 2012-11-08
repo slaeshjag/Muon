@@ -13,6 +13,7 @@ UI_WIDGET *ui_widget_create_spacer() {
 	p->set_h=0;
 	
 	widget->event_handler=NULL;
+	widget->destroy=ui_widget_destroy;
 	widget->set_prop=ui_spacer_set_prop;
 	widget->get_prop=ui_spacer_get_prop;
 	widget->resize=ui_spacer_resize;

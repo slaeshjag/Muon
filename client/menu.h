@@ -4,6 +4,11 @@
 void menu_init();
 
 //Main menu
+struct UI_PANE_LIST panelist_menu_sidebar;
+UI_WIDGET *menu_sidebar_button[8];
+UI_WIDGET *menu_sidebar_spacer;
+UI_WIDGET *menu_sidebar_button_quit;
+
 struct UI_PANE_LIST panelist_input_name;
 UI_WIDGET *input_name_entry;
 UI_WIDGET *input_name_button;

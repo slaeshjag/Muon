@@ -23,6 +23,7 @@ UI_WIDGET *ui_widget_create_hbox() {
 	p->size=0;
 	p->children=NULL;
 	
+	widget->destroy=ui_widget_hbox_destroy;
 	widget->set_prop=ui_hbox_set_prop;
 	widget->get_prop=ui_hbox_get_prop;
 	widget->resize=ui_hbox_resize;
@@ -31,6 +32,16 @@ UI_WIDGET *ui_widget_create_hbox() {
 	widget->x=widget->y=widget->w=widget->h=0;
 	
 	return widget;
+}
+
+void *ui_widget_hbox_destroy(UI_WIDGET* widget) {
+	struct UI_VBOX_PROPERTIES *p=widget->properties;
+	struct UI_WIDGET_LIST *c, *next;
+	for(c=p->children; c; c=next) {
+		next=c->next;
+		free(c);
+	}
+	return ui_widget_destroy(widget);
 }
 
 void ui_hbox_event_notify_children(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

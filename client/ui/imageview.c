@@ -25,6 +25,7 @@ UI_WIDGET *ui_widget_create_imageview() {
 	p->image_w=0;
 	p->image_h=0;
 	
+	widget->destroy=ui_widget_destroy_imageview;
 	widget->set_prop=ui_imageview_set_prop;
 	widget->get_prop=ui_imageview_get_prop;
 	widget->resize=ui_imageview_resize;
@@ -33,6 +34,14 @@ UI_WIDGET *ui_widget_create_imageview() {
 	widget->x=widget->y=widget->w=widget->h=0;
 	
 	return widget;
+}
+
+void *ui_widget_destroy_imageview(UI_WIDGET *widget) {
+	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
+	darnitRenderTileFree(p->tile);
+	darnitRenderTilesheetFree(p->tilesheet);
+	darnitRenderLineFree(p->border);
+	return ui_widget_destroy(widget);
 }
 
 UI_WIDGET *ui_widget_create_imageview_raw(int w, int h, int pixel_format) {

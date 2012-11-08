@@ -14,12 +14,11 @@ UI_PANE *ui_pane_create(int x, int y, int w, int h, UI_WIDGET *root_widget) {
 	return pane;
 }
 
-void ui_pane_destroy(UI_PANE *pane) {
-	darnitRenderRectFree(pane->background);
+void *ui_pane_destroy(UI_PANE *pane) {
 	darnitRenderLineFree(pane->border);
-	//if(pane->root_widget!=NULL)
-		//free(pane->root_widget);
+	darnitRenderRectFree(pane->background);
 	free(pane);
+	return NULL;
 }
 
 void ui_pane_resize(UI_PANE *pane, int x, int y, int w, int h) {

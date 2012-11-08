@@ -22,6 +22,7 @@ struct UI_ENTRY_PROPERTIES {
 };
 
 UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font);
+void *ui_widget_destroy_entry(UI_WIDGET *widget);
 
 void ui_entry_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

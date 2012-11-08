@@ -3,10 +3,36 @@
 #include "muon.h"
 #include "client.h"
 #include "chat.h"
+#include "game.h"
 #include "menu.h"
+
+char *menu_sidebar_button_text_main[8]={
+	"Single player",
+	"Multi player",
+	"Settings",
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+};
 
 void menu_init() {
 	int i;
+	
+	//Main menu
+	panelist_menu_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
+	panelist_menu_sidebar.next=NULL;
+	ui_pane_set_root_widget(panelist_menu_sidebar.pane, ui_widget_create_vbox());
+	for(i=0; i<8; i++) {
+		if(!menu_sidebar_button_text_main[i])
+			continue;
+		menu_sidebar_button[i]=ui_widget_create_button(ui_widget_create_label(font_std, menu_sidebar_button_text_main[i]));
+		ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button[i], 0);
+	}
+	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
+	menu_sidebar_button_quit=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
+	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button_quit, 0);
 	
 	//Input player name
 	panelist_input_name.pane=ui_pane_create(16, 16, 256, 96, NULL);
@@ -76,7 +102,7 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 	memset(player_name, 0, 32);
 	strncpy(player_name, v.p, 31);
 	player_name[31]=0;
-	printf("Player name: %s\n", player_name);
+	//printf("Player name: %s\n", player_name);
 	game_state(GAME_STATE_CONNECT_SERVER);
 }
 
@@ -88,7 +114,7 @@ void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT 
 	char *host=v.p;
 	v=connect_server_entry_port->get_prop(connect_server_entry_port, UI_ENTRY_PROP_TEXT);
 	int port=atoi(v.p);
-	printf("Server: %s:%i\n", host, port);
+	//printf("Server: %s:%i\n", host, port);
 	if(client_init(host, port)==0)
 		game_state(GAME_STATE_CONNECTING);
 }
@@ -97,6 +123,10 @@ void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
 	client_disconnect();
+}
+
+void menu_render() {
+	
 }
 
 //In-game menu

@@ -26,6 +26,7 @@ UI_WIDGET *ui_widget_create_button(UI_WIDGET *child) {
 	p->activated=0;
 	p->border=darnitRenderLineAlloc(8, 1);
 	p->active_border=darnitRenderLineAlloc(4, 1);
+	widget->destroy=ui_widget_destroy_button;
 	widget->set_prop=ui_button_set_prop;
 	widget->get_prop=ui_button_get_prop;
 	widget->resize=ui_button_resize;
@@ -41,7 +42,7 @@ UI_WIDGET *ui_widget_create_button_text(char *text) {
 	UI_WIDGET *widget, *label;
 	label=ui_widget_create_label(font_std, text);
 	widget=ui_widget_create_button(label);
-	widget->destroy=ui_widget_destroy_button_text;
+	widget->destroy=ui_widget_destroy_button_recursive;
 	return widget;
 }
 
@@ -49,8 +50,17 @@ UI_WIDGET *ui_widget_create_button_image() {
 	return NULL;
 }
 
-void ui_widget_destroy_button_text(UI_WIDGET *widget) {
-	return;
+void *ui_widget_destroy_button(UI_WIDGET *widget) {
+	struct UI_BUTTON_PROPERTIES *p=widget->properties;
+	darnitRenderLineFree(p->border);
+	darnitRenderLineFree(p->active_border);
+	return ui_widget_destroy(widget);
+}
+
+void *ui_widget_destroy_button_recursive(UI_WIDGET *widget) {
+	struct UI_BUTTON_PROPERTIES *p=widget->properties;
+	p->child->destroy(p->child);
+	return ui_widget_destroy_button(widget);
 }
 
 void ui_button_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -96,6 +106,10 @@ void ui_button_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 			old_child=p->child;
 			p->child=value.p;
 			p->child->resize(p->child, old_child->x, old_child->y, old_child->w, old_child->h);
+			if(widget->destroy==ui_widget_destroy_button_recursive) {
+				old_child->destroy(old_child);
+				widget->destroy=ui_widget_destroy_button;
+			}
 			break;
 		case UI_BUTTON_PROP_ACTIVATED:
 			p->activated=value.i;

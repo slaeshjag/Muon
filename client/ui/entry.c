@@ -31,6 +31,7 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 	p->cursor=darnitRenderLineAlloc(1, 1);
 	p->border=darnitRenderLineAlloc(4, 1);
 	
+	widget->destroy=ui_widget_destroy_entry;
 	widget->set_prop=ui_entry_set_prop;
 	widget->get_prop=ui_entry_get_prop;
 	widget->resize=ui_entry_resize;
@@ -39,6 +40,14 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 	widget->x=widget->y=widget->w=widget->h=0;
 
 	return widget;
+}
+
+void *ui_widget_destroy_entry(UI_WIDGET *widget) {
+	struct UI_ENTRY_PROPERTIES *p=widget->properties;
+	darnitRenderLineFree(p->cursor);
+	darnitRenderLineFree(p->border);
+	darnitTextSurfaceFree(p->surface);
+	return ui_widget_destroy(widget);
 }
 
 void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

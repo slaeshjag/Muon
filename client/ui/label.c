@@ -12,6 +12,7 @@ UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, char *text) {
 	p->surface=NULL;
 	p->font=font;
 	widget->event_handler=NULL;
+	widget->destroy=ui_widget_destroy_label;
 	widget->set_prop=ui_label_set_prop;
 	widget->get_prop=ui_label_get_prop;
 	widget->resize=ui_label_resize;
@@ -22,6 +23,12 @@ UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, char *text) {
 	UI_PROPERTY_VALUE v={.p=text};
 	widget->set_prop(widget, UI_LABEL_PROP_TEXT, v);
 	return widget;
+}
+
+void *ui_widget_destroy_label(UI_WIDGET *widget) {
+	struct UI_LABEL_PROPERTIES *p=widget->properties;
+	darnitTextSurfaceFree(p->surface);
+	return ui_widget_destroy(widget);
 }
 
 void ui_label_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {

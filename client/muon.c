@@ -7,6 +7,16 @@
 #include "game.h"
 #include "menu.h"
 
+void (*state_render[])()={
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		game_view_draw,
+		game_view_draw,
+		NULL,
+};
+
 void game_state(GAME_STATE state) {
 	//Game state destructors
 	if(gamestate==GAME_STATE_GAME) {
@@ -66,17 +76,17 @@ int main() {
 	
 	game_state(GAME_STATE_INPUT_NAME);
 	
-	while(1) {
+	while(gamestate!=GAME_STATE_QUIT) {
 		serverLoop(darnitTimeLastFrameTook());
 		
-		if(gamestate==GAME_STATE_QUIT)
-			return 0;
 		if(gamestate>=GAME_STATE_LOBBY)
 			client_check_incomming();
 		
 		darnitRenderBegin();
-		if(gamestate>=GAME_STATE_GAME)
-			game_view_draw();
+		/*if(gamestate>=GAME_STATE_GAME)
+			game_view_draw();*/
+		if(state_render[gamestate])
+			state_render[gamestate]();
 			
 		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 		if(gamestate==GAME_STATE_GAME_MENU)

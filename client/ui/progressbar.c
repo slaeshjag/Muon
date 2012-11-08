@@ -21,6 +21,7 @@ UI_WIDGET *ui_widget_create_progressbar(DARNIT_FONT *font) {
 	p->progress=0;
 	strcpy(p->text, "0%");
 	
+	widget->destroy=ui_widget_destroy_progressbar;
 	widget->set_prop=ui_progressbar_set_prop;
 	widget->get_prop=ui_progressbar_get_prop;
 	widget->resize=ui_progressbar_resize;
@@ -29,6 +30,14 @@ UI_WIDGET *ui_widget_create_progressbar(DARNIT_FONT *font) {
 	widget->x=widget->y=widget->w=widget->h=0;
 
 	return widget;
+}
+
+void *ui_widget_destroy_progressbar(UI_WIDGET *widget) {
+	struct UI_PROGRESSBAR_PROPERTIES *p=widget->properties;
+	darnitRenderRectFree(p->bar);
+	darnitRenderLineFree(p->border);
+	darnitTextSurfaceFree(p->surface);
+	return ui_widget_destroy(widget);
 }
 
 void ui_progressbar_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {

@@ -18,6 +18,7 @@ struct UI_PROGRESSBAR_PROPERTIES {
 };
 
 UI_WIDGET *ui_widget_create_progressbar(DARNIT_FONT *font);
+void *ui_widget_destroy_progressbar(UI_WIDGET *widget);
 
 void ui_progressbar_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value);
 UI_PROPERTY_VALUE ui_progressbar_get_prop(UI_WIDGET *widget, int prop);

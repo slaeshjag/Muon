@@ -22,6 +22,7 @@ struct UI_LISTBOX_LIST {
 };
 
 UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font);
+void *ui_widget_destroy_listbox(UI_WIDGET *widget);
 
 void ui_listbox_add(UI_WIDGET *widget, char *text);
 void ui_listbox_clear(UI_WIDGET *widget);
