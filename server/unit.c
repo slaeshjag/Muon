@@ -525,11 +525,12 @@ int unitAttackValidate(int index_src, int owner, int index_dst) {
 
 
 void unitAttackerScan(int x, int y) {
-	int team, i, j, index, range, owner;
+	int team, i, j, index, range, owner, target_x, target_y;
 	
 	range = unitRange(UNIT_DEF_ATTACKER);
 	team = server->player[server->map[x + y * server->w]->owner].team;
 	owner = server->map[x + y * server->w]->owner;
+	target_x = target_y = 0x7FFFFFFF;
 
 	for (i = -1 * range; i <= range; i++) {
 		if ((i + x) < 0 || (i + x) >= server->w)
@@ -546,11 +547,15 @@ void unitAttackerScan(int x, int y) {
 				continue;
 			if (team > -1 && server->player[server->map[index]->owner].team == team)
 				continue;
-			fprintf(stderr, "Attacking building, %i\n", index);
-			unitAttackSet(x + y * server->w, index);
-			return;
+			if (target_x * target_x + target_y * target_y > i * i + j * j) {
+				target_x = x + i;
+				target_y = y + j;
+			}
 		}
 	}
+
+	if (target_x != 0x7FFFFFFF)
+		unitAttackSet(x + y * server->w, index);
 
 	return;
 }
