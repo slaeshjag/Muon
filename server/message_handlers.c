@@ -55,6 +55,11 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerChat(unsigned int player, MESSAGE *message) {
+	if (server->player[player].status == PLAYER_SPECTATING) {
+		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		return;
+	}
+
 	fprintf(stdout, "Debug: CHAT: <%s> ", server->player[player].name);
 	fwrite(message->extra, message->arg[1], 1, stdout);
 	fprintf(stdout, "\n");
