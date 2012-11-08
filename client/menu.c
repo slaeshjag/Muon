@@ -128,6 +128,7 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 	memset(config.player_name, 0, 32);
 	strncpy(config.player_name, v.p, 31);
 	config.player_name[31]=0;
+	platform_config_write();
 	//printf("Player name: %s\n", player_name);
 	panelist_menu_sidebar.next=NULL;
 }

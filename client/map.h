@@ -46,6 +46,7 @@ void map_select_building(int index);
 void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
+void map_clear_fow();
 void map_draw(int draw_powergrid);
 void map_minimap_update_viewport();
 void map_minimap_render(UI_WIDGET *widget);

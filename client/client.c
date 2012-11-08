@@ -102,6 +102,10 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_PLAYER_DEFEATED:
 			chat_defeated(msg->player_id);
+			break;
+		case MSG_RECV_CLEAR_MAP:
+			map_clear_fow();
+			break;
 		case MSG_RECV_BUILDING_ATTACK:
 			game_attacklist_target(msg->arg_2, msg->arg_1);
 			break;
@@ -117,6 +121,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 					map_set_home(msg->arg_2);
 					game_view_scroll_to(home_x, home_y);
 				}
+				printf("cancel build queue!\n");
 				game_reset_building_progress();
 			}
 			break;
