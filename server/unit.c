@@ -552,11 +552,12 @@ void unitAttackerScan(int x, int y) {
 		}
 	}
 
-	target_x += x;
-	target_y += y;
 
-	if (target_x != 0x7FFFFFFF)
+	if (target_x != 0x7FFFFFFF) {
+		target_x += x;
+		target_y += y;
 		unitAttackSet(x + y * server->w, target_x + target_y * server->w);
+	}
 
 	return;
 }
