@@ -21,6 +21,8 @@ UI_WIDGET *connect_server_button;
 struct UI_PANE_LIST panelist_connecting;
 UI_WIDGET *connecting_button_cancel;
 
+void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

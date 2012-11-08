@@ -19,6 +19,7 @@ char *menu_sidebar_button_text_main[8]={
 
 void menu_init() {
 	int i;
+	UI_PROPERTY_VALUE v={.p=NULL};
 	
 	//Main menu
 	panelist_menu_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
@@ -28,10 +29,12 @@ void menu_init() {
 		if(!menu_sidebar_button_text_main[i])
 			continue;
 		menu_sidebar_button[i]=ui_widget_create_button(ui_widget_create_label(font_std, menu_sidebar_button_text_main[i]));
+		menu_sidebar_button[i]->event_handler->add(menu_sidebar_button[i], menu_sidebar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 		ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button[i], 0);
 	}
 	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
 	menu_sidebar_button_quit=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
+	menu_sidebar_button_quit->event_handler->add(menu_sidebar_button_quit, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button_quit, 0);
 	
 	//Input player name
@@ -42,12 +45,14 @@ void menu_init() {
 	input_name_entry=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_input_name.pane->root_widget, input_name_entry, 0);
 	input_name_entry->event_handler->add(input_name_entry, input_name_button_click, UI_EVENT_TYPE_KEYBOARD);
+	v.p=config.player_name;
+	input_name_entry->set_prop(input_name_entry, UI_ENTRY_PROP_TEXT, v);
 	input_name_button=ui_widget_create_button(ui_widget_create_label(font_std, "OK"));
 	ui_vbox_add_child(panelist_input_name.pane->root_widget, input_name_button, 0);
 	input_name_button->event_handler->add(input_name_button, input_name_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	//Connect to server
-	UI_PROPERTY_VALUE v={.p=NULL};
+	v.p=NULL;
 	panelist_connect_server.pane=ui_pane_create(16, 16, 256, 128, NULL);
 	ui_pane_set_root_widget(panelist_connect_server.pane, ui_widget_create_vbox());
 	panelist_connect_server.next=NULL;
@@ -92,6 +97,27 @@ void menu_init() {
 }
 
 //Main menu
+void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
+		return;
+	if(widget==menu_sidebar_button[1]) {
+		panelist_menu_sidebar.next=&panelist_connect_server;
+		ui_selected_widget=connect_server_entry_host;
+	} else if(widget==menu_sidebar_button[2]) {
+		panelist_menu_sidebar.next=&panelist_input_name;
+		ui_selected_widget=input_name_entry;
+	} else {
+		panelist_menu_sidebar.next=NULL;
+		ui_selected_widget=NULL;
+	}
+}
+
+void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
+		return;
+	game_state(GAME_STATE_QUIT);
+}
+
 void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(!(type==UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym==KEY(RETURN))))
 		return;
@@ -99,11 +125,11 @@ void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 	v=input_name_entry->get_prop(input_name_entry, UI_ENTRY_PROP_TEXT);
 	if(!strlen(v.p))
 		return;
-	memset(player_name, 0, 32);
-	strncpy(player_name, v.p, 31);
-	player_name[31]=0;
+	memset(config.player_name, 0, 32);
+	strncpy(config.player_name, v.p, 31);
+	config.player_name[31]=0;
 	//printf("Player name: %s\n", player_name);
-	game_state(GAME_STATE_CONNECT_SERVER);
+	panelist_menu_sidebar.next=NULL;
 }
 
 void connect_server_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -135,7 +161,8 @@ void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		return;
 	if(widget==game_menu_button[0]) {
 		client_disconnect();
-		game_state(GAME_STATE_CONNECT_SERVER);
+		game_state(GAME_STATE_MENU);
+		panelist_menu_sidebar.next=NULL;
 	} else if(widget==game_menu_button[1]) {
 		game_state(GAME_STATE_QUIT);
 	} else if(widget==game_menu_button[2]) {

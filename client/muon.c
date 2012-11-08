@@ -11,7 +11,6 @@ void (*state_render[])()={
 		NULL,
 		NULL,
 		NULL,
-		NULL,
 		game_view_draw,
 		game_view_draw,
 		NULL,
@@ -29,10 +28,10 @@ void game_state(GAME_STATE state) {
 	}
 	//Game state constructors
 	switch(state) {
-		case GAME_STATE_INPUT_NAME:
+		/*case GAME_STATE_INPUT_NAME:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
 			ui_selected_widget=input_name_entry;
-			break;
+			break;*/
 		case GAME_STATE_LOBBY:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
 			chat_show(gamestate_pane[GAME_STATE_LOBBY]);
@@ -49,9 +48,11 @@ void game_state(GAME_STATE state) {
 		case GAME_STATE_CONNECTING:
 			ui_selected_widget=NULL;
 			break;
-		case GAME_STATE_CONNECT_SERVER:
+		/*case GAME_STATE_CONNECT_SERVER:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
-			ui_selected_widget=connect_server_entry_host;
+			ui_selected_widget=connect_server_entry_host;*/
+		case GAME_STATE_MENU:
+			darnitRenderClearColorSet(0x0, 0x0, 0x0);
 		case GAME_STATE_QUIT:
 		case GAME_STATE_GAME_MENU:
 			darnitInputUngrab();
@@ -73,8 +74,7 @@ int main() {
 	chat_init();
 	
 	ui_event_global_add(view_draw_mouse, UI_EVENT_TYPE_UI);
-	
-	game_state(GAME_STATE_INPUT_NAME);
+	game_state(GAME_STATE_MENU);
 	
 	while(gamestate!=GAME_STATE_QUIT) {
 		serverLoop(darnitTimeLastFrameTook());
