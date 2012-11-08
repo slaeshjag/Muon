@@ -545,15 +545,18 @@ void unitAttackerScan(int x, int y) {
 				continue;
 			if (team > -1 && server->player[server->map[index]->owner].team == team)
 				continue;
-			if (target_x * target_x + target_y * target_y > i * i + j * j) {
-				target_x = x + i;
-				target_y = y + j;
+			if (target_x * target_x + target_y * target_y > i * i + j * j || target_x == 0x7FFFFFFF) {
+				target_x = i;
+				target_y = j;
 			}
 		}
 	}
 
+	target_x += x;
+	target_y += y;
+
 	if (target_x != 0x7FFFFFFF)
-		unitAttackSet(x + y * server->w, index);
+		unitAttackSet(x + y * server->w, target_x + target_y * server->w);
 
 	return;
 }
