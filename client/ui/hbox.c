@@ -50,7 +50,7 @@ void ui_hbox_event_notify_children(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	for(c=p->children; c; c=c->next)
 		if(c->widget->event_handler) {
 			if(PINR(e->mouse->x, e->mouse->y, c->widget->x, c->widget->y, c->widget->w, c->widget->h)) {
-				if((type&UI_EVENT_TYPE_MOUSE_BUTTON))
+				if((type&(UI_EVENT_TYPE_MOUSE_BUTTON|UI_EVENT_TYPE_MOUSE_SCROLL)))
 					c->widget->event_handler->send(c->widget, type, e);
 				else if(!PINR(ui_e_m_prev.x, ui_e_m_prev.y, c->widget->x, c->widget->y, c->widget->w, c->widget->h))
 					c->widget->event_handler->send(c->widget, UI_EVENT_TYPE_MOUSE_ENTER, e);

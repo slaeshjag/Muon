@@ -105,6 +105,8 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_RELEASE, &e);
 				if(e_m.buttons)
 					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_DOWN, &e);
+				if(e_m.wheel)
+					w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_SCROLL, &e);
 				
 			} else if(PINR(ui_e_m_prev.x, ui_e_m_prev.y, w->x, w->y, w->w, w->h))
 				w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_LEAVE, &e);
