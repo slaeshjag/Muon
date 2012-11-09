@@ -23,5 +23,7 @@ void gameLoop(int msec);
 int gameKillPlayerUnits(unsigned int player);
 int gameAttemptStart();
 void gameStart();
+int gameDetectIfOver();
+void gameEnd();
 
 #endif

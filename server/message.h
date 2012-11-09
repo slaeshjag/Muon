@@ -4,27 +4,29 @@
 #define	MESSAGE_BUFFER_INITIAL		65536
 #define	MESSAGE_MAX_PAYLOAD		512
 
-#define	MESSAGE_ALWAYS_MAX		1
+#define	MESSAGE_ALWAYS_MAX		3
 
-#define	MESSAGE_LOBBY_MIN		2
-#define	MESSAGE_LOBBY_MAX		4
+#define	MESSAGE_LOBBY_MIN		4
+#define	MESSAGE_LOBBY_MAX		6
 
-#define	MESSAGE_GAME_MIN		5
-#define	MESSAGE_GAME_MAX		7
+#define	MESSAGE_GAME_MIN		7
+#define	MESSAGE_GAME_MAX		9
 
 /* Messages we can always get */
 #define	MSG_RECV_PONG			0
 #define	MSG_RECV_CHAT			1
+#define	MSG_RECV_KICK			2
+#define	MSG_RECV_SET_GAMESPEED		3
 
 /* Messages we can only get in lobby mode */
-#define	MSG_RECV_IDENTIFY		2
-#define	MSG_RECV_MAP_PROGRESS		3
-#define	MSG_RECV_READY			4
+#define	MSG_RECV_IDENTIFY		4
+#define	MSG_RECV_MAP_PROGRESS		5
+#define	MSG_RECV_READY			6
 
 /* Messages we can only get in-game */
-#define	MSG_RECV_START_BUILD		5
-#define	MSG_RECV_PLACE_BUILDING		6
-#define	MSG_RECV_SET_ATTACK		7
+#define	MSG_RECV_START_BUILD		7
+#define	MSG_RECV_PLACE_BUILDING		8
+#define	MSG_RECV_SET_ATTACK		9
 
 /* Messages we can send */
 
@@ -53,6 +55,7 @@
 #define	MSG_SEND_PLAYER_DEFEATED	0x011
 #define	MSG_SEND_NAME_IN_USE		0x012
 #define	MSG_SEND_MAP_CLEAR		0x013
+#define	MSG_SEND_GAME_ENDED		0x014
 
 typedef struct {
 	unsigned int		player_ID;

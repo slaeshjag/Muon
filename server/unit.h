@@ -132,5 +132,7 @@ void unitPylonPulse();
 void unitDestroyAll(int player);
 void unitLoop(int msec);
 
+int unitAttackValidate(int index_src, int owner, int index_dst);
+void unitAttackSet(int index_src, int index_dst);
 
 #endif

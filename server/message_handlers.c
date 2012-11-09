@@ -29,6 +29,8 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 			}
 
 	server->player[player].status = PLAYER_IN_LOBBY;
+	i = (player == server->server_admin) ? 1 : 0;
+	messageBufferPushDirect(player, player, MSG_SEND_PLAYER_INFO, 0, 0, NULL);
 	playerMessageBroadcast(player, MSG_SEND_JOIN, 0, strlen(server->player[player].name), server->player[player].name);
 
 	for (i = 0; i < server->players; i++)
@@ -46,6 +48,8 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 			msg.arg[1] = server->player[i].map_progress;
 			msg.extra = NULL;
 			messageBufferPush(server->player[player].msg_buf, &msg);
+
+			messageBufferPushDirect(player, i, MSG_SEND_PLAYER_INFO, server->player[i].team + 1, 0, NULL);
 		}
 	
 	lobbyMapSend(player);
@@ -71,7 +75,16 @@ void messageHandlerChat(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerPlayerInfo(unsigned int player, MESSAGE *message) {
-	playerMessageBroadcast(player, MSG_SEND_PLAYER_INFO, message->arg[0], 0, NULL);
+	int i;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status < PLAYER_IN_LOBBY)
+			continue;
+		if (server->server_admin == i)
+			messageBufferPushDirect(i, player, MSG_SEND_PLAYER_INFO, message->arg[0], 1, NULL);
+		else
+			messageBufferPushDirect(i, player, MSG_SEND_PLAYER_INFO, message->arg[0], 0, NULL);
+	}
 	
 	server->player[player].team = message->arg[0] - 1;
 
@@ -145,15 +158,39 @@ void messageHandlerDummy(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerKick(unsigned int player, MESSAGE *message) {
+	if (player != server->server_admin)
+		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+	if (message->arg[0] >= server->players)
+		return;
+	messageBufferPushDirect(message->arg[0], player, MSG_SEND_KICKED, 0, 0, NULL);
+	playerDisconnect(message->arg[0]);
+
+	return;
+}
+
+
+void messageHandlerSetAttack(unsigned int player, MESSAGE *message) {
+	if (unitAttackValidate(message->arg[0], message->player_ID, message->arg[1]) < 0)
+		return;
+	unitAttackSet(message->arg[0], message->arg[1]);
+	
+	return;
+}
+
+
 int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
+	server->message_handler.handle[MSG_RECV_KICK] 		= messageHandlerDummy;
+	server->message_handler.handle[MSG_RECV_SET_GAMESPEED]	= messageHandlerDummy;
+
 	server->message_handler.handle[MSG_RECV_IDENTIFY] 	= messageHandlerIdentify;
 	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerPlayerInfo;
 	server->message_handler.handle[MSG_RECV_READY] 		= messageHandlerPlayerReady;
 	server->message_handler.handle[MSG_RECV_START_BUILD]	= messageHandlerStartBuild;
 	server->message_handler.handle[MSG_RECV_PLACE_BUILDING]	= messageHandlerPlaceBuilding;
-	server->message_handler.handle[7] 			= messageHandlerDummy;
+	server->message_handler.handle[MSG_RECV_SET_ATTACK]	= messageHandlerSetAttack;
 
 	return 0;
 }

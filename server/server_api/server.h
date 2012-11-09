@@ -16,6 +16,7 @@ void serverLoop(unsigned int msec);
 void serverStop();
 int serverIsRunning();
 int serverPlayersPlaying();
+void serverAdminSet(int player);
 
 
 #endif

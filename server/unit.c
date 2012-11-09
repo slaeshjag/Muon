@@ -353,6 +353,8 @@ int unitRemove(int x, int y) {
 			unitPylonDelete(next);
 			server->player[next->owner].status = PLAYER_SPECTATING;
 			playerDefeatAnnounce(next->owner);
+			if (gameDetectIfOver() == 0)
+				gameEnd();
 		}
 		free(next);
 		server->map[x + y * server->h] = NULL;
