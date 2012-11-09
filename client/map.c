@@ -175,6 +175,16 @@ int map_selected_index() {
 	return map_selected.index;
 }
 
+void map_clear_fow() {
+	unsigned int *d=map->layer[map->layers-1].tilemap->data;
+	int w=map->layer[map->layers-1].tilemap->w;
+	int h=map->layer[map->layers-1].tilemap->h;
+	int i;
+	for(i=0; i<w*h; i++) {
+		d[i]&=~0xFFF;
+	}
+}
+
 void map_draw(int draw_powergrid) {
 	int i;
 	for(i=0; i<map->layers; i++)

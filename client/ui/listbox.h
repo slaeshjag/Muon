@@ -6,6 +6,9 @@
 #define UI_LISTBOX_PROP_SCROLL_OFFSET 3
 #define UI_LISTBOX_PROP_BORDER 4
 #define UI_LISTBOX_PROP_SIZE 5
+#define UI_LISTBOX_PROP_SCROLL 6
+#define UI_LISTBOX_PROP_SELECTED 7
+#define UI_LISTBOX_PROP_SELECTED_RECT 8
 
 struct UI_LISTBOX_PROPERTIES {
 	DARNIT_FONT *font;
@@ -13,6 +16,9 @@ struct UI_LISTBOX_PROPERTIES {
 	struct UI_LISTBOX_LIST *offset;
 	DARNIT_LINE *border;
 	int size;
+	int scroll;
+	int selected;
+	DARNIT_RECT *selected_rect;
 };
 
 struct UI_LISTBOX_LIST {
@@ -23,6 +29,8 @@ struct UI_LISTBOX_LIST {
 
 UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font);
 void *ui_widget_destroy_listbox(UI_WIDGET *widget);
+
+void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 void ui_listbox_add(UI_WIDGET *widget, char *text);
 void ui_listbox_clear(UI_WIDGET *widget);
