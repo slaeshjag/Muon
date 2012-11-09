@@ -1,0 +1,29 @@
+Muon - a new kind of rts
+
+Muon is a real time strategy game under heavy development and with a rather
+unusual twist - it has no mobile units. You win the game by conquering the
+map using buildings only.
+
+The buildings in the game are:
+
+ * Generator:	Your core building, generates energy which is essential for
+		the gameplay. If your generator is destroyed, you are doomed.
+ * Pylon:	Re-distributes energy from the generator and extends your
+		powergrid. All buildings must be within range of the powergrid
+		to function.
+ * Scout:	A watch tower with long line of sight and weak firepower, used
+		to explore the map.
+ * Attacker:	A military building used to take down enemy structures
+ * Wall:	The wall blocks the enemies' powergrid and prevent their
+		mobilization over the map
+ * Buildsite:	The buildsite is a structure which can only be built on map
+		strategic points that you take control over, providing you
+		with faster building
+
+
+Note to developers:
+If you are allergic to fugly code, hate quick and dirty hacks, think function
+pointers are an abomination or curse upon lack of comments or documentation:
+please walk away now. You will not like what you are about to see.
+If any of the above however does not bother you, you are more than welcome to
+have a look!
