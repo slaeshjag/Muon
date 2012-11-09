@@ -97,9 +97,29 @@ void platform_config_write() {
 	darnitFileClose(f);
 }
 
+/*void platform_config_write_option(enum CONFIG_OPTIONS opt, void *value) {
+	char buf[128];
+	int i;
+	DARNIT_FILE *f;
+	if(!(f=darnitFileOpen("muon.cfg", "r+")))
+		return;
+	while((len=darnitFileLineGet(buf, 128, f))) {
+		if(buf[0]=='#')
+			continue;
+		
+		int optlen=strlen(parsers[opt].option);
+		if(memcmp(buf, parsers[opt].option, optlen)||buf[optlen]!='=')
+			continue;
+		buf[len]=0;
+		parsers[i].parser_func(parsers[i].config_opt, &buf[optlen+1]);
+	}
+	darnitFileClose(f);
+}*/
+
 void platform_init() {
 	darnitInitPartial("muon");
 	platform=darnitPlatformGet();
+	videomodes=darnitVideomodeGet();
 	platform_config_init_defaults();
 	platform_config_read();
 	darnitInitRest("Muon", config.screen_w, config.screen_h, config.fullscreen);

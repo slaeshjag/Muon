@@ -3,6 +3,14 @@
 
 DARNIT_PLATFORM platform;
 
+enum CONFIG_OPTIONS {
+	CONFIG_OPTION_SCREEN_W,
+	CONFIG_OPTION_SCREEN_H,
+	CONFIG_OPTION_FULLSCREEN,
+	CONFIG_OPTION_PLASMA,
+	CONFIG_OPTION_PLAYER_NAME,
+} options;
+
 struct CONFIG {
 	int screen_w;
 	int screen_h;
@@ -17,6 +25,8 @@ struct CONFIG_PARSER {
 	void (*writer_func)(void *opt, char *p);
 	void *config_opt;
 };
+
+DARNIT_VIDEOMODE **videomodes;
 
 void platform_init();
 

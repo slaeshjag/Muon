@@ -7,8 +7,8 @@
 #include "menu.h"
 
 char *menu_sidebar_button_text_main[8]={
-	"Single player",
-	"Multi player",
+	"Singleplayer",
+	"Multiplayer",
 	"Settings",
 	NULL,
 	NULL,
@@ -51,6 +51,44 @@ void menu_init() {
 	ui_vbox_add_child(panelist_input_name.pane->root_widget, input_name_button, 0);
 	input_name_button->event_handler->add(input_name_button, input_name_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
+	//Monitor settings
+	panelist_settings_monitor.pane=ui_pane_create(16, 16, 256, 256, NULL);
+	panelist_settings_monitor.next=NULL;
+	ui_pane_set_root_widget(panelist_settings_monitor.pane, ui_widget_create_hbox());
+	settings_monitor_listbox_modes=ui_widget_create_listbox(font_std);
+	ui_hbox_add_child(panelist_settings_monitor.pane->root_widget, settings_monitor_listbox_modes, 1);
+	settings_monitor_vbox=ui_widget_create_vbox();
+	ui_hbox_add_child(panelist_settings_monitor.pane->root_widget, settings_monitor_vbox, 1);
+	settings_monitor_entry_w=ui_widget_create_entry(font_std);
+	settings_monitor_entry_h=ui_widget_create_entry(font_std);
+	ui_vbox_add_child(settings_monitor_vbox, ui_widget_create_label(font_std, "Screen width"), 0);
+	ui_vbox_add_child(settings_monitor_vbox, settings_monitor_entry_w, 0);
+	ui_vbox_add_child(settings_monitor_vbox, ui_widget_create_label(font_std, "Screen height"), 0);
+	ui_vbox_add_child(settings_monitor_vbox, settings_monitor_entry_h, 0);
+	settings_monitor_hbox_checkbox=ui_widget_create_hbox();
+	settings_monitor_checkbox_fullscreen=ui_widget_create_checkbox();
+	ui_hbox_add_child(settings_monitor_hbox_checkbox, settings_monitor_checkbox_fullscreen, 0);
+	ui_hbox_add_child(settings_monitor_hbox_checkbox, ui_widget_create_label(font_std, "Fullscreen"), 0);
+	ui_vbox_add_child(settings_monitor_vbox, settings_monitor_hbox_checkbox, 0);
+	ui_vbox_add_child(settings_monitor_vbox, ui_widget_create_spacer(), 1);
+	settings_monitor_button_ok=ui_widget_create_button(ui_widget_create_label(font_std, "OK"));
+	settings_monitor_button_cancel=ui_widget_create_button(ui_widget_create_label(font_std, "Cancel"));
+	ui_vbox_add_child(settings_monitor_vbox, settings_monitor_button_ok, 0);
+	ui_vbox_add_child(settings_monitor_vbox, settings_monitor_button_cancel, 0);
+	char buf[32];
+	v.p=buf;
+	sprintf(buf, "%i", config.screen_w);
+	settings_monitor_entry_w->set_prop(settings_monitor_entry_w, UI_ENTRY_PROP_TEXT, v);
+	sprintf(buf, "%i", config.screen_h);
+	settings_monitor_entry_h->set_prop(settings_monitor_entry_h, UI_ENTRY_PROP_TEXT, v);
+	v.i=config.fullscreen;
+	settings_monitor_checkbox_fullscreen->set_prop(settings_monitor_checkbox_fullscreen, UI_CHECKBOX_PROP_ACTIVATED, v);
+	DARNIT_VIDEOMODE **mode;
+	for(mode=videomodes; mode&&*mode; mode+=sizeof(void *)) {
+		sprintf(buf, "%ix%i", (*mode)->w, (*mode)->h);
+		ui_listbox_add(settings_monitor_listbox_modes, buf);
+	}
+		
 	//Connect to server
 	v.p=NULL;
 	panelist_connect_server.pane=ui_pane_create(16, 16, 256, 128, NULL);
@@ -104,7 +142,8 @@ void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e
 		panelist_menu_sidebar.next=&panelist_connect_server;
 		ui_selected_widget=connect_server_entry_host;
 	} else if(widget==menu_sidebar_button[2]) {
-		panelist_menu_sidebar.next=&panelist_input_name;
+		//panelist_menu_sidebar.next=&panelist_input_name;
+		panelist_menu_sidebar.next=&panelist_settings_monitor;
 		ui_selected_widget=input_name_entry;
 	} else {
 		panelist_menu_sidebar.next=NULL;
