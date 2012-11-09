@@ -8,6 +8,7 @@
 #define UI_LISTBOX_PROP_SIZE 5
 #define UI_LISTBOX_PROP_SCROLL 6
 #define UI_LISTBOX_PROP_SELECTED 7
+#define UI_LISTBOX_PROP_SELECTED_RECT 8
 
 struct UI_LISTBOX_PROPERTIES {
 	DARNIT_FONT *font;
@@ -17,6 +18,7 @@ struct UI_LISTBOX_PROPERTIES {
 	int size;
 	int scroll;
 	int selected;
+	DARNIT_RECT *selected_rect;
 };
 
 struct UI_LISTBOX_LIST {
