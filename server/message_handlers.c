@@ -64,10 +64,6 @@ void messageHandlerChat(unsigned int player, MESSAGE *message) {
 		return;
 	}
 
-	fprintf(stdout, "Debug: CHAT: <%s> ", server->player[player].name);
-	fwrite(message->extra, message->arg[1], 1, stdout);
-	fprintf(stdout, "\n");
-
 	playerMessageBroadcast(player, MSG_SEND_CHAT, 0, message->arg[1], message->extra);
 
 	return;
@@ -179,11 +175,22 @@ void messageHandlerSetAttack(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerSetGamespeed(unsigned int player, MESSAGE *message) {
+	if (message->arg[0] == 0)
+		return;
+	if (message->arg[0] > 1000)	/* 1000 gamespeed should be enough for everyone */
+		return;
+	server->game.gamespeed = message->arg[0];
+
+	return;
+}
+
+
 int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
-	server->message_handler.handle[MSG_RECV_KICK] 		= messageHandlerDummy;
-	server->message_handler.handle[MSG_RECV_SET_GAMESPEED]	= messageHandlerDummy;
+	server->message_handler.handle[MSG_RECV_KICK] 		= messageHandlerSetAttack;
+	server->message_handler.handle[MSG_RECV_SET_GAMESPEED]	= messageHandlerSetGamespeed;
 
 	server->message_handler.handle[MSG_RECV_IDENTIFY] 	= messageHandlerIdentify;
 	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerPlayerInfo;
