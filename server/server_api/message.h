@@ -130,6 +130,13 @@ typedef struct {
 /* arg_1 is ignored. Message must have data (the message that is send.) */
 #define	MSG_SEND_CHAT			1
 
+
+/* arg_1 is the player to kick. No data */
+#define	MSG_SEND_KICK			2
+
+/* arg_1 is the gamespeed. No data. 0 < gamespeed < 1001. 3 is default. */
+#define	MSG_SEND_SET_GAMESPEED		3
+
 /* arg_1 is client version. Message must have data (player name, max. 31 bytes long. Send this only once.) */
 #define	MSG_SEND_IDENTIFY		4
 
