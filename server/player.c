@@ -88,7 +88,8 @@ void playerDisconnect(unsigned int player) {
 	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
 
 	/* We probably need to add a mutex here */
-	gameKillPlayerUnits(player);
+	if (server->game.started)
+		unitRemove(server->player[player].spawn.x, server->player[player].spawn.y);
 	server->player[player].status = PLAYER_UNUSED;
 	messageBufferFlush(server->player[player].msg_buf);
 	server->player[player].socket = networkSocketDisconnect(server->player[player].socket);

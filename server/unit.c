@@ -353,6 +353,8 @@ int unitRemove(int x, int y) {
 			unitPylonDelete(next);
 			server->player[next->owner].status = PLAYER_SPECTATING;
 			playerDefeatAnnounce(next->owner);
+			if (gameDetectIfOver() == 0)
+				gameEnd();
 		}
 		free(next);
 		server->map[x + y * server->h] = NULL;
@@ -436,7 +438,6 @@ int unitValidateWall(int index, int player) {
 				continue;
 			if (server->map[index_dst]->owner != player && team == -1)
 				continue;
-			fprintf(stderr, "Testing wall\n");
 			if (unitWallTest(index, index_dst, player) == 0)
 				return 0;
 		}

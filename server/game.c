@@ -13,11 +13,6 @@ int gameInit(int gamespeed) {
 }
 
 
-int gameKillPlayerUnits(unsigned int player) {
-	return 0;
-}
-
-
 int gameAttemptStart() {
 	int i;
 
@@ -107,5 +102,46 @@ void gameLoop(int msec) {
 		gameStart();
 	}
 
+	return;
+}
+
+
+int gameDetectIfOver() {
+	int i, team;
+	
+	team = -2;
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME_NOW)
+			continue;
+		if (team == -1)
+			return -1;
+		if (server->player[i].team > -1) {
+			if (server->player[i].team != team)
+				return -1;
+		}
+		
+		team = server->player[i].team;
+	}
+
+	return 0;
+}
+
+
+void gameEnd() {
+	int i, team, player;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME_NOW)
+			continue;
+		if (server->player[i].status == PLAYER_IN_GAME_NOW) {
+			team = server->player[i].team;
+			player = i;
+			server->player[i].status = PLAYER_SPECTATING;
+			playerClear(i);
+		}
+	}
+
+	team += 1;
+	playerMessageBroadcast(player, MSG_SEND_GAME_ENDED, player, team, NULL);
 	return;
 }

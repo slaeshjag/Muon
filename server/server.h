@@ -64,6 +64,7 @@ typedef struct {
 	SERVER_MAP		map_c;
 	int			build_spots;
 	UNIT_PYLON		*pylons;
+	int			server_admin;
 } SERVER;
 
 SERVER *server;

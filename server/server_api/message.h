@@ -61,7 +61,7 @@ typedef struct {
 /* player_id is always 0. No arguments, but arg_1 and arg_2 may be used for checksum in the future. */
 #define	MSG_RECV_MAP_END		0x006
 
-/* arg_1 is the team the player is member of. 0 is no team. No data. */
+/* arg_1 is the team the player is member of. 0 is no team. arg_2 is 1 if the player is admin. No data. */
 #define	MSG_RECV_PLAYER_INFO		0x007
 
 /* No arguments. No data. Not used at the moment, but is reserved for future use. Client must reply with PONG */
@@ -101,6 +101,9 @@ typedef struct {
 #define	MSG_RECV_CLEAR_MAP		0x013
 
 
+/* arg_1 is team. If team is 0, arg_2 is the winning player. */
+#define	MSG_RECV_GAME_ENDED		0x014
+
 
 /* These commands actually have data after them */
 
@@ -127,23 +130,30 @@ typedef struct {
 /* arg_1 is ignored. Message must have data (the message that is send.) */
 #define	MSG_SEND_CHAT			1
 
+
+/* arg_1 is the player to kick. No data */
+#define	MSG_SEND_KICK			2
+
+/* arg_1 is the gamespeed. No data. 0 < gamespeed < 1001. 3 is default. */
+#define	MSG_SEND_SET_GAMESPEED		3
+
 /* arg_1 is client version. Message must have data (player name, max. 31 bytes long. Send this only once.) */
-#define	MSG_SEND_IDENTIFY		2
+#define	MSG_SEND_IDENTIFY		4
 
 /* arg_1 is the team to be member of. 0 is no team. No data. */
-#define	MSG_SEND_PLAYER_INFO		3
+#define	MSG_SEND_PLAYER_INFO		5
 
 /* arg_1 is 1 if client is ready, 0 if not. arg_2 is download progress on the map (0..100) */
-#define	MSG_SEND_READY			4
+#define	MSG_SEND_READY			6
 
 /* arg_1 is the building type to build. arg_2 is the action (0 = stop, 1 = start, 2 = hold) */
-#define	MSG_SEND_START_BUILD		5
+#define	MSG_SEND_START_BUILD		7
 
 /* arg_1 is the building type to place, arg_2 is the index on the map to place it on */
-#define	MSG_SEND_PLACE_BUILDING		6
+#define	MSG_SEND_PLACE_BUILDING		8
 
 /* arg_1 is map index the building to set attack from is at, arg_2 the tile index for the target building */
-#define	MSG_SEND_SET_ATTACK		7
+#define	MSG_SEND_SET_ATTACK		9
 
 
 #endif

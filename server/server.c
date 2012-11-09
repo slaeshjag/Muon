@@ -423,3 +423,12 @@ int serverPlayersPlaying() {
 			p++;
 	return p;
 }
+
+
+void serverAdminSet(int player) {
+	if (!server)
+		return;
+	server->server_admin = player;
+
+	return;
+}
