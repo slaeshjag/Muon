@@ -232,7 +232,7 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 		playerBuildQueueStop(player, unit);
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status >= PLAYER_IN_GAME_NOW)
+		if (server->player[i].status < PLAYER_IN_GAME_NOW)
 			continue;
 		if (server->player[i].team == team && team != -1)
 			continue;
