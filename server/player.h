@@ -45,6 +45,14 @@ typedef struct {
 
 
 typedef struct {
+	unsigned int		buildtime;
+	unsigned int		no_build_time;
+	unsigned int		buildings_raised;
+	unsigned int		buildings_lost;
+} PLAYER_STATS;
+
+
+typedef struct {
 	PLAYER_MAP		*map;
 	unsigned int		map_progress;
 	int			team;
@@ -61,6 +69,7 @@ typedef struct {
 	char			name[PLAYER_NAME_LEN];
 	PLAYER_SPAWN		spawn;
 	PLAYER_BUILDQUEUE	queue;
+	PLAYER_STATS		stats;
 } PLAYER;
 
 PLAYER *playerInit(unsigned int players, int map_w, int map_h);

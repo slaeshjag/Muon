@@ -488,7 +488,7 @@ void unitDamageAnnounce(int index) {
 		hp = 1;
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status >= PLAYER_IN_GAME_NOW)
+		if (server->player[i].status < PLAYER_IN_GAME_NOW)
 			continue;
 		if (server->player[i].map[index].fog || server->player[i].status == PLAYER_SPECTATING)
 			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_HP, hp, index, NULL);
@@ -526,7 +526,7 @@ int unitAttackValidate(int index_src, int owner, int index_dst) {
 void unitAttackerScan(int x, int y) {
 	int team, i, j, index, range, owner, target_x, target_y;
 	
-	range = unitRange(UNIT_DEF_ATTACKER);
+	range = unit_range[server->map[server->w * y + x]->type];
 	team = server->player[server->map[x + y * server->w]->owner].team;
 	owner = server->map[x + y * server->w]->owner;
 	target_x = target_y = 0x7FFFFFFF;
@@ -570,7 +570,7 @@ void unitShieldAnnounce(int index) {
 	shield = server->map[index]->shield * 100 / unitShieldMax(server->map[index]->type);
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status >= PLAYER_IN_GAME_NOW)
+		if (server->player[i].status < PLAYER_IN_GAME_NOW)
 			continue;
 		if (server->player[i].map[index].fog || server->player[i].status == PLAYER_SPECTATING)
 			messageBufferPushDirect(i, server->map[index]->owner, MSG_SEND_BUILDING_SHIELD, shield, index, NULL);
@@ -594,15 +594,14 @@ void unitLoop(int msec) {
 				if (next->shield > unit_maxshield[next->type])
 					next->shield = unit_maxshield[next->type];
 			}
-			
 			unitShieldAnnounce(index);
 		}
 		
-		if (next->type == UNIT_DEF_ATTACKER && next->target > -1) {
+		if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && next->target > -1) {
 			if (!server->map[next->target])
 				next->target = -1;
 			else {
-				server->map[next->target]->shield -= UNIT_ATTACKER_DMGP * msec * server->game.gamespeed;
+				server->map[next->target]->shield -= unit_damage[next->type] * msec * server->game.gamespeed;
 				if (server->map[next->target]->shield < 0) {
 					server->map[next->target]->hp += server->map[next->target]->shield;
 					server->map[next->target]->shield = 0;
@@ -616,7 +615,7 @@ void unitLoop(int msec) {
 					}
 				}
 			}
-		} else if (next->type == UNIT_DEF_ATTACKER) {
+		} else if (next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) {
 			unitAttackerScan(next->x, next->y);
 		}
 
