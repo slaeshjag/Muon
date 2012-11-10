@@ -25,7 +25,13 @@
 DARNIT_FONT *font_std;
 DARNIT_TILESHEET *mouse_tilesheet;
 
+int view_background_w, view_background_h;
+DARNIT_TILESHEET *view_background_ts;
+DARNIT_TILE *view_background_tile;
+unsigned int *view_background_pixbuf;
+
 void view_init();
-void view_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void view_background_draw();
+void view_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif

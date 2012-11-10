@@ -27,12 +27,28 @@
 #include "chat.h"
 #include "menu.h"
 #include "lobby.h"
+#include "intmath.h"
 #include "map.h"
 
 void view_init() {
 	//TODO: lots of breaking out to separate functions, game menu and lobby for example
 	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
 	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
+	
+	//Menu background
+	//TODO: free these later
+	if(config.plasma) {
+		view_background_w=platform.screen_w/config.plasma;
+		view_background_h=platform.screen_h/config.plasma;
+		view_background_ts=darnitRenderTilesheetNew(1, 1, view_background_w, view_background_h, DARNIT_PFORMAT_RGB5A1);
+		view_background_tile=darnitRenderTileAlloc(1);
+		view_background_pixbuf=malloc(view_background_w*view_background_h*sizeof(unsigned int));
+		darnitRenderTileMove(view_background_tile, 0, view_background_ts, 0, 0);
+		darnitRenderTileSetTilesheetCoord(view_background_tile, 0, view_background_ts, 0, 0, view_background_w, view_background_h);
+		darnitRenderTileSizeSet(view_background_tile, 0, platform.screen_w, platform.screen_h);
+		memset(view_background_pixbuf, 0, view_background_w*view_background_h*sizeof(unsigned int));
+		darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
+	}
 	
 	menu_init();
 	lobby_init();
@@ -48,7 +64,29 @@ void view_init() {
 	map=NULL;
 }
 
-void view_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+void view_background_draw() {
+	static int t=0;
+	static int x, y, mov1, mov2, c1, c2, c3;
+	if(t%2&&config.plasma) {
+		for (y=0; y<view_background_h; y++)
+			for (x=0; x<view_background_w; x++) {
+				//int mov0=x+y+cosine((2*sine(t/2))/10)+sine(360*x/100);
+				mov1=360*y/view_background_h+(t>>1);
+				mov2=360*x/view_background_w;
+				c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
+				//int c2=sine((c1+sine(mov0+t/10)+sine(y/40+t/2)+sine((x+y)/100)));
+				c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
+				c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
+				view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/150+64;///0x10+128;
+			}
+		darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
+	}
+	t++;
+	
+	darnitRenderTileDraw(view_background_tile, view_background_ts, 1);
+}
+
+void view_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	float r, g, b, a;
 	darnitRenderTintGet(&r, &g, &b, &a);
 	darnitRenderTint(1, 1, 1, 1);

@@ -28,9 +28,9 @@
 #include "menu.h"
 
 void (*state_render[])()={
-		menu_background_draw,
-		NULL,
-		NULL,
+		view_background_draw,
+		view_background_draw,
+		view_background_draw,
 		game_view_draw,
 		game_view_draw,
 		NULL,
@@ -87,14 +87,14 @@ int main() {
 	
 	player_id=0;
 	serverInit();
-	serverStart("../res/map.ldi", 2, 1337, 10);
+	serverStart("../res/map.ldi", 2, 1337, 3);
 	
 	intmath_init();
 	ui_init();
 	view_init();
 	chat_init();
 	
-	ui_event_global_add(view_draw_mouse, UI_EVENT_TYPE_UI);
+	ui_event_global_add(view_mouse_draw, UI_EVENT_TYPE_UI);
 	game_state(GAME_STATE_MENU);
 	
 	while(gamestate!=GAME_STATE_QUIT) {
@@ -104,8 +104,6 @@ int main() {
 			client_check_incomming();
 		
 		darnitRenderBegin();
-		/*if(gamestate>=GAME_STATE_GAME)
-			game_view_draw();*/
 		if(state_render[gamestate])
 			state_render[gamestate]();
 			

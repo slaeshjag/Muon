@@ -297,7 +297,8 @@ void game_attacklist_target(int index, int target) {
 }
 
 void game_view_draw() {
-	int selected=map_selected_building();	
+	view_background_draw();
+	int selected=map_selected_building();
 	if((building_place!=-1||selected==BUILDING_PYLON||selected==BUILDING_GENERATOR))
 		map_draw(1);
 	else
@@ -326,5 +327,5 @@ void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		darnitRenderBlendingDisable();
 		darnitRenderOffset(0, 0);
 	}
-	view_draw_mouse(widget, type, e);
+	view_mouse_draw(widget, type, e);
 }
