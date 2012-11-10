@@ -65,23 +65,22 @@ void view_init() {
 }
 
 void view_background_draw() {
-	static int t=0;
+	static int t=0, recalc=0;
 	static int x, y, mov1, mov2, c1, c2, c3;
-	if(t%2&&config.plasma) {
+	if(config.plasma&&recalc) {
 		for (y=0; y<view_background_h; y++)
 			for (x=0; x<view_background_w; x++) {
-				//int mov0=x+y+cosine((2*sine(t/2))/10)+sine(360*x/100);
 				mov1=360*y/view_background_h+(t>>1);
 				mov2=360*x/view_background_w;
 				c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
-				//int c2=sine((c1+sine(mov0+t/10)+sine(y/40+t/2)+sine((x+y)/100)));
 				c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
 				c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
-				view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/150+64;///0x10+128;
+				view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/300+32;
 			}
 		darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
+		t++;
 	}
-	t++;
+	recalc=!recalc;
 	
 	darnitRenderTileDraw(view_background_tile, view_background_ts, 1);
 }
