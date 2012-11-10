@@ -75,7 +75,7 @@ void view_background_draw() {
 				c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
 				c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
 				c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
-				view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/300+32;
+				view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/360+26;
 			}
 		darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
 		t++;
