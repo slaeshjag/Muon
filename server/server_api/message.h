@@ -119,10 +119,11 @@ typedef struct {
 /* No arguments, no data. When the client gets this, it's okay to clear all FoW */
 #define	MSG_RECV_CLEAR_MAP		0x013
 
-
 /* arg_1 is team. If team is 0, arg_2 is the winning player. */
 #define	MSG_RECV_GAME_ENDED		0x014
 
+/* arg_1 is the unit ID, arg_2 is the number ready. No data. */
+#define	MSG_RECV_UNIT_READY		0x015
 
 /* These commands actually have data after them */
 

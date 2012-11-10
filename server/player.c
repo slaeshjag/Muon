@@ -38,6 +38,8 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 				player[i].map[j].power = 0;
 				player[i].map[j].fog = 0;
 			}
+		for (j = 0; j < UNITS_DEFINED; j++)
+			player[i].queue.ready[j].count = 0;
 		player[i].status = PLAYER_UNUSED;
 		player[i].msg_buf = messageBufferInit();
 		player[i].socket = NULL;
@@ -293,7 +295,7 @@ int playerBuildQueueDestroy() {
 
 
 int playerBuildQueueLoop(int msec) {
-	int i, j, building, progress;
+	int i, j, building, progress, unit;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME_NOW)
@@ -303,8 +305,14 @@ int playerBuildQueueLoop(int msec) {
 				continue;
 			if (!server->player[i].queue.queue[j].building)
 				continue;
-			if (server->player[i].queue.queue[j].progress == 100)
+			unit = server->player[i].queue.queue[j].building;
+			if (server->player[i].queue.queue[j].progress == 100) {
+				server->player[i].queue.ready[unit].count++;
+				playerBuildQueueStop(i, unit);
+				messageBufferPushDirect(i, i, MSG_SEND_UNIT_READY, unit, server->player[i].queue.ready[unit].count, NULL);
 				continue;
+			}
+
 			building = server->player[i].queue.queue[j].building;
 			server->player[i].queue.queue[j].time += msec * server->game.gamespeed;
 			if (server->player[i].queue.queue[j].time > unit_buildtime[building])
