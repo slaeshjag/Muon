@@ -35,7 +35,7 @@ UI_WIDGET *ui_widget_create_slider(unsigned int steps) {
 	p->line=darnitRenderLineAlloc(1+steps, 1);
 	p->handle=darnitRenderRectAlloc(1);
 	p->value=0;
-	p->value=steps;
+	p->steps=steps;
 	
 	widget->destroy=ui_widget_destroy_slider;
 	widget->set_prop=ui_slider_set_prop;
@@ -95,11 +95,11 @@ void ui_slider_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	darnitRenderLineMove(p->line, 0, x+2, y+h/2, x+w-2, y+h/2);
 	int i;
 	for(i=0; i<p->steps; i++) {
-		int xx=x+2+i*((w-4)/p->steps);
+		int xx=x+2+i*((w-4)/(p->steps-1));
 		darnitRenderLineMove(p->line, i+1, xx, y+h/2-2, xx, y+h/2+2);
 	}
 	int xx=x+2+p->value*((w-4)/p->steps);
-	darnitRenderRectSet(p->handle, 0, xx-2, y+h/2-2, xx+2, y+h/2+2);
+	darnitRenderRectSet(p->handle, 0, xx-2, y+h/2-4, xx+2, y+h/2+4);
 }
 
 void ui_slider_request_size(UI_WIDGET *widget, int *w, int *h) {

@@ -90,6 +90,7 @@ void menu_init() {
 	ui_hbox_add_child(settings_monitor_hbox_checkbox, settings_monitor_checkbox_fullscreen, 0);
 	ui_hbox_add_child(settings_monitor_hbox_checkbox, ui_widget_create_label(font_std, "Fullscreen"), 0);
 	ui_vbox_add_child(settings_monitor_vbox, settings_monitor_hbox_checkbox, 0);
+	ui_vbox_add_child(settings_monitor_vbox, ui_widget_create_slider(5), 0);
 	ui_vbox_add_child(settings_monitor_vbox, ui_widget_create_spacer(), 1);
 	settings_monitor_button_ok=ui_widget_create_button(ui_widget_create_label(font_std, "OK"));
 	settings_monitor_button_ok->event_handler->add(settings_monitor_button_ok, settings_monitor_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
