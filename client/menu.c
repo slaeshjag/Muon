@@ -23,6 +23,7 @@
 #include "client.h"
 #include "chat.h"
 #include "game.h"
+#include "intmath.h"
 #include "menu.h"
 
 char *menu_sidebar_button_text_main[8]={
@@ -39,6 +40,22 @@ char *menu_sidebar_button_text_main[8]={
 void menu_init() {
 	int i;
 	UI_PROPERTY_VALUE v={.p=NULL};
+	
+	//Menu background
+	//TODO: free these later
+	if(config.plasma) {
+		menu_background_w=platform.screen_w/config.plasma;
+		menu_background_h=platform.screen_h/config.plasma;
+		menu_background_ts=darnitRenderTilesheetNew(1, 1, menu_background_w, menu_background_h, DARNIT_PFORMAT_RGB5A1);
+		menu_background_tile=darnitRenderTileAlloc(1);
+		menu_background_pixbuf=malloc(menu_background_w*menu_background_h*sizeof(unsigned int));
+		darnitRenderTileMove(menu_background_tile, 0, menu_background_ts, 0, 0);
+		darnitRenderTileSetTilesheetCoord(menu_background_tile, 0, menu_background_ts, 0, 0, menu_background_w, menu_background_h);
+		darnitRenderTileSizeSet(menu_background_tile, 0, platform.screen_w, platform.screen_h);
+		memset(menu_background_pixbuf, 0, menu_background_w*menu_background_h*sizeof(unsigned int));
+		darnitRenderTilesheetUpdate(menu_background_ts, 0, 0, menu_background_w, menu_background_h, menu_background_pixbuf);
+	}
+	
 	
 	//Main menu
 	panelist_menu_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
@@ -240,8 +257,26 @@ void connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 	client_disconnect();
 }
 
-void menu_render() {
+void menu_background_draw() {
+	static int t=0;
+	static int x, y, mov1, mov2, c1, c2, c3;
+	if(t%2&&config.plasma) {
+		for (y=0; y<menu_background_h; y++)
+			for (x=0; x<menu_background_w; x++) {
+				//int mov0=x+y+cosine((2*sine(t/2))/10)+sine(360*x/100);
+				mov1=360*y/menu_background_h+(t>>1);
+				mov2=360*x/menu_background_w;
+				c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
+				//int c2=sine((c1+sine(mov0+t/10)+sine(y/40+t/2)+sine((x+y)/100)));
+				c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
+				c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
+				menu_background_pixbuf[y*menu_background_w+x]=(c1+c2+c3)/150+64;///0x10+128;
+			}
+		darnitRenderTilesheetUpdate(menu_background_ts, 0, 0, menu_background_w, menu_background_h, menu_background_pixbuf);
+	}
+	t++;
 	
+	darnitRenderTileDraw(menu_background_tile, menu_background_ts, 1);
 }
 
 //In-game menu

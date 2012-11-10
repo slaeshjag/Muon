@@ -58,10 +58,17 @@ void map_init(char *filename) {
 	darnitRenderLineMove(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
 	
 	minimap_viewport=darnitRenderLineAlloc(4, 1);
-	
 	unsigned int i;
 	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
+	
+	map_grid_lines=platform.screen_w/map->layer->tile_w+platform.screen_h/map->layer->tile_h+2;
+	map_grid=darnitRenderLineAlloc(map_grid_lines, 1);
+	for(i=0; i<platform.screen_w/map->layer->tile_w+1; i++)
+		darnitRenderLineMove(map_grid, i, map->layer->tile_w*i, 0, map->layer->tile_w*i, platform.screen_h);
+	int j;
+	for(j=0; j<platform.screen_h/map->layer->tile_h+1; i++, j++)
+		darnitRenderLineMove(map_grid, i, 0, map->layer->tile_h*j, platform.screen_w, map->layer->tile_h*j);
 }
 
 void map_close(DARNIT_MAP *map) {
@@ -72,6 +79,7 @@ void map_close(DARNIT_MAP *map) {
 	powergrid=darnitRenderLineFree(powergrid);
 	minimap_viewport=darnitRenderLineFree(minimap_viewport);
 	map=darnitMapUnload(map);
+	map_grid=darnitRenderLineFree(map_grid);
 	
 	game_attacklist_clear();
 }
@@ -208,6 +216,12 @@ void map_draw(int draw_powergrid) {
 	int i;
 	for(i=0; i<map->layers; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
+	if(config.grid) {
+		darnitRenderOffset(map->cam_x<0?map->cam_x:map->cam_x%map->layer->tile_w, MAX(map->cam_y, map->cam_y%map->layer->tile_h));
+		darnitRenderTint(0.4, 0.4, 0.4, 1);
+		darnitRenderLineDraw(map_grid, map_grid_lines);
+		darnitRenderTint(1, 1, 1, 1);
+	}
 	darnitRenderOffset(map->cam_x, map->cam_y);
 	if(map_border)
 		darnitRenderLineDraw(map_border, 4);

@@ -23,6 +23,8 @@
 #include "game.h"
 
 DARNIT_LINE *map_border;
+DARNIT_LINE *map_grid;
+int map_grid_lines;
 DARNIT_LINE *powergrid;
 int powergrid_lines;
 

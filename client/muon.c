@@ -24,10 +24,11 @@
 #include "client.h"
 #include "chat.h"
 #include "game.h"
+#include "intmath.h"
 #include "menu.h"
 
 void (*state_render[])()={
-		NULL,
+		menu_background_draw,
 		NULL,
 		NULL,
 		game_view_draw,
@@ -88,6 +89,7 @@ int main() {
 	serverInit();
 	serverStart("../res/map.ldi", 2, 1337, 10);
 	
+	intmath_init();
 	ui_init();
 	view_init();
 	chat_init();

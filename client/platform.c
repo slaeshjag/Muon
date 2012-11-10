@@ -26,6 +26,7 @@ struct CONFIG_PARSER parsers[]={
 	{"width", platform_option_read_int, platform_option_write_int, &config.screen_w},
 	{"height", platform_option_read_int, platform_option_write_int, &config.screen_h},
 	{"fullscreen", platform_option_read_int, platform_option_write_int, &config.fullscreen},
+	{"grid", platform_option_read_int, platform_option_write_int, &config.grid},
 	{"plasma", platform_option_read_int, platform_option_write_int, &config.plasma},
 	{"name", platform_option_read_string, platform_option_write_string, &config.player_name},
 };
@@ -72,7 +73,8 @@ void platform_config_init_defaults() {
 		};
 		darnitButtonMappingSet(keymap);
 	}
-	config.plasma=1;
+	config.grid=1;
+	config.plasma=4;
 	strcpy(config.player_name, "player");
 }
 

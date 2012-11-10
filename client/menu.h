@@ -20,7 +20,13 @@
 #ifndef MENU_H
 #define MENU_H
 
-void menu_init();
+#define MENU_BACKGROUND_SCALE 4
+
+//Menu background
+int menu_background_w, menu_background_h;
+DARNIT_TILESHEET *menu_background_ts;
+DARNIT_TILE *menu_background_tile;
+unsigned int *menu_background_pixbuf;
 
 //Main menu
 struct UI_PANE_LIST panelist_menu_sidebar;
@@ -49,6 +55,9 @@ UI_WIDGET *connect_server_button;
 
 struct UI_PANE_LIST panelist_connecting;
 UI_WIDGET *connecting_button_cancel;
+
+void menu_init();
+void menu_background_draw();
 
 void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
