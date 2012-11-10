@@ -64,11 +64,11 @@ void map_init(char *filename) {
 	
 	map_grid_lines=platform.screen_w/map->layer->tile_w+platform.screen_h/map->layer->tile_h+2;
 	map_grid=darnitRenderLineAlloc(map_grid_lines, 1);
-	for(i=0; i<platform.screen_w/map->layer->tile_w+1; i++)
-		darnitRenderLineMove(map_grid, i, map->layer->tile_w*i, 0, map->layer->tile_w*i, platform.screen_h);
+	for(i=0; i<MIN(platform.screen_w, map_w)/map->layer->tile_w+1; i++)
+		darnitRenderLineMove(map_grid, i, map->layer->tile_w*i, 0, map->layer->tile_w*i, MIN(platform.screen_h, map_h));
 	int j;
-	for(j=0; j<platform.screen_h/map->layer->tile_h+1; i++, j++)
-		darnitRenderLineMove(map_grid, i, 0, map->layer->tile_h*j, platform.screen_w, map->layer->tile_h*j);
+	for(j=0; j<MIN(platform.screen_h, map_h)/map->layer->tile_h+1; i++, j++)
+		darnitRenderLineMove(map_grid, i, 0, map->layer->tile_h*j, MIN(platform.screen_w, map_w), map->layer->tile_h*j);
 }
 
 void map_close(DARNIT_MAP *map) {
@@ -217,7 +217,24 @@ void map_draw(int draw_powergrid) {
 	for(i=0; i<map->layers; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
 	if(config.grid) {
-		darnitRenderOffset(map->cam_x<0?map->cam_x:map->cam_x%map->layer->tile_w, MAX(map->cam_y, map->cam_y%map->layer->tile_h));
+		int movex, movey;
+		//TODO: clean up
+		//FIXME: does not rednder properly on large screens
+		if(map->cam_x<0)
+			movex=map->cam_x;
+		else if(map_w-map->cam_x<platform.screen_w)
+			movex=platform.screen_w-(map_w-map->cam_x);
+		else
+			movex=map->cam_x%map->layer->tile_w;
+		
+		if(map->cam_y<0)
+			movey=map->cam_y;
+		else if(map_h-map->cam_y<platform.screen_h)
+			movey=platform.screen_h-(map_h-map->cam_y);
+		else
+			movey=map->cam_y%map->layer->tile_h;
+			
+		darnitRenderOffset(movex, movey);
 		darnitRenderTint(0.4, 0.4, 0.4, 1);
 		darnitRenderLineDraw(map_grid, map_grid_lines);
 		darnitRenderTint(1, 1, 1, 1);
