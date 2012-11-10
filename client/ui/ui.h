@@ -62,6 +62,7 @@ UI_WIDGET *ui_selected_widget;
 #include "listbox.h"
 #include "spacer.h"
 #include "imageview.h"
+#include "slider.h"
 
 void ui_init();
 void *ui_widget_destroy(UI_WIDGET *widget);
