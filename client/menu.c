@@ -106,9 +106,8 @@ void menu_init() {
 	settings_monitor_entry_h->set_prop(settings_monitor_entry_h, UI_ENTRY_PROP_TEXT, v);
 	v.i=config.fullscreen;
 	settings_monitor_checkbox_fullscreen->set_prop(settings_monitor_checkbox_fullscreen, UI_CHECKBOX_PROP_ACTIVATED, v);
-	DARNIT_VIDEOMODE **mode;
-	for(mode=videomodes; mode&&*mode; mode+=sizeof(void *)) {
-		sprintf(buf, "%ix%i", (*mode)->w, (*mode)->h);
+	for(i=0; videomodes[i]; i++) {
+		sprintf(buf, "%ix%i", videomodes[i]->w, videomodes[i]->h);
 		ui_listbox_add(settings_monitor_listbox_modes, buf);
 	}
 		
