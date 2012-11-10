@@ -248,7 +248,8 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 	if (server->map[index])
 		return -1;
 	if (unitAdd(player, unit, x, y) >= 0)
-		playerBuildQueueStop(player, unit);
+		if (server->player[player].queue.ready[unit].count > 0)
+			server->player[player].queue.ready[unit].count--;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_IN_GAME_NOW)
@@ -278,7 +279,7 @@ SERVER_UNIT *unitInit(int owner, int type, int x, int y) {
 	unit->owner = owner;
 	unit->type = type;
 	unit->hp = unitHPMax(type);
-	unit->shield = unitShieldMax(unit->type);		/* Don't spawn with any shield! */
+	unit->shield = unitShieldMax(unit->type);		/* -Don't-spawn-with-any-shield!- ;; Now we do! */
 	unit->status = 0;				/* Nothing yet? */
 	unit->next = NULL;
 	unit->target = -1;

@@ -153,7 +153,7 @@ void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
 		return;
 	if (server->map[message->arg[1]])				/* Even more nope. */
 		return;
-	if (playerBuildQueueUnitReady(player, message->arg[0]) < 0)	/* Pff. lol. */
+	if (!server->player[player].queue.ready[message->arg[0]].count)	/* Pff. lol. */
 		return;
 	if (unitValidateWall(message->arg[1], player) < 0)		/* D: */
 		return;
@@ -208,7 +208,7 @@ void messageHandlerSetGamespeed(unsigned int player, MESSAGE *message) {
 int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
-	server->message_handler.handle[MSG_RECV_KICK] 		= messageHandlerSetAttack;
+	server->message_handler.handle[MSG_RECV_KICK] 		= messageHandlerKick;
 	server->message_handler.handle[MSG_RECV_SET_GAMESPEED]	= messageHandlerSetGamespeed;
 
 	server->message_handler.handle[MSG_RECV_IDENTIFY] 	= messageHandlerIdentify;

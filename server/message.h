@@ -75,6 +75,7 @@
 #define	MSG_SEND_NAME_IN_USE		0x012
 #define	MSG_SEND_MAP_CLEAR		0x013
 #define	MSG_SEND_GAME_ENDED		0x014
+#define	MSG_SEND_UNIT_READY		0x015
 
 typedef struct {
 	unsigned int		player_ID;

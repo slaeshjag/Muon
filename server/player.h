@@ -59,7 +59,13 @@ typedef struct {
 
 
 typedef struct {
+	int			count;
+} PLAYER_READYQUEUE;
+
+
+typedef struct {
 	PLAYER_BUILDQUEUE_E	*queue;
+	PLAYER_READYQUEUE	ready[UNITS_DEFINED];
 } PLAYER_BUILDQUEUE;
 
 
