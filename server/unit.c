@@ -336,7 +336,7 @@ int unitAdd(int owner, int type, int x, int y) {
 
 int unitRemove(int x, int y) {
 	SERVER_UNIT *unit, *next, **parent;
-	int i;
+	int i, owner;
 
 	if (x >= server->w || y >= server->h) {
 		fprintf(stderr, "Unable to remove unit at %i %i: Tile is outside of the map\n", x, y);
@@ -347,6 +347,7 @@ int unitRemove(int x, int y) {
 		return -1;
 	parent = &server->unit;
 	next = *parent;
+	owner = unit->owner;
 
 	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
 	for (i = 0; i < server->players; i++) {
@@ -368,11 +369,12 @@ int unitRemove(int x, int y) {
 			unitPylonDelete(next);
 			unitPylonPulse();
 		} else if (next->type == UNIT_DEF_GENERATOR) {
+			server->player[next->owner].status = PLAYER_SPECTATING;
 			playerMessageBroadcast(next->owner, MSG_SEND_PLAYER_DEFEATED, 0, 0, NULL);
 			unitDestroyAll(next->owner);
-			unitPylonDelete(next);
-			server->player[next->owner].status = PLAYER_SPECTATING;
 			playerDefeatAnnounce(next->owner);
+			unitPylonDelete(next);
+			server->map[x + y * server->h] = NULL;
 			if (gameDetectIfOver() == 0)
 				gameEnd();
 		}
@@ -381,6 +383,7 @@ int unitRemove(int x, int y) {
 		return 0;
 	}
 	
+	messageBufferPushDirect(owner, owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
 	server->map[x + y * server->h] = NULL;
 
 	return 0;

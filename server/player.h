@@ -35,6 +35,8 @@
 #define	PLAYER_PROCESS_MSG			1
 #define	PLAYER_PROCESS_DATA			2
 
+#define	PLAYER_BUILDSPOT_MULTIPLIER		5
+
 
 typedef struct {
 	unsigned int		power 	: 16;
@@ -115,5 +117,7 @@ int playerBuildQueueUnitReady(int player, int building);
 
 void playerClear(int player);
 void playerDefeatAnnounce(int player);
+
+int playerCanQueueAnotherBuilding(int player);
 
 #endif

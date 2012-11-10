@@ -225,6 +225,8 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					server->player[player].map[index].fog += haz_los * mode;
 					t = (server->player[player].map[index].fog) ? 0 : 1;
 					fogdiff = (server->player[player].map[index].fog > 0);
+					if (mode < 0 && j == 0 && k == 0)
+						unitAnnounce(owner, i, 0, index);
 					fogdiff = (oldfog ^ fogdiff);
 					if (((t && mode == -1) || (!t && mode == 1)) || (j == 0 && k == 0)) {
 						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), 0, NULL);
@@ -238,6 +240,8 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				t = (server->player[player].map[index].fog) ? 0 : 1;
 				fogdiff = (server->player[player].map[index].fog > 0);
 				fogdiff = (oldfog ^ fogdiff);
+				if (mode < 0 && j == 0 && k == 0)
+					unitAnnounce(owner, player, 0, index);
 				if (fogdiff || (j == 0 && k == 0)) {
 					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 					if (mode > 0)
@@ -307,9 +311,11 @@ int playerBuildQueueLoop(int msec) {
 				continue;
 			unit = server->player[i].queue.queue[j].building;
 			if (server->player[i].queue.queue[j].progress == 100) {
-				server->player[i].queue.ready[unit].count++;
-				playerBuildQueueStop(i, unit);
-				messageBufferPushDirect(i, i, MSG_SEND_UNIT_READY, unit, server->player[i].queue.ready[unit].count, NULL);
+				if (playerCanQueueAnotherBuilding(i) == 0) {
+					server->player[i].queue.ready[unit].count++;
+					playerBuildQueueStop(i, unit);
+					messageBufferPushDirect(i, i, MSG_SEND_UNIT_READY, unit, server->player[i].queue.ready[unit].count, NULL);
+				}
 				continue;
 			}
 
@@ -396,8 +402,9 @@ void playerClear(int player) {
 	messageBufferPushDirect(player, player, MSG_SEND_MAP_CLEAR, 0, 0, NULL);
 	for (i = 0; i < server->w * server->h; i++) {
 		server->player[player].map[i].fog = 1;
-		if (server->map[i])
-			unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
+		if (!server->map[i])
+			continue;
+		unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
 	}
 
 	return;
@@ -426,4 +433,16 @@ void playerDefeatAnnounce(int player) {
 	playerClear(player);
 
 	return;
+}
+
+
+int playerCanQueueAnotherBuilding(int player) {
+	int i, cnt, buildspots;
+
+	for (i = buildspots = 0; i < server->build_spots; i++)
+		if (server->player[player].queue.queue[i].in_use)
+			buildspots++;
+	for (i = cnt = 0; i < UNITS_DEFINED; i++)
+		cnt += server->player[player].queue.ready[i].count;
+	return (cnt + 1 < PLAYER_BUILDSPOT_MULTIPLIER * buildspots) ? 0 : -1;
 }
