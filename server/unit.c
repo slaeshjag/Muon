@@ -611,6 +611,11 @@ void unitLoop(int msec) {
 	next = server->unit;
 	while (next != NULL) {
 		index = next->x + next->y * server->w;
+		if (next->shield > 0 && server->player[next->owner].map[index].power) {
+			next->shield = 0;
+			unitShieldAnnounce(index);
+		}
+
 		if (next->shield < unit_maxshield[next->type] && server->player[next->owner].map[index].power) {
 			if (next->last_no_shield + UNIT_REGEN_DELAY/server->game.gamespeed <= server->game.time_elapsed) {
 				next->shield += unit_shieldreg[next->type] * msec * server->game.gamespeed;
