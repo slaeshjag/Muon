@@ -1,4 +1,7 @@
+RM	= rm
 
 all:
-	@echo " [DFSI] res/maps"
-	@darnit-fsimage maps map.ldi
+	@./makemaps.sh
+
+clean:
+	@$(RM) *.ldi

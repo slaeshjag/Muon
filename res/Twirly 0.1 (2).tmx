@@ -6,7 +6,7 @@
   <property name="tileset" value="maps/default.png"/>
  </properties>
  <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
-  <image source="maps/default.png" width="256" height="256"/>
+  <image source="maps/Twirly 0.1 (2)/default.png" width="256" height="256"/>
  </tileset>
  <layer name="terrain" width="48" height="48">
   <data encoding="base64" compression="zlib">
