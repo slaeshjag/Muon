@@ -20,12 +20,12 @@
 #include <string.h>
 
 #include "muon.h"
+#include "menu/menu.h"
 #include "view.h"
 #include "client.h"
 #include "chat.h"
 #include "game.h"
 #include "intmath.h"
-#include "menu.h"
 
 void (*state_render[])()={
 		view_background_draw,

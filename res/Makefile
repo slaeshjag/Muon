@@ -1,4 +1,4 @@
-RM	= rm
+RM	= rm -f
 
 all:
 	@./makemaps.sh

@@ -20,12 +20,13 @@
 #include <string.h>
 
 #include "muon.h"
+#include "menu/menu.h"
+#include "menu/multiplayer.h"
 #include "view.h"
 #include "game.h"
 //#include "client.h"
 //#include "engine.h"
 #include "chat.h"
-#include "menu.h"
 #include "lobby.h"
 #include "intmath.h"
 #include "map.h"
@@ -43,6 +44,7 @@ void view_init() {
 		view_background_ts=darnitRenderTilesheetNew(1, 1, view_background_w, view_background_h, DARNIT_PFORMAT_RGB5A1);
 		view_background_tile=darnitRenderTileAlloc(1);
 		view_background_pixbuf=malloc(view_background_w*view_background_h*sizeof(unsigned int));
+		darnitRenderTilesheetScaleAlgorithm(view_background_ts, DARNIT_SCALE_LINEAR);
 		darnitRenderTileMove(view_background_tile, 0, view_background_ts, 0, 0);
 		darnitRenderTileSetTilesheetCoord(view_background_tile, 0, view_background_ts, 0, 0, view_background_w, view_background_h);
 		darnitRenderTileSizeSet(view_background_tile, 0, platform.screen_w, platform.screen_h);
@@ -55,7 +57,7 @@ void view_init() {
 	game_view_init();
 	
 	gamestate_pane[0]=&panelist_menu_sidebar;
-	gamestate_pane[1]=&panelist_connecting;
+	gamestate_pane[1]=&panelist_multiplayer_connecting;
 	gamestate_pane[2]=&panelist_lobby;
 	gamestate_pane[3]=&panelist_game_sidebar;
 	gamestate_pane[4]=&panelist_game_menu;

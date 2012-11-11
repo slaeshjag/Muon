@@ -19,8 +19,10 @@ all: $(OBJFILES)
 	@echo ""
 	@echo " [ CD ] client/ui/"
 	+@make -C ui/
+	@echo " [ CD ] client/menu/"
+	+@make -C menu/
 	@echo " [ LD ]	client/$(BIN)"
-	@$(CC) $(OBJFILES) ui/*.o $(SERVER) -o $(BIN) $(LIBS) $(LDFLAGS)
+	@$(CC) $(OBJFILES) ui/*.o menu/*.o $(SERVER) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " Done."
 	@echo
 
@@ -32,6 +34,8 @@ clean:
 	@echo ""
 	@echo " [ CD ] client/ui/"
 	+@make -C ui/ clean
+	@echo " [ CD ] client/menu/"
+	+@make -C menu/ clean
 
 %.o: %.c %.h
 	@echo " [ CC ]	client/$<"
