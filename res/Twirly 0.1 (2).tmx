@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="48" height="48" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="max_players" value="2"/>
+  <property name="name" value="Twirly 0.1 (2)"/>
+  <property name="tileset" value="maps/default.png"/>
+ </properties>
+ <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
+  <image source="maps/default.png" width="256" height="256"/>
+ </tileset>
+ <layer name="terrain" width="48" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzVkkkOAyEMBPnW/P9juUZRDMa92GOJI13Vhmet9Vye3SjuMQ/K7+7A4HV1UHBc/kqGuoNjR9EoclVvrOBN8K8y3e5MLpqBdI0Gyag6TNm/ix+N07/icZoJbxjlZMa9/6yXwv2XX72P9kC5zDPNucL65+r07t6Z8g90ebD8XT0YvK4OLFZm1N47TtZD3eE2H+ErOtxkMtmMnGzGbpx/lslRZqsZzN2cOjB4SndHB7V7pgeaWd3dhA67u9lBOrjfmtmj4686/NHMk5uqCyvr5j6zAyOrcpfljzhUds/ksrIU/C7/qvt31lv3j/Zm+Xf0YPG7OrC40bzB/dRB1UWRnZmp7o4OSNYH5Vt5sA==
+  </data>
+ </layer>
+ <layer name="buildings" width="48" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzt1iEOgDAURMEqEkgNhPufFV9EDWFbmHHfvVQ0WwrwhNrca6Tif7Z0AFNZ0gEAwOe9sTdsGoA+f+WdNwEAEmbYIEc6gOHtzX1GKqDvAjVBAHs=
+  </data>
+ </layer>
+ <layer name="collision" width="48" height="48">
+  <data encoding="base64" compression="zlib">
+   eJzVlUEShTAIQ114/zP/veP0tyQvYGZcKbyAlF7Xue7FQ8Q5pfK7a3DwumogOCn/JIOuIdEjap46Z9TBm+C/ypyw46pcNQexX5UcVQ8VEf1P8V3zT8zfKs/qTu6Y/5Wn3e86+7/ri/D+5KtK+yY0zbNrJpO+u3umasJ/f/qoxnXVkdiLlFys9H845ez6oGs4za/wiRqqPVfZxIzufkf3LnE2yNw0w63kGadE1kB7f2O5/VeYrr3i2HWnLJU9YWbpvaiq0z8xo//eTzobJ/HUuajmqsQSO8XlP8V15SL4anzVv6ov91+Rcp4m3E3UPk6J3AF0HW4Wcc/u8oicZB2pvky6b39KBwmB
+  </data>
+ </layer>
+ <layer name="fow" width="48" height="48" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztwwEJAAAMBKHj+4dejoGCq6aqqqqqqqqqqr58WvwSAQ==
+  </data>
+ </layer>
+</map>
