@@ -3,10 +3,10 @@
  <properties>
   <property name="max_players" value="4"/>
   <property name="name" value="testmap"/>
-  <property name="tileset" value="maps/default.png"/>
+  <property name="tileset" value="mapdata/default.png"/>
  </properties>
  <tileset firstgid="1" name="lol" tilewidth="32" tileheight="32">
-  <image source="maps/default.png" width="256" height="256"/>
+  <image source="maps/Twirly 0.1 (2)/default.png" width="256" height="256"/>
  </tileset>
  <layer name="terrain" width="32" height="32">
   <data encoding="csv">
