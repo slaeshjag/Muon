@@ -232,7 +232,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			f=NULL;
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
-			map_init("maps/map.ldmz");
+			map_init("mapdata/map.ldmz");
 			lobby_ready_checkbox_enable();
 			break;
 		case MSG_RECV_GAME_START:

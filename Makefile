@@ -13,3 +13,5 @@ clean:
 	+@make -C server/ clean
 	@echo " [ CD ] client/"
 	+@make -C client/ clean
+	@echo " [ CD ] res/"
+	+@make -C res/ clean

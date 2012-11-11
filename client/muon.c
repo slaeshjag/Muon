@@ -87,7 +87,7 @@ int main() {
 	
 	player_id=0;
 	serverInit();
-	serverStart("../res/map.ldi", 2, 1337, 3);
+	serverStart("../res/current_map.ldi", 2, 1337, 3);
 	
 	intmath_init();
 	ui_init();

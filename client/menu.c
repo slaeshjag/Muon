@@ -110,7 +110,7 @@ void menu_init() {
 		sprintf(buf, "%ix%i", videomodes[i]->w, videomodes[i]->h);
 		ui_listbox_add(settings_monitor_listbox_modes, buf);
 	}
-		
+	
 	//Connect to server
 	v.p=NULL;
 	panelist_connect_server.pane=ui_pane_create(16, 16, 256, 128, NULL);
