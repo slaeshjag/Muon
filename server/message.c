@@ -84,8 +84,6 @@ int messageBufferPushDirect(unsigned int to, unsigned int player, unsigned int m
 	msg.arg[1] = arg_2;
 	msg.extra = data;
 
-	fprintf(stderr, "To: %i, from: %i. Packet %i (%i %i)\n", to, player, message, arg_1, arg_2);
-
 	return messageBufferPush(server->player[to].msg_buf, &msg);
 }
 
