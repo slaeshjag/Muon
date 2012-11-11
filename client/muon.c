@@ -87,7 +87,7 @@ int main() {
 	
 	player_id=0;
 	serverInit();
-	serverStart("../res/testmap.ldi", 2, 1337, 3);
+	serverStart("../res/Twirly 0.1 (2).ldi", 2, 1337, 3);
 	
 	intmath_init();
 	ui_init();
