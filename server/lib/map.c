@@ -23,7 +23,7 @@
 void *ldmzLoad(const char *fname) {
 	void *ret;
 	darnitFSMount(fname);
-	ret = darnitMapLoad("maps/map.ldmz");
+	ret = darnitMapLoad("mapdata/map.ldmz");
 	darnitFSUnmount(fname);
 
 	return ret;

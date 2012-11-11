@@ -37,10 +37,9 @@ typedef struct {
 
 
 LDMZ_MAP *ldmzLoad(const char *fname) {
-	FILE *fp, *new;
+	FILE *fp;
 	LDI_HEADER ldih;
 	LDI_FILE ldif;
-	char dir[128];
 	int i;
 	off_t start;
 	void *map;
@@ -60,7 +59,7 @@ LDMZ_MAP *ldmzLoad(const char *fname) {
 	start = sizeof(LDI_HEADER) + sizeof(LDI_FILE) * ldih.files;
 	for (i = 0; i < ldih.files; i++) {
 		fread(&ldif, sizeof(ldif), 1, fp);
-		if (strcmp("maps/map.ldmz", ldif.name) != 0)
+		if (strcmp("mapdata/map.ldmz", ldif.name) != 0)
 			continue;
 		utilBlockToHostEndian(&ldif.pos, 3);
 		fseek(fp, start + ldif.pos, SEEK_SET);
