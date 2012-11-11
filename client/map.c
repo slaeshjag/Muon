@@ -235,7 +235,7 @@ void map_draw(int draw_powergrid) {
 			movey=map->cam_y%map->layer->tile_h;
 			
 		darnitRenderOffset(movex, movey);
-		darnitRenderTint(0.4, 0.4, 0.4, 1);
+		darnitRenderTint(0.07, 0.07, 0.07, 1);
 		darnitRenderLineDraw(map_grid, map_grid_lines);
 		darnitRenderTint(1, 1, 1, 1);
 	}
