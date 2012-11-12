@@ -29,7 +29,16 @@ UI_WIDGET *ui_widget_create_slider(unsigned int steps) {
 		free(widget);
 		return NULL;
 	}
-	widget->event_handler=NULL;
+	if((widget->event_handler=malloc(sizeof(UI_EVENT_HANDLER)))==NULL) {
+		free(widget->properties);
+		free(widget);
+		return NULL;
+	}
+	widget->event_handler->handlers=NULL;
+	widget->event_handler->add=ui_event_add;
+	widget->event_handler->remove=ui_event_remove;
+	widget->event_handler->send=ui_event_send;
+	widget->event_handler->add(widget, ui_slider_event_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
 	
 	struct UI_SLIDER_PROPERTIES *p=widget->properties;
 	p->line=darnitRenderLineAlloc(1+steps, 1);
@@ -53,6 +62,16 @@ void *ui_widget_destroy_slider(UI_WIDGET *widget) {
 	darnitRenderRectFree(p->handle);
 	darnitRenderLineFree(p->line);
 	return ui_widget_destroy(widget);
+}
+
+void ui_slider_event_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int i, value=0;
+	struct UI_SLIDER_PROPERTIES *p=widget->properties;
+	for(i=0; i<p->steps; i++)
+		if(e->mouse->x>widget->x+2+(widget->w-4)/(p->steps-1)/2+i*((widget->w-4)/(p->steps-1)))
+			value++;
+	p->value=value;
+	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
 
 void ui_slider_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
@@ -98,7 +117,7 @@ void ui_slider_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 		int xx=x+2+i*((w-4)/(p->steps-1));
 		darnitRenderLineMove(p->line, i+1, xx, y+h/2-2, xx, y+h/2+2);
 	}
-	int xx=x+2+p->value*((w-4)/p->steps);
+	int xx=x+2+p->value*((w-4)/(p->steps-1));
 	darnitRenderRectSet(p->handle, 0, xx-2, y+h/2-4, xx+2, y+h/2+4);
 }
 

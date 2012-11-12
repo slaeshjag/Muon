@@ -96,6 +96,14 @@ void ui_listbox_clear(UI_WIDGET *widget) {
 	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
 
+char *ui_listbox_get(UI_WIDGET *widget, int index) {
+	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
+	struct UI_LISTBOX_LIST *l;
+	int i;
+	for(l=p->list, i=0; l&&i<index; l=l->next);
+	return l->text;
+}
+
 void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	int text_h;//darnitFontGetGlyphH(p->font)+2;

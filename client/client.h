@@ -20,6 +20,11 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
+#define CLIENT_PORT "1337"
+
+static const char mapdir[]="maps";
+static const unsigned char ldimagic[]={0x83, 0xB3, 0x66, 0x1B, 0xBB, 0xA7, 0x7A, 0xBC};
+
 DARNIT_SOCKET *sock;
 MESSAGE_RAW msg_recv;
 void *msg_recv_offset;

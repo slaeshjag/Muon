@@ -87,7 +87,7 @@ int main() {
 	
 	player_id=0;
 	serverInit();
-	serverStart("../res/Twirly 0.1 (2).ldi", 2, 1337, 3);
+	darnitDirectoryCreate("maps");
 	
 	intmath_init();
 	ui_init();
