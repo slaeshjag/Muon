@@ -79,6 +79,8 @@ void ui_slider_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 	switch(prop) {
 		case UI_SLIDER_PROP_VALUE:
 			p->value=value.i;
+			if(p->value>=p->steps)
+				p->value=p->steps-1;
 			widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 			break;
 		case UI_SLIDER_PROP_STEPS:

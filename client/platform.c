@@ -74,7 +74,7 @@ void platform_config_init_defaults() {
 		darnitButtonMappingSet(keymap);
 	}
 	config.grid=1;
-	config.plasma=4;
+	config.plasma=3;
 	strcpy(config.player_name, "player");
 }
 
