@@ -37,13 +37,17 @@ void menu_multiplayer_init() {
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_label(font_std, "Port"), 0);
 	multiplayer_host_entry_port=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(multiplayer_host_vbox, multiplayer_host_entry_port, 0);
-	v.p=CLIENT_PORT;
+	v.p=CLIENT_DEFAULT_PORT;
 	multiplayer_host_entry_port->set_prop(multiplayer_host_entry_port, UI_ENTRY_PROP_TEXT, v);
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_label(font_std, "Number of players"), 0);
 	multiplayer_host_slider_players=ui_widget_create_slider(4);
+	v.i=CLIENT_DEFAULT_PLAYERS-1;
+	multiplayer_host_slider_players->set_prop(multiplayer_host_slider_players, UI_SLIDER_PROP_VALUE, v);
 	ui_vbox_add_child(multiplayer_host_vbox, multiplayer_host_slider_players, 0);
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_label(font_std, "Game speed"), 0);
 	multiplayer_host_slider_gamespeed=ui_widget_create_slider(10);
+	v.i=CLIENT_DEFAULT_GAMESPEED-1;
+	multiplayer_host_slider_gamespeed->set_prop(multiplayer_host_slider_gamespeed, UI_SLIDER_PROP_VALUE, v);
 	ui_vbox_add_child(multiplayer_host_vbox, multiplayer_host_slider_gamespeed, 0);
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_spacer(), 1);
 	multiplayer_host_button_host=ui_widget_create_button(ui_widget_create_label(font_std, "Host"));
@@ -56,18 +60,18 @@ void menu_multiplayer_init() {
 	panelist_multiplayer_join.pane=ui_pane_create(16, 16, 256, 128, NULL);
 	ui_pane_set_root_widget(panelist_multiplayer_join.pane, ui_widget_create_vbox());
 	panelist_multiplayer_join.next=NULL;
-	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, ui_widget_create_label(font_std, "Connect to a server"), 1);
+	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, ui_widget_create_label(font_std, "Join a server"), 1);
 	multiplayer_join_entry_host=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_entry_host, 0);
 	multiplayer_join_entry_port=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_entry_port, 0);
 	multiplayer_join_entry_host->event_handler->add(multiplayer_join_entry_host, multiplayer_join_button_click, UI_EVENT_TYPE_KEYBOARD);
-	multiplayer_join_button=ui_widget_create_button(ui_widget_create_label(font_std, "Connect"));
+	multiplayer_join_button=ui_widget_create_button(ui_widget_create_label(font_std, "Join"));
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_button, 0);
 	multiplayer_join_button->event_handler->add(multiplayer_join_button, multiplayer_join_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	v.p="localhost";
 	multiplayer_join_entry_host->set_prop(multiplayer_join_entry_host, UI_ENTRY_PROP_TEXT, v);
-	v.p=CLIENT_PORT;
+	v.p=CLIENT_DEFAULT_PORT;
 	multiplayer_join_entry_port->set_prop(multiplayer_join_entry_port, UI_ENTRY_PROP_TEXT, v);
 	
 	//Connecting

@@ -69,6 +69,14 @@ void map_init(char *filename) {
 	int j;
 	for(j=0; j<MIN(platform.screen_h, map_h)/map->layer->tile_h+1; i++, j++)
 		darnitRenderLineMove(map_grid, i, 0, map->layer->tile_h*j, MIN(platform.screen_w, map_w), map->layer->tile_h*j);
+	
+	for(i=0; i<map->layer->tilemap->w*map->layer->tilemap->w; i++) {
+		for(j=0; j<map->layers-2; j++)
+			if(map->layer[j].tilemap->data[i]&0xFFF)
+				break;
+		if(j>=map->layers-2)
+			map->layer[map->layers-2].tilemap->data[i]|=1<<17;
+	}
 }
 
 void map_close(DARNIT_MAP *map) {
@@ -114,7 +122,7 @@ void map_calculate_powergrid() {
 }
 
 void map_building_place(int index, int player, int building) {
-	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_BUILDSITE)?5:(building!=0)*(player*8+building+7);
+	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_BUILDSITE)?5:(building!=0)*(player*8+building+7)|(map->layer[map->layers-2].tilemap->data[index]&(1<<17));
 	if(building==BUILDING_ATTACKER||building==BUILDING_SCOUT) {
 		game_attacklist_add(index);
 	} else if(building==BUILDING_NONE) {
@@ -287,15 +295,19 @@ void map_minimap_update() {
 	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
 	DARNIT_TILEMAP *fow_tilemap=map->layer[map->layers-1].tilemap;
 	for(y=0; y<(SIDEBAR_WIDTH-8); y++)
-		for(x=0; x<(SIDEBAR_WIDTH-8); x++)
-			minimap_data[y*(SIDEBAR_WIDTH-8)+x]=minimap_colors[(fow_tilemap->data[(y*(building_tilemap->h)/(SIDEBAR_WIDTH-8))*(building_tilemap->w)+(x*(building_tilemap->w))/(SIDEBAR_WIDTH-8)]&0xFFF)==1];
+		for(x=0; x<(SIDEBAR_WIDTH-8); x++) {
+			int index=(y*(fow_tilemap->h)/(SIDEBAR_WIDTH-8))*(fow_tilemap->w)+(x*(fow_tilemap->w))/(SIDEBAR_WIDTH-8);
+			minimap_data[y*(SIDEBAR_WIDTH-8)+x]=minimap_colors[((fow_tilemap->data[index]&0xFFF)!=1)*(((map->layer[map->layers-2].tilemap->data[index]&(1<<17))==0)?1:7)];
+		}
 	
 	for(y=0; y<building_tilemap->h; y++)
 		for(x=0; x<building_tilemap->w; x++)
-			if((building_tilemap->data[(y*building_tilemap->w)+x]&~0xFFF)>0)
-				minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
-			else if(building_tilemap->data[(y*building_tilemap->w)+x]==5&&(fow_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==0)
-				minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[6];
+			if((fow_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==0) {
+				if(building_tilemap->data[(y*building_tilemap->w)+x]==5)
+					minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[6];
+				else if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)>0)
+					minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
+			}
 	
 	UI_PROPERTY_VALUE v;
 	v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);

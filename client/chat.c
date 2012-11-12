@@ -149,7 +149,9 @@ void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void chat_recv(int player, char *buf, int len) {
 	//buf must be at least one byte larger than len!
-	char *chatmsg=(char *)malloc(len+36);
+	char *chatmsg;
+	if(!(chatmsg=malloc(len+36)))
+		return;
 	buf[len]=0;
 	sprintf(chatmsg, "<%s> %s\n", &player_names[player*32], buf);
 	ui_listbox_add(chat_listbox, chatmsg);
@@ -160,7 +162,9 @@ void chat_recv(int player, char *buf, int len) {
 }
 
 void chat_join(int player) {
-	char *chatmsg=malloc(64);
+	char *chatmsg;
+	if(!(chatmsg=malloc(64)))
+		return;
 	sprintf(chatmsg, " * %s joined", &player_names[player*32]);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
@@ -168,7 +172,9 @@ void chat_join(int player) {
 }
 
 void chat_leave(int player) {
-	char *chatmsg=malloc(64);
+	char *chatmsg;
+	if(!(chatmsg=malloc(64)))
+		return;
 	sprintf(chatmsg, " * %s disconnected", &player_names[player*32]);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
@@ -176,7 +182,9 @@ void chat_leave(int player) {
 }
 
 void chat_defeated(int player) {
-	char *chatmsg=malloc(64);
+	char *chatmsg;
+	if(!(chatmsg=malloc(64)))
+		return;
 	sprintf(chatmsg, " * %s defeated", &player_names[player*32]);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
@@ -184,7 +192,9 @@ void chat_defeated(int player) {
 }
 
 void chat_countdown(int countdown) {
-	char *chatmsg=malloc(32);
+	char *chatmsg;
+	if(!(chatmsg=malloc(32)))
+		return;
 	sprintf(chatmsg, " * Game starts in %i", countdown);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);

@@ -26,28 +26,10 @@ UI_WIDGET *menu_sidebar_button[8];
 UI_WIDGET *menu_sidebar_spacer;
 UI_WIDGET *menu_sidebar_button_quit;
 
-struct UI_PANE_LIST panelist_settings_monitor;
-UI_WIDGET *settings_monitor_vbox;
-UI_WIDGET *settings_monitor_hbox_checkbox;
-UI_WIDGET *settings_monitor_listbox_modes;
-UI_WIDGET *settings_monitor_entry_w;
-UI_WIDGET *settings_monitor_entry_h;
-UI_WIDGET *settings_monitor_checkbox_fullscreen;
-UI_WIDGET *settings_monitor_button_cancel;
-UI_WIDGET *settings_monitor_button_ok;
-
-struct UI_PANE_LIST panelist_input_name;
-UI_WIDGET *input_name_entry;
-UI_WIDGET *input_name_button;
-
 void menu_init();
 
 void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
-
-void settings_monitor_listbox_modes_changed(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
-void settings_monitor_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
-void input_name_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 //In-game menu
 struct UI_PANE_LIST panelist_game_menu;
