@@ -26,5 +26,6 @@ void *ldmzFree(void *map);
 void ldmzGetSize(void *map, int *x, int *y);
 unsigned int *ldmzGetData(void *map);
 const char *ldmzFindProp(void *map, const char *key);
+void *ldmzCache(const char *fname, unsigned int *len);
 
 #endif
