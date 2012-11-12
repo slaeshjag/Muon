@@ -72,9 +72,13 @@ int serverInitMap(const char *path) {
 			break;
 	}
 
-	server->map_c.path = path;
-	server->pylons = NULL;
+	for (server->map_c.path = path; path; server->map_c.path = path + 1);
+	path = server->map_c.path;
+	if (!(server->map_c.path = malloc(strlen(path) + 1)))
+		return -1;
+	strcpy((char *) server->map_c.path, path);
 
+	server->pylons = NULL;
 
 	return 0;
 }
