@@ -2,7 +2,7 @@
 
 MAKEFLAGS += --no-print-directory
 
-BIN  = server
+BIN  = ../muon-server
 LIBOUT = server.a
 STANDALONE = standalone/*.o
 LIBOBJ = lib/*.o

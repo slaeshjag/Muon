@@ -32,8 +32,8 @@
 
 void view_init() {
 	//TODO: lots of breaking out to separate functions, game menu and lobby for example
-	font_std=darnitFontLoad("../res/FreeMonoBold.ttf", 12, 512, 512);
-	mouse_tilesheet=darnitRenderTilesheetLoad("../res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
+	font_std=darnitFontLoad("res/FreeMonoBold.ttf", 12, 512, 512);
+	mouse_tilesheet=darnitRenderTilesheetLoad("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	
 	//Menu background
 	//TODO: free these later

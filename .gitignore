@@ -1,7 +1,9 @@
 *.o
-client/muon
-server/server
+muon
+muon-server
 server/server_tester/server-tester
+maps
+client/res
 *.swp
 *.a
 *.ldi

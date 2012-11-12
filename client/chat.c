@@ -43,7 +43,7 @@ void chat_init() {
 	
 	panelist_chat_indicator.pane=ui_pane_create(0, platform.screen_h-(32+UI_PADDING*2), 32+UI_PADDING*2, 32+UI_PADDING*2, NULL);
 	panelist_chat_indicator.next=NULL;
-	chat_indicator_image=ui_widget_create_imageview_file("../res/chat.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	chat_indicator_image=ui_widget_create_imageview_file("res/chat.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ui_pane_set_root_widget(panelist_chat_indicator.pane, chat_indicator_image);
 	chat_indicator_image->event_handler->add(chat_indicator_image, chat_indicator_image_click, UI_EVENT_TYPE_MOUSE_PRESS);
 }

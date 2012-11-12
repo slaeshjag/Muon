@@ -218,7 +218,7 @@ SERVER *serverStop() {
 	networkSocketDisconnect(server->accept);
 	ldmzFree(server->map_data);
 	free(server->map_c.data);
-	free(server->map_c.path);
+	free((void *) server->map_c.path);
 
 	free(server);
 	server = NULL;
