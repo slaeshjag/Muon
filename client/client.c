@@ -214,9 +214,11 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 				darnitFileClose(f);
 			}
 			filesize_bytes=msg->arg_1;
-			filename=malloc(msg->arg_2+1);
-			memcpy(filename, payload, msg->arg_2);
-			filename[msg->arg_2]=0;
+			filename=malloc(5+msg->arg_2+1);
+			//memcpy(filename, payload, msg->arg_2);
+			//filename[msg->arg_2]=0;
+			payload[msg->arg_2]=0;
+			sprintf(filename, "%s/%s", mapdir, payload);
 			f=darnitFileOpen(filename, "wb");
 			break;
 		case MSG_RECV_MAP_CHUNK:

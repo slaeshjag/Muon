@@ -20,12 +20,12 @@
 #include <string.h>
 
 #include "muon.h"
+#include "menu/menu.h"
 #include "view.h"
 #include "client.h"
 #include "chat.h"
 #include "game.h"
 #include "intmath.h"
-#include "menu.h"
 
 void (*state_render[])()={
 		view_background_draw,
@@ -87,7 +87,7 @@ int main() {
 	
 	player_id=0;
 	serverInit();
-	serverStart("../res/current_map.ldi", 2, 1337, 3);
+	darnitDirectoryCreate("maps");
 	
 	intmath_init();
 	ui_init();

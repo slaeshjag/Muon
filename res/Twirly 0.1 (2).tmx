@@ -3,7 +3,7 @@
  <properties>
   <property name="max_players" value="2"/>
   <property name="name" value="Twirly 0.1 (2)"/>
-  <property name="tileset" value="maps/default.png"/>
+  <property name="tileset" value="mapdata/default.png"/>
  </properties>
  <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
   <image source="maps/Twirly 0.1 (2)/default.png" width="256" height="256"/>

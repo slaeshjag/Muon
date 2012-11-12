@@ -17,31 +17,24 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CLIENT_H
-#define CLIENT_H
+#ifndef MENU_H
+#define MENU_H
 
-#define CLIENT_DEFAULT_PORT "1337"
-#define CLIENT_DEFAULT_PLAYERS 2
-#define CLIENT_DEFAULT_GAMESPEED 3
+//Main menu
+struct UI_PANE_LIST panelist_menu_sidebar;
+UI_WIDGET *menu_sidebar_button[8];
+UI_WIDGET *menu_sidebar_spacer;
+UI_WIDGET *menu_sidebar_button_quit;
 
-static const char mapdir[]="maps";
-static const unsigned char ldimagic[]={0x83, 0xB3, 0x66, 0x1B, 0xBB, 0xA7, 0x7A, 0xBC};
+void menu_init();
 
-DARNIT_SOCKET *sock;
-MESSAGE_RAW msg_recv;
-void *msg_recv_offset;
-unsigned char msg_recv_payload[512];
-unsigned char *msg_recv_payload_offset;
-int player_id;
-char *player_names;
+void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
-void (*client_message_handler)(MESSAGE_RAW *, unsigned char *);
+//In-game menu
+struct UI_PANE_LIST panelist_game_menu;
+UI_WIDGET *game_menu_button[3];
 
-void client_chat(int id, char *buf, int len);
-
-int client_init(char *host, int port);
-void client_disconnect();
-void client_check_incomming();
-void client_message_send(int player_id, int command, int arg_1, int arg_2, char *payload);
+void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif

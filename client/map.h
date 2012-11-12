@@ -36,8 +36,8 @@ unsigned int minimap_data[(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8)];
 DARNIT_LINE *minimap_viewport;
 
 static const unsigned int minimap_colors[]={
-	0xFF000000,
 	0xFF7F007F,
+	0xFF000000,
 	
 	0xFF0000FF,
 	0xFFFF0000,
@@ -45,6 +45,7 @@ static const unsigned int minimap_colors[]={
 	0xFF00FFFF,
 	
 	0xFFFFFF,
+	0xFF00007F,
 };
 
 struct MAP_SELECTED {
