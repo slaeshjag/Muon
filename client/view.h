@@ -31,6 +31,7 @@ DARNIT_TILE *view_background_tile;
 unsigned int *view_background_pixbuf;
 
 void view_init();
+void view_background_update(int t);
 void view_background_draw();
 void view_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 

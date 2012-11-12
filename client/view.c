@@ -24,33 +24,27 @@
 #include "menu/multiplayer.h"
 #include "view.h"
 #include "game.h"
-//#include "client.h"
-//#include "engine.h"
 #include "chat.h"
 #include "lobby.h"
 #include "intmath.h"
 #include "map.h"
 
 void view_init() {
-	//TODO: lots of breaking out to separate functions, game menu and lobby for example
 	font_std=darnitFontLoad("res/FreeMonoBold.ttf", 12, 512, 512);
 	mouse_tilesheet=darnitRenderTilesheetLoad("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	
 	//Menu background
-	//TODO: free these later
-	if(config.plasma) {
-		view_background_w=platform.screen_w/config.plasma;
-		view_background_h=platform.screen_h/config.plasma;
-		view_background_ts=darnitRenderTilesheetNew(1, 1, view_background_w, view_background_h, DARNIT_PFORMAT_RGB5A1);
-		view_background_tile=darnitRenderTileAlloc(1);
-		view_background_pixbuf=malloc(view_background_w*view_background_h*sizeof(unsigned int));
-		darnitRenderTilesheetScaleAlgorithm(view_background_ts, DARNIT_SCALE_LINEAR);
-		darnitRenderTileMove(view_background_tile, 0, view_background_ts, 0, 0);
-		darnitRenderTileSetTilesheetCoord(view_background_tile, 0, view_background_ts, 0, 0, view_background_w, view_background_h);
-		darnitRenderTileSizeSet(view_background_tile, 0, platform.screen_w, platform.screen_h);
-		memset(view_background_pixbuf, 0, view_background_w*view_background_h*sizeof(unsigned int));
-		darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
-	}
+	int scale=config.plasma==0?2:(1<<(5-config.plasma));
+	view_background_w=platform.screen_w/scale;
+	view_background_h=platform.screen_h/scale;
+	view_background_ts=darnitRenderTilesheetNew(1, 1, view_background_w, view_background_h, DARNIT_PFORMAT_RGB5A1);
+	view_background_tile=darnitRenderTileAlloc(1);
+	view_background_pixbuf=malloc(view_background_w*view_background_h*sizeof(unsigned int));
+	darnitRenderTilesheetScaleAlgorithm(view_background_ts, DARNIT_SCALE_LINEAR);
+	darnitRenderTileMove(view_background_tile, 0, view_background_ts, 0, 0);
+	darnitRenderTileSetTilesheetCoord(view_background_tile, 0, view_background_ts, 0, 0, view_background_w, view_background_h);
+	darnitRenderTileSizeSet(view_background_tile, 0, platform.screen_w, platform.screen_h);
+	view_background_update(0);
 	
 	menu_init();
 	lobby_init();
@@ -66,20 +60,24 @@ void view_init() {
 	map=NULL;
 }
 
+void view_background_update(int t) {
+	static int x, y, mov1, mov2, c1, c2, c3;
+	for (y=0; y<view_background_h; y++)
+		for (x=0; x<view_background_w; x++) {
+			mov1=360*y/view_background_h+(t>>1);
+			mov2=360*x/view_background_w;
+			c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
+			c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
+			c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
+			view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/360+26;
+		}
+	darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
+}
+
 void view_background_draw() {
 	static int t=0, recalc=0;
-	static int x, y, mov1, mov2, c1, c2, c3;
 	if(config.plasma&&recalc) {
-		for (y=0; y<view_background_h; y++)
-			for (x=0; x<view_background_w; x++) {
-				mov1=360*y/view_background_h+(t>>1);
-				mov2=360*x/view_background_w;
-				c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
-				c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
-				c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
-				view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/360+26;
-			}
-		darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
+		view_background_update(t);
 		t++;
 	}
 	recalc=!recalc;

@@ -31,6 +31,7 @@ UI_WIDGET *settings_monitor_listbox_modes;
 UI_WIDGET *settings_monitor_entry_w;
 UI_WIDGET *settings_monitor_entry_h;
 UI_WIDGET *settings_monitor_checkbox_fullscreen;
+UI_WIDGET *settings_monitor_slider_plasma;
 UI_WIDGET *settings_monitor_button_cancel;
 UI_WIDGET *settings_monitor_button_ok;
 
