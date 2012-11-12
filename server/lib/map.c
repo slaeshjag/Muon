@@ -56,3 +56,26 @@ const char *ldmzFindProp(void *map, const char *key) {
 
 	return darnitMapPropGet(dmap->prop, key);
 }
+
+
+void *ldmzCache(const char *fname, unsigned int *len) {
+	DARNIT_FILE *f;
+	void *data;
+
+	if (!(f = darnitFileOpen(fname, "rb")))
+		return NULL;
+	
+	darnitFileSeek(f, 0, SEEK_END);
+	*len = darnitFileTell(f);
+	if (!(data = malloc(darnitFileTell(f)))) {
+		darnitFileClose(f);
+		return NULL;
+	}
+
+	darnitFileSeek(f, 0, SEEK_SET);
+	darnitFileRead(data, *len, f);
+		
+	darnitFileClose(f);
+
+	return data;
+}

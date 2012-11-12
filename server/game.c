@@ -162,5 +162,17 @@ void gameEnd() {
 
 	team += 1;
 	playerMessageBroadcast(player, MSG_SEND_GAME_ENDED, player, team, NULL);
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status < PLAYER_SPECTATING)
+			continue;
+		fprintf(stdout, "=== Stats for %s (ID: %i) ===\n", server->player[i].name, i);
+		fprintf(stdout, "Buildings raised: 	%i\n", server->player[i].stats.buildings_raised);
+		fprintf(stdout, "Buildings lost:	%i\n", server->player[i].stats.buildings_lost);
+		fprintf(stdout, "Buildings destroyed:	%i\n", server->player[i].stats.buildings_destroyed);
+		fprintf(stderr, "Buildtime efficiency:	%i\n", server->player[i].stats.buildtime / (server->player[i].stats.buildtime + server->player[i].stats.no_build_time));
+		fprintf(stdout, "\n\n");
+	}
+
 	return;
 }

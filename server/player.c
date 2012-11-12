@@ -44,6 +44,12 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].msg_buf = messageBufferInit();
 		player[i].socket = NULL;
 		player[i].process_recv = PLAYER_PROCESS_NOTHING;
+
+		player[i].stats.buildings_raised = 0;
+		player[i].stats.buildings_lost = 0;
+		player[i].stats.buildings_destroyed = 0;
+		player[i].stats.buildtime = 0;
+		player[i].stats.no_build_time = 0;
 	}
 	
 	server->players = players;
@@ -61,8 +67,6 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		return NULL;
 	}
 
-	server->player = player;
-	server->players = players;
 
 	return server->player;
 }
@@ -262,8 +266,9 @@ int playerBuildQueueInit() {
 	err = 0;
 
 	for (i = 0; i < server->players; i++)
-		if (!(server->player[i].queue.queue = malloc(sizeof(PLAYER_BUILDQUEUE_E) * server->build_spots)))
+		if (!(server->player[i].queue.queue = malloc(sizeof(PLAYER_BUILDQUEUE_E) * server->build_spots))) {
 			err = 1;
+		}
 	if (err) {
 		for (i = 0; i < server->players; i++)
 			free(server->player[i].queue.queue);
@@ -307,8 +312,12 @@ int playerBuildQueueLoop(int msec) {
 		for (j = 0; j < server->build_spots; j++) {
 			if (!server->player[i].queue.queue[j].in_use)
 				continue;
-			if (!server->player[i].queue.queue[j].building)
+			if (!server->player[i].queue.queue[j].building) {
+				server->player[i].stats.no_build_time += msec;
 				continue;
+			}
+
+			server->player[i].stats.buildtime += msec;
 			unit = server->player[i].queue.queue[j].building;
 			if (server->player[i].queue.queue[j].progress == 100) {
 				if (playerCanQueueAnotherBuilding(i) == 0) {

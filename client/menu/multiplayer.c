@@ -108,16 +108,17 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	v=multiplayer_host_entry_port->get_prop(multiplayer_host_entry_port, UI_ENTRY_PROP_TEXT);
 	port=atoi(v.p);
 	v=multiplayer_host_slider_players->get_prop(multiplayer_host_slider_players, UI_SLIDER_PROP_VALUE);
-	players=v.i;
+	players=v.i+1;
 	v=multiplayer_host_slider_gamespeed->get_prop(multiplayer_host_slider_gamespeed, UI_SLIDER_PROP_VALUE);
-	speed=v.i;
+	speed=v.i+1;
 	v=multiplayer_host_listbox_maps->get_prop(multiplayer_host_listbox_maps, UI_LISTBOX_PROP_SELECTED);
 	if(v.i==-1)
 		return;
 	map=ui_listbox_get(multiplayer_host_listbox_maps, v.i);
 	sprintf(buf, "%s/%s", mapdir, map);
 	serverStop();
-	serverStart(buf, players, port, speed);
+	if(!serverStart(buf, players, port, speed))
+		return;
 	if(client_init("localhost", port)==0)
 		game_state(GAME_STATE_CONNECTING);
 	else

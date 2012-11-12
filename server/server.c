@@ -21,29 +21,14 @@
 
 
 int serverInitMap(const char *path) {
-	FILE *fp;
 	int i, n, t, building, owner;
 
 
-	if ((fp = fopen(path, "rb")) == NULL) {
-		fprintf(stderr, "Unable to open map %s for cache", path);
-		errorPush(SERVER_ERROR_CANT_OPEN_MAP);
-		return -1;
-	}
-
-	fseek(fp, 0, SEEK_END);
-	server->map_c.data_len = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	if ((server->map_c.data = malloc(server->map_c.data_len)) == NULL) {		
+	if (!(server->map_c.data = ldmzCache(path, &server->map_c.data_len))) {
 		fprintf(stderr, "Unable to malloc for map cache\n");
 		errorPush(SERVER_ERROR_NO_MEMORY);
-		fclose(fp);
 		return -1;
 	}
-
-	fread(server->map_c.data, server->map_c.data_len, 1, fp);
-	fclose(fp);
 
 	for (i = 0; i < server->players; i++)
 		server->player[i].spawn.x = server->player[i].spawn.y = -1;

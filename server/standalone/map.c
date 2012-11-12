@@ -94,3 +94,23 @@ const char *ldmzFindProp(LDMZ_MAP *map, const char *key) {
 	return mapPropSearch(map->prop, key);
 }
 
+
+void *ldmzCache(const char *fname, unsigned int *len) {
+	FILE *fp;
+	void *data;
+
+	if (!(fp = fopen(fname, "rb")))
+		return NULL;
+	fseek(fp, 0, SEEK_END);
+	*len = ftell(fp);
+	if (!(data = malloc(ftell(fp)))) {
+		fclose(fp);
+		return NULL;
+	}
+
+	fseek(fp, 0, SEEK_SET);
+	fread(data, *len, 1, fp);
+	fclose(fp);
+
+	return data;
+}
