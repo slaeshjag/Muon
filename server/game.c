@@ -170,7 +170,7 @@ void gameEnd() {
 		fprintf(stdout, "Buildings raised: 	%i\n", server->player[i].stats.buildings_raised);
 		fprintf(stdout, "Buildings lost:	%i\n", server->player[i].stats.buildings_lost);
 		fprintf(stdout, "Buildings destroyed:	%i\n", server->player[i].stats.buildings_destroyed);
-		fprintf(stderr, "Buildtime efficiency:	%i\n", server->player[i].stats.buildtime / (server->player[i].stats.buildtime + server->player[i].stats.no_build_time));
+		fprintf(stderr, "Buildtime efficiency:	%i\n", server->player[i].stats.buildtime*100 / (server->player[i].stats.buildtime + server->player[i].stats.no_build_time));
 		fprintf(stdout, "\n\n");
 	}
 
