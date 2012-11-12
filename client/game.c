@@ -197,7 +197,7 @@ void game_update_building_status() {
 }
 
 void game_view_scroll_to(int x, int y) {
-	darnitMapCameraMove(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, x*map->layer[map->layers-2].tile_h-platform.screen_h/2);
+	darnitMapCameraMove(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, y*map->layer[map->layers-2].tile_h-platform.screen_h/2);
 	map_minimap_update_viewport();
 }
 

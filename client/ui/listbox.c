@@ -86,6 +86,7 @@ void ui_listbox_clear(UI_WIDGET *widget) {
 	struct UI_LISTBOX_LIST *l, *next;
 	for(l=p->list; l; l=next) {
 		next=l->next;
+		darnitTextSurfaceFree(l->surface);
 		free(l);
 	}
 	p->list=NULL;
@@ -100,7 +101,7 @@ char *ui_listbox_get(UI_WIDGET *widget, int index) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	struct UI_LISTBOX_LIST *l;
 	int i;
-	for(l=p->list, i=0; l&&i<index; l=l->next);
+	for(l=p->list, i=0; l->next&&i<index; l=l->next);
 	return l->text;
 }
 
