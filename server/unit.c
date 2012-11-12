@@ -325,6 +325,8 @@ int unitAdd(int owner, int type, int x, int y) {
 	
 	unit->next = server->unit;
 	server->unit = unit;
+	server->player[owner].stats.buildings_raised++;
+
 
 	playerCalcLOS(owner, x , y, 1);
 	if (type == UNIT_DEF_GENERATOR)
@@ -357,7 +359,9 @@ int unitRemove(int x, int y) {
 			continue;
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
 	}
-
+	
+	server->player[owner].stats.buildings_lost++;
+	
 	while (next != unit) {
 		parent = &next->next;
 		next = next->next;
@@ -373,6 +377,7 @@ int unitRemove(int x, int y) {
 			playerMessageBroadcast(next->owner, MSG_SEND_PLAYER_DEFEATED, 0, 0, NULL);
 			unitDestroyAll(next->owner);
 			playerDefeatAnnounce(next->owner);
+			messageBufferPushDirect(next->owner, next->owner, MSG_SEND_BUILDING_PLACE, 0, server->player[next->owner].spawn.index, NULL);
 			unitPylonDelete(next);
 			server->map[x + y * server->h] = NULL;
 			if (gameDetectIfOver() == 0)
@@ -611,7 +616,7 @@ void unitLoop(int msec) {
 	next = server->unit;
 	while (next != NULL) {
 		index = next->x + next->y * server->w;
-		if (next->shield > 0 && server->player[next->owner].map[index].power) {
+		if (next->shield > 0 && !server->player[next->owner].map[index].power) {
 			next->shield = 0;
 			unitShieldAnnounce(index);
 		}
@@ -638,6 +643,7 @@ void unitLoop(int msec) {
 					if (!server->player[server->map[next->target]->owner].map[next->target].power)
 						unitShieldAnnounce(index);
 					if (server->map[next->target]->hp <= 0) {
+						server->player[next->owner].stats.buildings_destroyed++;
 						unitRemove(next->target % server->w, next->target / server->w);
 						next->target = -1;
 					}
