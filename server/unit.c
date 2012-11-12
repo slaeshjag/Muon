@@ -366,6 +366,8 @@ int unitRemove(int x, int y) {
 		parent = &next->next;
 		next = next->next;
 	}
+	
+	messageBufferPushDirect(next->owner, next->owner, MSG_SEND_BUILDING_PLACE, 0, x + y * server->w, NULL);
 
 	if (next == unit) {
 		*parent = next->next;
@@ -377,7 +379,6 @@ int unitRemove(int x, int y) {
 			playerMessageBroadcast(next->owner, MSG_SEND_PLAYER_DEFEATED, 0, 0, NULL);
 			unitDestroyAll(next->owner);
 			playerDefeatAnnounce(next->owner);
-			messageBufferPushDirect(next->owner, next->owner, MSG_SEND_BUILDING_PLACE, 0, server->player[next->owner].spawn.index, NULL);
 			unitPylonDelete(next);
 			server->map[x + y * server->h] = NULL;
 			if (gameDetectIfOver() == 0)
