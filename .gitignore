@@ -8,3 +8,4 @@ client/res
 *.a
 *.ldi
 *.orig
+*.log
