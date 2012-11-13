@@ -222,8 +222,9 @@ void map_clear_fow() {
 
 void map_draw(int draw_powergrid) {
 	int i;
-	for(i=0; i<map->layers; i++)
+	for(i=0; i<map->layers-1; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
+	
 	if(config.grid) {
 		int movex, movey;
 		//TODO: clean up
@@ -247,6 +248,9 @@ void map_draw(int draw_powergrid) {
 		darnitRenderLineDraw(map_grid, map_grid_lines);
 		darnitRenderTint(1, 1, 1, 1);
 	}
+	
+	darnitRenderTilemap(map->layer[map->layers-1].tilemap);
+	
 	darnitRenderOffset(map->cam_x, map->cam_y);
 	if(map_border)
 		darnitRenderLineDraw(map_border, 4);
