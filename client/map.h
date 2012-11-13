@@ -32,6 +32,12 @@ DARNIT_MAP *map;
 int map_w, map_h;
 int home_x, home_y;
 
+struct MAP_GRID_CHUNK {
+	DARNIT_LINE *lines;
+	int size;
+} *map_grid_chunk;
+int map_grid_chunks;
+
 unsigned int minimap_data[(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8)];
 DARNIT_LINE *minimap_viewport;
 
@@ -56,6 +62,7 @@ struct MAP_SELECTED {
 
 void map_init(char *filename);
 void map_close(DARNIT_MAP *map);
+void map_update_grid();
 void map_calculate_powergrid();
 void map_building_place(int index, int player, int building);
 void map_set_home(int index);

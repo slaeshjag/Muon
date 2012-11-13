@@ -38,6 +38,9 @@ void map_init(char *filename) {
 	map_selected.index=-1;
 	map_selected.building=0;
 	
+	map_grid_chunk=NULL;
+	map_grid_chunks=0;
+	
 	game_attacklist=NULL;
 	game_attacklist_lines=NULL;
 	game_attacklist_length=0;
@@ -58,17 +61,19 @@ void map_init(char *filename) {
 	darnitRenderLineMove(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
 	
 	minimap_viewport=darnitRenderLineAlloc(4, 1);
-	unsigned int i;
+	unsigned int i, j;
 	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
 	
-	map_grid_lines=platform.screen_w/map->layer->tile_w+platform.screen_h/map->layer->tile_h+2;
+	/*map_grid_lines=platform.screen_w/map->layer->tile_w+platform.screen_h/map->layer->tile_h+2;
 	map_grid=darnitRenderLineAlloc(map_grid_lines, 1);
 	for(i=0; i<MIN(platform.screen_w, map_w)/map->layer->tile_w+1; i++)
 		darnitRenderLineMove(map_grid, i, map->layer->tile_w*i, 0, map->layer->tile_w*i, MIN(platform.screen_h, map_h));
 	int j;
 	for(j=0; j<MIN(platform.screen_h, map_h)/map->layer->tile_h+1; i++, j++)
-		darnitRenderLineMove(map_grid, i, 0, map->layer->tile_h*j, MIN(platform.screen_w, map_w), map->layer->tile_h*j);
+		darnitRenderLineMove(map_grid, i, 0, map->layer->tile_h*j, MIN(platform.screen_w, map_w), map->layer->tile_h*j);*/
+		
+	map_update_grid();
 	
 	for(i=0; i<map->layer->tilemap->w*map->layer->tilemap->w; i++) {
 		for(j=0; j<map->layers-2; j++)
@@ -90,6 +95,40 @@ void map_close(DARNIT_MAP *map) {
 	map_grid=darnitRenderLineFree(map_grid);
 	
 	game_attacklist_clear();
+}
+
+void map_update_grid() {
+	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
+	int i, x, y, cols, rows;
+	for(i=0; i<map_grid_chunks; i++)
+		darnitRenderLineFree(map_grid_chunk[i].lines);
+	free(map_grid_chunk);
+	cols=(building_tilemap->w+(building_tilemap->w%8>0?8:0))/8;
+	rows=(building_tilemap->h+(building_tilemap->h%8>0?8:0))/8;
+	map_grid_chunks=cols*rows;
+	if((map_grid_chunk=malloc(map_grid_chunks*sizeof(struct MAP_GRID_CHUNK)))==NULL)
+		return;
+	for(i=0; i<map_grid_chunks; i++) {
+		map_grid_chunk[i].lines=darnitRenderLineAlloc(128, 1);
+		map_grid_chunk[i].size=0;
+	}
+	
+	int chunk;
+	for(y=0; y<building_tilemap->h; y++) {
+		chunk=(y/8)*cols;
+		for(x=0; x<building_tilemap->w; x++) {
+			if(x+1<building_tilemap->w&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[y*building_tilemap->w+x+1]&(1<<17)))) {
+				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, (x+1)*building_tilemap->w, y*building_tilemap->h, (x+1)*building_tilemap->w, (y+1)*building_tilemap->h);
+				map_grid_chunk[chunk].size++;
+			}
+			if(y+1<building_tilemap->w&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[(y+1)*building_tilemap->w+x]&(1<<17)))) {
+				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, x*building_tilemap->w, (y+1)*building_tilemap->h, (x+1)*building_tilemap->w, (y+1)*building_tilemap->h);
+				map_grid_chunk[chunk].size++;
+			}
+			if((x+1)%8==0)
+				chunk++;
+		}
+	}
 }
 
 void map_calculate_powergrid() {
@@ -225,8 +264,13 @@ void map_draw(int draw_powergrid) {
 	for(i=0; i<map->layers-1; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
 	
+	darnitRenderOffset(map->cam_x, map->cam_y);
 	if(config.grid) {
-		int movex, movey;
+		darnitRenderTint(0.07, 0.07, 0.07, 1);
+		for(i=0; i<map_grid_chunks; i++)
+			if(map_grid_chunk[i].lines)
+				darnitRenderLineDraw(map_grid_chunk[i].lines, map_grid_chunk[i].size);
+		/*int movex, movey;
 		//TODO: clean up
 		//FIXME: does not rednder properly on large screens
 		if(map->cam_x<0)
@@ -245,15 +289,14 @@ void map_draw(int draw_powergrid) {
 			
 		darnitRenderOffset(movex, movey);
 		darnitRenderTint(0.07, 0.07, 0.07, 1);
-		darnitRenderLineDraw(map_grid, map_grid_lines);
+		darnitRenderLineDraw(map_grid, map_grid_lines);*/
 		darnitRenderTint(1, 1, 1, 1);
 	}
 	
 	darnitRenderTilemap(map->layer[map->layers-1].tilemap);
 	
-	darnitRenderOffset(map->cam_x, map->cam_y);
-	if(map_border)
-		darnitRenderLineDraw(map_border, 4);
+	/*if(map_border)
+		darnitRenderLineDraw(map_border, 4);*/
 	if(powergrid&&draw_powergrid)
 		darnitRenderLineDraw(powergrid, powergrid_lines);
 	if(map_selected.index>-1&&map_selected.building) {
