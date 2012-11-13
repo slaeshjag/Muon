@@ -79,6 +79,8 @@
 #define	MSG_SEND_UNIT_ATTACK		0x016
 #define	MSG_SEND_UNIT_RANGE		0x017
 #define	MSG_SEND_UNIT_LOS		0x018
+#define	MSG_SEND_PLAYER_STATS_1		0x019
+#define	MSG_SEND_PLAYER_STATS_2		0x01A
 
 typedef struct {
 	unsigned int		player_ID;

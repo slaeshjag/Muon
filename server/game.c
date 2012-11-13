@@ -147,7 +147,8 @@ int gameDetectIfOver() {
 
 
 void gameEnd() {
-	int i, team, player;
+	int i, team, player, eff;
+	PLAYER_STATS stats;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME_NOW)
@@ -166,12 +167,10 @@ void gameEnd() {
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_SPECTATING)
 			continue;
-		fprintf(stdout, "=== Stats for %s (ID: %i) ===\n", server->player[i].name, i);
-		fprintf(stdout, "Buildings raised: 	%i\n", server->player[i].stats.buildings_raised);
-		fprintf(stdout, "Buildings lost:	%i\n", server->player[i].stats.buildings_lost);
-		fprintf(stdout, "Buildings destroyed:	%i\n", server->player[i].stats.buildings_destroyed);
-		fprintf(stderr, "Buildtime efficiency:	%i\n", server->player[i].stats.buildtime*100 / (server->player[i].stats.buildtime + server->player[i].stats.no_build_time));
-		fprintf(stdout, "\n\n");
+		stats = server->player[i].stats;
+		eff = stats.buildtime * 100 / (stats.buildtime + stats.no_build_time);
+		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_1, stats.buildings_raised, stats.buildings_lost, NULL);
+		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_2, stats.buildings_destroyed, eff, NULL);
 	}
 
 	return;

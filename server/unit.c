@@ -321,6 +321,8 @@ int unitAdd(int owner, int type, int x, int y) {
 	if (unit->type == UNIT_DEF_BUILDSITE) {
 		if ((server->map_c.tile_data[index] & 0xFFF) != UNIT_BUILDSITE)
 			return -1;
+		server->player[owner].buildspots++;
+		server->player[owner].buildspeed = logf(M_E + server->player[owner].buildspots);
 	}
 	
 	unit->next = server->unit;
@@ -383,6 +385,9 @@ int unitRemove(int x, int y) {
 			server->map[x + y * server->h] = NULL;
 			if (gameDetectIfOver() == 0)
 				gameEnd();
+		} else if (next->type == UNIT_DEF_BUILDSITE) {
+			server->player[owner].buildspots--;
+			server->player[owner].buildspeed = logf(M_E + server->player[owner].buildspots);
 		}
 		free(next);
 		server->map[x + y * server->h] = NULL;
