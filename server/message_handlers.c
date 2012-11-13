@@ -70,7 +70,8 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 
 			messageBufferPushDirect(player, i, MSG_SEND_PLAYER_INFO, server->player[i].team + 1, 0, NULL);
 		}
-	
+
+	unitAnnounceBuildingData(player);
 	lobbyMapSend(player);
 
 	return;
