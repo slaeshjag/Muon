@@ -676,3 +676,16 @@ void unitDestroyAll(int player) {
 
 	return;
 }
+
+
+void unitAnnounceBuildingData(int player) {
+	int i;
+
+	for (i = 1; i <= UNITS_DEFINED; i++) {
+		messageBufferPushDirect(player, player, MSG_SEND_UNIT_ATTACK, i, unit_damage[i], NULL); 
+		messageBufferPushDirect(player, player, MSG_SEND_UNIT_RANGE, i, unit_range[i], NULL); 
+		messageBufferPushDirect(player, player, MSG_SEND_UNIT_LOS, i, unit_los[i], NULL); 
+	}
+
+	return;
+}

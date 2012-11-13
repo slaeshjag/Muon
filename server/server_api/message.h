@@ -125,7 +125,18 @@ typedef struct {
 /* arg_1 is the unit ID, arg_2 is the number ready. No data. */
 #define	MSG_RECV_UNIT_READY		0x015
 
-/* These commands actually have data after them */
+/* arg_1 is the building type, arg_2 is the attack value in tiles. No data. */
+#define	MSG_RECV_UNIT_ATTACK		0x016
+
+/* arg_1 is the building type, arg_2 is the range value in tiles. No data. */
+#define	MSG_RECV_UNIT_RANGE		0x017
+
+/* arg_1 is the building type, arg_2 is the LoS value in tiles. No data */
+#define	MSG_RECV_UNIT_LOS		0x018
+
+
+
+/* These commands have data after them */
 
 /* player_id is always 0. arg_1 is the size of the map in bytes. The message has data (map file name.) */
 #define	MSG_RECV_MAP_BEGIN		0x100

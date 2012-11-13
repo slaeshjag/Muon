@@ -29,3 +29,5 @@ clean:
 	+@make -C client/ clean
 	@echo " [ CD ] res/"
 	+@make -C res/ clean
+	@echo " [ RM ] maps/"
+	@rm -Rf maps/
