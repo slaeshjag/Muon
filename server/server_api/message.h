@@ -134,6 +134,11 @@ typedef struct {
 /* arg_1 is the building type, arg_2 is the LoS value in tiles. No data */
 #define	MSG_RECV_UNIT_LOS		0x018
 
+/* arg_1 is the amounts of buildings contructed, arg_2 is the amount of buildings lost. No data. */
+#define	MSG_RECV_PLAYER_STATS_1		0x019
+
+/* arg_1 is the amount of buildings destroyed (by player,) arg_2 is the contruction time utilization efficiency */
+#define	MSG_RECV_PLAYER_STATS_2		0x01A
 
 
 /* These commands have data after them */
