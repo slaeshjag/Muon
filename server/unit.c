@@ -311,7 +311,7 @@ int unitAdd(int owner, int type, int x, int y) {
 		return -1;
 	}
 
-	if (unit->type == UNIT_DEF_BUILDSITE) {
+	if (type == UNIT_DEF_BUILDSITE) {
 		if ((server->map_c.tile_data[index] & 0xFFF) != UNIT_BUILDSITE)
 			return -1;
 		server->player[owner].buildspots++;
