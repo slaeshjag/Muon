@@ -29,6 +29,8 @@
 #define MAX(a, b) ((a)>(b)?(a):(b))
 
 void map_init(char *filename) {
+	unsigned int i, j;
+	
 	powergrid=NULL;
 	powergrid_lines=0;
 	
@@ -48,12 +50,7 @@ void map_init(char *filename) {
 	map=darnitMapLoad(filename);
 	map_w=map->layer->tilemap->w*map->layer->tile_w;
 	map_h=map->layer->tilemap->h*map->layer->tile_h;
-	map_border=darnitRenderLineFree(map_border);
-	map_border=darnitRenderLineAlloc(4, 1);
-	darnitRenderLineMove(map_border, 0, 0, 0, map_w, 0);
-	darnitRenderLineMove(map_border, 1, 0, 0, 0, map_h);
-	darnitRenderLineMove(map_border, 2, map_w, 0, map_w, map_h);
-	darnitRenderLineMove(map_border, 3, 0, map_h, map_w, map_h);
+	
 	DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
 	darnitRenderLineMove(map_selected.border, 0, 0, 0, building_layer->tile_w, 0);
 	darnitRenderLineMove(map_selected.border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
@@ -61,19 +58,9 @@ void map_init(char *filename) {
 	darnitRenderLineMove(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
 	
 	minimap_viewport=darnitRenderLineAlloc(4, 1);
-	unsigned int i, j;
+	
 	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
-	
-	/*map_grid_lines=platform.screen_w/map->layer->tile_w+platform.screen_h/map->layer->tile_h+2;
-	map_grid=darnitRenderLineAlloc(map_grid_lines, 1);
-	for(i=0; i<MIN(platform.screen_w, map_w)/map->layer->tile_w+1; i++)
-		darnitRenderLineMove(map_grid, i, map->layer->tile_w*i, 0, map->layer->tile_w*i, MIN(platform.screen_h, map_h));
-	int j;
-	for(j=0; j<MIN(platform.screen_h, map_h)/map->layer->tile_h+1; i++, j++)
-		darnitRenderLineMove(map_grid, i, 0, map->layer->tile_h*j, MIN(platform.screen_w, map_w), map->layer->tile_h*j);*/
-		
-	map_update_grid();
 	
 	for(i=0; i<map->layer->tilemap->w*map->layer->tilemap->w; i++) {
 		for(j=0; j<map->layers-2; j++)
@@ -82,17 +69,22 @@ void map_init(char *filename) {
 		if(j>=map->layers-2)
 			map->layer[map->layers-2].tilemap->data[i]|=1<<17;
 	}
+	map_update_grid();
 }
 
 void map_close(DARNIT_MAP *map) {
 	if(!map)
 		return;
-	map_border=darnitRenderLineFree(map_border);
+	int i;
 	map_selected.border=darnitRenderLineFree(map_selected.border);
 	powergrid=darnitRenderLineFree(powergrid);
 	minimap_viewport=darnitRenderLineFree(minimap_viewport);
 	map=darnitMapUnload(map);
-	map_grid=darnitRenderLineFree(map_grid);
+	for(i=0; i<map_grid_chunks; i++)
+		darnitRenderLineFree(map_grid_chunk[i].lines);
+	free(map_grid_chunk);
+	map_grid_chunk=NULL;
+	map_grid_chunks=0;
 	
 	game_attacklist_clear();
 }
@@ -104,10 +96,10 @@ void map_update_grid() {
 	int tile_h=map->layer[map->layers-2].tile_h;
 	for(i=0; i<map_grid_chunks; i++)
 		darnitRenderLineFree(map_grid_chunk[i].lines);
-	free(map_grid_chunk);
 	cols=(building_tilemap->w+(building_tilemap->w%8>0?8:0))/8;
 	rows=(building_tilemap->h+(building_tilemap->h%8>0?8:0))/8;
 	map_grid_chunks=cols*rows;
+	free(map_grid_chunk);
 	if((map_grid_chunk=malloc(map_grid_chunks*sizeof(struct MAP_GRID_CHUNK)))==NULL)
 		return;
 	for(i=0; i<map_grid_chunks; i++) {
@@ -195,7 +187,6 @@ void map_set_building_health(int index, unsigned int health) {
 	map->layer[map->layers-2].tilemap->data[index]=(map->layer[map->layers-2].tilemap->data[index]&0xFE03FFFF)|health<<18;
 	if(index==map_selected.index)
 		game_update_building_status();
-	//darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
 }
 
 void map_set_building_shield(int index, unsigned int shield) {
@@ -204,7 +195,6 @@ void map_set_building_shield(int index, unsigned int shield) {
 	map->layer[map->layers-2].tilemap->data[index]=(map->layer[map->layers-2].tilemap->data[index]&0x1FFFFFF)|shield<<25;
 	if(index==map_selected.index)
 		game_update_building_status();
-	//darnitRenderTilemapRecalculate(map->layer[map->layers-2].tilemap);
 }
 
 void map_set_tile_attributes(int index, int attrib) {
@@ -222,10 +212,6 @@ void map_set_tile_attributes(int index, int attrib) {
 			map->layer[map->layers-1].tilemap->data[index]|=0x1000000;
 			break;
 	}
-	/*int layerbits;
-	layerbits=((attrib&MSG_TILE_ATTRIB_FOW)==MSG_TILE_ATTRIB_FOW)|(map->layer[map->layers-1].tilemap->data[index]&0x1000000);
-	layerbits|=(((attrib&MSG_TILE_ATTRIB_POWER)==MSG_TILE_ATTRIB_POWER)<<24);
-	map->layer[map->layers-1].tilemap->data[index]=layerbits;*/
 }
 
 void map_select_building(int index) {
@@ -272,39 +258,16 @@ void map_draw(int draw_powergrid) {
 		for(i=0; i<map_grid_chunks; i++)
 			if(map_grid_chunk[i].lines)
 				darnitRenderLineDraw(map_grid_chunk[i].lines, map_grid_chunk[i].size);
-		/*int movex, movey;
-		//TODO: clean up
-		//FIXME: does not rednder properly on large screens
-		if(map->cam_x<0)
-			movex=map->cam_x;
-		else if(map_w-map->cam_x<platform.screen_w)
-			movex=platform.screen_w-(map_w-map->cam_x);
-		else
-			movex=map->cam_x%map->layer->tile_w;
-		
-		if(map->cam_y<0)
-			movey=map->cam_y;
-		else if(map_h-map->cam_y<platform.screen_h)
-			movey=platform.screen_h-(map_h-map->cam_y);
-		else
-			movey=map->cam_y%map->layer->tile_h;
-			
-		darnitRenderOffset(movex, movey);
-		darnitRenderTint(0.07, 0.07, 0.07, 1);
-		darnitRenderLineDraw(map_grid, map_grid_lines);*/
 		darnitRenderTint(1, 1, 1, 1);
 	}
 	
 	darnitRenderTilemap(map->layer[map->layers-1].tilemap);
 	
-	/*if(map_border)
-		darnitRenderLineDraw(map_border, 4);*/
 	if(powergrid&&draw_powergrid)
 		darnitRenderLineDraw(powergrid, powergrid_lines);
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
-		//printf("(%i, %i) (%i, %i)\n", x, y, map->cam_x, map->cam_y);
 		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
 		darnitRenderLineDraw(map_selected.border, 4);
