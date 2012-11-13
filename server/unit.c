@@ -311,6 +311,13 @@ int unitAdd(int owner, int type, int x, int y) {
 		return -1;
 	}
 
+	if (unit->type == UNIT_DEF_BUILDSITE) {
+		if ((server->map_c.tile_data[index] & 0xFFF) != UNIT_BUILDSITE)
+			return -1;
+		server->player[owner].buildspots++;
+		server->player[owner].buildspeed = logf(M_E + server->player[owner].buildspots);
+	}
+
 	if ((unit = unitInit(owner, type, x, y)) == NULL)
 		return -1;
 
@@ -318,12 +325,6 @@ int unitAdd(int owner, int type, int x, int y) {
 		return -1;
 	if ((server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE && unit->type != UNIT_DEF_BUILDSITE)
 		return -1;
-	if (unit->type == UNIT_DEF_BUILDSITE) {
-		if ((server->map_c.tile_data[index] & 0xFFF) != UNIT_BUILDSITE)
-			return -1;
-		server->player[owner].buildspots++;
-		server->player[owner].buildspeed = logf(M_E + server->player[owner].buildspots);
-	}
 	
 	unit->next = server->unit;
 	server->unit = unit;
