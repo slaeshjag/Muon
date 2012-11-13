@@ -67,7 +67,7 @@ void *ui_widget_destroy_listbox(UI_WIDGET *widget) {
 	return ui_widget_destroy(widget);
 }
 
-void ui_listbox_add(UI_WIDGET *widget, char *text) {
+void ui_listbox_add(UI_WIDGET *widget, const char *text) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	struct UI_LISTBOX_LIST **l;
 	for(l=&(p->list); *l; l=&((*l)->next));
@@ -103,6 +103,16 @@ char *ui_listbox_get(UI_WIDGET *widget, int index) {
 	int i;
 	for(l=p->list, i=0; l->next&&i<index; l=l->next);
 	return l->text;
+}
+
+int ui_listbox_index_of(UI_WIDGET *widget, const char *text) {
+	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
+	struct UI_LISTBOX_LIST *l;
+	int i;
+	for(l=p->list, i=0; l; l=l->next, i++)
+		if(!strcmp(text, l->text))
+			return i;
+	return -1;
 }
 
 void ui_listbox_scroll(UI_WIDGET *widget, int pos) {

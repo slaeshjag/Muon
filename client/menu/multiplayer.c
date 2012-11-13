@@ -92,14 +92,14 @@ void menu_multiplayer_host_maps_reload() {
 	ui_listbox_clear(multiplayer_host_listbox_maps);
 	dir=darnitFileList(mapdir, DARNIT_FILESYSTEM_TYPE_READ|DARNIT_FILESYSTEM_TYPE_WRITE, &dirs);
 	for(d=dir; d; d=d->next) {
-		if(d->file) {
+		if(d->file&&ui_listbox_index_of(multiplayer_host_listbox_maps, d->fname)==-1) {
 			sprintf(buf, "%s/%s", mapdir, d->fname);
 			f=darnitFileOpen(buf, "rb");
 			darnitFileRead(buf, 8, f);
 			darnitFileClose(f);
 			if(memcmp(buf, ldimagic, 8))
 				continue;
-			ui_listbox_add(multiplayer_host_listbox_maps, (char *)(d->fname));
+			ui_listbox_add(multiplayer_host_listbox_maps, d->fname);
 		}
 	}
 	darnitFileListFree(dir);
