@@ -20,6 +20,7 @@ install:
 	@install -m 0755 -D res/FreeMono.ttf $(DATAPATH)/res/FreeMono.ttf
 	@install -m 0755 -D res/chat.png $(DATAPATH)/res/chat.png
 	@install -m 0755 -D res/mouse.png $(DATAPATH)/res/mouse.png
+	@install -m 0755 -D res/icon.png $(DATAPATH)/res/icon.png
 	@install -m 0755 -d $(DATAPATH)/maps
 	@install -m 0755 -D -t $(DATAPATH)/maps/ maps/* 
 clean:

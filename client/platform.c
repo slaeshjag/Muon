@@ -143,6 +143,6 @@ void platform_init() {
 	videomodes=darnitVideomodeGet();
 	platform_config_init_defaults();
 	platform_config_read();
-	darnitInitRest("Muon", config.screen_w, config.screen_h, config.fullscreen);
+	darnitInitRest("Muon", config.screen_w, config.screen_h, config.fullscreen, "res/icon.png");
 	platform=darnitPlatformGet();
 }
