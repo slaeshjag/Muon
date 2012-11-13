@@ -313,12 +313,12 @@ int unitAdd(int owner, int type, int x, int y) {
 
 	if ((server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE && type != UNIT_DEF_BUILDSITE)
 		return -1;
+	if (server->map_c.tile_data[index] & 0x10000)
+		return -1;
 
 	if ((unit = unitInit(owner, type, x, y)) == NULL)
 		return -1;
 
-	if (server->map_c.tile_data[index] & 0x10000)
-		return -1;
 	if (type == UNIT_DEF_BUILDSITE) {
 		if ((server->map_c.tile_data[index] & 0xFFF) != UNIT_BUILDSITE)
 			return -1;
