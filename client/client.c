@@ -250,6 +250,8 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	config.player_name[31]=0;
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(config.player_name), config.player_name);
 	client_message_handler=client_download_map;
+	if(serverIsRunning())
+		serverAdminSet(player_id);
 }
 
 int client_init(char *host, int port) {
