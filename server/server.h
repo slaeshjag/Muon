@@ -81,7 +81,6 @@ typedef struct {
 	SERVER_SOCKET		*accept;
 	void			*map_data;
 	SERVER_MAP		map_c;
-	int			build_spots;
 	UNIT_PYLON		*pylons;
 	int			server_admin;
 } SERVER;

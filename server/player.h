@@ -66,7 +66,7 @@ typedef struct {
 
 
 typedef struct {
-	PLAYER_BUILDQUEUE_E	*queue;
+	PLAYER_BUILDQUEUE_E	queue;
 	PLAYER_READYQUEUE	ready[UNITS_DEFINED];
 } PLAYER_BUILDQUEUE;
 
@@ -98,6 +98,8 @@ typedef struct {
 	PLAYER_SPAWN		spawn;
 	PLAYER_BUILDQUEUE	queue;
 	PLAYER_STATS		stats;
+	int			buildspots;
+	float			buildspeed;
 } PLAYER;
 
 PLAYER *playerInit(unsigned int players, int map_w, int map_h);
@@ -110,7 +112,6 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode);
 int playerCalcSetPower(unsigned int player, int x, int y, int mode);
 
 int playerBuildQueueInit();
-int playerBuildQueueDestroy();
 int playerBuildQueueLoop(int msec);
 int playerBuildQueueStart(int player, int building);
 int playerBuildQueueStop(int player, int building);

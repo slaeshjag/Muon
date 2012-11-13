@@ -108,21 +108,6 @@ int serverIsRunning() {
 }
 
 
-int serverParseMapFirst() {
-	int i, buildspots;
-
-	buildspots = 1;		/* Player's generator counts! */
-	for (i = 0; i < server->w * server->h; i++)
-		if (server->map_c.tile_data[i] == UNIT_BUILDSITE)
-			buildspots++;
-	server->build_spots = buildspots;
-	
-	return 0;
-}
-
-
-
-/* TODO: Expand with arguments */
 SERVER *serverStart(const char *fname, unsigned int players, int port, int gamespeed) {
 	int i, map_w, map_h;
 	const char *tmp;
@@ -165,7 +150,6 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 	server->map_c.tile_data = ldmzGetData(server->map_data);
 	server->w = map_w;
 	server->h = map_h;
-	serverParseMapFirst();
 	
 	playerInit(players, map_w, map_h);
 	server->accept = networkListen(port);
