@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Muon
+Comment=A new kind of RTS
+Exec=muon
+Icon=/usr/share/games/muon/res/icon.png
+Terminal=false
+Type=Application
+Categories=Game;StrategyGame;
+Keywords=muon
+StartupNotify=true

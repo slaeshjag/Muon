@@ -1,6 +1,7 @@
 MAKEFLAGS += --no-print-directory
 PREFIX = /usr/local
 DATAPATH=/usr/share/games/muon
+APPLICATIONSPATH=/usr/share/applications
 
 all:
 	@echo " [ CD ] server/"
@@ -16,13 +17,14 @@ install:
 	@echo " [INST] muon-server"
 	@install -m 0755 -D muon-server $(PREFIX)/bin/muon-server
 	@echo " [INST] muon resources"
-	@install -m 0755 -D res/FreeMonoBold.ttf $(DATAPATH)/res/FreeMonoBold.ttf
-	@install -m 0755 -D res/FreeMono.ttf $(DATAPATH)/res/FreeMono.ttf
-	@install -m 0755 -D res/chat.png $(DATAPATH)/res/chat.png
-	@install -m 0755 -D res/mouse.png $(DATAPATH)/res/mouse.png
-	@install -m 0755 -D res/icon.png $(DATAPATH)/res/icon.png
+	@install -m 0744 -D res/FreeMonoBold.ttf $(DATAPATH)/res/FreeMonoBold.ttf
+	@install -m 0744 -D res/FreeMono.ttf $(DATAPATH)/res/FreeMono.ttf
+	@install -m 0744 -D res/chat.png $(DATAPATH)/res/chat.png
+	@install -m 0744 -D res/mouse.png $(DATAPATH)/res/mouse.png
+	@install -m 0744 -D res/icon.png $(DATAPATH)/res/icon.png
 	@install -m 0755 -d $(DATAPATH)/maps
-	@install -m 0755 -D -t $(DATAPATH)/maps/ maps/* 
+	@install -m 0744 -D -t $(DATAPATH)/maps/ maps/*
+	@install -m 0755 -D res/muon.desktop $(APPLICATIONSPATH)/muon.desktop
 clean:
 	@echo " [ CD ] server/"
 	+@make -C server/ clean
