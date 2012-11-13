@@ -100,6 +100,8 @@ void map_close(DARNIT_MAP *map) {
 void map_update_grid() {
 	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
 	int i, x, y, cols, rows;
+	int tile_w=map->layer[map->layers-2].tile_w;
+	int tile_h=map->layer[map->layers-2].tile_h;
 	for(i=0; i<map_grid_chunks; i++)
 		darnitRenderLineFree(map_grid_chunk[i].lines);
 	free(map_grid_chunk);
@@ -118,11 +120,11 @@ void map_update_grid() {
 		chunk=(y/8)*cols;
 		for(x=0; x<building_tilemap->w; x++) {
 			if(x+1<building_tilemap->w&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[y*building_tilemap->w+x+1]&(1<<17)))) {
-				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, (x+1)*building_tilemap->w, y*building_tilemap->h, (x+1)*building_tilemap->w, (y+1)*building_tilemap->h);
+				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, (x+1)*tile_w, y*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				map_grid_chunk[chunk].size++;
 			}
 			if(y+1<building_tilemap->w&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[(y+1)*building_tilemap->w+x]&(1<<17)))) {
-				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, x*building_tilemap->w, (y+1)*building_tilemap->h, (x+1)*building_tilemap->w, (y+1)*building_tilemap->h);
+				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, x*tile_w, (y+1)*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				map_grid_chunk[chunk].size++;
 			}
 			if((x+1)%8==0)
