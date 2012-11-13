@@ -139,12 +139,12 @@ void map_set_home(int index) {
 }
 
 int map_get_building_health(int index) {
-	unsigned int health=(map->layer[map->layers-2].tilemap->data[index]>>18)&0xFE;
+	unsigned int health=(map->layer[map->layers-2].tilemap->data[index]>>18)&0x7F;
 	return health>100?100:health;
 }
 
 int map_get_building_shield(int index) {
-	unsigned int shield=(map->layer[map->layers-2].tilemap->data[index]>>25)&0xFE;
+	unsigned int shield=(map->layer[map->layers-2].tilemap->data[index]>>25)&0x7F;
 	return shield>100?100:shield;
 }
 
