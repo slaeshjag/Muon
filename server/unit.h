@@ -114,6 +114,17 @@ static const int unit_buildtime[] =	 { 0,          /* nothing */
 	                                   10000       /* owned control point (buildsite) */
 	                                 };
 
+/* Points for determening a winner without generators being lost. */
+static const int unit_points[] = { 
+	1,		/* Powered tile */
+	0,		/* Generator */
+	2,		/* Scout */
+	4,		/* Attacker */
+	0,		/* Pylon */
+	2,		/* Wall */
+	20,		/* Owned control point */
+};
+
 struct SERVER_UNIT;
 
 

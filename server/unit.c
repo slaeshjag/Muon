@@ -231,7 +231,7 @@ void unitAnnounce(int from, int to, int building, int index) {
 		messageBufferPushDirect(to, from, MSG_SEND_BUILDING_HP, progress, index, NULL);
 		progress = server->map[index]->shield * 100 / unitShieldMax(building);
 		messageBufferPushDirect(to, from, MSG_SEND_BUILDING_SHIELD, progress, index, NULL);
-		if (server->map[index]->target)
+		if (server->map[index]->target > -1)
 			messageBufferPushDirect(to, from, MSG_SEND_BUILDING_ATTACKING, index, server->map[index]->target, NULL);
 	}
 
@@ -636,7 +636,7 @@ void unitLoop(int msec) {
 			unitShieldAnnounce(index);
 		}
 		
-		if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && next->target > -1) {
+		if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && next->target > -1 && server->player[next->owner].map[next->x + next->y * server->w ].power) {
 			if (!server->map[next->target])
 				next->target = -1;
 			else {

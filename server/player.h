@@ -119,6 +119,7 @@ int playerBuildQueueUnitReady(int player, int building);
 
 void playerClear(int player);
 void playerDefeatAnnounce(int player);
+unsigned int playerCountPoints(int player);
 
 int playerCanQueueAnotherBuilding(int player);
 

@@ -403,3 +403,22 @@ int playerCanQueueAnotherBuilding(int player) {
 		cnt += server->player[player].queue.ready[i].count;
 	return (cnt + 1 < PLAYER_BUILDSPOT_MULTIPLIER * (buildspots)) ? 0 : -1;
 }
+
+
+unsigned int playerCountPoints(int player) {
+	int i, t;
+	unsigned int total = 0;
+
+	t = server->w * server->h;
+
+	for (i = 0; i < t; i++) {
+		if (server->player[player].map[i].power)
+			total += unit_points[0];
+		if (!server->map[i])
+			continue;
+		if (server->map[i]->owner == player)
+			total += unit_points[server->map[i]->type];
+	}
+
+	return total;
+}
