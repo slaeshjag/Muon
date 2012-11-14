@@ -128,6 +128,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		return NULL;
 	}
 
+	server->map_c.path = NULL;
 	messageHandlerInit(server);
 	gameInit(gamespeed);
 
