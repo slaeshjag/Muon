@@ -638,10 +638,7 @@ void unitLoop(int msec) {
 		}
 		
 		if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && next->target > -1) {
-			if (!server->player[next->owner].map[next->x + next->y * server->w].power) {
-				next->target = -1;
-				unitAttackSet(next->x + next->y * server->w, -1);
-			} else if (!server->map[next->target])
+			if (!server->map[next->target])
 				next->target = -1;
 			else {
 				server->map[next->target]->shield -= unit_damage[next->type] * msec * server->game.gamespeed;
@@ -659,7 +656,7 @@ void unitLoop(int msec) {
 					}
 				}
 			}
-		} else if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && server->player[next->owner].map[next->x + next->y * server->w].power) {
+		} else if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT)) {
 			unitAttackerScan(next->x, next->y);
 		}
 
