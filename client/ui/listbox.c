@@ -105,6 +105,14 @@ char *ui_listbox_get(UI_WIDGET *widget, int index) {
 	return l->text;
 }
 
+void ui_listbox_set(UI_WIDGET *widget, int index, const char *text) {
+	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
+	struct UI_LISTBOX_LIST *l;
+	int i;
+	for(l=p->list, i=0; l->next&&i<index; l=l->next);
+	strcpy(l->text, text);
+}
+
 int ui_listbox_index_of(UI_WIDGET *widget, const char *text) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	struct UI_LISTBOX_LIST *l;

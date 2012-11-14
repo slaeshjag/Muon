@@ -54,6 +54,7 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void ui_listbox_add(UI_WIDGET *widget, const char *text);
 void ui_listbox_clear(UI_WIDGET *widget);
 char *ui_listbox_get(UI_WIDGET *widget, int index);
+void ui_listbox_set(UI_WIDGET *widget, int index, const char *text);
 int ui_listbox_index_of(UI_WIDGET *widget, const char *text);
 void ui_listbox_scroll(UI_WIDGET *widget, int pos);
 
