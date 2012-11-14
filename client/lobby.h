@@ -20,16 +20,23 @@
 #ifndef LOBBY_H
 #define LOBBY_H
 
-struct UI_PANE_LIST panelist_lobby, panelist_lobby_ready;
-UI_WIDGET *lobby_countdown_label;
-UI_WIDGET *lobby_progress_map;
-char lobby_countdown_text[16];
-UI_WIDGET *lobby_checkbox_ready;
+UI_WIDGET *lobby_players_listbox;
+UI_WIDGET *lobby_players_hbox;
+UI_WIDGET *lobby_players_checkbox_ready;
+
+struct UI_PANE_LIST panelist_lobby_players, panelist_lobby_download;
+UI_WIDGET *lobby_download_progress;
 
 void lobby_init();
-void lobby_ready_checkbox_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+
+void lobby_open();
+void lobby_close();
+void lobby_join(int player);
+void lobby_leave(int player);
+void lobby_ready(int player, int ready);
+void lobby_progress(int player, int progress);
+
+void lobby_players_checkbox_ready_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void lobby_set_map_progress(int progress);
-void lobby_ready_checkbox_enable();
-void lobby_ready_checkbox_disable();
 
 #endif

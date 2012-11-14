@@ -52,11 +52,6 @@ void game_state(GAME_STATE state) {
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
 			ui_selected_widget=input_name_entry;
 			break;*/
-		case GAME_STATE_LOBBY:
-			darnitRenderClearColorSet(0x0, 0x0, 0x0);
-			chat_show(gamestate_pane[GAME_STATE_LOBBY]);
-			ui_selected_widget=chat_entry;
-			break;
 		case GAME_STATE_GAME:
 			darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
 			ui_event_global_add(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
@@ -71,6 +66,7 @@ void game_state(GAME_STATE state) {
 		/*case GAME_STATE_CONNECT_SERVER:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
 			ui_selected_widget=connect_server_entry_host;*/
+		case GAME_STATE_LOBBY:
 		case GAME_STATE_MENU:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
 		case GAME_STATE_QUIT:

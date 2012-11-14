@@ -52,7 +52,7 @@ void view_init() {
 	
 	gamestate_pane[0]=&panelist_menu_sidebar;
 	gamestate_pane[1]=&panelist_multiplayer_connecting;
-	gamestate_pane[2]=&panelist_lobby;
+	gamestate_pane[2]=&panelist_lobby_players;
 	gamestate_pane[3]=&panelist_game_sidebar;
 	gamestate_pane[4]=&panelist_game_menu;
 	gamestate_pane[5]=NULL;

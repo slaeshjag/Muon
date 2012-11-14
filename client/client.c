@@ -168,12 +168,12 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_LEAVE:
-			chat_leave(msg->player_id);
+			lobby_leave(msg->player_id);
 			break;
 		case MSG_RECV_GAME_START:
 			chat_countdown(msg->arg_1);
 			if(!msg->arg_1) {
-				lobby_ready_checkbox_disable();
+				lobby_close();
 				game_state(GAME_STATE_GAME);
 				client_message_handler=client_game_handler;
 			}
@@ -192,6 +192,14 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_BAD_CLIENT:
 			client_disconnect();
 			break;
+		case MSG_RECV_PLAYER_READY:
+			if(msg->arg_2==100) {
+				if(msg->player_id==player_id)
+					panelist_lobby_players.next=panelist_lobby_download.next;
+				lobby_ready(msg->player_id, msg->arg_1);
+			} else
+				lobby_progress(msg->player_id, msg->arg_2);
+			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
@@ -199,10 +207,10 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			if(!payload)
 				break;
 			memcpy(&player_names[msg->player_id*32], payload, msg->arg_2);
-			chat_join(msg->player_id);
+			lobby_join(msg->player_id);
 			break;
 		case MSG_RECV_LEAVE:
-			chat_leave(msg->player_id);
+			lobby_leave(msg->player_id);
 			break;
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
@@ -235,7 +243,6 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
 			map_init("mapdata/map.ldmz");
-			lobby_ready_checkbox_enable();
 			break;
 		case MSG_RECV_GAME_START:
 			game_state(GAME_STATE_LOBBY);
@@ -246,10 +253,12 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 
 void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	player_id=msg->player_id;
-	player_names=(char *)calloc(msg->arg_2, 32);
+	players=msg->arg_2;
+	player_names=(char *)calloc(players, 32);
 	config.player_name[31]=0;
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(config.player_name), config.player_name);
 	client_message_handler=client_download_map;
+	lobby_open();
 	if(serverIsRunning())
 		serverAdminSet(player_id);
 }
