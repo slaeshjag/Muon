@@ -306,27 +306,28 @@ void map_minimap_render(UI_WIDGET *widget) {
 	darnitRenderTint(r, g, b, a);
 }
 
-void map_minimap_update() {
+void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
 	//This is really slow and retarded, but it works
 	int x, y;
 	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
 	DARNIT_TILEMAP *fow_tilemap=map->layer[map->layers-1].tilemap;
-	for(y=0; y<(SIDEBAR_WIDTH-8); y++)
-		for(x=0; x<(SIDEBAR_WIDTH-8); x++) {
-			int index=(y*(fow_tilemap->h)/(SIDEBAR_WIDTH-8))*(fow_tilemap->w)+(x*(fow_tilemap->w))/(SIDEBAR_WIDTH-8);
-			minimap_data[y*(SIDEBAR_WIDTH-8)+x]=minimap_colors[((fow_tilemap->data[index]&0xFFF)!=1)*(((map->layer[map->layers-2].tilemap->data[index]&(1<<17))==0)?1:7)];
+	for(y=0; y<(h); y++)
+		for(x=0; x<(h); x++) {
+			int index=(y*(fow_tilemap->h)/(h))*(fow_tilemap->w)+(x*(fow_tilemap->w))/(w);
+			minimap_data[y*(w)+x]=minimap_colors[((fow_tilemap->data[index]&0xFFF)!=1||!show_fow)*(((map->layer[map->layers-2].tilemap->data[index]&(1<<17))==0)?1:7)];
 		}
 	
 	for(y=0; y<building_tilemap->h; y++)
 		for(x=0; x<building_tilemap->w; x++)
 			if((fow_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==0) {
 				if(building_tilemap->data[(y*building_tilemap->w)+x]==5)
-					minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[6];
+					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[6];
 				else if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)>0)
-					minimap_data[(y*(SIDEBAR_WIDTH-8))/(building_tilemap->h)*(SIDEBAR_WIDTH-8)+(x*(SIDEBAR_WIDTH-8))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
+					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
 			}
 	
-	UI_PROPERTY_VALUE v;
+	/*UI_PROPERTY_VALUE v;
 	v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
-	darnitRenderTilesheetUpdate(v.p, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);
+	darnitRenderTilesheetUpdate(v.p, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);*/
+	darnitRenderTilesheetUpdate(ts, 0, 0, w, h, minimap_data);
 }
