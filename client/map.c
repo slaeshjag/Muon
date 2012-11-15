@@ -273,7 +273,7 @@ void map_draw(int draw_powergrid) {
 	
 	darnitRenderTilemap(map->layer[map->layers-1].tilemap);
 	
-	if(powergrid&&draw_powergrid)
+	if(powergrid&&(draw_powergrid||config.powergrid))
 		darnitRenderLineDraw(powergrid, powergrid_lines);
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
