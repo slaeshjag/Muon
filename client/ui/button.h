@@ -33,7 +33,7 @@ struct UI_BUTTON_PROPERTIES {
 };
 
 UI_WIDGET *ui_widget_create_button(UI_WIDGET *child);
-UI_WIDGET *ui_widget_create_button_text(char *);
+UI_WIDGET *ui_widget_create_button_text(DARNIT_FONT *font, char *text);
 UI_WIDGET *ui_widget_create_button_image();
 
 void *ui_widget_destroy_button(UI_WIDGET *widget);

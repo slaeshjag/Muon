@@ -50,7 +50,7 @@ void menu_multiplayer_init() {
 	multiplayer_host_slider_gamespeed->set_prop(multiplayer_host_slider_gamespeed, UI_SLIDER_PROP_VALUE, v);
 	ui_vbox_add_child(multiplayer_host_vbox, multiplayer_host_slider_gamespeed, 0);
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_spacer(), 1);
-	multiplayer_host_button_host=ui_widget_create_button(ui_widget_create_label(font_std, "Host"));
+	multiplayer_host_button_host=ui_widget_create_button_text(font_std, "Host");
 	ui_vbox_add_child(multiplayer_host_vbox, multiplayer_host_button_host, 0);
 	multiplayer_host_button_host->event_handler->add(multiplayer_host_button_host, multiplayer_host_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	menu_multiplayer_host_maps_reload();
@@ -66,7 +66,7 @@ void menu_multiplayer_init() {
 	multiplayer_join_entry_port=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_entry_port, 0);
 	multiplayer_join_entry_host->event_handler->add(multiplayer_join_entry_host, multiplayer_join_button_click, UI_EVENT_TYPE_KEYBOARD);
-	multiplayer_join_button=ui_widget_create_button(ui_widget_create_label(font_std, "Join"));
+	multiplayer_join_button=ui_widget_create_button_text(font_std, "Join");
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_button, 0);
 	multiplayer_join_button->event_handler->add(multiplayer_join_button, multiplayer_join_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	v.p="localhost";
@@ -79,7 +79,7 @@ void menu_multiplayer_init() {
 	panelist_multiplayer_connecting.next=NULL;
 	ui_pane_set_root_widget(panelist_multiplayer_connecting.pane, ui_widget_create_vbox());
 	ui_vbox_add_child(panelist_multiplayer_connecting.pane->root_widget, ui_widget_create_label(font_std, "Connecting to server"), 1);
-	multiplayer_connecting_button_cancel=ui_widget_create_button_text("Cancel");
+	multiplayer_connecting_button_cancel=ui_widget_create_button_text(font_std, "Cancel");
 	ui_vbox_add_child(panelist_multiplayer_connecting.pane->root_widget, multiplayer_connecting_button_cancel, 0);
 	multiplayer_connecting_button_cancel->event_handler->add(multiplayer_connecting_button_cancel, multiplayer_connecting_button_cancel_click, UI_EVENT_TYPE_UI);
 }

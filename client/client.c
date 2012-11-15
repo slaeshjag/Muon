@@ -102,7 +102,7 @@ void client_check_incomming() {
 	if(recalc_map) {
 		UI_PROPERTY_VALUE v;
 		v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
-		map_minimap_update(v.p, SIDEBAR_WIDTH-2*UI_PADDING, SIDEBAR_WIDTH-2*UI_PADDING, 1);
+		map_minimap_update(v.p, game_sidebar_minimap->w, game_sidebar_minimap->h, 1);
 	}
 	for(i=0; recalc_map; recalc_map>>=1, i++)
 		if(recalc_map&1) {
@@ -252,6 +252,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			game_state(GAME_STATE_LOBBY);
 			client_message_handler=client_countdown_handler;
 			client_countdown_handler(msg, payload);
+			break;
 	}
 }
 

@@ -62,7 +62,18 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 	}
 	
 	//TODO: this should be replaced by a real keymap
-	e_k.character=(e_k.keysym>=32&&e_k.keysym<127)?e_k.keysym-0x20*((e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT)>0&&(e_k.keysym>=0x61&&e_k.keysym<0x7b)):0;
+	//e_k.character=(e_k.keysym>=32&&e_k.keysym<127)?e_k.keysym-0x20*((e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT)>0&&(e_k.keysym>=0x61&&e_k.keysym<0x7b)):0;
+	if(e_k.keysym>=32&&e_k.keysym<127) {
+		e_k.character=e_k.keysym;
+		if(e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT) {
+			if(e_k.keysym>=0x61&&e_k.keysym<0x7b)
+				e_k.character-=0x20;
+			else if(e_k.keysym>=0x31&&e_k.keysym<0x9b)
+				e_k.character-=0x10;
+		}
+	} else
+		e_k.character=0;
+	
 	
 	e.keyboard=&e_k;
 	if(ui_selected_widget) {

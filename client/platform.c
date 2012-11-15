@@ -28,6 +28,7 @@ struct CONFIG_PARSER parsers[]={
 	{"fullscreen", platform_option_read_int, platform_option_write_int, &config.fullscreen},
 	{"grid", platform_option_read_int, platform_option_write_int, &config.grid},
 	{"plasma", platform_option_read_int, platform_option_write_int, &config.plasma},
+	{"alpha", platform_option_read_int, platform_option_write_int, &config.alpha},
 	{"name", platform_option_read_string, platform_option_write_string, &config.player_name},
 };
 
@@ -75,6 +76,7 @@ void platform_config_init_defaults() {
 	}
 	config.grid=1;
 	config.plasma=3;
+	config.alpha=1;
 	strcpy(config.player_name, "player");
 }
 

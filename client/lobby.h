@@ -24,6 +24,7 @@ struct UI_PANE_LIST panelist_lobby_players, panelist_lobby_download, panelist_lo
 UI_WIDGET *lobby_players_listbox;
 UI_WIDGET *lobby_players_hbox;
 UI_WIDGET *lobby_players_checkbox_ready;
+UI_WIDGET *lobby_players_button_kick;
 UI_WIDGET *lobby_download_progress;
 UI_WIDGET *lobby_map_label;
 UI_WIDGET *lobby_map_imageview;
@@ -38,6 +39,7 @@ void lobby_leave(int player);
 void lobby_ready(int player, int ready);
 void lobby_progress(int player, int progress);
 
+void lobby_players_button_kick_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void lobby_players_checkbox_ready_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void lobby_set_map_progress(int progress);
 

@@ -33,7 +33,7 @@ void chat_init() {
 	chat_listbox=ui_widget_create_listbox(font_std);
 	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_listbox, 1);
 	chat_hbox=ui_widget_create_hbox();
-	chat_button_send=ui_widget_create_button_text("Send");
+	chat_button_send=ui_widget_create_button_text(font_std, "Send");
 	chat_entry=ui_widget_create_entry(font_std);
 	ui_hbox_add_child(chat_hbox, chat_entry, 1);
 	ui_hbox_add_child(chat_hbox, chat_button_send, 0);

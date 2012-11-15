@@ -254,8 +254,13 @@ void map_clear_fow() {
 
 void map_draw(int draw_powergrid) {
 	int i;
-	for(i=0; i<map->layers-1; i++)
+	for(i=0; i<map->layers-2; i++)
 		darnitRenderTilemap(map->layer[i].tilemap);
+	if(config.alpha)
+		darnitRenderBlendingEnable();
+	darnitRenderTilemap(map->layer[map->layers-2].tilemap);
+	darnitRenderBlendingDisable();
+	darnitRenderTilemap(map->layer[map->layers-1].tilemap);
 	
 	darnitRenderOffset(map->cam_x, map->cam_y);
 	if(config.grid) {
