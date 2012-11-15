@@ -319,8 +319,8 @@ void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
 	
 	for(y=0; y<building_tilemap->h; y++)
 		for(x=0; x<building_tilemap->w; x++)
-			if((fow_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==0) {
-				if(building_tilemap->data[(y*building_tilemap->w)+x]==5)
+			if((fow_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==0||!show_fow) {
+				if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==5)
 					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[6];
 				else if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)>0)
 					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
