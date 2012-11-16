@@ -31,10 +31,6 @@
 #define	PLAYER_IN_GAME_NOW			4
 #define	PLAYER_SPECTATING			5
 
-#define	PLAYER_PROCESS_NOTHING			0
-#define	PLAYER_PROCESS_MSG			1
-#define	PLAYER_PROCESS_DATA			2
-
 #define	PLAYER_BUILDSPOT_MULTIPLIER		5
 
 
@@ -81,6 +77,17 @@ typedef struct {
 
 
 typedef struct {
+	unsigned int		send_stat;
+	unsigned int		send_pos;
+	MESSAGE			send;	
+
+	unsigned int		recv_stat;
+	unsigned int		recv_pos;
+	MESSAGE			recv;
+} PLAYER_NETWORK;
+
+
+typedef struct {
 	PLAYER_MAP		*map;
 	unsigned int		map_progress;
 	int			team;
@@ -89,12 +96,8 @@ typedef struct {
 	time_t			id_req_send;
 	time_t			last_ping_sent;
 	MESSAGE_BUFFER		*msg_buf;
-	int			process_recv;
-	MESSAGE			process_msg_recv;
-	int			process_send;
-	MESSAGE			process_msg_send;
-	int			process_byte_send;
 	char			name[PLAYER_NAME_LEN];
+	PLAYER_NETWORK		network;
 	PLAYER_SPAWN		spawn;
 	PLAYER_BUILDQUEUE	queue;
 	PLAYER_STATS		stats;

@@ -20,10 +20,18 @@
 #ifndef __SERVER_H__
 #define	__SERVER_H__
 
-#define	SERVER_PORT		56789
-#define	SERVER_VERSION		0x10000
+#define	SERVER_PORT			56789
+#define	SERVER_VERSION			0x10000
 
-#define	SERVER_PING_INTERVAL	2
+#define	SERVER_PROCESS_NOTHING		0
+#define	SERVER_PROCESS_MSG		1
+#define	SERVER_PROCESS_DATA		2
+
+#define	SERVER_PROCESS_DONE		1
+#define	SERVER_PROCESS_INCOMPLETE	0
+#define	SERVER_PROCESS_FAIL		-1
+
+#define	SERVER_PING_INTERVAL		2
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +40,7 @@
 #include <time.h>
 
 #include "network.h"
+#include "superweapon.h"
 #include "unit.h"
 #include "message.h"
 #include "message_handlers.h"

@@ -40,8 +40,8 @@ void lobbyMapSend(unsigned int player) {
 		msg.arg[0] = 0;
 		msg.arg[1] = send;
 		msg.extra = &data[i];
-		messageBufferPush(server->player[player].msg_buf, &msg);
 		i += send;
+		messageBufferPush(server->player[player].msg_buf, &msg);
 	}
 
 	msg.player_ID = player;
@@ -74,10 +74,8 @@ int lobbyPoll() {
 	*server->player[slot].name = 0;
 	server->player[slot].map_progress = 0;
 
-	server->player[slot].process_recv = PLAYER_PROCESS_NOTHING;
-	server->player[slot].process_send = PLAYER_PROCESS_NOTHING;
-	server->player[slot].process_byte_send = 0;
-	server->player[slot].last_ping_sent = 0;
+	server->player[slot].network.recv_stat = SERVER_PROCESS_NOTHING;
+	server->player[slot].network.send_stat = SERVER_PROCESS_NOTHING;
 	server->player[slot].team = -1;
 
 	server->player[slot].stats.buildtime = 0;

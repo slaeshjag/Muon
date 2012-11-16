@@ -209,14 +209,17 @@ int networkSend(SERVER_SOCKET *sock, char *buff, int buff_len) {
 
 	if (!sock)
 		return -1;
-	
+
 	t = send(sock->socket, buff, buff_len, MSG_NOSIGNAL);
 
 	if (t >= 0)
 		return t;
+
 	#ifndef _WIN32
-	if (errno != EAGAIN && errno != EWOULDBLOCK)
+	if (errno != EAGAIN && errno != EWOULDBLOCK) {
+		fprintf(stderr, "Error: %s\n", strerror(errno));
 		return -1;
+	}
 	#else
 	int error_n = WSAGetLastError();
 	if (error_n != WSAEWOULDBLOCK && error_n != WSAEINPROGRESS)

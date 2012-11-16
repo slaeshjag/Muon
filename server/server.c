@@ -240,147 +240,146 @@ void serverSendPing() {
 }
 
 
-void serverProcessNetwork() {
-	int i, t;
-	MESSAGE msg, msg_c;
+int serverRecv(PLAYER_NETWORK *network, int player) {
+	int t;
 
-	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status == PLAYER_UNUSED)
-			continue;
-		if (server->player[i].process_recv) {
-			msg_c = server->player[i].process_msg_recv;
-			if ((t = networkReceiveTry(server->player[i].socket, msg_c.extra, msg_c.arg[1])) > 0) {
-				server->player[i].process_recv = PLAYER_PROCESS_NOTHING;
-				messageExecute(i, &msg_c);
-			} else if (t == -1) {
-				playerDisconnect(i);
-				continue;
-			} else
-				continue;
-		}
-
-		while ((t = networkReceiveTry(server->player[i].socket, (void *) &msg, 16)) > 0) {
-			msg.player_ID = ntohl(msg.player_ID);
-			msg.command = ntohl(msg.command);
-			msg.arg[0] = ntohl(msg.arg[0]);
-			msg.arg[1] = ntohl(msg.arg[1]);
-
-			if (messageHasData(msg.command, msg.arg[1]) == 0 && msg.arg[1]) {
-				if (msg.arg[1] > MESSAGE_MAX_PAYLOAD) {
-					messageSend(server->player[i].socket, i, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
-					playerDisconnect(i);
-					break;
-				}
-				
-				if ((msg.extra = malloc(msg.arg[1] + 1)) == NULL) {
-					fprintf(stderr, "Fatal error: System seems to be out of RAM. Server is dieing\n");
-					errorPush(SERVER_ERROR_NO_MEMORY);
-					serverStop();
-					return;
-				}
-
-				if ((t = networkReceiveTry(server->player[i].socket, (void *) msg.extra, msg.arg[1])) > 0) {
-					messageExecute(i, &msg);
-					server->player[i].process_recv = PLAYER_PROCESS_NOTHING;
-				} else {
-					server->player[i].process_msg_recv = msg;
-					server->player[i].process_recv = PLAYER_PROCESS_DATA;
-					break;
-				}
-			} else {
-				msg.extra = NULL;
-				server->player[i].process_recv = PLAYER_PROCESS_NOTHING;
-				messageExecute(i, &msg);
-			}
-		}
-
-		if (t < 0)
-			playerDisconnect(i);
+	if (network->recv_stat == SERVER_PROCESS_NOTHING) {
+		network->recv_stat = SERVER_PROCESS_MSG;
+		network->recv_pos = 0;
 	}
 
+	if (network->recv_stat == SERVER_PROCESS_MSG) {
+		t = networkReceiveTry(server->player[player].socket, &((char *) &network->recv)[network->recv_pos], MESSAGE_SIZE - network->recv_pos);
+		if (t < 0)
+			return SERVER_PROCESS_FAIL;
+		if (t == 0)
+			return SERVER_PROCESS_INCOMPLETE;
+		network->recv_pos += t;
+		if (network->recv_pos < MESSAGE_SIZE)
+			return SERVER_PROCESS_INCOMPLETE;
 
+		network->recv.player_ID = ntohl(network->recv.player_ID);
+		network->recv.command = ntohl(network->recv.command);
+		network->recv.arg[0] = ntohl(network->recv.arg[0]);
+		network->recv.arg[1] = ntohl(network->recv.arg[1]);
+		network->recv.extra = (messageHasData(network->recv.command, network->recv.arg[1]) == 0) ? malloc(network->recv.arg[1]) : NULL;
+
+		if (!network->recv.extra) {
+			network->recv_stat = SERVER_PROCESS_NOTHING;
+			return SERVER_PROCESS_DONE;
+		}
+		
+		network->recv_stat = SERVER_PROCESS_DATA;
+		network->recv_pos = 0;
+	}
+
+	if (network->recv_stat == SERVER_PROCESS_DATA) {
+		t = networkReceiveTry(server->player[player].socket, network->recv.extra, network->recv.arg[1] - network->recv_pos);
+		if (t < 0) {
+			free(network->recv.extra);
+			network->recv.extra = NULL;
+			return SERVER_PROCESS_FAIL;
+		} else if (t == 0)
+			return SERVER_PROCESS_INCOMPLETE;
+		
+		network->recv_pos += t;
+		if (network->recv_pos < network->recv.arg[1])
+			return SERVER_PROCESS_INCOMPLETE;
+		network->recv_stat = SERVER_PROCESS_NOTHING;
+		return SERVER_PROCESS_DONE;
+	}
+
+	return SERVER_PROCESS_FAIL;
+}
+
+
+int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
+	int t;
+	MESSAGE msg;
+
+	if (network->send_stat == SERVER_PROCESS_NOTHING) {
+		if (messageBufferPop(buffer, &network->send) < 0)
+			return SERVER_PROCESS_INCOMPLETE;
+		network->send_stat = SERVER_PROCESS_MSG;
+		network->send_pos = 0;
+	}
+
+	if (network->send_stat == SERVER_PROCESS_MSG) {
+		msg.player_ID = htonl(network->send.player_ID);
+		msg.command = htonl(network->send.command);
+		msg.arg[0] = htonl(network->send.arg[0]);
+		msg.arg[1] = htonl(network->send.arg[1]);
+
+		t = networkSend(server->player[player].socket, &((char *) &msg)[network->send_pos], MESSAGE_SIZE - network->send_pos);
+
+		if (t < 0) {
+			free(network->send.extra);
+			return SERVER_PROCESS_FAIL;
+		}
+
+		network->send_pos += t;
+		if (network->send_pos < MESSAGE_SIZE)
+			return SERVER_PROCESS_INCOMPLETE;
+		if (network->send.extra == NULL) {
+			network->send_stat = SERVER_PROCESS_NOTHING;
+			return SERVER_PROCESS_DONE;
+		}
+
+		network->send_stat = SERVER_PROCESS_DATA;
+		network->send_pos = 0;
+	}
+
+	if (network->send_stat == SERVER_PROCESS_DATA) {
+		t = networkSend(server->player[player].socket, &((char *) network->send.extra)[network->send_pos], network->send.arg[1] - network->send_pos);
+
+		if (t < 0) {
+			free(network->send.extra);
+			return SERVER_PROCESS_FAIL;
+		}
+
+		network->send_pos += t;
+		if (network->send_pos < network->send.arg[1])
+			return SERVER_PROCESS_INCOMPLETE;
+		
+		free(network->send.extra);
+		network->send_stat = SERVER_PROCESS_NOTHING;
+		return SERVER_PROCESS_DONE;
+	}
+
+	return SERVER_PROCESS_FAIL;
+}
+
+
+
+void serverProcessNetwork() {
+	int i, t;
+	PLAYER_NETWORK *network;
+
+	/* Recieve */
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
-		if (server->player[i].process_send) {
-			msg_c = server->player[i].process_msg_send;
-			msg.player_ID = htonl(msg_c.player_ID);
-			msg.command = htonl(msg_c.command);
-			msg.arg[0] = htonl(msg_c.arg[0]);
-			msg.arg[1] = htonl(msg_c.arg[1]);
-
-			if (server->player[i].process_send == PLAYER_PROCESS_MSG) {
-				if ((t = networkSend(server->player[i].socket, (void *) &msg, 16 - server->player[i].process_byte_send)) > 0) {
-					if (t + server->player[i].process_byte_send < 16) {
-						server->player[i].process_byte_send =+ t;
-						continue;
-					} else {
-						server->player[i].process_send = (server->player[i].process_msg_send.extra) ? PLAYER_PROCESS_DATA : PLAYER_PROCESS_NOTHING;
-						server->player[i].process_byte_send = 0;
-					}
-				} else if (t < 0) {
-					playerDisconnect(i);
-					continue;
-				} else
-					continue;
-			}
-
-			if (server->player[i].process_send == PLAYER_PROCESS_DATA) {
-				if ((t = networkSend(server->player[i].socket, msg_c.extra, msg_c.arg[1])) > 0) {
-					if (t + server->player[i].process_byte_send < msg_c.arg[1]) {
-						server->player[i].process_byte_send += t;
-						continue;
-					} else {
-						free(msg_c.extra);
-						server->player[i].process_send = PLAYER_PROCESS_NOTHING;
-					}
-				} else if (t < 0) {
-					playerDisconnect(i);
-					continue;
-				} else 
-					continue;
-			}
+		network = &server->player[i].network;
+		
+		while ((t = serverRecv(network, i)) > 0) {
+			messageExecute(i, &server->player[i].network.recv);
 		}
-
-		if (messageBufferPop(server->player[i].msg_buf, &msg_c) < 0)
+		
+		if (t == SERVER_PROCESS_INCOMPLETE)
 			continue;
-		msg.player_ID = htonl(msg_c.player_ID);
-		msg.command = htonl(msg_c.command);
-		msg.arg[0] = htonl(msg_c.arg[0]);
-		msg.arg[1] = htonl(msg_c.arg[1]);
-		while ((t = networkSend(server->player[i].socket, (void *) &msg, 16)) > 0) {
-			server->player[i].process_send = PLAYER_PROCESS_DATA;
-			if (msg_c.extra) {
-				if ((t = networkSend(server->player[i].socket, (void *) msg_c.extra, msg_c.arg[1])) > 0) {
-					if (t + server->player[i].process_byte_send < msg_c.arg[1]) {
-						server->player[i].process_byte_send += t;
-						break;
-					} else {
-						free(msg_c.extra);
-						server->player[i].process_send = PLAYER_PROCESS_NOTHING;
-					}
-				} else if (t < 0) {
-					playerDisconnect(i);
-					break;
-				} else {
-					server->player[i].process_send = PLAYER_PROCESS_DATA;
-					break;
-				}
-			} else
-				server->player[i].process_send = PLAYER_PROCESS_NOTHING;
-			if ((messageBufferPop(server->player[i].msg_buf, &msg_c)) < 0)
-				break;
-			msg.player_ID = htonl(msg_c.player_ID);
-			msg.command = htonl(msg_c.command);
-			msg.arg[0] = htonl(msg_c.arg[0]);
-			msg.arg[1] = htonl(msg_c.arg[1]);
-		}
+		playerDisconnect(i);
+	}
 
-		if (t == -1) {
-			playerDisconnect(i);
+	/* Send */
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
-		}
 
+		while ((t = serverSend(network, server->player[i].msg_buf, i)) > 0);
+		
+		if (t == SERVER_PROCESS_INCOMPLETE)
+			continue;
+		playerDisconnect(i);
 	}
 		
 

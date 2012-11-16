@@ -59,13 +59,15 @@ int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 		return -1;
 	}
 
-	if ((msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1 == msg_buf->read_pos)
+	if (((msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1) == msg_buf->read_pos)
 		return -1;
 	
 	msg_buf->message[msg_buf->write_pos] = *message;
 	
 	if (message->extra) {
 		msg_buf->message[msg_buf->write_pos].extra  = malloc(message->arg[1]);
+		if (!msg_buf->message[msg_buf->write_pos].extra)
+			fprintf(stderr, "Malloc returned a null pointer!\n");
 		memcpy(msg_buf->message[msg_buf->write_pos].extra, message->extra, message->arg[1]);
 	}
 
@@ -95,9 +97,9 @@ int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 		return -1;
 	}
 
-	if (msg_buf->read_pos == msg_buf->write_pos) 
+	if (msg_buf->read_pos == msg_buf->write_pos)
 		return -1;
-	
+
 	*message = msg_buf->message[msg_buf->read_pos];
 	msg_buf->read_pos++;
 	if (msg_buf->read_pos == msg_buf->len)
