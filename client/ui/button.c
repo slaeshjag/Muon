@@ -57,9 +57,9 @@ UI_WIDGET *ui_widget_create_button(UI_WIDGET *child) {
 	return widget;
 }
 
-UI_WIDGET *ui_widget_create_button_text(char *text) {
+UI_WIDGET *ui_widget_create_button_text(DARNIT_FONT *font, char *text) {
 	UI_WIDGET *widget, *label;
-	label=ui_widget_create_label(font_std, text);
+	label=ui_widget_create_label(font, text);
 	widget=ui_widget_create_button(label);
 	widget->destroy=ui_widget_destroy_button_recursive;
 	return widget;

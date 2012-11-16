@@ -77,6 +77,7 @@ void map_clear_fow();
 void map_draw(int draw_powergrid);
 void map_minimap_update_viewport();
 void map_minimap_render(UI_WIDGET *widget);
-void map_minimap_update();
+//void map_minimap_update();
+void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow);
 
 #endif

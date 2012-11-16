@@ -99,13 +99,16 @@ void client_check_incomming() {
 				client_message_handler(&msg_recv, NULL);
 		}
 	}
-	
+	if(recalc_map) {
+		UI_PROPERTY_VALUE v;
+		v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
+		map_minimap_update(v.p, game_sidebar_minimap->w, game_sidebar_minimap->h, 1);
+	}
 	for(i=0; recalc_map; recalc_map>>=1, i++)
 		if(recalc_map&1) {
 			if(i==map->layers-1)
 				map_calculate_powergrid();
 			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
-			map_minimap_update();
 		}
 	return;
 }
@@ -243,11 +246,13 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
 			darnitFSMount(filename);
 			map_init("mapdata/map.ldmz");
+			lobby_map_preview_generate();
 			break;
 		case MSG_RECV_GAME_START:
 			game_state(GAME_STATE_LOBBY);
 			client_message_handler=client_countdown_handler;
 			client_countdown_handler(msg, payload);
+			break;
 	}
 }
 

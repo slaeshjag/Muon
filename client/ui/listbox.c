@@ -242,9 +242,9 @@ void ui_listbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 
 void ui_listbox_request_size(UI_WIDGET *widget, int *w, int *h) {
 	if(w)
-		*w=32;
+		*w=128;
 	if(h)
-		*h=32;
+		*h=64;
 }
 
 void ui_listbox_render(UI_WIDGET *widget) {

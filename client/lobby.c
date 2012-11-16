@@ -22,10 +22,13 @@
 #include "muon.h"
 #include "client.h"
 #include "chat.h"
+#include "map.h"
 #include "lobby.h"
 
 void lobby_init() {
 	UI_PROPERTY_VALUE v;
+	
+	//Player list
 	panelist_lobby_players.pane=ui_pane_create(16, 16, 256, 128, NULL);
 	panelist_lobby_players.next=&panelist_lobby_download;
 	ui_pane_set_root_widget(panelist_lobby_players.pane, ui_widget_create_vbox());
@@ -34,19 +37,33 @@ void lobby_init() {
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_listbox, 1);
 	lobby_players_hbox=ui_widget_create_hbox();
 	lobby_players_checkbox_ready=ui_widget_create_checkbox();
+	lobby_players_button_kick=ui_widget_create_button_text(font_std, "Kick");
+	lobby_players_button_kick->event_handler->add(lobby_players_button_kick, lobby_players_button_kick_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ui_hbox_add_child(lobby_players_hbox, lobby_players_checkbox_ready, 0);
 	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_label(font_std, "Ready"), 0);
+	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_spacer(), 1);
+	ui_hbox_add_child(lobby_players_hbox, lobby_players_button_kick, 0);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_spacer_size(1, 8), 0);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_hbox, 0);
 	
+	//Map download progress
 	panelist_lobby_download.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
-	panelist_lobby_download.next=NULL;
+	panelist_lobby_download.next=&panelist_lobby_map;
 	ui_pane_set_root_widget(panelist_lobby_download.pane, ui_widget_create_vbox());
 	lobby_download_progress=ui_widget_create_progressbar(font_std);
 	ui_vbox_add_child(panelist_lobby_download.pane->root_widget, ui_widget_create_label(font_std, "Downloading map"), 1);
 	ui_vbox_add_child(panelist_lobby_download.pane->root_widget, lobby_download_progress, 0);
 	v.i=0;
-	lobby_download_progress->set_prop(lobby_download_progress, UI_PROGRESSBAR_PROP_PROGRESS, v);	
+	lobby_download_progress->set_prop(lobby_download_progress, UI_PROGRESSBAR_PROP_PROGRESS, v);
+	
+	//Map preview
+	panelist_lobby_map.pane=ui_pane_create(platform.screen_w-128-16, 16, 128, 152, NULL);
+	lobby_map_imageview=ui_widget_create_imageview_raw(128-2*UI_PADDING, 128-2*UI_PADDING, DARNIT_PFORMAT_RGB5A1);
+	lobby_map_label=ui_widget_create_label(font_std, "Map");
+	ui_pane_set_root_widget(panelist_lobby_map.pane, ui_widget_create_vbox());
+	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_label, 1);
+	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_imageview, 0);
+	
 	//panelist_lobby.next=&panelist_lobby_ready;
 	/*panelist_lobby_ready.pane=ui_pane_create(16, 16, 64, 32, NULL);
 	ui_pane_set_root_widget(panelist_lobby_ready.pane, ui_widget_create_hbox());
@@ -74,6 +91,15 @@ void lobby_close() {
 	lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI);
 }
 
+void lobby_map_preview_generate() {
+	UI_PROPERTY_VALUE v;
+	v.p=(void *)darnitMapPropGet(map->prop, "name");
+	if(v.p)
+		lobby_map_label->set_prop(lobby_map_label, UI_LABEL_PROP_TEXT, v);
+	v=lobby_map_imageview->get_prop(lobby_map_imageview, UI_IMAGEVIEW_PROP_TILESHEET);
+	map_minimap_update(v.p, lobby_map_imageview->w, lobby_map_imageview->h, 0);
+}
+
 void lobby_join(int player) {
 	ui_listbox_set(lobby_players_listbox, player, &player_names[player*32]);
 	chat_join(player);
@@ -96,6 +122,13 @@ void lobby_progress(int player, int progress) {
 	char buf[64];
 	sprintf(buf, "%s (%i%%)", &player_names[player*32], progress);
 	ui_listbox_set(lobby_players_listbox, player, buf);
+}
+
+void lobby_players_button_kick_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
+	v=lobby_players_listbox->get_prop(lobby_players_listbox, UI_LISTBOX_PROP_SELECTED);
+	if(v.i>=0)
+		client_message_send(player_id, MSG_SEND_KICK, v.i, 0, NULL);
 }
 
 void lobby_players_checkbox_ready_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

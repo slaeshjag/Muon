@@ -27,7 +27,9 @@ enum CONFIG_OPTIONS {
 	CONFIG_OPTION_SCREEN_H,
 	CONFIG_OPTION_FULLSCREEN,
 	CONFIG_OPTION_GRID,
+	CONFIG_OPTION_POWERGRID,
 	CONFIG_OPTION_PLASMA,
+	CONFIG_OPTION_ALPHA,
 	CONFIG_OPTION_PLAYER_NAME,
 } options;
 
@@ -36,7 +38,9 @@ struct CONFIG {
 	int screen_h;
 	int fullscreen;
 	int grid;
+	int powergrid;
 	int plasma;
+	int alpha;
 	char player_name[32];
 } config;
 

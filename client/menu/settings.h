@@ -26,11 +26,13 @@ UI_WIDGET *settings_game_button_ok;
  
 struct UI_PANE_LIST panelist_settings_monitor;
 UI_WIDGET *settings_monitor_vbox;
-UI_WIDGET *settings_monitor_hbox_checkbox;
+UI_WIDGET *settings_monitor_hbox_fullscreen;
+UI_WIDGET *settings_monitor_hbox_alpha;
 UI_WIDGET *settings_monitor_listbox_modes;
 UI_WIDGET *settings_monitor_entry_w;
 UI_WIDGET *settings_monitor_entry_h;
 UI_WIDGET *settings_monitor_checkbox_fullscreen;
+UI_WIDGET *settings_monitor_checkbox_alpha;
 UI_WIDGET *settings_monitor_slider_plasma;
 UI_WIDGET *settings_monitor_button_cancel;
 UI_WIDGET *settings_monitor_button_ok;
