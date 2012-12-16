@@ -73,6 +73,7 @@ void client_check_incomming() {
 	for(i=0; i<1000; i++) {
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
+			//printf("payload size %i\n", msg_recv.arg_2);
 			s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2);
 				if(s==0)
 					break;
@@ -80,15 +81,17 @@ void client_check_incomming() {
 					client_connect_callback(-1, NULL, sock);
 					return;
 				}
-				//printf("payload size %i\n", msg_recv.arg_2);
 				if(client_message_handler)
 					client_message_handler(&msg_recv, msg_recv_payload);
 				msg_recv.command=0;
 		} else {
 			//download message
 			s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
-			if(s==0)
+			if(s==0) {
+				msg_recv.command = 0;
 				break;
+			}
+
 			if(s==-1) {
 				client_connect_callback(-1, NULL, sock);
 				return;

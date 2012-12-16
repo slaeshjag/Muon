@@ -215,6 +215,8 @@ int networkSend(SERVER_SOCKET *sock, char *buff, int buff_len) {
 	if (t >= 0)
 		return t;
 
+	if (buff_len == 16 && buff[4] != 0)
+		fprintf(stderr, "Bogus message!\n");
 	#ifndef _WIN32
 	if (errno != EAGAIN && errno != EWOULDBLOCK) {
 		fprintf(stderr, "Error: %s\n", strerror(errno));

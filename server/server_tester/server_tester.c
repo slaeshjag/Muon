@@ -49,6 +49,7 @@ int main(int argc, char **argv) {
 	struct hostent *hp;
 	char buff[256];
 	int sock, port, i, a, j;
+	unsigned int t;
 	
 	if (argc <3) {
 		printf("Usage: %s <host> <port>\n", argv[0]);
@@ -78,21 +79,26 @@ int main(int argc, char **argv) {
 	}
 	
 	message.player_ID = 0;
-	message.command = 2;
+	message.command = 6;
 	message.arg[0] = 0x10000;
 	message.arg[1] = strlen("Testspelare");
 	messageConvert(&message);
-	
+
 	send(sock, &message, 16, 0);
 	send(sock, "Testspelare", strlen("Testspelare"), 0);
+	recv(sock, &t, 4, 0);
+	t = htonl(t);
+	fprintf(stdout, "Receiving chunk of size %i\n", t);
+	t -= 4;
 
 	for (j = 0;; j++) {
 		if (recv(sock, &message, 16, 0) <= 0)
 			break;
+		t -= 16;
 		messageConvert(&message);
-		fprintf(stderr, "\n\nMessage %i from player %i: %i %i;; ", message.command, message.player_ID, message.arg[0], message.arg[1]);
+		fprintf(stdout, "Message %i from player %i: %i %i;;\n", message.command, message.player_ID, message.arg[0], message.arg[1]);
 
-		if (message.command & 0x100)
+		if (message.command & 0x100) {
 			for (i = 0; i < message.arg[1]; ) {
 					a = (message.arg[1] - i > 256) ? 256 : message.arg[1] - i;
 				
@@ -102,11 +108,23 @@ int main(int argc, char **argv) {
 				fwrite(buff, port, 1, stderr);
 
 			}
-		if (j == 10) {
-			fprintf(stderr, "\nSending ready message\n");
-			messageSend(sock, 4, 1, 100);
+			t -= message.arg[1];
 		}
 
+		if (t == 0) {
+			fprintf(stderr, "Sending chuck ack\n");
+			message.player_ID = 0;
+			message.command = 4;
+			message.arg[0] = 0;
+			message.arg[1] = 0;
+			messageConvert(&message);
+			send(sock, &message, 16, 0);
+	
+			recv(sock, &t, 4, 0);
+			fprintf(stdout, "Receiving chunk of size %i\n", t);
+			t = htonl(t);
+			t -= 4;
+		}
 		if (port <= 0)
 			break;
 	}

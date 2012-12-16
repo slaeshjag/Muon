@@ -76,6 +76,7 @@ int lobbyPoll() {
 
 	server->player[slot].network.recv_stat = SERVER_PROCESS_NOTHING;
 	server->player[slot].network.send_stat = SERVER_PROCESS_NOTHING;
+	server->player[slot].network.ready_to_send = 0;
 	server->player[slot].team = -1;
 
 	server->player[slot].stats.buildtime = 0;

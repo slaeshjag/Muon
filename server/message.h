@@ -23,30 +23,33 @@
 #define	MESSAGE_BUFFER_INITIAL		65536
 #define	MESSAGE_MAX_PAYLOAD		512
 #define	MESSAGE_SIZE			16
+#define	MESSAGE_SEND_BUFFER_SIZE	4096
 
-#define	MESSAGE_ALWAYS_MAX		3
+#define	MESSAGE_ALWAYS_MAX		5
 
-#define	MESSAGE_LOBBY_MIN		4
-#define	MESSAGE_LOBBY_MAX		6
+#define	MESSAGE_LOBBY_MIN		6
+#define	MESSAGE_LOBBY_MAX		8
 
-#define	MESSAGE_GAME_MIN		7
-#define	MESSAGE_GAME_MAX		9
+#define	MESSAGE_GAME_MIN		9
+#define	MESSAGE_GAME_MAX		11
 
 /* Messages we can always get */
 #define	MSG_RECV_PONG			0
 #define	MSG_RECV_CHAT			1
 #define	MSG_RECV_KICK			2
 #define	MSG_RECV_SET_GAMESPEED		3
+#define	MSG_RECV_CHUNK_OK		4
+#define	MSG_RECV_CHUNK_RESEND		5
 
 /* Messages we can only get in lobby mode */
-#define	MSG_RECV_IDENTIFY		4
-#define	MSG_RECV_MAP_PROGRESS		5
-#define	MSG_RECV_READY			6
+#define	MSG_RECV_IDENTIFY		6
+#define	MSG_RECV_MAP_PROGRESS		7
+#define	MSG_RECV_READY			8
 
 /* Messages we can only get in-game */
-#define	MSG_RECV_START_BUILD		7
-#define	MSG_RECV_PLACE_BUILDING		8
-#define	MSG_RECV_SET_ATTACK		9
+#define	MSG_RECV_START_BUILD		9
+#define	MSG_RECV_PLACE_BUILDING		10
+#define	MSG_RECV_SET_ATTACK		11
 
 /* Messages we can send */
 
@@ -96,6 +99,8 @@ typedef struct {
 	unsigned int		len;
 	unsigned int		read_pos;
 	unsigned int		write_pos;
+	unsigned char		*send_buff;
+	unsigned int		send_buff_size;
 } MESSAGE_BUFFER;
 
 
@@ -103,6 +108,7 @@ MESSAGE_BUFFER *messageBufferInit();
 MESSAGE_BUFFER *messageBufferDelete(MESSAGE_BUFFER *msg_buf);
 int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message);
 int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message);
+int messageBufferGetNextSize(MESSAGE_BUFFER *msg_buf);
 int messageBufferFlush(MESSAGE_BUFFER *msg_buf);
 int messageBufferPushDirect(unsigned int to, unsigned int player, unsigned int message, unsigned int arg_1, unsigned int arg_2, void *data);
 
