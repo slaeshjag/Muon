@@ -149,8 +149,7 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 	msg.arg[1] = ntohl(arg2);
 	buf = (char *) &msg;
 
-	d = MESSAGE_SIZE + 4;// + (data) ? arg2 : 0;
-	fprintf(stderr, "Sending chunk of size %i (datasize: %i),, %i\n", d, (data) ? arg2 : 0, MESSAGE_SIZE);
+	d = MESSAGE_SIZE + 4 + ((data) ? arg2 : 0);
 	d = htonl(d);
 	networkSend(socket, (void *) &d, 4);
 
