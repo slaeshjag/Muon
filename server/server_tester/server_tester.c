@@ -88,7 +88,6 @@ int main(int argc, char **argv) {
 	send(sock, "Testspelare", strlen("Testspelare"), 0);
 	recv(sock, &t, 4, 0);
 	t = htonl(t);
-	fprintf(stdout, "Receiving chunk of size %i\n", t);
 	t -= 4;
 
 	for (j = 0;; j++) {
@@ -112,7 +111,6 @@ int main(int argc, char **argv) {
 		}
 
 		if (t == 0) {
-			fprintf(stderr, "Sending chuck ack\n");
 			message.player_ID = 0;
 			message.command = 4;
 			message.arg[0] = 0;
@@ -121,7 +119,6 @@ int main(int argc, char **argv) {
 			send(sock, &message, 16, 0);
 	
 			recv(sock, &t, 4, 0);
-			fprintf(stdout, "Receiving chunk of size %i\n", t);
 			t = htonl(t);
 			t -= 4;
 		}

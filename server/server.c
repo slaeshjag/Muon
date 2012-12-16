@@ -310,7 +310,6 @@ int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
 	MESSAGE msg;
 
 	if (network->send_stat == SERVER_PROCESS_NOTHING) {
-			return SERVER_PROCESS_INCOMPLETE;
 		
 		t = buffer->send_buff_size = 4;
 		for (;;) {
@@ -341,7 +340,6 @@ int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
 		
 		buffer->send_buff_size = t;
 		network->send_pos = 0;
-		fprintf(stderr, "Sending chunk of size %i\n", ((int *) buffer->send_buff)[0]);
 		((int *) buffer->send_buff)[0] = htonl(t);
 	}
 
@@ -351,7 +349,6 @@ int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
 
 		if (t < 0) {
 			free(network->send.extra);
-			fprintf(stderr, "Send error\n");
 			return SERVER_PROCESS_FAIL;
 		}
 
@@ -396,8 +393,10 @@ void serverProcessNetwork() {
 		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
 
-		if (server->player[i].network.ready_to_send)
-			t = serverSend(network, server->player[i].msg_buf, i);
+		if (!server->player[i].network.ready_to_send)
+			continue;
+
+		t = serverSend(network, server->player[i].msg_buf, i);
 		
 		if (t == SERVER_PROCESS_INCOMPLETE)
 			continue;
