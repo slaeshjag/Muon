@@ -70,28 +70,37 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 
 void client_check_incomming() {
 	int s, i;
-	for(i=0; i<1000; i++) {
+	unsigned int chunk_got=0, chunk_size;
+	if((s=darnitSocketRecvTry(sock, &chunk_size, 4))<4) {
+		if(s==-1)
+			client_connect_callback(-1, NULL, sock);
+		return;
+	}
+	chunk_size=darnitUtilNtohl(chunk_size)-4;
+	
+	while(chunk_got<chunk_size) {
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
 			//printf("payload size %i\n", msg_recv.arg_2);
 			s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2);
-				if(s==0)
-					break;
-				if(s==-1) {
-					client_connect_callback(-1, NULL, sock);
-					return;
-				}
-				if(client_message_handler)
-					client_message_handler(&msg_recv, msg_recv_payload);
-				msg_recv.command=0;
+			if(s==0)
+				continue;
+				//break;
+			if(s==-1) {
+				client_connect_callback(-1, NULL, sock);
+				return;
+			}
+			if(client_message_handler)
+				client_message_handler(&msg_recv, msg_recv_payload);
+			msg_recv.command=0;
 		} else {
 			//download message
 			s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
 			if(s==0) {
 				msg_recv.command = 0;
-				break;
+				continue;
+				//break;
 			}
-
 			if(s==-1) {
 				client_connect_callback(-1, NULL, sock);
 				return;
@@ -101,7 +110,11 @@ void client_check_incomming() {
 			if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
 				client_message_handler(&msg_recv, NULL);
 		}
+		chunk_got+=s;
 	}
+	client_message_send(player_id, MSG_SEND_CHUNK_OK, 0, 0, NULL);
+	
+	//TODO: move somewhere else
 	if(recalc_map) {
 		UI_PROPERTY_VALUE v;
 		v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
