@@ -338,6 +338,8 @@ int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
 				memcpy(&buffer->send_buff[t], network->send.extra, network->send.arg[1]);
 				t += network->send.arg[1];
 			}
+
+			free(network->send.extra);
 			
 		}
 		
@@ -354,15 +356,12 @@ int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
 		t = networkSend(server->player[player].socket, (void *) &buffer->send_buff[network->send_pos], buffer->send_buff_size - network->send_pos);
 
 		if (t < 0) {
-			free(network->send.extra);
 			return SERVER_PROCESS_FAIL;
 		}
 
 		network->send_pos += t;
 		if (network->send_pos < buffer->send_buff_size)
 			return SERVER_PROCESS_INCOMPLETE;
-		
-		free(network->send.extra);
 		
 		network->send_stat = SERVER_PROCESS_NOTHING;
 		server->player[player].network.ready_to_send = 0;

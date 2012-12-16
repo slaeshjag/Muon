@@ -34,6 +34,7 @@ int lobbyMapSend(unsigned int player) {
 
 	send = (server->map_c.data_len - i > MESSAGE_MAX_PAYLOAD) ? MESSAGE_MAX_PAYLOAD : server->map_c.data_len - i;
 	messageBufferPushDirect(player, player, MSG_SEND_MAP_CHUNK, 0, send, &data[i]);
+	server->player[player].transfer_pos += send;
 
 	return 0;
 }
