@@ -20,38 +20,22 @@
 #include "server.h"
 
 
-void lobbyMapSend(unsigned int player) {
-	MESSAGE msg;
+int lobbyMapSend(unsigned int player) {
 	int i, send;
 	char *data = server->map_c.data;
 
-	msg.player_ID = player;
-	msg.command = MSG_SEND_MAP_BEGIN;
-	msg.arg[0] = server->map_c.data_len;
-	msg.arg[1] = strlen(server->map_c.path);
-	msg.extra = (void *) server->map_c.path;
-	messageBufferPush(server->player[player].msg_buf, &msg);
 	
-	for (i = 0; i < server->map_c.data_len; ) {
-		send = (server->map_c.data_len - i > MESSAGE_MAX_PAYLOAD) ? MESSAGE_MAX_PAYLOAD : server->map_c.data_len - i;
-		
-		msg.player_ID = player;
-		msg.command = MSG_SEND_MAP_CHUNK;
-		msg.arg[0] = 0;
-		msg.arg[1] = send;
-		msg.extra = &data[i];
-		i += send;
-		messageBufferPush(server->player[player].msg_buf, &msg);
+	i = server->player[player].transfer_pos;
+	if (i == server->map_c.data_len) {
+		server->player[player].transfer = NONE;
+		messageBufferPushDirect(player, player, MSG_SEND_MAP_END, 0, 0, NULL);
+		return 0;
 	}
 
-	msg.player_ID = player;
-	msg.command = MSG_SEND_MAP_END;
-	msg.arg[0] = 0;
-	msg.arg[1] = 0;
-	msg.extra = NULL;
-	messageBufferPush(server->player[player].msg_buf, &msg);
+	send = (server->map_c.data_len - i > MESSAGE_MAX_PAYLOAD) ? MESSAGE_MAX_PAYLOAD : server->map_c.data_len - i;
+	messageBufferPushDirect(player, player, MSG_SEND_MAP_CHUNK, 0, send, &data[i]);
 
-	return;
+	return 0;
 }
 
 
@@ -83,6 +67,9 @@ int lobbyPoll() {
 	server->player[slot].stats.no_build_time = 0;
 	server->player[slot].stats.buildings_raised = 0;
 	server->player[slot].stats.buildings_lost = 0;
+	
+	server->player[slot].transfer = NONE;
+	server->player[slot].transfer_pos = 0;
 
 	messageSend(socket, slot, MSG_SEND_REQUEST_IDENTIFY, slot, server->players, NULL);
 

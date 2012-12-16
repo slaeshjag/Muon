@@ -72,7 +72,9 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 		}
 
 	unitAnnounceBuildingData(player);
-	lobbyMapSend(player);
+	server->player[player].transfer = MAP;
+	server->player[player].transfer_pos = 0;
+	messageBufferPushDirect(player, player, MSG_SEND_MAP_BEGIN, server->map_c.data_len, strlen(server->map_c.path), (char *) server->map_c.path);
 
 	return;
 }

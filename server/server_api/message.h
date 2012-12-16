@@ -33,6 +33,11 @@
 
 /* Message protocol, general stuff */
 
+/* All messages are wrapped in a "chunk", which means before a group of messages, an int
+   containing the number of bytes in the chunk (incl. this int).
+   If the number of bytes isnt fully readable within a reasonable time, request a resend.
+   If you got the data fine, you need to send a CHUNK_OK message, or you won't get any more data */
+
 /* This struct is used for *all* message bodies. Ints are in correct (big) endian */
 typedef struct {
 	/* When sending messages, this field is ignored */

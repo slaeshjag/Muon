@@ -42,6 +42,7 @@ void gameLoop(int msec);
 int gameKillPlayerUnits(unsigned int player);
 int gameAttemptStart();
 void gameStart();
+int gameWorldTransfer(unsigned int player);
 int gameDetectIfOver();
 void gameEnd();
 

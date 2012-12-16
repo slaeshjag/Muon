@@ -21,7 +21,7 @@
 #define	__LOBBY_H__
 
 int lobbyPoll();
-void lobbyMapSend(unsigned int player);
+int lobbyMapSend(unsigned int player);
 
 
 #endif

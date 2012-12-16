@@ -20,6 +20,12 @@
 #ifndef __PLAYER_H__
 #define	__PLAYER_H__
 
+typedef enum PLAYER_DATA_TRANSFER {
+	NONE,
+	MAP,
+	WORLD
+} PLAYER_DATA_TRANSFER;
+
 #define PLAYER_ID_TIME				5
 
 #define	PLAYER_NAME_LEN				32
@@ -104,6 +110,9 @@ typedef struct {
 	PLAYER_STATS		stats;
 	int			buildspots;
 	float			buildspeed;
+
+	PLAYER_DATA_TRANSFER	transfer;
+	int			transfer_pos;
 } PLAYER;
 
 PLAYER *playerInit(unsigned int players, int map_w, int map_h);

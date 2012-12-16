@@ -316,8 +316,14 @@ int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
 		for (;;) {
 			if (t + messageBufferGetNextSize(buffer) > MESSAGE_SEND_BUFFER_SIZE)
 				break;
-			if (messageBufferGetNextSize(buffer) < 0)
-				break;
+			if (messageBufferGetNextSize(buffer) < 0) {
+				if (serverRequestMoreData(player) < 0) {
+					break;
+				} else {
+					continue;
+				}
+			}
+
 
 			messageBufferPop(buffer, &network->send);
 			msg.player_ID = htonl(network->send.player_ID);
@@ -410,6 +416,20 @@ void serverProcessNetwork() {
 	return;
 }
 
+
+/* Pushes a message to the message buffer, when there's room in the chunk but no more data to send */
+int serverRequestMoreData(unsigned int player) {
+	switch (server->player[player].transfer) {
+		case MAP:
+			return lobbyMapSend(player);
+		case WORLD:
+			return gameWorldTransfer(player);
+		default:
+			return -1;
+	}
+
+	return -1;
+}
 
 
 int serverLoop(unsigned int d_ms) {

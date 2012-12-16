@@ -125,6 +125,26 @@ void gameLoop(int msec) {
 }
 
 
+int gameWorldTransfer(unsigned int player) {
+	int i;
+
+	for (i = server->player[player].transfer_pos; i < server->w * server->h; i++) {
+		server->player[player].map[i].fog = 1;
+		if (!server->map[i])
+			continue;
+		unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
+		server->player[player].transfer_pos = i;
+
+		return 0;
+	}
+
+	server->player[player].transfer = NONE;
+	server->player[player].transfer_pos = i;
+	
+	return -1;
+}
+
+
 int gameDetectIfOver() {
 	int i, team;
 	

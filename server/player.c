@@ -55,6 +55,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 	
 	server->players = players;
 	server->player = player;
+
 	if (playerBuildQueueInit() < 0)
 		err = 1;
 
@@ -360,6 +361,10 @@ void playerClear(int player) {
 	int i;
 
 	messageBufferPushDirect(player, player, MSG_SEND_MAP_CLEAR, 0, 0, NULL);
+	
+	server->player[player].transfer = WORLD;
+	server->player[player].transfer_pos = 0;
+	
 	for (i = 0; i < server->w * server->h; i++) {
 		server->player[player].map[i].fog = 1;
 		if (!server->map[i])
