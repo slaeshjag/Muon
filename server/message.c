@@ -171,7 +171,9 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 
 
 int messageExecute(unsigned int player, MESSAGE *message) {
+	
 
+	
 	if (message->command >= MESSAGE_HANDLERS) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);

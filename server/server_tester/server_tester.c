@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 				if ((port = recv(sock, buff, a, 0)) <= 0)
 					break;
 				i += port;
-				fwrite(buff, port, 1, stderr);
+			//	fwrite(buff, port, 1, stderr);
 
 			}
 			t -= message.arg[1];
