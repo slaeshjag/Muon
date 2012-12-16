@@ -293,56 +293,77 @@ int serverRecv(PLAYER_NETWORK *network, int player) {
 }
 
 
+void serverResend(int player) {
+	PLAYER_NETWORK *network = &server->player[player].network;
+
+	network->send_stat = SERVER_PROCESS_MSG;
+	network->send_pos = 0;
+	network->ready_to_send = 1;
+
+	return;
+}
+
+
+
 int serverSend(PLAYER_NETWORK *network, MESSAGE_BUFFER *buffer, int player) {
 	int t;
 	MESSAGE msg;
 
 	if (network->send_stat == SERVER_PROCESS_NOTHING) {
-		if (messageBufferPop(buffer, &network->send) < 0)
 			return SERVER_PROCESS_INCOMPLETE;
-		network->send_stat = SERVER_PROCESS_MSG;
+		
+		t = buffer->send_buff_size = 4;
+		for (;;) {
+			if (t + messageBufferGetNextSize(buffer) > MESSAGE_SEND_BUFFER_SIZE)
+				break;
+			if (messageBufferGetNextSize(buffer) < 0)
+				break;
+
+			messageBufferPop(buffer, &network->send);
+			msg.player_ID = htonl(network->send.player_ID);
+			msg.command = htonl(network->send.command);
+			msg.arg[0] = htonl(network->send.arg[0]);
+			msg.arg[1] = htonl(network->send.arg[1]);
+	
+			network->send_stat = SERVER_PROCESS_MSG;
+			memcpy(&buffer->send_buff[t], (void *) &msg, MESSAGE_SIZE);
+			t += MESSAGE_SIZE;
+
+			if (network->send.extra) {
+				memcpy(&buffer->send_buff[t], network->send.extra, network->send.arg[1]);
+				t += network->send.arg[1];
+			}
+			
+		}
+		
+		if (t == 4)
+			return SERVER_PROCESS_INCOMPLETE;
+		
+		buffer->send_buff_size = t;
 		network->send_pos = 0;
+		fprintf(stderr, "Sending chunk of size %i\n", ((int *) buffer->send_buff)[0]);
+		((int *) buffer->send_buff)[0] = htonl(t);
 	}
 
 	if (network->send_stat == SERVER_PROCESS_MSG) {
-		msg.player_ID = htonl(network->send.player_ID);
-		msg.command = htonl(network->send.command);
-		msg.arg[0] = htonl(network->send.arg[0]);
-		msg.arg[1] = htonl(network->send.arg[1]);
 
-		t = networkSend(server->player[player].socket, &((char *) &msg)[network->send_pos], MESSAGE_SIZE - network->send_pos);
+		t = networkSend(server->player[player].socket, (void *) &buffer->send_buff[network->send_pos], buffer->send_buff_size - network->send_pos);
 
 		if (t < 0) {
 			free(network->send.extra);
+			fprintf(stderr, "Send error\n");
 			return SERVER_PROCESS_FAIL;
 		}
 
 		network->send_pos += t;
-		if (network->send_pos < MESSAGE_SIZE)
-			return SERVER_PROCESS_INCOMPLETE;
-		if (network->send.extra == NULL) {
-			network->send_stat = SERVER_PROCESS_NOTHING;
-			return SERVER_PROCESS_DONE;
-		}
-
-		network->send_stat = SERVER_PROCESS_DATA;
-		network->send_pos = 0;
-	}
-
-	if (network->send_stat == SERVER_PROCESS_DATA) {
-		t = networkSend(server->player[player].socket, &((char *) network->send.extra)[network->send_pos], network->send.arg[1] - network->send_pos);
-
-		if (t < 0) {
-			free(network->send.extra);
-			return SERVER_PROCESS_FAIL;
-		}
-
-		network->send_pos += t;
-		if (network->send_pos < network->send.arg[1])
+		if (network->send_pos < buffer->send_buff_size)
 			return SERVER_PROCESS_INCOMPLETE;
 		
 		free(network->send.extra);
+		
 		network->send_stat = SERVER_PROCESS_NOTHING;
+		server->player[player].network.ready_to_send = 0;
+		
 		return SERVER_PROCESS_DONE;
 	}
 
@@ -375,9 +396,12 @@ void serverProcessNetwork() {
 		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
 
-		while ((t = serverSend(network, server->player[i].msg_buf, i)) > 0);
+		if (server->player[i].network.ready_to_send)
+			t = serverSend(network, server->player[i].msg_buf, i);
 		
 		if (t == SERVER_PROCESS_INCOMPLETE)
+			continue;
+		if (t > 0)
 			continue;
 		playerDisconnect(i);
 	}

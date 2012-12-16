@@ -36,6 +36,7 @@ MESSAGE_BUFFER *messageBufferInit() {
 
 	msg_buf->len = MESSAGE_BUFFER_INITIAL;
 	msg_buf->read_pos = msg_buf->write_pos = 0;
+	msg_buf->send_buff = malloc(MESSAGE_SEND_BUFFER_SIZE);
 
 	return msg_buf;
 }
@@ -90,6 +91,22 @@ int messageBufferPushDirect(unsigned int to, unsigned int player, unsigned int m
 }
 
 
+int messageBufferGetNextSize(MESSAGE_BUFFER *msg_buf) {
+	int size;
+
+	if (!msg_buf) {
+		fprintf(stderr, "Message buffer is NULL, unable to look at next message");
+		return -1;
+	}
+
+	if (msg_buf->read_pos == msg_buf->write_pos)
+		return -1;
+	size = MESSAGE_SIZE;
+	size += (msg_buf->message[msg_buf->read_pos].extra) ? msg_buf->message[msg_buf->read_pos].arg[1] : 0;
+
+	return size;
+}
+
 
 int messageBufferPop(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 	if (msg_buf == NULL) {
@@ -122,6 +139,7 @@ int messageBufferFlush(MESSAGE_BUFFER *msg_buf) {
 
 int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message, int arg1, int arg2, void *data) {
 	int i, t;
+	unsigned int d;
 	MESSAGE msg;
 	char *buf;
 
@@ -131,8 +149,13 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 	msg.arg[1] = ntohl(arg2);
 	buf = (char *) &msg;
 
-	for (i = t = 0; i < 16 && t > -1; ) {
-		t = networkSend(socket, &buf[i], 16 - i);
+	d = MESSAGE_SIZE + 4;// + (data) ? arg2 : 0;
+	fprintf(stderr, "Sending chunk of size %i (datasize: %i),, %i\n", d, (data) ? arg2 : 0, MESSAGE_SIZE);
+	d = htonl(d);
+	networkSend(socket, (void *) &d, 4);
+
+	for (i = t = 0; i < MESSAGE_SIZE && t > -1; ) {
+		t = networkSend(socket, &buf[i], MESSAGE_SIZE - i);
 		i += t;
 	}
 	

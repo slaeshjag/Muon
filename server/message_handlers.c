@@ -206,11 +206,27 @@ void messageHandlerSetGamespeed(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerChunkOK(unsigned int player, MESSAGE *message) {
+	server->player[player].network.ready_to_send = 1;
+
+	return;
+}
+
+
+void messageHandlerChunkResend(unsigned int player, MESSAGE *message) {
+	serverResend(player);
+
+	return;
+}
+
+
 int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
 	server->message_handler.handle[MSG_RECV_KICK] 		= messageHandlerKick;
 	server->message_handler.handle[MSG_RECV_SET_GAMESPEED]	= messageHandlerSetGamespeed;
+	server->message_handler.handle[MSG_RECV_CHUNK_OK]	= messageHandlerChunkOK;
+	server->message_handler.handle[MSG_RECV_CHUNK_RESEND]	= messageHandlerChunkResend;
 
 	server->message_handler.handle[MSG_RECV_IDENTIFY] 	= messageHandlerIdentify;
 	server->message_handler.handle[MSG_RECV_MAP_PROGRESS] 	= messageHandlerPlayerInfo;

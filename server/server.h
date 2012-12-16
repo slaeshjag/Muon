@@ -100,6 +100,7 @@ SERVER *server;
 int serverPowerGet(int owner, int x, int y);
 SERVER *serverStart(const char *fname, unsigned int players, int port, int gamespeed);
 SERVER *serverStop();
+void serverResend(int player);
 int serverLoop(unsigned int d_ms);
 int serverPlayersPlaying();
 

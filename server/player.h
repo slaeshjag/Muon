@@ -84,6 +84,7 @@ typedef struct {
 	unsigned int		recv_stat;
 	unsigned int		recv_pos;
 	MESSAGE			recv;
+	unsigned int		ready_to_send;
 } PLAYER_NETWORK;
 
 
