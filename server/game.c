@@ -130,9 +130,12 @@ int gameWorldTransfer(unsigned int player) {
 
 	for (i = server->player[player].transfer_pos; i < server->w * server->h; i++) {
 		server->player[player].map[i].fog = 1;
-		if (!server->map[i])
+		if (server->map_c.tile_data[i] & 0x40000)
+			messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, (server->map_c.tile_data[i] & 0x20000) ? 0x11 : 0x10, i, NULL);
+		else if (!server->map[i])
 			continue;
-		unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
+		if (server->map[i])
+			unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
 		server->player[player].transfer_pos = i;
 
 		return 0;

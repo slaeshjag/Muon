@@ -112,6 +112,8 @@ void playerDisconnect(unsigned int player) {
 	int broadcast;
 
 	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
+	if (server->player[player].status == PLAYER_UNUSED)
+		return;
 
 	/* We probably need to add a mutex here */
 	if (server->game.started)

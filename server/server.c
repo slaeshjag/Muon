@@ -114,6 +114,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 
 	if (server)
 		return server;
+	fprintf(stderr, "Stopping server\n");
 	
 	if (gamespeed < 0) {
 		errorPush(SERVER_ERROR_GAMESPEED_TOO_SMALL);
@@ -201,7 +202,7 @@ SERVER *serverStop() {
 	playerDestroy(server->player, server->players);
 	free(server->map);
 	networkSocketDisconnect(server->accept);
-	ldmzFree(server->map_data);
+	server->map_data = ldmzFree(server->map_data);
 	free(server->map_c.data);
 	free((void *) server->map_c.path);
 
@@ -400,8 +401,10 @@ void serverProcessNetwork() {
 
 		if (!server->player[i].network.ready_to_send)
 			continue;
-
-		t = serverSend(network, server->player[i].msg_buf, i);
+		
+		do {
+			t = serverSend(network, server->player[i].msg_buf, i);
+		} while (t == SERVER_PROCESS_DONE);
 		
 		if (t == SERVER_PROCESS_INCOMPLETE)
 			continue;
