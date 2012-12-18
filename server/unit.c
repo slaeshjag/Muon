@@ -152,6 +152,9 @@ void unitPylonDelete(SERVER_UNIT *unit) {
 
 	list = &server->pylons;
 
+	if (server->pylons == NULL)
+		return;
+
 	while (*list) {
 		if ((*list)->unit == unit) {
 			*list = (*list)->next;
