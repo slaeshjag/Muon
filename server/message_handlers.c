@@ -148,6 +148,7 @@ void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
 		return;
 	}
 
+
 	if (message->arg[1] > server->w * server->h)			/* Meh, nice try :P */
 		return;
 	if (!server->player[player].map[message->arg[1]].power)		/* Sorry! :x */

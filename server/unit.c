@@ -152,6 +152,9 @@ void unitPylonDelete(SERVER_UNIT *unit) {
 
 	list = &server->pylons;
 
+	if (server->pylons == NULL)
+		return;
+
 	while (*list) {
 		if ((*list)->unit == unit) {
 			*list = (*list)->next;
@@ -354,7 +357,7 @@ int unitRemove(int x, int y) {
 	next = *parent;
 	owner = unit->owner;
 
-	playerCalcLOS(unit->owner, unit->x, unit->y, -1);
+	playerCalcLOS(unit->owner, x, y, -1);
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
@@ -616,6 +619,41 @@ void unitShieldAnnounce(int index) {
 }
 
 
+void unitDamageDo(int index, int damage, int time) {
+	SERVER_UNIT *next = server->map[index];
+	
+	if (next->target < 0 || next->target > server->w * server->h)
+		return;
+
+	if (!server->map[next->target]) {
+		if (damage < MAP_TERRAIN_ABSORTION)
+			return;
+		server->map_c.tile_data[index] |= 0x60000;
+		server->map_c.tile_data[index] ^= 0x20000;
+		return;
+	}
+
+
+	server->map[next->target]->shield -= damage * time * server->game.gamespeed;
+	if (server->map[next->target]->shield < 0) {
+		server->map[next->target]->hp += server->map[next->target]->shield;
+		server->map[next->target]->shield = 0;
+		server->map[next->target]->last_no_shield = server->game.time_elapsed;
+		unitDamageAnnounce(next->target);
+		if (!server->player[server->map[next->target]->owner].map[next->target].power)
+			unitShieldAnnounce(next->target);
+		if (server->map[next->target]->hp <= 0) {
+			server->player[next->owner].stats.buildings_destroyed++;
+			unitRemove(next->target % server->w, next->target / server->w);
+			next->target = -1;
+		}
+	}
+
+	return;
+}
+	
+
+
 void unitLoop(int msec) {
 	SERVER_UNIT *next;
 	int index;
@@ -641,20 +679,7 @@ void unitLoop(int msec) {
 			if (!server->map[next->target])
 				next->target = -1;
 			else {
-				server->map[next->target]->shield -= unit_damage[next->type] * msec * server->game.gamespeed;
-				if (server->map[next->target]->shield < 0) {
-					server->map[next->target]->hp += server->map[next->target]->shield;
-					server->map[next->target]->shield = 0;
-					server->map[next->target]->last_no_shield = server->game.time_elapsed;
-					unitDamageAnnounce(next->target);
-					if (!server->player[server->map[next->target]->owner].map[next->target].power)
-						unitShieldAnnounce(index);
-					if (server->map[next->target]->hp <= 0) {
-						server->player[next->owner].stats.buildings_destroyed++;
-						unitRemove(next->target % server->w, next->target / server->w);
-						next->target = -1;
-					}
-				}
+				unitDamageDo(index, unit_damage[next->type], msec);
 			}
 		} else if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT)) {
 			unitAttackerScan(next->x, next->y);

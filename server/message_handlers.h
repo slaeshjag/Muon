@@ -20,7 +20,7 @@
 #ifndef __MESSAGE_HANDLERS_H__
 #define	__MESSAGE_HANDLERS_H__
 
-#define	MESSAGE_HANDLERS	10
+#define	MESSAGE_HANDLERS	12
 
 int messageHandlerInit();
 

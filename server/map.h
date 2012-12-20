@@ -19,4 +19,10 @@
 
 #include "standalone/map.h"
 
+#ifndef __MAP_H__
+#define	__MAP_H__
 
+#define	MAP_TERRAIN_ABSORTION		4000
+
+
+#endif
