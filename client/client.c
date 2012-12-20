@@ -214,7 +214,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_PLAYER_READY:
 			if(msg->arg_2==100) {
 				if(msg->player_id==player_id)
-					panelist_lobby_players.next=panelist_lobby_download.next;
+					lobby_download_complete();
 				lobby_ready(msg->player_id, msg->arg_1);
 			} else
 				lobby_progress(msg->player_id, msg->arg_2);

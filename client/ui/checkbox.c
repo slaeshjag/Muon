@@ -52,6 +52,7 @@ UI_WIDGET *ui_widget_create_checkbox() {
 	widget->render=ui_checkbox_render;
 	
 	widget->x=widget->y=widget->w=widget->h=0;
+	widget->enabled=1;
 
 	return widget;
 }
@@ -64,6 +65,8 @@ void *ui_widget_destroy_checkbox(UI_WIDGET *widget) {
 }
 
 void ui_checkbox_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(!widget->enabled)
+		return;
 	struct UI_CHECKBOX_PROPERTIES *p=widget->properties;
 	if(e->keyboard->keysym!=KEY(RETURN)&&e->keyboard->keysym!=KEY(KP_ENTER)&&e->keyboard->keysym!=KEY(SPACE))
 		return;
@@ -81,6 +84,8 @@ void ui_checkbox_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 }
 
 void ui_checkbox_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(!widget->enabled)
+		return;
 	struct UI_CHECKBOX_PROPERTIES *p=widget->properties;
 	switch(type) {
 		case UI_EVENT_TYPE_MOUSE_PRESS:

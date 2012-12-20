@@ -311,6 +311,13 @@ void map_minimap_render(UI_WIDGET *widget) {
 	darnitRenderTint(r, g, b, a);
 }
 
+void map_minimap_clear(DARNIT_TILESHEET *ts, int w, int h) {
+	int i;
+	for(i=0; i<w*h; i++)
+		minimap_data[i]=0;
+	darnitRenderTilesheetUpdate(ts, 0, 0, w, h, minimap_data);
+}
+
 void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
 	//This is really slow and retarded, but it works
 	int x, y;

@@ -56,6 +56,8 @@ UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font) {
 	widget->request_size=ui_listbox_request_size;
 	widget->render=ui_listbox_render;
 	widget->x=widget->y=widget->w=widget->h=0;
+	widget->enabled=1;
+	
 	return widget;
 }
 
@@ -145,6 +147,8 @@ void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 }
 
 void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(!widget->enabled)
+		return;
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	if(type==UI_EVENT_TYPE_MOUSE_SCROLL) {
 		p->scroll+=e->mouse->wheel;

@@ -53,6 +53,7 @@ UI_WIDGET *ui_widget_create_slider(unsigned int steps) {
 	widget->request_size=ui_slider_request_size;
 	widget->render=ui_slider_render;
 	widget->x=widget->y=widget->w=widget->h=0;
+	widget->enabled=1;
 
 	return widget;
 }
@@ -65,6 +66,8 @@ void *ui_widget_destroy_slider(UI_WIDGET *widget) {
 }
 
 void ui_slider_event_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(!widget->enabled)
+		return;
 	int i, value=0;
 	struct UI_SLIDER_PROPERTIES *p=widget->properties;
 	for(i=0; i<p->steps; i++)

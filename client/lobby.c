@@ -45,6 +45,7 @@ void lobby_init() {
 	ui_hbox_add_child(lobby_players_hbox, lobby_players_button_kick, 0);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_spacer_size(1, 8), 0);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_hbox, 0);
+	lobby_players_checkbox_ready->event_handler->add(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	//Map download progress
 	panelist_lobby_download.pane=ui_pane_create(platform.screen_w/2-64, platform.screen_h/2-32, 128, 64, NULL);
@@ -76,19 +77,22 @@ void lobby_open() {
 	int i;
 	UI_PROPERTY_VALUE v={.i=0};
 	lobby_players_checkbox_ready->set_prop(lobby_players_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
-	lobby_players_checkbox_ready->event_handler->add(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI);
+	lobby_players_checkbox_ready->enabled=0;
 	ui_listbox_clear(lobby_players_listbox);
 	for(i=0; i<players; i++)
 		ui_listbox_add(lobby_players_listbox, "");
 	panelist_lobby_players.next=&panelist_lobby_download;
 	chat_show(gamestate_pane[GAME_STATE_LOBBY]);
 	ui_selected_widget=chat_entry;
+	
+	v=lobby_map_imageview->get_prop(lobby_map_imageview, UI_IMAGEVIEW_PROP_TILESHEET);
+	map_minimap_clear(v.p, lobby_map_imageview->w, lobby_map_imageview->h);
 }
 
 void lobby_close() {
 	UI_PROPERTY_VALUE v={.i=0};
 	lobby_players_checkbox_ready->set_prop(lobby_players_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
-	lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI);
+	//lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 }
 
 void lobby_map_preview_generate() {
@@ -122,6 +126,12 @@ void lobby_progress(int player, int progress) {
 	char buf[64];
 	sprintf(buf, "%s (%i%%)", &player_names[player*32], progress);
 	ui_listbox_set(lobby_players_listbox, player, buf);
+}
+
+void lobby_download_complete() {
+	//lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	panelist_lobby_players.next=panelist_lobby_download.next;
+	lobby_players_checkbox_ready->enabled=1;
 }
 
 void lobby_players_button_kick_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

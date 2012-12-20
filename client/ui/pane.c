@@ -30,6 +30,7 @@ UI_PANE *ui_pane_create(int x, int y, int w, int h, UI_WIDGET *root_widget) {
 	pane->root_widget=NULL;
 	ui_pane_resize(pane, x, y, w ,h);
 	ui_pane_set_root_widget(pane, root_widget);
+	
 	return pane;
 }
 
