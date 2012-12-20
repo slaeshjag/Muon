@@ -147,13 +147,13 @@ void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	chat_entry->set_prop(chat_entry, UI_ENTRY_PROP_TEXT, v);
 }
 
-void chat_recv(int player, char *buf, int len) {
+void chat_recv(int player_id, char *buf, int len) {
 	//buf must be at least one byte larger than len!
 	char *chatmsg;
 	if(!(chatmsg=malloc(len+36)))
 		return;
 	buf[len]=0;
-	sprintf(chatmsg, "<%s> %s\n", &player_names[player*32], buf);
+	sprintf(chatmsg, "<%s> %s\n", player[player_id].name, buf);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
@@ -161,31 +161,31 @@ void chat_recv(int player, char *buf, int len) {
 		chat_indicator_show(&panelist_game_sidebar);
 }
 
-void chat_join(int player) {
+void chat_join(int player_id) {
 	char *chatmsg;
 	if(!(chatmsg=malloc(64)))
 		return;
-	sprintf(chatmsg, " * %s joined", &player_names[player*32]);
+	sprintf(chatmsg, " * %s joined", player[player_id].name);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
 }
 
-void chat_leave(int player) {
+void chat_leave(int player_id) {
 	char *chatmsg;
 	if(!(chatmsg=malloc(64)))
 		return;
-	sprintf(chatmsg, " * %s disconnected", &player_names[player*32]);
+	sprintf(chatmsg, " * %s disconnected", player[player_id].name);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
 }
 
-void chat_defeated(int player) {
+void chat_defeated(int player_id) {
 	char *chatmsg;
 	if(!(chatmsg=malloc(64)))
 		return;
-	sprintf(chatmsg, " * %s defeated", &player_names[player*32]);
+	sprintf(chatmsg, " * %s defeated", player[player_id].name);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);

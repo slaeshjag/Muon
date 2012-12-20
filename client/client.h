@@ -24,6 +24,12 @@
 #define CLIENT_DEFAULT_PLAYERS 2
 #define CLIENT_DEFAULT_GAMESPEED 3
 
+typedef struct {
+	char name[32];
+	unsigned int team;
+	unsigned int ready:1;
+} PLAYER;
+
 static const char mapdir[]="maps";
 static const unsigned char ldimagic[]={0x83, 0xB3, 0x66, 0x1B, 0xBB, 0xA7, 0x7A, 0xBC};
 
@@ -32,9 +38,11 @@ MESSAGE_RAW msg_recv;
 void *msg_recv_offset;
 unsigned char msg_recv_payload[512];
 unsigned char *msg_recv_payload_offset;
-int players;
+
 int player_id;
-char *player_names;
+//char *player_names;
+PLAYER *player;
+int players;
 
 void (*client_message_handler)(MESSAGE_RAW *, unsigned char *);
 

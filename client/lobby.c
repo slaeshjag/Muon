@@ -29,12 +29,16 @@ void lobby_init() {
 	UI_PROPERTY_VALUE v;
 	
 	//Player list
-	panelist_lobby_players.pane=ui_pane_create(16, 16, 256, 128, NULL);
+	panelist_lobby_players.pane=ui_pane_create(16, 16, 256, 128+48, NULL);
 	panelist_lobby_players.next=&panelist_lobby_download;
 	ui_pane_set_root_widget(panelist_lobby_players.pane, ui_widget_create_vbox());
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_label(font_std, "Players"), 0);
 	lobby_players_listbox=ui_widget_create_listbox(font_std);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_listbox, 1);
+	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_label(font_std, "Team:"), 0);
+	lobby_players_slider_team=ui_widget_create_slider(5);
+	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_slider_team, 0);
+	lobby_players_slider_team->event_handler->add(lobby_players_slider_team, lobby_players_slider_team_changed, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	lobby_players_hbox=ui_widget_create_hbox();
 	lobby_players_checkbox_ready=ui_widget_create_checkbox();
 	lobby_players_button_kick=ui_widget_create_button_text(font_std, "Kick");
@@ -43,7 +47,7 @@ void lobby_init() {
 	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_label(font_std, "Ready"), 0);
 	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_spacer(), 1);
 	ui_hbox_add_child(lobby_players_hbox, lobby_players_button_kick, 0);
-	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_spacer_size(1, 8), 0);
+	//ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_spacer_size(1, 8), 0);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_hbox, 0);
 	lobby_players_checkbox_ready->event_handler->add(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
@@ -104,34 +108,46 @@ void lobby_map_preview_generate() {
 	map_minimap_update(v.p, lobby_map_imageview->w, lobby_map_imageview->h, 0);
 }
 
-void lobby_join(int player) {
-	ui_listbox_set(lobby_players_listbox, player, &player_names[player*32]);
-	chat_join(player);
+void lobby_join(int player_id) {
+	ui_listbox_set(lobby_players_listbox, player_id, player[player_id].name);
+	chat_join(player_id);
 }
 
-void lobby_leave(int player) {
-	ui_listbox_set(lobby_players_listbox, player, "");
-	chat_leave(player);
+void lobby_leave(int player_id) {
+	ui_listbox_set(lobby_players_listbox, player_id, "");
+	chat_leave(player_id);
 }
 
-void lobby_ready(int player, int ready) {
+void lobby_update_player(int player_id) {
 	char buf[64];
-	strcpy(buf, &player_names[player*32]);
-	if(ready)
+	
+	if(player[player_id].team)
+		sprintf(buf, "%s [%i]", player[player_id].name, player[player_id].team);
+	else
+		sprintf(buf, "%s", player[player_id].name);
+	
+	if(player[player_id].ready)
 		strcat(buf, " (Ready)");
-	ui_listbox_set(lobby_players_listbox, player, buf);
+		
+	ui_listbox_set(lobby_players_listbox, player_id, buf);
 }
 
-void lobby_progress(int player, int progress) {
+void lobby_progress(int player_id, int progress) {
 	char buf[64];
-	sprintf(buf, "%s (%i%%)", &player_names[player*32], progress);
-	ui_listbox_set(lobby_players_listbox, player, buf);
+	sprintf(buf, "%s (%i%%)", player[player_id].name, progress);
+	ui_listbox_set(lobby_players_listbox, player_id, buf);
 }
 
 void lobby_download_complete() {
 	//lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	panelist_lobby_players.next=panelist_lobby_download.next;
 	lobby_players_checkbox_ready->enabled=1;
+}
+
+void lobby_players_slider_team_changed(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
+	v=lobby_players_slider_team->get_prop(lobby_players_slider_team, UI_SLIDER_PROP_VALUE);
+	client_message_send(player_id, MSG_SEND_PLAYER_INFO, v.i, 0, NULL);
 }
 
 void lobby_players_button_kick_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

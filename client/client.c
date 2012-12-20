@@ -34,8 +34,8 @@ unsigned int recalc_map=0;
 
 void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
-		free(player_names);
-		player_names=NULL;
+		free(player);
+		player=NULL;
 		game_state(GAME_STATE_MENU);
 		sock=darnitSocketClose(socket);
 	} else
@@ -220,7 +220,8 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			if(msg->arg_2==100) {
 				if(msg->player_id==player_id)
 					lobby_download_complete();
-				lobby_ready(msg->player_id, msg->arg_1);
+				player[msg->player_id].ready=msg->arg_1;
+				lobby_update_player(msg->player_id);
 			} else
 				lobby_progress(msg->player_id, msg->arg_2);
 			break;
@@ -230,7 +231,8 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_JOIN:
 			if(!payload)
 				break;
-			memcpy(&player_names[msg->player_id*32], payload, msg->arg_2);
+			memcpy(&player[msg->player_id].name, payload, msg->arg_2);
+			player[msg->player_id].name[msg->arg_2]=0;
 			lobby_join(msg->player_id);
 			break;
 		case MSG_RECV_LEAVE:
@@ -274,13 +276,18 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			client_message_handler=client_countdown_handler;
 			client_countdown_handler(msg, payload);
 			break;
+		case MSG_RECV_PLAYER_INFO:
+			player[msg->player_id].team=msg->arg_1;
+			lobby_update_player(msg->player_id);
+			break;
 	}
 }
 
 void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	player_id=msg->player_id;
 	players=msg->arg_2;
-	player_names=(char *)calloc(players, 32);
+	//player_names=(char *)calloc(players, 32);
+	player=calloc(players, sizeof(PLAYER));
 	config.player_name[31]=0;
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(config.player_name), config.player_name);
 	client_message_handler=client_download_map;
@@ -290,7 +297,7 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 }
 
 int client_init(char *host, int port) {
-	player_names=NULL;
+	player=NULL;
 	if((sock=darnitSocketConnect(host, port, client_connect_callback, NULL))==NULL)
 		return -1;
 	msg_recv.command=0;

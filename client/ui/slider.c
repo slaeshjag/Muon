@@ -39,6 +39,8 @@ UI_WIDGET *ui_widget_create_slider(unsigned int steps) {
 	widget->event_handler->remove=ui_event_remove;
 	widget->event_handler->send=ui_event_send;
 	widget->event_handler->add(widget, ui_slider_event_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
+	widget->event_handler->add(widget, ui_slider_event_mouse_release, UI_EVENT_TYPE_MOUSE_RELEASE);
+	widget->event_handler->add(widget, ui_slider_event_mouse_release, UI_EVENT_TYPE_MOUSE_LEAVE);
 	
 	struct UI_SLIDER_PROPERTIES *p=widget->properties;
 	p->line=darnitRenderLineAlloc(1+steps, 1);
@@ -75,6 +77,15 @@ void ui_slider_event_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 			value++;
 	p->value=value;
 	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
+}
+
+void ui_slider_event_mouse_release(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(type==UI_EVENT_TYPE_MOUSE_LEAVE&&!e->mouse->buttons)
+		return;
+	UI_EVENT ee;
+	UI_EVENT_UI e_u={};
+	ee.ui=&e_u;
+	widget->event_handler->send(widget, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, &ee);
 }
 
 void ui_slider_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {

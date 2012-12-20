@@ -36,6 +36,7 @@ UI_WIDGET *ui_widget_create_slider(unsigned int steps);
 void *ui_widget_destroy_slider(UI_WIDGET *widget);
 
 void ui_slider_event_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void ui_slider_event_mouse_release(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 void ui_slider_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value);
 UI_PROPERTY_VALUE ui_slider_get_prop(UI_WIDGET *widget, int prop);
