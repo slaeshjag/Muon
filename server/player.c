@@ -38,8 +38,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 				player[i].map[j].power = 0;
 				player[i].map[j].fog = 0;
 			}
-		for (j = 0; j < UNITS_DEFINED; j++)
-			player[i].queue.ready[j].count = 0;
+		
 		player[i].status = PLAYER_UNUSED;
 		player[i].msg_buf = messageBufferInit();
 		player[i].socket = NULL;
@@ -276,6 +275,7 @@ int playerBuildQueueInit() {
 
 		server->player[i].queue.queue.index = server->player[i].spawn.index;
 		server->player[i].queue.queue.in_use = 1;
+		server->player[i].queue.queue.ready = 0;
 		server->player[i].buildspots = 0;
 		server->player[i].buildspeed = 1.0f;
 	}
@@ -297,12 +297,10 @@ int playerBuildQueueLoop(int msec) {
 
 		server->player[i].stats.buildtime += msec;
 		unit = server->player[i].queue.queue.building;
-		if (server->player[i].queue.queue.progress == 100) {
-			if (playerCanQueueAnotherBuilding(i) == 0) {
-				server->player[i].queue.ready[unit].count++;
-				playerBuildQueueStop(i, unit);
-				messageBufferPushDirect(i, i, MSG_SEND_UNIT_READY, unit, server->player[i].queue.ready[unit].count, NULL);
-			}
+		if (server->player[i].queue.queue.progress == 100 && !server->player[i].queue.queue.ready) {
+			messageBufferPushDirect(i, i, MSG_SEND_UNIT_READY, unit, 1, NULL);
+			server->player[i].queue.queue.ready = server->player[i].queue.queue.building;
+			server->player[i].queue.queue.building = 0;
 			continue;
 		}
 
@@ -400,16 +398,6 @@ void playerDefeatAnnounce(int player) {
 	playerClear(player);
 
 	return;
-}
-
-
-int playerCanQueueAnotherBuilding(int player) {
-	int i, cnt, buildspots;
-
-	buildspots = server->player[player].buildspots + 1;
-	for (i = cnt = 0; i < UNITS_DEFINED; i++)
-		cnt += server->player[player].queue.ready[i].count;
-	return (cnt + 1 < PLAYER_BUILDSPOT_MULTIPLIER * (buildspots)) ? 0 : -1;
 }
 
 

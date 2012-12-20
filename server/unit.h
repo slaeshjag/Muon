@@ -20,7 +20,7 @@
 #ifndef __UNIT_H__
 #define	__UNIT_H__
 
-#define	UNITS_DEFINED			6
+#define	UNITS_DEFINED			7
 
 #define	UNIT_DEF_NOTHING		0
 #define	UNIT_DEF_GENERATOR		1
@@ -28,7 +28,11 @@
 #define	UNIT_DEF_ATTACKER		3
 #define	UNIT_DEF_PYLON			4
 #define	UNIT_DEF_WALL			5
+
+/* These can be build on an empty control point */
 #define	UNIT_DEF_BUILDSITE		6
+#define	UNIT_DEF_CLUSTERBOMB		7
+
 #define	UNIT_DEF_BUILDSITE_FREE		0x100
 
 #define	UNIT_BUILDSITE			5
@@ -37,13 +41,14 @@
 #define	UNIT_REGEN_DELAY		5000
 
 static const int unit_los[] = {
-	0,          /* nothing */
-	7,          /* generator */
-	6,          /* scout */
-	3,          /* attacker */
-	4,          /* pylon */
-	1,          /* wall */
-	7           /* owned control point (buildsite) */
+	0,		/* nothing */
+	7,		/* generator */
+	6,		/* scout */
+	3,		/* attacker */
+	4,		/* pylon */
+	1,		/* wall */
+	7,		/* owned control point (buildsite) */
+	2		/* carpet bomb */
 };
 
 /* 2000 is the base coefficient for hp,
@@ -60,65 +65,71 @@ static const int unit_maxhp[] = {
 	2000 * 90,      /* attacker */
 	2000 * 40,      /* pylon */
 	1,              /* wall */
-	2000 * 50       /* owned control point (buildsite) */
+	2000 * 50,	/* owned control point (buildsite) */
+	2000 * 50	/* carpet bomb */
 };
 
 /* Shield must not be 0 for any existing building! */
 /* same coefficient as hp, the exception being
  * buildings that "doesn't have" shields. */
 static const int unit_maxshield[] = {
-	0,              /* nothing */
-	2000 * 150,     /* generator */
-	1,              /* scout */
-	2000 * 60,      /* attacker */
-	2000 * 30,      /* pylon */
-	2000 * 200,      /* wall */
-	1               /* owned control point (buildsite) */
+	0,		/* nothing */
+	2000 * 150,	/* generator */
+	1,		/* scout */
+	2000 * 60,	/* attacker */
+	2000 * 30,	/* pylon */
+	2000 * 200,	/* wall */
+	1,		/* owned control point (buildsite) */
+	1		/* carpet bomb */
 };
 
 static const int unit_shieldreg[] = {
-	0,          /* nothing */
-	1,          /* generator */
-	1,          /* scout */
-	1,          /* attacker */
-	1,          /* pylon */
-	1,          /* wall */
-	1           /* owned control point (buildsite) */
+	0,		/* nothing */
+	1,		/* generator */
+	1,		/* scout */
+	1,		/* attacker */
+	1,		/* pylon */
+	1,		/* wall */
+	1,		/* owned control point (buildsite) */
+	1,		/* carpet bomb */
 };
 
 /* Meant to replace UNIT_ATTACKER_DMGP */
 static const int unit_damage[] = {
-	0,          /* nothing */
-	0,          /* generator */
-	1,          /* scout */
-	5,          /* attacker */
-	0,          /* pylon */
-	0,          /* wall */
-	0           /* owned control point (buildsite) */
+	0,		/* nothing */
+	0,		/* generator */
+	1,		/* scout */
+	5,		/* attacker */
+	0,		/* pylon */
+	0,		/* wall */
+	0,		/* owned control point (buildsite) */
+	2000 * 150 * 5	/* carpet bomb (this / Generator shield gives bomb count) */
 };
 
 /* Pylons and generators must have the same distribution range... */
 /* range is for shooting and power distribution, whereever
  * applicable. units that don't do either have a range of 0. */
 static const int unit_range[] = {
-	0,          /* nothing */
-    4,          /* generator, distribution range */
-    4,          /* scout, attack range */
-    5,          /* attacker, attack range */
-    4,          /* pylon, redistribution range */
-    0,          /* wall */
-    0           /* owned control point (buildsite) */
+	0,		/* nothing */
+	4,		/* generator, distribution range */
+	4,		/* scout, attack range */
+	5,		/* attacker, attack range */
+	4,		/* pylon, redistribution range */
+	0,		/* wall */
+	0,		/* owned control point (buildsite) */
+	7,		/* carpet bomb (radius of spread) */
 };
 
 /* measured in ticks, of which there are 3000/s with normal game speed. */
 static const int unit_buildtime[] = {
-	0,          /* nothing */
-	0,          /* generator */
-	10000,       /* scout */
-	40000,      /* attacker */
-	20000,      /* pylon */
-	20000,      /* wall */
-	50000       /* owned control point (buildsite) */
+	0,		/* nothing */
+	0,		/* generator */
+	10000,		/* scout */
+	40000,		/* attacker */
+	20000,		/* pylon */
+	20000,		/* wall */
+	50000,		/* owned control point (buildsite) */
+	70000		/* carpet bomb */
 };
 
 /* Points for determening a winner without generators being lost. */
@@ -130,6 +141,7 @@ static const int unit_points[] = {
 	0,		/* Pylon */
 	2,		/* Wall */
 	20,		/* Owned control point */
+	30		/* carpet bomb */
 };
 
 struct SERVER_UNIT;

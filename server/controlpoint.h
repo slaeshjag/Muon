@@ -17,14 +17,14 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "server.h"
+#ifndef __CONTROLPOINT_H__
+#define	__CONTROLPOINT_H__
 
+#define	CONTROLPOINT_CLUSTERBOMB_WARMUP	10800
 
-SUPERWEAPON *superweaponInit(unsigned int type, unsigned int time_request, unsigned int time_deploy, unsigned int time_end, unsigned int power) {
-	if (type >= SUPERWEAPONS_DEFINED)
-		return NULL;
-	
-	/* Stub for now */
+struct SERVER_UNIT;
 
-	return NULL;
-}
+int controlpointInit(struct SERVER_UNIT *unit);
+void controlpointRemove(struct SERVER_UNIT *unit);
+
+#endif

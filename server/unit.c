@@ -247,9 +247,8 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
-	if (unitAdd(player, unit, x, y) >= 0)
-		if (server->player[player].queue.ready[unit].count > 0)
-			server->player[player].queue.ready[unit].count--;
+	if (unitAdd(player, unit, x, y) >= 0) 	
+		server->player[player].queue.queue.ready = 0;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_IN_GAME_NOW)
@@ -311,7 +310,7 @@ int unitAdd(int owner, int type, int x, int y) {
 		return -1;
 	}
 
-	if ((server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE && type != UNIT_DEF_BUILDSITE)
+	if ((server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE && type < UNIT_DEF_BUILDSITE)
 		return -1;
 	if (server->map_c.tile_data[index] & 0x10000)
 		return -1;
@@ -319,11 +318,12 @@ int unitAdd(int owner, int type, int x, int y) {
 	if ((unit = unitInit(owner, type, x, y)) == NULL)
 		return -1;
 
-	if (type == UNIT_DEF_BUILDSITE) {
-		if ((server->map_c.tile_data[index] & 0xFFF) != UNIT_BUILDSITE)
+	if (type >= UNIT_DEF_BUILDSITE) {
+		if (!controlpointInit(unit)) {
+			free(unit);
+			server->map[x + y * server->w] = NULL;
 			return -1;
-		server->player[owner].buildspots++;
-		server->player[owner].buildspeed = logf(M_E + server->player[owner].buildspots);
+		}
 	}
 	
 	unit->next = server->unit;
@@ -386,9 +386,8 @@ int unitRemove(int x, int y) {
 			server->map[x + y * server->h] = NULL;
 			if (gameDetectIfOver() == 0)
 				gameEnd();
-		} else if (next->type == UNIT_DEF_BUILDSITE) {
-			server->player[owner].buildspots--;
-			server->player[owner].buildspeed = logf(M_E + server->player[owner].buildspots);
+		} else if (next->type >= UNIT_DEF_BUILDSITE) {
+			controlpointRemove(next);
 		}
 		free(next);
 		server->map[x + y * server->h] = NULL;

@@ -402,9 +402,9 @@ void serverProcessNetwork() {
 		if (!server->player[i].network.ready_to_send)
 			continue;
 		
-		do {
+		//do {
 			t = serverSend(network, server->player[i].msg_buf, i);
-		} while (t == SERVER_PROCESS_DONE);
+		//} while (t == SERVER_PROCESS_DONE);
 		
 		if (t == SERVER_PROCESS_INCOMPLETE)
 			continue;

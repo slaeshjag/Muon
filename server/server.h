@@ -40,7 +40,6 @@
 #include <time.h>
 
 #include "network.h"
-#include "superweapon.h"
 #include "unit.h"
 #include "message.h"
 #include "message_handlers.h"
@@ -48,7 +47,9 @@
 #include "game.h"
 #include "lobby.h"
 #include "error.h"
+#include "controlpoint.h"
 #ifndef __TTMZ_H__
+#include "controlpoint.h"
 #include "map.h"
 #endif
 
