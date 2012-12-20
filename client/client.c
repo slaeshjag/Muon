@@ -132,6 +132,9 @@ void client_check_incomming() {
 void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
+		case MSG_RECV_KICKED:
+			client_disconnect();
+			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
 			break;
@@ -178,6 +181,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
+		case MSG_RECV_KICKED:
 		case MSG_RECV_NAME_IN_USE:
 		case MSG_RECV_SERVER_FULL:
 		case MSG_RECV_BAD_CLIENT:
@@ -206,6 +210,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static DARNIT_FILE *f=NULL;
 	switch(msg->command) {
 		PONG;
+		case MSG_RECV_KICKED:
 		case MSG_RECV_NAME_IN_USE:
 		case MSG_RECV_SERVER_FULL:
 		case MSG_RECV_BAD_CLIENT:
