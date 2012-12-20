@@ -39,6 +39,7 @@ UI_WIDGET *ui_widget_create_spacer() {
 	widget->request_size=ui_spacer_request_size;
 	widget->render=ui_spacer_render;
 	widget->x=widget->y=widget->w=widget->h=0;
+	widget->enabled=1;
 	
 	return widget;
 }

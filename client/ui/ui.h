@@ -45,6 +45,7 @@ typedef struct UI_WIDGET {
 	int y;
 	int w;
 	int h;
+	int enabled:1;
 } UI_WIDGET;
 
 UI_WIDGET *ui_selected_widget;

@@ -38,6 +38,7 @@ void lobby_join(int player);
 void lobby_leave(int player);
 void lobby_ready(int player, int ready);
 void lobby_progress(int player, int progress);
+void lobby_download_complete();
 
 void lobby_players_button_kick_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void lobby_players_checkbox_ready_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

@@ -49,6 +49,7 @@ UI_WIDGET *ui_widget_create_vbox() {
 	widget->request_size=ui_vbox_request_size;
 	widget->render=ui_vbox_render;
 	widget->x=widget->y=widget->w=widget->h=0;
+	widget->enabled=1;
 	
 	return widget;
 }

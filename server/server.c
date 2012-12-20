@@ -195,11 +195,13 @@ SERVER *serverStop() {
 	if (!server)
 		return NULL;
 
+	
+	playerDestroy(server->player, server->players);
+	
 	for (i = 0; i < server->w * server->h; i++) {
 		free(server->map[i]);
 	}
 	
-	playerDestroy(server->player, server->players);
 	free(server->map);
 	networkSocketDisconnect(server->accept);
 	server->map_data = ldmzFree(server->map_data);

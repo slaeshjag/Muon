@@ -57,6 +57,7 @@ UI_WIDGET *ui_widget_create_entry(DARNIT_FONT *font) {
 	widget->request_size=ui_entry_request_size;
 	widget->render=ui_entry_render;
 	widget->x=widget->y=widget->w=widget->h=0;
+	widget->enabled=1;
 
 	return widget;
 }
@@ -70,6 +71,8 @@ void *ui_widget_destroy_entry(UI_WIDGET *widget) {
 }
 
 void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(!widget->enabled)
+		return;
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
 	int tw;
 	switch(type) {
@@ -99,6 +102,8 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 }
 
 void ui_entry_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(!widget->enabled)
+		return;
 	switch(type) {
 		case UI_EVENT_TYPE_MOUSE_PRESS:
 			if(e->mouse->buttons==UI_EVENT_MOUSE_BUTTON_LEFT)
