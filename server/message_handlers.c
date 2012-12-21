@@ -159,8 +159,7 @@ void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
 		return;	
 	if (server->map[message->arg[1]])				/* Even more nope. */
 		return;
-	if (server->player[player].queue.queue.ready != message->arg[0] 
-	    || server->player[player].queue.queue.progress < 100)	/* Pff. lol. */
+	if (server->player[player].queue.queue.ready != message->arg[0])/* Pff. lol. */
 		return;
 	if (unitValidateWall(message->arg[1], player) < 0)		/* D: */
 		return;
