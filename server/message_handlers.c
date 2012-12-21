@@ -181,8 +181,11 @@ void messageHandlerDummy(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerKick(unsigned int player, MESSAGE *message) {
-	if (player != server->server_admin)
+	if (player != server->server_admin) {
 		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		return;
+	}
+
 	if (message->arg[0] >= server->players)
 		return;
 	messageSend(server->player[player].socket, player, MSG_SEND_KICKED, 0, 0, NULL);
