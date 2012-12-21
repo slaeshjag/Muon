@@ -46,7 +46,7 @@ static const int unit_los[] = {
 	6,		/* scout */
 	3,		/* attacker */
 	4,		/* pylon */
-	1,		/* wall */
+	0,		/* wall */
 	7,		/* owned control point (buildsite) */
 	2		/* carpet bomb */
 };
