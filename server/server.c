@@ -141,11 +141,11 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		return NULL;
 	}
 
-/*	if (strcmp((tmp = ldmzFindProp(server->map_data, "max_players")), "NO SUCH KEY") == 0) {
+	if (strcmp((tmp = ldmzFindProp(server->map_data, "max_players")), "NO SUCH KEY") == 0) {
 		tmp = NULL;
 		fprintf(stderr, "Missing map property max_players in mapfile\n");
 		errorPush(SERVER_ERROR_MAP_NO_MAX_PLAYERS);
-	}*/
+	}
 
 	ldmzGetSize(server->map_data, &map_w, &map_h);
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
