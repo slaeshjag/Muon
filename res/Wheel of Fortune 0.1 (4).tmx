@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="64" height="64" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="max_players" value="4"/>
+  <property name="name" value="Wheel of Fortune 0.1 (4)"/>
+  <property name="tileset" value="mapdata/default.png"/>
+ </properties>
+ <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
+  <image source="maps/Twirly 0.1 (2)/default.png" width="256" height="256"/>
+ </tileset>
+ <layer name="terrain" width="64" height="64">
+  <data encoding="base64" compression="zlib">
+   eJztk0EOQyEIRL3Wv//FumryY6owwwA2kYRFW4T30D5jjAfMOX59j/Zk5q94Khisnag5PL2r3U+Kyru+OzhnD53O1XvodlPvo5vt5s2buTmMz9/vdtHtwHp7nJDIvpsqd9Z/PqtgrPaeZ7Jxkr+CmY3u95/FiQR77ywbylmxY/bdvz+jrNne6Ez0fMQ/6o4wq/ytcwhThOPX+Yod7OoRFna+lyWyg6i7xYHOzXBH72BXh7J4Z2b7e1msGsQHqa3w9/SymBEnFbeqz6pf9HdvTYRb1Yd5A9c/5410+c89mVm7GrX73FPhHt11tT/Lzsyu8LdC4e11YHZo1by/W/3GMKPeEfZIjwxuRR+2RumPMkf6eWsz3z/Kjv73o7tS11T6KN7Jv/hH+60i2z/Krdqpl0tR4511or9nntVnFx3+KAvj5/VX8Cv82Xqv0y4q/VmG1Rmk3y6y7k51fnUO8dlFxf1HZ7/rx1j3ZBgQjrlPhfsz1bMeViA80XtH541h97N6eqPCPTJnjN/9FUxRtuq3xvRk4zTvzPvx8kfOKviz3+nOA61X+2fsE/Hpcs9OlX+3R8YemJqbN2/+R6qj26fT/R3dbl3e3+h2POHu58/dueJTcO56d3vvXJWMVpzinsmVNesD6LRibA==
+  </data>
+ </layer>
+ <layer name="buildings" width="64" height="64">
+  <data encoding="base64" compression="zlib">
+   eJzt1zEKg0AQBVCrQIoUKSxSWKTI/a+YQgQZRBB0h1nfg+kW/FMs+x2GXI/k7zN7Zwdo6JsdAIASqnWUankBAAAWVf9nquYGzjNuTPQL05OtfffY/95a7e995u5a3IHXwfPTJSny2P+YHvePE01hgNrOeFt1VAAA2HdFZ9bDAaBPz+wADXyyA6zoVPn+HvUDZg==
+  </data>
+ </layer>
+ <layer name="collision" width="64" height="64">
+  <data encoding="base64" compression="zlib">
+   eJztVssOwzAIy2H//83TbtWUhzEG0jaWJk0rGNttWFuz4/P36f0eidncLA0jTVE6EO5s7zPP2Z8qVPveIYPW0fIGzz28ySuCp/k5ODjA8X/Oe+f+bXvvY6iLzCEqW4uXqv/BiEwZ/VXvAhFZejRX5KDMUa0zKoNrjyrDrGdVMWO0f1rjs4zcU5aZ1v7W+a7QgfBEnAu2l9GkvA/K587a17sWNR/VwvbPOFDvTIYK7VZY7sGsTvEMVfhHtaBnHtGj8D7iYVHtP0Kzl8973XqGIjR7uFbPgLV/VPMU/0hN9jPr4WRmWXeISqvKOzprF/8oFLMz/I/2g0qzxQPCZa25/obkw2bA8Fj3X8R+q/LP1iBzUai8I3xo7aoG4eldZ7RHQnVvZzWZfixQ7YdVTZR/L1+Vf0UOCq4s/5ZZrHYFx4wryr9Ku7d/xcP4Q+ap9Hv7VxyK872Lf1bDqMdzjhgP3vzY/l3893jYPra/tbl/RoMnA2u9Z+aKz+Of2QUIlJmv+Lz+1TlEzRllodCkyqAiY5U2j+ZM395+RQbq/Kz6VTyMjwrf19lqvgj/d4TK/93Bnv+Dg4N7gn0veMIOVHu/Sw6Rvu/g/4cM77tlsXqfieLeARn3aNczkakratYXsu0VLQ==
+  </data>
+ </layer>
+ <layer name="fow" width="64" height="64" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztw8EJAAAMA6Ej+w/dMfpRcNVUVVVVVVVVVVVVVVVVVVXV1we8ACAB
+  </data>
+ </layer>
+</map>
