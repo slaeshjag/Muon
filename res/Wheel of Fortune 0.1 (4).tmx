@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="64" height="64" tilewidth="32" tileheight="32">
  <properties>
+  <property name="max_players" value="4"/>
   <property name="name" value="Wheel of Fortune 0.1 (4)"/>
   <property name="tileset" value="mapdata/default.png"/>
  </properties>
