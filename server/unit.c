@@ -322,7 +322,7 @@ int unitAdd(int owner, int type, int x, int y) {
 		return -1;
 
 	if (type >= UNIT_DEF_BUILDSITE) {
-		if (!controlpointInit(unit)) {
+		if (controlpointInit(unit) < 0) {
 			free(unit);
 			server->map[x + y * server->w] = NULL;
 			return -1;

@@ -37,7 +37,7 @@ int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 
 int controlpointInit(struct SERVER_UNIT *unit) {
 
-	if (!(server->map_c.tile_data[unit->x + unit->y * server->w] & 0xFFF) != UNIT_BUILDSITE)
+	if ((server->map_c.tile_data[unit->x + unit->y * server->w] & 0xFFF) != UNIT_BUILDSITE)
 		return -1;
 
 	switch (unit->type) {
