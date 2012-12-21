@@ -205,7 +205,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 	index = y * server->w + x;
 	team = server->player[player].team;
 
-	if ((los = unitLOS(server->map[index]->type)) == 0)
+	if ((los = unitLOS(server->map[index]->type)) < 0)
 		return 0;
 
 	for (j = -1 * los; j <= los; j++) {
@@ -218,7 +218,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 			haz_los = (j*j + k*k <= los*los) ? 1 : 0;
 			building = (server->map[index]) ? server->map[index]->type : 0;
 			owner = (server->map[index]) ? server->map[index]->owner : 0;
-			if (!building && server->map_c.tile_data[index] == UNIT_BUILDSITE)
+			if ((!building) && (server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE)
 				building = UNIT_DEF_BUILDSITE_FREE;
 
 			if (team > -1)
