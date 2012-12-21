@@ -3,8 +3,6 @@
 MAKEFLAGS += --no-print-directory
 
 SERVER	= ../server/server.a
-LIBS	= -L"/usr/lib"
-INCS	= -I"/usr/include"
 BIN	= ../muon
 DBGFLAGS= -g -D__DEBUG__
 CFLAGS 	+= -Wall $(INCS) $(DBGFLAGS)

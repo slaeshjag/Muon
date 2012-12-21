@@ -1,8 +1,6 @@
 # Project: muon
 
 MAKEFLAGS += --no-print-directory
-LIBS	= -L"/usr/lib"
-INCS	= -I"/usr/include"
 DBGFLAGS= -g -D__DEBUG__
 CFLAGS 	+= -Wall $(INCS) $(DBGFLAGS)
 LDFLAGS += -ldarnit

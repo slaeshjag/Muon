@@ -1,7 +1,6 @@
 # Project: muon
 
-LIBS =  -L"/usr/lib"
-INCS =  -I"/usr/include" -I../
+INCS =  -I../
 DEBUGFLAGS = -O0 -g -D__DEBUG__
 CFLAGS += $(INCS) $(DEBUGFLAGS)
 LDFLAGS += 

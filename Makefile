@@ -32,6 +32,7 @@ pandora: all
 	@mkdir -p muon-pnd
 	@mkdir -p muon-pnd/res
 	@mkdir -p muon-pnd/maps
+	@mkdir -p muon-pnd/lib
 	@cp muon muon-pnd
 	@cp res/FreeMonoBold.ttf muon-pnd/res
 	@cp res/FreeMono.ttf muon-pnd/res
@@ -40,6 +41,7 @@ pandora: all
 	@cp res/icon.png muon-pnd/res
 	@cp res/pandora/PXML.xml muon-pnd
 	@cp maps/*.ldi muon-pnd/maps
+	@cp /usr/local/angstrom/arm/arm-angstrom-linux-gnueabi/usr/lib/libdarnit.so muon-pnd/lib
 	@mksquashfs muon-pnd/* muon.pnd > /dev/null
 	@cat muon-pnd/PXML.xml >> muon.pnd
 	@cat muon-pnd/res/icon.png >> muon.pnd
