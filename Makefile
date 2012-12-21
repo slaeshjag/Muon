@@ -25,6 +25,27 @@ install:
 	@install -m 0755 -d $(DATAPATH)/maps
 	@install -m 0744 -D -t $(DATAPATH)/maps/ maps/*
 	@install -m 0755 -D res/muon.desktop $(APPLICATIONSPATH)/muon.desktop
+
+pandora: all
+	@echo " [PND ] muon.pnd"
+	@rm -Rf muon.pnd
+	@mkdir -p muon-pnd
+	@mkdir -p muon-pnd/res
+	@mkdir -p muon-pnd/maps
+	@cp muon muon-pnd
+	@cp res/FreeMonoBold.ttf muon-pnd/res
+	@cp res/FreeMono.ttf muon-pnd/res
+	@cp res/chat.png muon-pnd/res
+	@cp res/mouse.png muon-pnd/res
+	@cp res/icon.png muon-pnd/res
+	@cp res/pandora/PXML.xml muon-pnd
+	@cp maps/*.ldi muon-pnd/maps
+	@mksquashfs muon-pnd/* muon.pnd > /dev/null
+	@cat muon-pnd/PXML.xml >> muon.pnd
+	@cat muon-pnd/res/icon.png >> muon.pnd
+	@rm -Rf muon-pnd
+
+
 clean:
 	@echo " [ CD ] server/"
 	+@make -C server/ clean
@@ -34,3 +55,5 @@ clean:
 	+@make -C res/ clean
 	@echo " [ RM ] maps/"
 	@rm -Rf maps/
+	
+	@rm -Rf muon.pnd

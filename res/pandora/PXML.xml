@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PXML xmlns="http://openpandora.org/namespaces/PXML">
+	<package id="muon-slaeshjag">
+		<version major="0" minor="0" release="1" build="0"/>
+		<author name="Slaeshjag" website="http://slaeshjag.org" />
+		<titles> 
+			<title lang="en_US">Muon</title>
+		</titles>
+		<descriptions>
+			<description lang="en_US">Muon is a new kind of RTS with a minimalistic gameplay design.</description>
+		</descriptions> 
+		<icon src="icon.png" />
+	</package>
+	
+	<application id="muon-slaeshjag-egegheew" appdata="muon">
+		<title lang="en_US">Muon</title>
+		<description lang="en_US">Muon is a new kind of RTS with a minimalistic gameplay design.</description>
+		<version major="0" minor="0" release="1" build="0"/>
+		<exec command="./muon" background="true" standalone="true"/>
+		<author name="Undecided" website="http://slaeshjag.org/" />
+		<icon src="icon.png"/>
+		<previewpics>
+<!--			<pic src="previewpics/preview1.png"/>
+			<pic src="previewpics/preview2.png"/>
+			<pic src="previewpics/preview3.png"/>
+			<pic src="previewpics/preview4.png"/> -->
+		</previewpics>
+		<categories>
+			<category name="Game">
+				<subcategory name="StrategyGame" />
+			</category>
+		</categories>
+	</application>
+</PXML>	
