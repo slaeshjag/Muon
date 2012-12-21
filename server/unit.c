@@ -356,14 +356,18 @@ int unitRemove(int x, int y) {
 	parent = &server->unit;
 	next = *parent;
 	owner = unit->owner;
+	unit->hp = 0;
+	unit->shield = 0;
 
 	playerCalcLOS(unit->owner, x, y, -1);
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
-		if (!server->player[i].map[x + y * server->w].fog)
+		if ((!server->player[i].map[x + y * server->w].fog) && unit->owner != i)
 			continue;
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
+		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_HP, 0, x + server->w * y, NULL);
+		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_SHIELD, 0, x + server->w * y, NULL);
 	}
 	
 	server->player[owner].stats.buildings_lost++;
@@ -394,7 +398,6 @@ int unitRemove(int x, int y) {
 		}
 		free(next);
 		server->map[x + y * server->h] = NULL;
-		return 0;
 	}
 	
 	messageBufferPushDirect(owner, owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
