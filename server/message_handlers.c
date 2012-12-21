@@ -95,6 +95,8 @@ void messageHandlerChat(unsigned int player, MESSAGE *message) {
 void messageHandlerPlayerInfo(unsigned int player, MESSAGE *message) {
 	int i;
 
+	if (server->player[player].status >= PLAYER_READY_TO_START)
+		return;
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_IN_LOBBY)
 			continue;
@@ -183,7 +185,7 @@ void messageHandlerKick(unsigned int player, MESSAGE *message) {
 		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 	if (message->arg[0] >= server->players)
 		return;
-	messageBufferPushDirect(message->arg[0], player, MSG_SEND_KICKED, 0, 0, NULL);
+	messageSend(server->player[player].socket, player, MSG_SEND_KICKED, 0, 0, NULL);
 	playerDisconnect(message->arg[0]);
 
 	return;

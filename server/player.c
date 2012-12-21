@@ -225,17 +225,17 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				for (i = 0; i < server->players; i++) {
 					if (server->player[i].team != team)
 						continue;
-					if (server->player[i].status >= PLAYER_IN_GAME_NOW)
+					if (server->player[i].status != PLAYER_IN_GAME_NOW)
 						continue;
-					oldfog = (server->player[player].map[index].fog > 0);
-					server->player[player].map[index].fog += haz_los * mode;
-					t = (server->player[player].map[index].fog) ? 0 : 1;
-					fogdiff = (server->player[player].map[index].fog > 0);
+					oldfog = (server->player[i].map[index].fog > 0);
+					server->player[i].map[index].fog += haz_los * mode;
+					t = (server->player[i].map[index].fog) ? 0 : 1;
+					fogdiff = (server->player[i].map[index].fog > 0);
+					fogdiff = (oldfog ^ fogdiff);
 					if (mode < 0 && j == 0 && k == 0)
 						unitAnnounce(owner, i, 0, index);
-					fogdiff = (oldfog ^ fogdiff);
-					if (((t && mode == -1) || (!t && mode == 1)) || (j == 0 && k == 0)) {
-						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), 0, NULL);
+					if (fogdiff || (j == 0 && k == 0)) {
+						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 						if (mode > 0)
 							unitAnnounce(owner, i, (!t) ? building : 0, index);
 					}
