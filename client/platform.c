@@ -30,6 +30,7 @@ struct CONFIG_PARSER parsers[]={
 	{"powergrid", platform_option_read_int, platform_option_write_int, &config.powergrid},
 	{"plasma", platform_option_read_int, platform_option_write_int, &config.plasma},
 	{"alpha", platform_option_read_int, platform_option_write_int, &config.alpha},
+	{"lang", platform_option_read_string, platform_option_write_string, &config.lang},
 	{"name", platform_option_read_string, platform_option_write_string, &config.player_name},
 };
 
@@ -79,6 +80,7 @@ void platform_config_init_defaults() {
 	config.powergrid=0;
 	config.plasma=3;
 	config.alpha=1;
+	strcpy(config.lang, "EN");
 	strcpy(config.player_name, "player");
 }
 
@@ -149,4 +151,8 @@ void platform_init() {
 	platform_config_read();
 	darnitInitRest("Muon", config.screen_w, config.screen_h, config.fullscreen, "res/icon.png");
 	platform=darnitPlatformGet();
+	darnitDirectoryCreate("maps");
+	stringtable=darnitStringtableOpen("res/lang.stz");
+	if(darnitStringtableSectionLoad(stringtable, config.lang)==-1)
+		darnitStringtableSectionLoad(stringtable, "EN");
 }

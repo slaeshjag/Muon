@@ -27,17 +27,6 @@
 #include "multiplayer.h"
 #include "settings.h"
 
-char *menu_sidebar_button_text_main[8]={
-	"Singleplayer",
-	"Multiplayer",
-	"Settings",
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-};
-
 void menu_init() {
 	int i;
 	
@@ -48,6 +37,13 @@ void menu_init() {
 	panelist_menu_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
 	panelist_menu_sidebar.next=NULL;
 	ui_pane_set_root_widget(panelist_menu_sidebar.pane, ui_widget_create_vbox());
+	
+	//TODO: fixfixfix when making proper menues, this is damned ugly
+	const char **menu_sidebar_button_text_main=calloc(sizeof(void *), 8);
+	menu_sidebar_button_text_main[0]=T("Singleplayer");
+	menu_sidebar_button_text_main[1]=T("Multiplayer");
+	menu_sidebar_button_text_main[2]=T("Settings");
+	
 	for(i=0; i<8; i++) {
 		if(!menu_sidebar_button_text_main[i])
 			continue;
@@ -56,7 +52,7 @@ void menu_init() {
 		ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button[i], 0);
 	}
 	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
-	menu_sidebar_button_quit=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
+	menu_sidebar_button_quit=ui_widget_create_button(ui_widget_create_label(font_std, T("Quit game")));
 	menu_sidebar_button_quit->event_handler->add(menu_sidebar_button_quit, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button_quit, 0);
 	
@@ -65,9 +61,9 @@ void menu_init() {
 	ui_pane_set_root_widget(panelist_game_menu.pane, ui_widget_create_vbox());
 	panelist_game_menu.next=&panelist_chat;
 	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
-	game_menu_button[0]=ui_widget_create_button(ui_widget_create_label(font_std, "Disconnect"));
-	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, "Quit game"));
-	game_menu_button[2]=ui_widget_create_button(ui_widget_create_label(font_std, "Return to game"));
+	game_menu_button[0]=ui_widget_create_button(ui_widget_create_label(font_std, T("Disconnect")));
+	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, T("Quit game")));
+	game_menu_button[2]=ui_widget_create_button(ui_widget_create_label(font_std, T("Return to game")));
 	for(i=0; i<2; i++) {
 		ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[i], 0);
 		game_menu_button[i]->event_handler->add(game_menu_button[i], game_menu_button_click, UI_EVENT_TYPE_UI);

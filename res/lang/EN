@@ -1,0 +1,51 @@
+Muon			Muon
+
+### Menu
+Singleplayer		Singleplayer
+Multiplayer		Multiplayer
+Settings		Settings
+
+Disconnect		Disconnect
+Return to game		Return to game
+
+Quit game		Quit game
+OK			OK
+Cancel			Cancel
+
+### Settings
+Player name		Player name
+Screen width		Screen width
+Screen height		Screen height
+Fullscreen		Fullscreen
+Plasma scale		Plasma scale
+Alpha blending		Alpha blending
+
+### Multiplayer
+Port			Port
+Number of players	Number of players
+Game speed		Game speed
+Host			Host
+Join a server		Join a server
+Join			Join
+Connecting to server	Connecting to server
+
+
+### Lobby
+Players			Players
+Team:			Team:
+Kick			Kick
+Ready			Ready
+
+Downloading map		Downloading map
+Map			Map
+
+### In-game
+Buildings:		Buildings:
+Scout			Scout
+Attacker		Attacker
+Pylon			Pylon
+Wall			Wall
+Build site		Build site
+
+Shield			Shield
+Health			Health

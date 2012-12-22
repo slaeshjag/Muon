@@ -19,7 +19,7 @@
 
 #include "ui.h"
 
-UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, char *text) {
+UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, const char *text) {
 	UI_WIDGET *widget;
 	if((widget=malloc(sizeof(UI_WIDGET)))==NULL)
 		return NULL;
@@ -40,7 +40,7 @@ UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, char *text) {
 	widget->x=widget->y=widget->w=widget->h=0;
 	widget->enabled=1;
 	
-	UI_PROPERTY_VALUE v={.p=text};
+	UI_PROPERTY_VALUE v={.p=(void *) text};
 	widget->set_prop(widget, UI_LABEL_PROP_TEXT, v);
 	return widget;
 }
