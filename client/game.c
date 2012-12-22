@@ -27,6 +27,7 @@
 
 void game_view_init() {
 	building_place=-1;
+	building_ready=-1;
 	
 	game_attacklist_blink_semaphore=0;
 	
@@ -74,17 +75,20 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 		return;
 	int i, do_build=-1;
 	UI_PROPERTY_VALUE wv=widget->get_prop(widget, UI_BUTTON_PROP_CHILD);
-	UI_PROPERTY_VALUE pv=game_sidebar_progress_build->get_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS);
+        UI_PROPERTY_VALUE pv=game_sidebar_progress_build->get_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS);
 	for(i=0; i<5; i++) {
-		if(widget==game_sidebar_button_build[i]&&wv.p!=game_sidebar_progress_build) {
-			do_build=i; //just make sure to cancel all other buildings first
-		} else if(widget==game_sidebar_button_build[i]&&pv.i==100) {
-			building_place=i;
-		} else {
+		if (pv.i == 0 || pv.i == 100) {
+			if(widget==game_sidebar_button_build[i]&&wv.p!=game_sidebar_progress_build && building_ready == -1)
+				do_build=i; //just make sure to cancel all other buildings first
+			else if (widget==game_sidebar_button_build[i] && building_ready == BUILDING_SCOUT+i)
+				building_place=i;
+		}
+/*		else {
 			UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
-			game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
+     	         	game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
 		}
+*/
 	}
 	if(do_build!=-1) {
 		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+do_build, MSG_BUILDING_START, NULL);
@@ -213,6 +217,10 @@ void game_reset_building_progress() {
 		UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 		game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 	}
+}
+
+void game_set_building_ready(int building) {
+	building_ready = building;
 }
 
 void game_attacklist_lines_recalculate() {
