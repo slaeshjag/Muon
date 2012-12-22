@@ -63,6 +63,7 @@ void map_close(DARNIT_MAP *map);
 void map_update_grid();
 void map_calculate_powergrid();
 void map_building_place(int index, int player, int building);
+void map_building_clear();
 void map_set_home(int index);
 int map_get_building_health(int index);
 int map_get_building_shield(int index);

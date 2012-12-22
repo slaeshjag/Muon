@@ -171,6 +171,13 @@ void map_building_place(int index, int player, int building) {
 	}
 }
 
+void map_building_clear() {
+	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
+	unsigned int i;
+	for(i=0; i<building_tilemap->w*building_tilemap->h; i++)
+		building_tilemap->data[i]&=~0xFFF;
+}
+
 void map_set_home(int index) {
 	home_y=index/map->layer[map->layers-2].tilemap->w;
 	home_x=index%map->layer[map->layers-2].tilemap->w;
