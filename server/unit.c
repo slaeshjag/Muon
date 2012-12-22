@@ -365,7 +365,7 @@ int unitRemove(int x, int y) {
 			continue;
 		if ((!server->player[i].map[x + y * server->w].fog) && unit->owner != i)
 			continue;
-		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
+//		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_HP, 0, x + server->w * y, NULL);
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_SHIELD, 0, x + server->w * y, NULL);
 	}
