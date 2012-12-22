@@ -18,12 +18,14 @@
  */
 
 #include "server.h"
+#include <time.h>
 
 
 int serverInitMap(const char *path) {
-	int i, n, t, building, owner;
+	int i, n, t, building, owner, max_players, spawns;
 
-
+	max_players = spawns = 0;
+	
 	if (!(server->map_c.data = ldmzCache(path, &server->map_c.data_len))) {
 		fprintf(stderr, "Unable to malloc for map cache\n");
 		errorPush(SERVER_ERROR_NO_MEMORY);
@@ -38,15 +40,25 @@ int serverInitMap(const char *path) {
 			t = server->map_c.tile_data[i] & 0xFFF;
 			building = (t % 8) + 1;
 			owner = (t / 8) - 1;
-			if (owner < 0 || owner >= server->players)
-				continue;
-			if (building == UNIT_DEF_GENERATOR) {
+			max_players = (owner > max_players) ? owner : max_players;
+			if (building == UNIT_DEF_GENERATOR && owner >= 0) {
+				spawns++;
+				if (owner >= server->players)
+					continue;
 				server->player[owner].spawn.x = i % server->w;
 				server->player[owner].spawn.y = i / server->w;
 				server->player[owner].spawn.index = i;
 			}
 
 		}
+
+	if (spawns != max_players + 1) {
+		fprintf(stderr, "The number of generator isn't exactly the same as the number of players (%i, %i)\n", spawns, max_players + 1);
+		errorPush(SERVER_ERROR_GENERATOR_COUNT_MISMATCH);
+		free(server->map_c.data);
+		server->map_c.data = NULL;
+		return -1;
+	}
 
 	for (i = 0; i < server->players; i++)
 		if (server->player[i].spawn.x == -1) {
@@ -85,7 +97,7 @@ int serverInitMap(const char *path) {
 
 	server->pylons = NULL;
 
-	return 0;
+	return max_players;
 }
 
 
@@ -109,12 +121,13 @@ int serverIsRunning() {
 
 
 SERVER *serverStart(const char *fname, unsigned int players, int port, int gamespeed) {
-	int i, map_w, map_h;
-	const char *tmp;
+	int i, j, k, map_w, map_h;
+	int max_players, spawn_as;
 
 	if (server)
 		return server;
 	fprintf(stderr, "Stopping server\n");
+	srand(time(NULL));
 	
 	if (gamespeed < 0) {
 		errorPush(SERVER_ERROR_GAMESPEED_TOO_SMALL);
@@ -141,12 +154,6 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		return NULL;
 	}
 
-	if (strcmp((tmp = ldmzFindProp(server->map_data, "max_players")), "NO SUCH KEY") == 0) {
-		tmp = NULL;
-		fprintf(stderr, "Missing map property max_players in mapfile\n");
-		errorPush(SERVER_ERROR_MAP_NO_MAX_PLAYERS);
-	}
-
 	ldmzGetSize(server->map_data, &map_w, &map_h);
 	server->map = malloc(sizeof(SERVER_UNIT *) * map_w * map_h);
 	server->map_c.tile_data = ldmzGetData(server->map_data);
@@ -156,7 +163,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 	playerInit(players, map_w, map_h);
 	server->accept = networkListen(port);
 
-	if (!server->map || !server->player || !server->accept || !tmp) {
+	if (!server->map || !server->player || !server->accept) {
 		if (!server->map)
 			errorPush(SERVER_ERROR_NO_MEMORY);
 		if (!server->accept)
@@ -174,15 +181,30 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		server->map[i] = NULL;
 
 	server->unit = NULL;
-	if (serverInitMap(fname) < 0) {
+	if ((max_players = serverInitMap(fname)) < 0) {
 		server = serverStop();
 		return server;
 	}
 
-	if (atoi(tmp) < players) {
-		fprintf(stderr, "Map file is only defined for %i players (%i player slots requested) %s\n", atoi(tmp), players, tmp);
-		errorPush(SERVER_ERROR_TOO_MANY_PLAYERS);
-		server = serverStop();
+	for (i = 0; i < players; i++)
+		server->player[i].spawn_as = -1;
+
+	for (i = 0; i < players; i++) {
+		for (k = 0; k < RANDOM_ATTEMPTS; k++) {
+			spawn_as = rand() % max_players;
+			for (j = 0; j < players; j++)
+				if (spawn_as == server->player[j].spawn_as)
+					break;
+			if (j == players)
+				break;
+		}
+
+		if (k == RANDOM_ATTEMPTS) {
+			errorPush(SERVER_ERROR_BAD_LUCK);
+			return (server = serverStop());
+		}
+
+		server->player[i].spawn_as = spawn_as;
 	}
 
 	return server;

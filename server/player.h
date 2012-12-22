@@ -94,6 +94,7 @@ typedef struct {
 	unsigned int		map_progress;
 	int			team;
 	int			status;
+	int			spawn_as;
 	SERVER_SOCKET		*socket;
 	time_t			id_req_send;
 	time_t			last_ping_sent;

@@ -63,25 +63,26 @@ int gameAttemptStart() {
 
 
 void gameSpawn() {
-	int n, i, t, building, owner;
+	int n, i, t, j, building, owner;
 
 	n = server->w * server->h;
-	for (i = 0; i < n; i++)
-		if (server->map_c.tile_data[i]) {
-			t = server->map_c.tile_data[i] & 0xFFF;
-			if (!t)
-				continue;
-			building = (t % 8) + 1;
-			owner = (t / 8) - 1;
-			if (owner < 0 || owner >= server->players)
-				continue;
-			if (server->player[owner].status != PLAYER_IN_GAME_NOW) 
-				continue;
-			if (building >= UNITS_DEFINED)
-				continue;
-
-			unitSpawn(owner, building, i % server->w, i / server->w);
-		}
+	for (j = 0; j < server->players; j++)
+		for (i = 0; i < n; i++)
+			if (server->map_c.tile_data[i]) {
+				t = server->map_c.tile_data[i] & 0xFFF;
+				if (!t)
+					continue;
+				building = (t % 8) + 1;
+				owner = (t / 8) - 1;
+				if (owner != server->player[j].spawn_as)
+					continue;
+				if (server->player[j].status != PLAYER_IN_GAME_NOW) 
+					continue;
+				if (building >= UNITS_DEFINED)
+					continue;
+	
+				unitSpawn(j, building, i % server->w, i / server->w);
+			}
 	
 	unitPylonPulse();
 	
@@ -136,7 +137,7 @@ int gameWorldTransfer(unsigned int player) {
 			continue;
 		if (server->map[i])
 			unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
-		server->player[player].transfer_pos = i;
+		server->player[player].transfer_pos = i + 1;
 
 		return 0;
 	}

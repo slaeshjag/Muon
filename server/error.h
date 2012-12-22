@@ -29,6 +29,8 @@
 #define	SERVER_ERROR_TOO_MANY_PLAYERS		7
 #define	SERVER_ERROR_GAMESPEED_TOO_SMALL	8
 #define	SERVER_ERROR_SPAWN_MISSING		9
+#define	SERVER_ERROR_GENERATOR_COUNT_MISMATCH	10
+#define	SERVER_ERROR_BAD_LUCK			11
 
 #ifdef WITH_SERVER_ERROR
 
@@ -43,7 +45,9 @@ const char *server_errors[] = { NULL,
 				"The server was unable to bind the requested port. It's either in use or blocked by a firewall.",
 				"The map is not defined for this many players",
 				"Gamespeed must be bigger than 0",
-				"The map is missing a generator for one or more players"};
+				"The map is missing a generator for one or more players",
+				"The number of generators on the map is not equal to the biggest player id",
+				"rand() wasn't on our side, and spawn randomization took too many tries. Try again."};
 
 typedef struct {
 	int			read_pos;

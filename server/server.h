@@ -31,6 +31,8 @@
 #define	SERVER_PROCESS_INCOMPLETE	0
 #define	SERVER_PROCESS_FAIL		-1
 
+#define	RANDOM_ATTEMPTS			20000
+
 #define	SERVER_PING_INTERVAL		2
 
 #include <stdio.h>

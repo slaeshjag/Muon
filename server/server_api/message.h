@@ -102,10 +102,10 @@ typedef struct {
 /* arg_1 is building type, arg_2 is index on the map (x + y * map_w). */
 #define	MSG_RECV_BUILDING_PLACE		0x00B
 
-/* arg_1 is the shield value (0..1000), arg_2 is index on the map that the building is at. */
+/* arg_1 is the shield value (0..100), arg_2 is index on the map that the building is at. */
 #define	MSG_RECV_BUILDING_SHIELD	0x00C
 
-/* arg_1 is the HP value (0..1000), arg_2 is index on the map that the building is at. */
+/* arg_1 is the HP value (0..100), arg_2 is index on the map that the building is at. */
 #define	MSG_RECV_BUILDING_HP		0x00D
 
 /* arg_1 is the index on the map that the building is at, arg_2 is the index of the building attacking */
