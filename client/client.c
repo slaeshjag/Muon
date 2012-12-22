@@ -270,6 +270,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			darnitFSMount(filename);
 			map_init("mapdata/map.ldmz");
 			lobby_map_preview_generate();
+			map_building_clear();
 			break;
 		case MSG_RECV_GAME_START:
 			game_state(GAME_STATE_LOBBY);

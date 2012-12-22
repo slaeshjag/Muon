@@ -133,6 +133,8 @@ void settings_monitor_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 		config.fullscreen=v.i;
 		v=settings_monitor_slider_plasma->get_prop(settings_monitor_slider_plasma, UI_SLIDER_PROP_VALUE);
 		config.plasma=v.i;
+		v=settings_monitor_checkbox_alpha->get_prop(settings_monitor_checkbox_alpha, UI_CHECKBOX_PROP_ACTIVATED);
+		config.alpha=v.i;
 		platform_config_write();
 	}
 	panelist_menu_sidebar.next=NULL;
