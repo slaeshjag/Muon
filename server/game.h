@@ -22,7 +22,7 @@
 
 
 #ifdef __DEBUG__
-#define	SERVER_GAME_START_DELAY	1000
+#define	SERVER_GAME_START_DELAY	3000
 #else
 #define	SERVER_GAME_START_DELAY	5000
 #endif
