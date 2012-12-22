@@ -377,8 +377,6 @@ int unitRemove(int x, int y) {
 		next = next->next;
 	}
 	
-	messageBufferPushDirect(next->owner, next->owner, MSG_SEND_BUILDING_PLACE, 0, x + y * server->w, NULL);
-
 	if (next == unit) {
 		*parent = next->next;
 		if (next->type == UNIT_DEF_PYLON) {
@@ -400,7 +398,6 @@ int unitRemove(int x, int y) {
 		server->map[x + y * server->h] = NULL;
 	}
 	
-	messageBufferPushDirect(owner, owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
 	server->map[x + y * server->h] = NULL;
 
 	return 0;
@@ -630,7 +627,7 @@ void unitDamageDo(int index, int damage, int time) {
 	if (!server->map[next->target]) {
 		if (damage < MAP_TERRAIN_ABSORTION)
 			return;
-		server->map_c.tile_data[index] |= 0x60000;
+		server->map_c.tile_data[index] &= 0x60000;
 		server->map_c.tile_data[index] ^= 0x20000;
 		return;
 	}
