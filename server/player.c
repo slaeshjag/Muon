@@ -234,7 +234,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					fogdiff = (server->player[i].map[index].fog > 0);
 					fogdiff = (oldfog ^ fogdiff);
 					if (mode < 0 && j == 0 && k == 0)
-						unitAnnounce(owner, i, 0, index);
+						unitAnnounce(owner, i, building, index);
 					if (fogdiff || (j == 0 && k == 0)) {
 						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 						if (mode > 0)
@@ -248,7 +248,7 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				fogdiff = (server->player[player].map[index].fog > 0);
 				fogdiff = (oldfog ^ fogdiff);
 				if (mode < 0 && j == 0 && k == 0)
-					unitAnnounce(owner, player, 0, index);
+					unitAnnounce(owner, player, building, index);
 				if (fogdiff || (j == 0 && k == 0)) {
 					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 					if (mode > 0)
