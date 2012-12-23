@@ -142,7 +142,7 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		chat_toggle(&panelist_game_sidebar);
 	if(e->buttons->b&&!prevbuttons.b) {
 		if(building_place>-1) {
-			building_place=-2;
+			building_place=-1;
 		} else if(map_selected_building()) {
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_NONE, map_selected_index(), NULL);
 			map_select_nothing();
@@ -335,7 +335,7 @@ void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
 		darnitRenderOffset(map->cam_x, map->cam_y);
 		darnitRenderBlendingEnable();
-		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, x, y);
+		darnitRenderTileBlit(l->ts, player_id*8+building_place+7, x, y);
 		darnitRenderBlendingDisable();
 		darnitRenderOffset(0, 0);
 	}
