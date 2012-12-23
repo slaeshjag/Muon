@@ -1,0 +1,51 @@
+Muon			Muon
+
+### Menu
+Singleplayer		Singleplayer
+Multiplayer		Multiplayer
+Settings		Inställningar
+
+Disconnect		Koppla från
+Return to game		Fortsätt spela
+
+Quit game		Avsluta
+OK			OK
+Cancel			Avbryt
+
+### Settings
+Player name		Spelarnamn
+Screen width		Skärmbredd
+Screen height		Skärmhöjd
+Fullscreen		Fullskärm
+Plasma scale		Plasmaskala
+Alpha blending		Alpha blending
+
+### Multiplayer
+Port			Port
+Number of players	Antal spelare
+Game speed		Spelhastighet
+Host			Skapa server
+Join a server		Anslut till server
+Join			Anslut
+Connecting to server	Ansluter till server
+
+
+### Lobby
+Players			Spelare
+Team:			Team:
+Kick			Sparka
+Ready			Redo
+
+Downloading map		Laddar ner karta
+Map			Karta
+
+### In-game
+Buildings:		Byggnader:
+Scout			Scout
+Attacker		Attackerare
+Pylon			Pylon
+Wall			Mur
+Build site		Byggplats
+
+Shield			Sköld
+Health			Liv

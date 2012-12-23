@@ -38,6 +38,7 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		player=NULL;
 		game_state(GAME_STATE_MENU);
 		sock=darnitSocketClose(socket);
+		player_id=0;
 	} else
 		game_state(GAME_STATE_LOBBY);
 }

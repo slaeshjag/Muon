@@ -22,6 +22,7 @@ install:
 	@install -m 0744 -D res/chat.png $(DATAPATH)/res/chat.png
 	@install -m 0744 -D res/mouse.png $(DATAPATH)/res/mouse.png
 	@install -m 0744 -D res/icon.png $(DATAPATH)/res/icon.png
+	@install -m 0744 -D res/lang.stz $(DATAPATH)/res/lang.stz
 	@install -m 0755 -d $(DATAPATH)/maps
 	@install -m 0744 -D -t $(DATAPATH)/maps/ maps/*
 	@install -m 0755 -D res/muon.desktop $(APPLICATIONSPATH)/muon.desktop

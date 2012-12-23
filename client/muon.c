@@ -83,7 +83,6 @@ int main() {
 	
 	player_id=0;
 	serverInit();
-	darnitDirectoryCreate("maps");
 	
 	intmath_init();
 	ui_init();

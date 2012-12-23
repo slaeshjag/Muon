@@ -32,19 +32,19 @@ void lobby_init() {
 	panelist_lobby_players.pane=ui_pane_create(16, 16, 256, 128+48, NULL);
 	panelist_lobby_players.next=&panelist_lobby_download;
 	ui_pane_set_root_widget(panelist_lobby_players.pane, ui_widget_create_vbox());
-	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_label(font_std, "Players"), 0);
+	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_label(font_std, T("Players")), 0);
 	lobby_players_listbox=ui_widget_create_listbox(font_std);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_listbox, 1);
-	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_label(font_std, "Team:"), 0);
+	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_label(font_std, T("Team:")), 0);
 	lobby_players_slider_team=ui_widget_create_slider(5);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_slider_team, 0);
 	lobby_players_slider_team->event_handler->add(lobby_players_slider_team, lobby_players_slider_team_changed, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	lobby_players_hbox=ui_widget_create_hbox();
 	lobby_players_checkbox_ready=ui_widget_create_checkbox();
-	lobby_players_button_kick=ui_widget_create_button_text(font_std, "Kick");
+	lobby_players_button_kick=ui_widget_create_button_text(font_std, T("Kick"));
 	lobby_players_button_kick->event_handler->add(lobby_players_button_kick, lobby_players_button_kick_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ui_hbox_add_child(lobby_players_hbox, lobby_players_checkbox_ready, 0);
-	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_label(font_std, "Ready"), 0);
+	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_label(font_std, T("Ready")), 0);
 	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_spacer(), 1);
 	ui_hbox_add_child(lobby_players_hbox, lobby_players_button_kick, 0);
 	//ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_spacer_size(1, 8), 0);
@@ -56,7 +56,7 @@ void lobby_init() {
 	panelist_lobby_download.next=&panelist_lobby_map;
 	ui_pane_set_root_widget(panelist_lobby_download.pane, ui_widget_create_vbox());
 	lobby_download_progress=ui_widget_create_progressbar(font_std);
-	ui_vbox_add_child(panelist_lobby_download.pane->root_widget, ui_widget_create_label(font_std, "Downloading map"), 1);
+	ui_vbox_add_child(panelist_lobby_download.pane->root_widget, ui_widget_create_label(font_std, T("Downloading map")), 1);
 	ui_vbox_add_child(panelist_lobby_download.pane->root_widget, lobby_download_progress, 0);
 	v.i=0;
 	lobby_download_progress->set_prop(lobby_download_progress, UI_PROGRESSBAR_PROP_PROGRESS, v);
@@ -64,7 +64,7 @@ void lobby_init() {
 	//Map preview
 	panelist_lobby_map.pane=ui_pane_create(platform.screen_w-128-16, 16, 128, 152, NULL);
 	lobby_map_imageview=ui_widget_create_imageview_raw(128-2*UI_PADDING, 128-2*UI_PADDING, DARNIT_PFORMAT_RGB5A1);
-	lobby_map_label=ui_widget_create_label(font_std, "Map");
+	lobby_map_label=ui_widget_create_label(font_std, T("Map"));
 	ui_pane_set_root_widget(panelist_lobby_map.pane, ui_widget_create_vbox());
 	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_label, 1);
 	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_imageview, 0);
@@ -126,8 +126,11 @@ void lobby_update_player(int player_id) {
 	else
 		sprintf(buf, "%s", player[player_id].name);
 	
-	if(player[player_id].ready)
-		strcat(buf, " (Ready)");
+	if(player[player_id].ready) {
+		strcat(buf, " (");
+		strcat(buf, T("Ready"));
+		strcat(buf, ")");
+	}
 		
 	ui_listbox_set(lobby_players_listbox, player_id, buf);
 }

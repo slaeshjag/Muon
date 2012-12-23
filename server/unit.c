@@ -344,30 +344,32 @@ int unitAdd(int owner, int type, int x, int y) {
 
 int unitRemove(int x, int y) {
 	SERVER_UNIT *unit, *next, **parent;
-	int i, owner;
+	int i, owner, type, index;
 
 	if (x >= server->w || y >= server->h) {
 		fprintf(stderr, "Unable to remove unit at %i %i: Tile is outside of the map\n", x, y);
 		return -1;
 	}
 
-	if ((unit = server->map[x + y * server->h]) == NULL)
+	index = x + y * server->w;
+	if ((unit = server->map[index]) == NULL)
 		return -1;
 	parent = &server->unit;
 	next = *parent;
 	owner = unit->owner;
 	unit->hp = 0;
 	unit->shield = 0;
+	type = ((server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE) ? UNIT_DEF_BUILDSITE_FREE : 0;
 
 	playerCalcLOS(unit->owner, x, y, -1);
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
-		if ((!server->player[i].map[x + y * server->w].fog) && unit->owner != i)
+		if ((!server->player[i].map[index].fog) && unit->owner != i)
 			continue;
-		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
-		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_HP, 0, x + server->w * y, NULL);
-		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_SHIELD, 0, x + server->w * y, NULL);
+		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_PLACE, type, index, NULL);
+		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_HP, 0, index, NULL);
+		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_SHIELD, 0, index, NULL);
 	}
 	
 	server->player[owner].stats.buildings_lost++;
@@ -377,8 +379,6 @@ int unitRemove(int x, int y) {
 		next = next->next;
 	}
 	
-	messageBufferPushDirect(next->owner, next->owner, MSG_SEND_BUILDING_PLACE, 0, x + y * server->w, NULL);
-
 	if (next == unit) {
 		*parent = next->next;
 		if (next->type == UNIT_DEF_PYLON) {
@@ -400,7 +400,6 @@ int unitRemove(int x, int y) {
 		server->map[x + y * server->h] = NULL;
 	}
 	
-	messageBufferPushDirect(owner, owner, MSG_SEND_BUILDING_PLACE, 0, x + server->w * y, NULL);
 	server->map[x + y * server->h] = NULL;
 
 	return 0;
@@ -630,7 +629,7 @@ void unitDamageDo(int index, int damage, int time) {
 	if (!server->map[next->target]) {
 		if (damage < MAP_TERRAIN_ABSORTION)
 			return;
-		server->map_c.tile_data[index] |= 0x60000;
+		server->map_c.tile_data[index] &= 0x60000;
 		server->map_c.tile_data[index] ^= 0x20000;
 		return;
 	}
