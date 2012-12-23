@@ -233,8 +233,6 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					t = (server->player[i].map[index].fog) ? 0 : 1;
 					fogdiff = (server->player[i].map[index].fog > 0);
 					fogdiff = (oldfog ^ fogdiff);
-					if (mode < 0 && j == 0 && k == 0)
-						unitAnnounce(owner, i, (!building) ? 0 : UNIT_DEF_BUILDSITE_FREE, index);
 					if (fogdiff || (j == 0 && k == 0)) {
 						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 						if (mode > 0)
@@ -247,8 +245,6 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 				t = (server->player[player].map[index].fog) ? 0 : 1;
 				fogdiff = (server->player[player].map[index].fog > 0);
 				fogdiff = (oldfog ^ fogdiff);
-				if (mode < 0 && j == 0 && k == 0)
-					unitAnnounce(owner, player, (!building) ? 0 : UNIT_DEF_BUILDSITE_FREE, index);
 				if (fogdiff || (j == 0 && k == 0)) {
 					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 					if (mode > 0)
