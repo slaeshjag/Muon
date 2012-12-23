@@ -34,6 +34,7 @@ UI_WIDGET *game_sidebar_progress_health;
 
 int building_place;
 int building_ready;
+int building_cancel;
 
 struct GAME_ATTACKLIST {
 	int index;
