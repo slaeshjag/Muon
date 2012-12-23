@@ -166,10 +166,10 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 				//printf("cancel build queue!\n");
 				game_reset_building_progress();
 			}
-			building_ready=BUILDING_NONE;
+			game_set_building_ready(BUILDING_NONE);
 			break;
 		case MSG_RECV_UNIT_READY:
-			building_ready=msg->arg_1;
+			game_set_building_ready(msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_PROGRESS:
 			game_set_building_progress(0, msg->arg_2);

@@ -87,7 +87,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 			v.p=game_sidebar_progress_build;
 			widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 			game_set_building_progress(0, 0);
-			building_ready=-(BUILDING_SCOUT+i);
+			game_set_building_ready(-(BUILDING_SCOUT+i));
 		} else if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
 			building_place=building_ready;
 		}
@@ -96,7 +96,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 		v.p=game_sidebar_label_build[i];
 		widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 		game_set_building_progress(0, 0);
-		building_ready=BUILDING_NONE; // No buildings in progress
+		game_set_building_ready(BUILDING_NONE); // No buildings in progress
 	}
 	ui_selected_widget=NULL;
 }
