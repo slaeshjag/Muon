@@ -2,7 +2,8 @@ RM	= rm -f
 
 all:
 	@./makemaps.sh
-	@darnit-stringtable lang lang.stz
+	@echo " [DSTZ] res/lang"
+	@darnit-stringtable lang lang.stz 2> /dev/null
 
 clean:
 	@$(RM) *.ldi
