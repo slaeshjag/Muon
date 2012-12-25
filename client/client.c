@@ -315,6 +315,7 @@ int client_init(char *host, int port) {
 }
 
 void client_disconnect() {
+	ui_messagebox(font_std, T("Woops!\nSomething silly happened, and you probably want to know why. Well, thing is, that is not yet implemented, so sorry for the inconvenience :3"));
 	client_connect_callback(-1, NULL, sock);
 	sock=NULL;
 }

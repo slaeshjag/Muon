@@ -27,6 +27,8 @@
 #include "multiplayer.h"
 #include "settings.h"
 
+const char **menu_sidebar_button_text_main;
+
 void menu_init() {
 	int i;
 	
@@ -39,7 +41,7 @@ void menu_init() {
 	ui_pane_set_root_widget(panelist_menu_sidebar.pane, ui_widget_create_vbox());
 	
 	//TODO: fixfixfix when making proper menues, this is damned ugly
-	const char **menu_sidebar_button_text_main=calloc(sizeof(void *), 8);
+	menu_sidebar_button_text_main=calloc(sizeof(void *), 8);
 	menu_sidebar_button_text_main[0]=T("Singleplayer");
 	menu_sidebar_button_text_main[1]=T("Multiplayer");
 	menu_sidebar_button_text_main[2]=T("Settings");

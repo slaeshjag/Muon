@@ -65,6 +65,10 @@ UI_WIDGET *ui_selected_widget;
 #include "imageview.h"
 #include "slider.h"
 
+struct UI_PANE_LIST ui_panelist_dialogue;
+
+#include "messagebox.h"
+
 void ui_init();
 void *ui_widget_destroy(UI_WIDGET *widget);
 

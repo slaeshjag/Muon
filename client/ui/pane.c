@@ -68,3 +68,8 @@ void ui_pane_render(UI_PANE *pane) {
 	if(pane->root_widget!=NULL)
 		pane->root_widget->render(pane->root_widget);
 }
+
+void ui_panelist_render(struct UI_PANE_LIST *panelist) {
+	for(; panelist; panelist=panelist->next)
+		ui_pane_render(panelist->pane);
+}
