@@ -30,6 +30,12 @@
 int ui_event_global_removed=0;
 
 void ui_events(struct UI_PANE_LIST *panes, int render) {
+	//override for dialogues such as message boxes.
+	if(ui_panelist_dialogue.pane) {
+		ui_panelist_render(panes);
+		panes=&ui_panelist_dialogue;
+	}
+	
 	UI_EVENT e;
 	UI_EVENT_MOUSE e_m;
 	UI_EVENT_BUTTONS e_b;
@@ -141,7 +147,7 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 			} else if(PINR(ui_e_m_prev.x, ui_e_m_prev.y, w->x, w->y, w->w, w->h))
 				w->event_handler->send(w, UI_EVENT_TYPE_MOUSE_LEAVE, &e);
 		}
-		if(render)
+		if(render&&p->pane)
 			ui_pane_render(p->pane);
 	}
 	
