@@ -104,7 +104,7 @@ void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
 	if(widget==game_menu_button[0]) {
-		client_disconnect();
+		client_disconnect(-1);
 		game_state(GAME_STATE_MENU);
 		panelist_menu_sidebar.next=NULL;
 	} else if(widget==game_menu_button[1]) {

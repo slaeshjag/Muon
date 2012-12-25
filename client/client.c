@@ -134,7 +134,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_KICKED:
-			client_disconnect();
+			client_disconnect(msg->command);
 			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
@@ -190,7 +190,7 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_NAME_IN_USE:
 		case MSG_RECV_SERVER_FULL:
 		case MSG_RECV_BAD_CLIENT:
-			client_disconnect();
+			client_disconnect(msg->command);
 			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
@@ -219,7 +219,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_NAME_IN_USE:
 		case MSG_RECV_SERVER_FULL:
 		case MSG_RECV_BAD_CLIENT:
-			client_disconnect();
+			client_disconnect(msg->command);
 			break;
 		case MSG_RECV_PLAYER_READY:
 			if(msg->arg_2==100) {
@@ -314,8 +314,21 @@ int client_init(char *host, int port) {
 	return 0;
 }
 
-void client_disconnect() {
-	ui_messagebox(font_std, T("Woops!\nSomething silly happened, and you probably want to know why. Well, thing is, that is not yet implemented, so sorry for the inconvenience :3"));
+void client_disconnect(int cause) {
+	switch(cause) {
+		case MSG_RECV_KICKED:
+			ui_messagebox(font_std, T("You were kicked from the server!"));
+			break;
+		case MSG_RECV_NAME_IN_USE:
+			ui_messagebox(font_std, T("Your name is already in use, please change it in the settings."));
+			break;
+		case MSG_RECV_SERVER_FULL:
+			ui_messagebox(font_std, T("The server is full."));
+			break;
+		case MSG_RECV_BAD_CLIENT:
+			ui_messagebox(font_std, T("You are using an outdated client, please update Muon."));
+			break;
+	}
 	client_connect_callback(-1, NULL, sock);
 	sock=NULL;
 }

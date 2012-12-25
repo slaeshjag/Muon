@@ -20,7 +20,7 @@ Fullscreen		Fullskärm
 Plasma scale		Plasmaskala
 Alpha blending		Alpha blending
 
-Please restart Muon for the changes to take place.	Vänligen starta om Muon för att dina inställningar ska börja gälla.
+Please restart Muon for the changes to take place.		Vänligen starta om Muon för att dina inställningar ska börja gälla.
 
 ### Multiplayer
 Port			Port
@@ -31,6 +31,13 @@ Join a server		Anslut till server
 Join			Anslut
 Connecting to server	Ansluter till server
 
+There was a problem starting the server; the port may already be in use. Try waiting for a while or change port.	Kunde inte starta servern; porten kanske är upptagen. Vänta ett tag eller byt port.
+Unable to connect to server.					Kunde inte ansluta till servern.
+
+You were kicked from the server!				Du blev utsparkad från servern!
+Your name is already in use, please change it in the settings.	Ditt namn används redan, vänligen ändra det i inställningarna.
+The server is full.						Servern är full.
+You are using an outdated client, please update Muon.		Du använder en utdaterad klient, vänligen uppdatera Muon.
 
 ### Lobby
 Players			Spelare
