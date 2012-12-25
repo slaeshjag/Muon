@@ -349,6 +349,7 @@ int playerBuildQueueStop(int player, int building) {
 	if (building <= UNIT_DEF_GENERATOR || building > UNITS_DEFINED)
 		return -1;
 	server->player[player].queue.queue.building = 0;
+	server->player[player].queue.queue.ready = 0;
 
 	return 0;
 }
