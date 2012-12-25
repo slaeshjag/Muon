@@ -24,6 +24,7 @@
 #include "map.h"
 #include "chat.h"
 #include "game.h"
+#include "intmath.h"
 
 void game_view_init() {
 	building_place=-1;
@@ -81,17 +82,17 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	// Find the building number.
 	while(widget!=game_sidebar_button_build[i])
 		i++;
-	if(building_ready>=BUILDING_NONE) {	// You should only build or place if there are no buildings ready or a building ready
-		if(building_ready==BUILDING_NONE) { // Build if no there are no buildings in progress nor other buildings ready.
+	if(!building_cancel) {
+		if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
+			building_place=building_ready;
+		} else if(building_ready==BUILDING_NONE) { // Build if no there are no buildings in progress nor other buildings ready.
 			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_START, NULL);
 			v.p=game_sidebar_progress_build;
 			widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 			game_set_building_progress(0, 0);
 			game_set_building_ready(-(BUILDING_SCOUT+i));
-		} else if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
-			building_place=building_ready;
 		}
-	} else if(building_ready==-(BUILDING_SCOUT+i)&&building_cancel) {	// Cancel if the building is is in progress and shift is pressed.
+	} else if(ABS(building_ready)==BUILDING_SCOUT+i) {	// Cancel if the building is is in progress or ready and shift is pressed
 		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
 		v.p=game_sidebar_label_build[i];
 		widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
