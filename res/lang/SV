@@ -1,8 +1,8 @@
 Muon			Muon
 
 ### Menu
-Singleplayer		Singleplayer
-Multiplayer		Multiplayer
+Singleplayer		En spelare
+Multiplayer		Flera spelare
 Settings		Inställningar
 
 Disconnect		Koppla från
@@ -32,8 +32,8 @@ Connecting to server	Ansluter till server
 
 ### Lobby
 Players			Spelare
-Team:			Team:
-Kick			Sparka
+Team:			Lag:
+Kick			Sparka ut
 Ready			Redo
 
 Downloading map		Laddar ner karta
@@ -41,7 +41,7 @@ Map			Karta
 
 ### In-game
 Buildings:		Byggnader:
-Scout			Scout
+Scout			Utkikstorn
 Attacker		Attackerare
 Pylon			Pylon
 Wall			Mur
