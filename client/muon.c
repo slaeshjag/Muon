@@ -113,5 +113,8 @@ int main() {
 		darnitLoop();
 	}
 	
+	if(serverIsRunning())
+		serverStop();
+	
 	return 0;
 }

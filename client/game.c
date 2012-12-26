@@ -105,15 +105,15 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) { 
 	if(type!=UI_EVENT_TYPE_KEYBOARD_PRESS)
 		return;
-	if(e->keyboard->character>='1'&&e->keyboard->character<='5') {
-		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->character-0x31], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
+	if(e->keyboard->keysym>=KEY(1)&&e->keyboard->keysym<=KEY(5)) {
+		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->keysym-KEY(1)], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
 	}
 }
 
 void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
-	//darnit buttons have no press or release events, we have to handle this ourself
+	//darnit buttons have no press or release events, we have to handle this ourselves
 	static UI_EVENT_BUTTONS prevbuttons={0};
 	
 	//View movement
