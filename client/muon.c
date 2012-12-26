@@ -96,7 +96,7 @@ int main() {
 		serverLoop(darnitTimeLastFrameTook());
 		
 		if(gamestate>=GAME_STATE_LOBBY)
-			client_check_incomming();
+			client_check_incoming();
 		
 		darnitRenderBegin();
 		if(state_render[gamestate])

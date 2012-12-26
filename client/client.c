@@ -69,7 +69,7 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 		darnitSocketSend(sock, payload, arg_2);
 }
 
-void client_check_incomming() {
+void client_check_incoming() {
 	int s, i;
 	unsigned int chunk_got=0, chunk_size;
 	if((s=darnitSocketRecvTry(sock, &chunk_size, 4))<4) {
