@@ -142,6 +142,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		return NULL;
 	}
 
+	server->server_admin = -1;
 	server->map_c.path = NULL;
 	messageHandlerInit(server);
 	gameInit(gamespeed);
