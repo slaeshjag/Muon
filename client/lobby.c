@@ -84,6 +84,7 @@ void lobby_init() {
 void lobby_open() {
 	int i;
 	UI_PROPERTY_VALUE v={.i=0};
+	lobby_players_slider_team->set_prop(lobby_players_slider_team, UI_SLIDER_PROP_VALUE, v);
 	lobby_players_checkbox_ready->set_prop(lobby_players_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
 	lobby_players_checkbox_ready->enabled=0;
 	ui_listbox_clear(lobby_players_listbox);
