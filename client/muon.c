@@ -109,7 +109,6 @@ int main() {
 		darnitRenderTint(1, 1, 1, 1);
 		
 		darnitRenderEnd();
-		
 		darnitLoop();
 	}
 	

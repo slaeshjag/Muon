@@ -73,15 +73,20 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 
 void client_check_incoming() {
 	int s, i;
-	unsigned int chunk_got=0, chunk_size;
+	unsigned int chunk_got=0, chunk_size, chunk_time;
 	if((s=darnitSocketRecvTry(sock, &chunk_size, 4))<4) {
 		if(s==-1)
 			client_connect_callback(-1, NULL, sock);
 		return;
 	}
 	chunk_size=darnitUtilNtohl(chunk_size)-4;
+	chunk_time=darnitTimeGet();
 	
 	while(chunk_got<chunk_size) {
+		if(darnitTimeGet()-chunk_time>CLIENT_TIMEOUT) {
+			client_connect_callback(-1, NULL, sock);
+			return;
+		}
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
 			//printf("payload size %i\n", msg_recv.arg_2);
@@ -186,6 +191,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 }
 
 void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
+	//TODO: merge with client_download_map as lobby handler
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_KICKED:

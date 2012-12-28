@@ -23,6 +23,7 @@
 #define CLIENT_DEFAULT_PORT "1337"
 #define CLIENT_DEFAULT_PLAYERS 2
 #define CLIENT_DEFAULT_GAMESPEED 3
+#define CLIENT_TIMEOUT 10000
 
 typedef struct {
 	char name[32];
