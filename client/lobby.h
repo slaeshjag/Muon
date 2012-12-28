@@ -29,6 +29,7 @@ UI_WIDGET *lobby_players_button_kick;
 UI_WIDGET *lobby_download_progress;
 UI_WIDGET *lobby_map_label;
 UI_WIDGET *lobby_map_imageview;
+UI_WIDGET *lobby_map_button_back;
 
 void lobby_init();
 
@@ -44,6 +45,7 @@ void lobby_download_complete();
 void lobby_players_slider_team_changed(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void lobby_players_button_kick_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void lobby_players_checkbox_ready_toggle(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void lobby_map_button_back_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 void lobby_set_map_progress(int progress);
 

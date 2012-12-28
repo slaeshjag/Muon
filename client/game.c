@@ -101,7 +101,8 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	ui_selected_widget=NULL;
 }
 
-void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) { 
+void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//TODO: keysyms of number keys might not be sequential on all platforms
 	if(type!=UI_EVENT_TYPE_KEYBOARD_PRESS)
 		return;
 	if(e->keyboard->keysym>=KEY(1)&&e->keyboard->keysym<=KEY(5)) {
