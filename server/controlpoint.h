@@ -22,9 +22,23 @@
 
 #define	CONTROLPOINT_CLUSTERBOMB_WARMUP	10800
 
+/* In gameticks */
+#define	CP_CLUSTERBOMB_DELAY		60 * 180
+
+typedef struct CONTROLPONIT_EXTRA {
+	unsigned int			type;
+	unsigned int			delay;
+	unsigned int			left;
+	unsigned int			index;
+	unsigned int			owner;
+	struct CONTROLPOINT_EXTRA	*next;
+} CONTROLPOINT_EXTRA;
+
+
 struct SERVER_UNIT;
 
 int controlpointInit(struct SERVER_UNIT *unit);
+void controlpointLoop();
 void controlpointRemove(struct SERVER_UNIT *unit);
 
 #endif

@@ -95,6 +95,7 @@ typedef struct {
 	SERVER_MAP		map_c;
 	UNIT_PYLON		*pylons;
 	int			server_admin;
+	CONTROLPOINT_EXTRA	*controlpoint;
 } SERVER;
 
 SERVER *server;
