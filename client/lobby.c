@@ -97,12 +97,6 @@ void lobby_open() {
 	map_minimap_clear(v.p, lobby_map_imageview->w, lobby_map_imageview->h);
 }
 
-void lobby_close() {
-	UI_PROPERTY_VALUE v={.i=0};
-	lobby_players_checkbox_ready->set_prop(lobby_players_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
-	//lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-}
-
 void lobby_map_preview_generate() {
 	UI_PROPERTY_VALUE v;
 	v.p=(void *)darnitMapPropGet(map->prop, "name");

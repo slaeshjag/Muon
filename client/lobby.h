@@ -34,7 +34,6 @@ UI_WIDGET *lobby_map_button_back;
 void lobby_init();
 
 void lobby_open();
-void lobby_close();
 void lobby_map_preview_generate();
 void lobby_join(int player_id);
 void lobby_leave(int player_id);
