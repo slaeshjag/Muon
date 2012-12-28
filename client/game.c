@@ -80,8 +80,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
 	// Find the building number.
-	while(widget!=game_sidebar_button_build[i])
-		i++;
+	for(; widget!=game_sidebar_button_build[i]; i++);
 	if(!building_cancel) {
 		if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
 			building_place=building_ready;
@@ -149,7 +148,7 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			map_select_nothing();
 		}
 	}
-
+	
 	// If shift is pressed (button Y) set building_cancel
 	building_cancel = e->buttons->y;
 	
