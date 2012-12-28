@@ -63,7 +63,7 @@ void lobby_init() {
 	
 	//Sidebar with map preview
 	panelist_lobby_map.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
-	lobby_map_imageview=ui_widget_create_imageview_raw(128-2*UI_PADDING, 128-2*UI_PADDING, DARNIT_PFORMAT_RGB5A1);
+	lobby_map_imageview=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-2*UI_PADDING, SIDEBAR_WIDTH-2*UI_PADDING, DARNIT_PFORMAT_RGB5A1);
 	lobby_map_label=ui_widget_create_label(font_std, T("Map"));
 	lobby_map_button_back=ui_widget_create_button_text(font_std, T("Back"));
 	lobby_map_button_back->event_handler->add(lobby_map_button_back, lobby_map_button_back_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
