@@ -93,7 +93,7 @@ void unitPylonPulseClimb(UNIT_PYLON *pylon) {
 	
 	for (i = 0; i < pylon->neighbours; i++)
 		if (pylon->neighbour[i])
-			unitPylonPulseClimb(pylon->neighbour[i]);;
+			unitPylonPulseClimb(pylon->neighbour[i]);
 
 	return;
 }
