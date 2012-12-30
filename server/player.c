@@ -51,6 +51,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].stats.buildings_destroyed = 0;
 		player[i].stats.buildtime = 0;
 		player[i].stats.no_build_time = 0;
+		player[i].team = -1;
 	}
 	
 	server->players = players;
@@ -175,9 +176,9 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 				continue;
 			if (team > -1) {
 				for (i = 0; i < server->players; i++) {
-					if (server->player[i].team != team)
-						continue;
 					if (server->player[i].status != PLAYER_IN_GAME_NOW)
+						continue;
+					if (server->player[i].team != team)
 						continue;
 					old = (server->player[i].map[index].power) ? 1 : 0;
 					server->player[i].map[index].power += mode;
@@ -225,9 +226,9 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 
 			if (team > -1)
 				for (i = 0; i < server->players; i++) {
-					if (server->player[i].team != team)
-						continue;
 					if (server->player[i].status != PLAYER_IN_GAME_NOW)
+						continue;
+					if (server->player[i].team != team)
 						continue;
 					oldfog = (server->player[i].map[index].fog > 0);
 					server->player[i].map[index].fog += haz_los * mode;
