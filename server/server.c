@@ -40,7 +40,7 @@ int serverInitMap(const char *path) {
 			t = server->map_c.tile_data[i] & 0xFFF;
 			building = (t % 8) + 1;
 			owner = (t / 8) - 1;
-			max_players = (owner > max_players) ? owner : max_players;
+			max_players = (owner + 1 > max_players) ? owner + 1 : max_players;
 			if (building == UNIT_DEF_GENERATOR && owner >= 0) {
 				spawns++;
 				if (owner >= server->players)
@@ -52,7 +52,7 @@ int serverInitMap(const char *path) {
 
 		}
 
-	if (spawns != max_players + 1) {
+	if (spawns != max_players) {
 		fprintf(stderr, "The number of generator isn't exactly the same as the number of players (%i, %i)\n", spawns, max_players + 1);
 		errorPush(SERVER_ERROR_GENERATOR_COUNT_MISMATCH);
 		free(server->map_c.data);
@@ -142,6 +142,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		return NULL;
 	}
 
+	server->server_admin = -1;
 	server->map_c.path = NULL;
 	messageHandlerInit(server);
 	gameInit(gamespeed);

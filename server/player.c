@@ -44,6 +44,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].socket = NULL;
 		player[i].network.recv_stat = SERVER_PROCESS_NOTHING;
 		player[i].network.send_stat = SERVER_PROCESS_NOTHING;
+		player[i].last_ping_sent = 0;
 
 		player[i].stats.buildings_raised = 0;
 		player[i].stats.buildings_lost = 0;
@@ -349,6 +350,7 @@ int playerBuildQueueStop(int player, int building) {
 	if (building <= UNIT_DEF_GENERATOR || building > UNITS_DEFINED)
 		return -1;
 	server->player[player].queue.queue.building = 0;
+	server->player[player].queue.queue.ready = 0;
 
 	return 0;
 }

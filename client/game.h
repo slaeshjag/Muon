@@ -33,6 +33,8 @@ UI_WIDGET *game_sidebar_progress_shield;
 UI_WIDGET *game_sidebar_progress_health;
 
 int building_place;
+int building_ready;
+int building_cancel;
 
 struct GAME_ATTACKLIST {
 	int index;
@@ -54,6 +56,7 @@ void game_update_building_status();
 void game_view_scroll_to(int x, int y);
 void game_set_building_progress(int building, int progress);
 void game_reset_building_progress();
+void game_set_building_ready(int building);
 
 void game_attacklist_lines_recalculate();
 void game_attacklist_add(int index);

@@ -11,6 +11,7 @@ Return to game		Return to game
 Quit game		Quit game
 OK			OK
 Cancel			Cancel
+Back			Back
 
 ### Settings
 Player name		Player name
@@ -19,6 +20,8 @@ Screen height		Screen height
 Fullscreen		Fullscreen
 Plasma scale		Plasma scale
 Alpha blending		Alpha blending
+
+Please restart Muon for the changes to take place.		Please restart Muon for the changes to take place.
 
 ### Multiplayer
 Port			Port
@@ -29,6 +32,13 @@ Join a server		Join a server
 Join			Join
 Connecting to server	Connecting to server
 
+There was a problem starting the server; the port may already be in use. Try waiting for a while or change port.	There was a problem starting the server; the port may already be in use. Try waiting for a while or change port.
+Unable to connect to server.					Unable to connect to server.
+
+You were kicked from the server!				You were kicked from the server!
+Your name is already in use, please change it in the settings.	Your name is already in use, please change it in the settings.
+The server is full.						The server is full.
+You are using an outdated client, please update Muon.		You are using an outdated client, please update Muon.
 
 ### Lobby
 Players			Players

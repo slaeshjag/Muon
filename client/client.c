@@ -39,6 +39,8 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		game_state(GAME_STATE_MENU);
 		sock=darnitSocketClose(socket);
 		player_id=0;
+		if(serverIsRunning())
+			serverStop();
 	} else
 		game_state(GAME_STATE_LOBBY);
 }
@@ -69,17 +71,22 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 		darnitSocketSend(sock, payload, arg_2);
 }
 
-void client_check_incomming() {
+void client_check_incoming() {
 	int s, i;
-	unsigned int chunk_got=0, chunk_size;
+	unsigned int chunk_got=0, chunk_size, chunk_time;
 	if((s=darnitSocketRecvTry(sock, &chunk_size, 4))<4) {
 		if(s==-1)
 			client_connect_callback(-1, NULL, sock);
 		return;
 	}
 	chunk_size=darnitUtilNtohl(chunk_size)-4;
+	chunk_time=darnitTimeGet();
 	
 	while(chunk_got<chunk_size) {
+		if(darnitTimeGet()-chunk_time>CLIENT_TIMEOUT) {
+			client_connect_callback(-1, NULL, sock);
+			return;
+		}
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
 			//printf("payload size %i\n", msg_recv.arg_2);
@@ -134,7 +141,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_KICKED:
-			client_disconnect();
+			client_disconnect(msg->command);
 			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
@@ -165,7 +172,11 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 				}
 				//printf("cancel build queue!\n");
 				game_reset_building_progress();
+				game_set_building_ready(BUILDING_NONE);
 			}
+			break;
+		case MSG_RECV_UNIT_READY:
+			game_set_building_ready(msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_PROGRESS:
 			game_set_building_progress(0, msg->arg_2);
@@ -180,13 +191,14 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 }
 
 void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
+	//TODO: merge with client_download_map as lobby handler
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_KICKED:
 		case MSG_RECV_NAME_IN_USE:
 		case MSG_RECV_SERVER_FULL:
 		case MSG_RECV_BAD_CLIENT:
-			client_disconnect();
+			client_disconnect(msg->command);
 			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
@@ -197,7 +209,6 @@ void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_GAME_START:
 			chat_countdown(msg->arg_1);
 			if(!msg->arg_1) {
-				lobby_close();
 				game_state(GAME_STATE_GAME);
 				client_message_handler=client_game_handler;
 			}
@@ -215,7 +226,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_NAME_IN_USE:
 		case MSG_RECV_SERVER_FULL:
 		case MSG_RECV_BAD_CLIENT:
-			client_disconnect();
+			client_disconnect(msg->command);
 			break;
 		case MSG_RECV_PLAYER_READY:
 			if(msg->arg_2==100) {
@@ -310,7 +321,21 @@ int client_init(char *host, int port) {
 	return 0;
 }
 
-void client_disconnect() {
+void client_disconnect(int cause) {
+	switch(cause) {
+		case MSG_RECV_KICKED:
+			ui_messagebox(font_std, T("You were kicked from the server!"));
+			break;
+		case MSG_RECV_NAME_IN_USE:
+			ui_messagebox(font_std, T("Your name is already in use, please change it in the settings."));
+			break;
+		case MSG_RECV_SERVER_FULL:
+			ui_messagebox(font_std, T("The server is full."));
+			break;
+		case MSG_RECV_BAD_CLIENT:
+			ui_messagebox(font_std, T("You are using an outdated client, please update Muon."));
+			break;
+	}
 	client_connect_callback(-1, NULL, sock);
 	sock=NULL;
 }

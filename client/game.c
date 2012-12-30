@@ -24,6 +24,7 @@
 #include "map.h"
 #include "chat.h"
 #include "game.h"
+#include "intmath.h"
 
 void game_view_init() {
 	building_place=-1;
@@ -69,45 +70,50 @@ void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EV
 	map_minimap_update_viewport();
 }
 
+/* building_ready values:
+ *  - negative if a building is in progress
+ *  - positive if a building is ready
+ *  - zero (BUILDING_NONE) if no building is ready */
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
+	int i=0;
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
-	int i, do_build=-1;
-	UI_PROPERTY_VALUE wv=widget->get_prop(widget, UI_BUTTON_PROP_CHILD);
-	UI_PROPERTY_VALUE pv=game_sidebar_progress_build->get_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS);
-	for(i=0; i<5; i++) {
-		if(widget==game_sidebar_button_build[i]&&wv.p!=game_sidebar_progress_build) {
-			do_build=i; //just make sure to cancel all other buildings first
-		} else if(widget==game_sidebar_button_build[i]&&pv.i==100) {
-			building_place=i;
-		} else {
-			UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
-			game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
-			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
+	// Find the building number.
+	for(; widget!=game_sidebar_button_build[i]; i++);
+	if(!building_cancel) {
+		if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
+			building_place=building_ready;
+		} else if(building_ready==BUILDING_NONE) { // Build if no there are no buildings in progress nor other buildings ready.
+			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_START, NULL);
+			v.p=game_sidebar_progress_build;
+			widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
+			game_set_building_progress(0, 0);
+			game_set_building_ready(-(BUILDING_SCOUT+i));
 		}
-	}
-	if(do_build!=-1) {
-		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+do_build, MSG_BUILDING_START, NULL);
-		UI_PROPERTY_VALUE v={.p=game_sidebar_progress_build};
+	} else if(ABS(building_ready)==BUILDING_SCOUT+i) {	// Cancel if the building is is in progress or ready and shift is pressed
+		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
+		v.p=game_sidebar_label_build[i];
 		widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
-		v.i=0;
-		game_sidebar_progress_build->set_prop(game_sidebar_progress_build, UI_PROGRESSBAR_PROP_PROGRESS, v);
+		game_set_building_progress(0, 0);
+		game_set_building_ready(BUILDING_NONE); // No buildings in progress
 	}
 	ui_selected_widget=NULL;
 }
 
-void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) { 
+void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//TODO: keysyms of number keys might not be sequential on all platforms
 	if(type!=UI_EVENT_TYPE_KEYBOARD_PRESS)
 		return;
-	if(e->keyboard->character>='1'&&e->keyboard->character<='5') {
-		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->character-0x31], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
+	if(e->keyboard->keysym>=KEY(1)&&e->keyboard->keysym<=KEY(5)) {
+		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->keysym-KEY(1)], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
 	}
 }
 
 void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
-	//darnit buttons have no press or release events, we have to handle this ourself
+	//darnit buttons have no press or release events, we have to handle this ourselves
 	static UI_EVENT_BUTTONS prevbuttons={0};
 	
 	//View movement
@@ -144,6 +150,9 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		}
 	}
 	
+	// If shift is pressed (button Y) set building_cancel
+	building_cancel = e->buttons->y;
+	
 	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));
 }
 
@@ -177,7 +186,7 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		if(map_offset<0||map_offset>map->layer->tilemap->w*map->layer->tilemap->h)
 			return;
 		if(building_place>-1) {
-			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_SCOUT+building_place, map_offset, NULL);
+			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, building_place, map_offset, NULL);
 			building_place=-1;
 		} else {
 			//status selected clicked building, etc
@@ -213,6 +222,10 @@ void game_reset_building_progress() {
 		UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 		game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 	}
+}
+
+void game_set_building_ready(int building) {
+	building_ready = building;
 }
 
 void game_attacklist_lines_recalculate() {
@@ -323,7 +336,7 @@ void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
 		darnitRenderOffset(map->cam_x, map->cam_y);
 		darnitRenderBlendingEnable();
-		darnitRenderTileBlit(l->ts, player_id*8+building_place+BUILDING_SCOUT+7, x, y);
+		darnitRenderTileBlit(l->ts, player_id*8+building_place+7, x, y);
 		darnitRenderBlendingDisable();
 		darnitRenderOffset(0, 0);
 	}

@@ -34,7 +34,7 @@ void view_init() {
 	mouse_tilesheet=darnitRenderTilesheetLoad("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	
 	//Menu background
-	int scale=config.plasma==0?2:(1<<(5-config.plasma));
+	int scale=config.plasma==0?1:(1<<(5-config.plasma));
 	view_background_w=platform.screen_w/scale;
 	view_background_h=platform.screen_h/scale;
 	view_background_ts=darnitRenderTilesheetNew(1, 1, view_background_w, view_background_h, DARNIT_PFORMAT_RGB5A1);

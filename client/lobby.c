@@ -61,13 +61,17 @@ void lobby_init() {
 	v.i=0;
 	lobby_download_progress->set_prop(lobby_download_progress, UI_PROGRESSBAR_PROP_PROGRESS, v);
 	
-	//Map preview
-	panelist_lobby_map.pane=ui_pane_create(platform.screen_w-128-16, 16, 128, 152, NULL);
-	lobby_map_imageview=ui_widget_create_imageview_raw(128-2*UI_PADDING, 128-2*UI_PADDING, DARNIT_PFORMAT_RGB5A1);
+	//Sidebar with map preview
+	panelist_lobby_map.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
+	lobby_map_imageview=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-2*UI_PADDING, SIDEBAR_WIDTH-2*UI_PADDING, DARNIT_PFORMAT_RGB5A1);
 	lobby_map_label=ui_widget_create_label(font_std, T("Map"));
+	lobby_map_button_back=ui_widget_create_button_text(font_std, T("Back"));
+	lobby_map_button_back->event_handler->add(lobby_map_button_back, lobby_map_button_back_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ui_pane_set_root_widget(panelist_lobby_map.pane, ui_widget_create_vbox());
-	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_label, 1);
+	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_label, 0);
 	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_imageview, 0);
+	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, ui_widget_create_spacer(), 1);
+	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_button_back, 0);
 	
 	//panelist_lobby.next=&panelist_lobby_ready;
 	/*panelist_lobby_ready.pane=ui_pane_create(16, 16, 64, 32, NULL);
@@ -80,6 +84,7 @@ void lobby_init() {
 void lobby_open() {
 	int i;
 	UI_PROPERTY_VALUE v={.i=0};
+	lobby_players_slider_team->set_prop(lobby_players_slider_team, UI_SLIDER_PROP_VALUE, v);
 	lobby_players_checkbox_ready->set_prop(lobby_players_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
 	lobby_players_checkbox_ready->enabled=0;
 	ui_listbox_clear(lobby_players_listbox);
@@ -91,12 +96,6 @@ void lobby_open() {
 	
 	v=lobby_map_imageview->get_prop(lobby_map_imageview, UI_IMAGEVIEW_PROP_TILESHEET);
 	map_minimap_clear(v.p, lobby_map_imageview->w, lobby_map_imageview->h);
-}
-
-void lobby_close() {
-	UI_PROPERTY_VALUE v={.i=0};
-	lobby_players_checkbox_ready->set_prop(lobby_players_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
-	//lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 }
 
 void lobby_map_preview_generate() {
@@ -164,6 +163,10 @@ void lobby_players_checkbox_ready_toggle(UI_WIDGET *widget, unsigned int type, U
 	UI_PROPERTY_VALUE v;
 	v=widget->get_prop(widget, UI_CHECKBOX_PROP_ACTIVATED);
 	client_message_send(player_id, MSG_SEND_READY, v.i, 100, NULL);
+}
+
+void lobby_map_button_back_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	client_disconnect(-1);
 }
 
 void lobby_set_map_progress(int progress) {

@@ -21,6 +21,9 @@
 #define INTMATH_H
 
 #define cosine(x) (sine((x)+90))
+#define ABS(x) ((x)>0?(x):-(x))
+
+
 
 int sinetable[360];
 

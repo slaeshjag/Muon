@@ -121,12 +121,16 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	map=ui_listbox_get(multiplayer_host_listbox_maps, v.i);
 	sprintf(buf, "%s/%s", mapdir, map);
 	serverStop();
-	if(!serverStart(buf, players, port, speed))
+	if(!serverStart(buf, players, port, speed)) {
+		ui_messagebox(font_std, T("There was a problem starting the server; the port may already be in use. Try waiting for a while or change port."));
 		return;
+	}
 	if(client_init("localhost", port)==0)
 		game_state(GAME_STATE_CONNECTING);
-	else
+	else {
+		ui_messagebox(font_std, T("Unable to connect to server."));
 		serverStop();
+	}
 }
 
 void multiplayer_join_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -145,5 +149,5 @@ void multiplayer_join_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 void multiplayer_connecting_button_cancel_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
 		return;
-	client_disconnect();
+	client_disconnect(-1);
 }
