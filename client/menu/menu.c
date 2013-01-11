@@ -77,9 +77,9 @@ void menu_init() {
 
 //Main menu
 void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
-	if(widget==menu_sidebar_button[1]) {
+	if(widget==menu_sidebar_button[0]) {
+		ui_messagebox(font_std, T("Singleplayer is not yet availble."));
+	} else if(widget==menu_sidebar_button[1]) {
 		panelist_menu_sidebar.next=&panelist_multiplayer_host;
 		ui_selected_widget=multiplayer_join_entry_host;
 		ui_selected_widget=NULL;
@@ -94,9 +94,10 @@ void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e
 }
 
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
-	game_state(GAME_STATE_QUIT);
+	if(panelist_menu_sidebar.next)
+		panelist_menu_sidebar.next=NULL;
+	else
+		game_state(GAME_STATE_QUIT);
 }
 
 //In-game menu
