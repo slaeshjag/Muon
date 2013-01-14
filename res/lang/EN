@@ -49,6 +49,12 @@ Ready			Ready
 Downloading map		Downloading map
 Map			Map
 
+### Chat
+joined			joined
+disconnected		disconnected
+defeated		defeated
+Game starts in		Game starts in
+
 ### In-game
 Buildings:		Buildings:
 Scout			Scout

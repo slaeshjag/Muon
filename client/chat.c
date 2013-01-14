@@ -165,7 +165,7 @@ void chat_join(int player_id) {
 	char *chatmsg;
 	if(!(chatmsg=malloc(64)))
 		return;
-	sprintf(chatmsg, " * %s joined", player[player_id].name);
+	sprintf(chatmsg, " * %s %s", player[player_id].name, T("joined"));
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
@@ -175,7 +175,7 @@ void chat_leave(int player_id) {
 	char *chatmsg;
 	if(!(chatmsg=malloc(64)))
 		return;
-	sprintf(chatmsg, " * %s disconnected", player[player_id].name);
+	sprintf(chatmsg, " * %s %s", player[player_id].name, T("disconnected"));
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
@@ -185,7 +185,7 @@ void chat_defeated(int player_id) {
 	char *chatmsg;
 	if(!(chatmsg=malloc(64)))
 		return;
-	sprintf(chatmsg, " * %s defeated", player[player_id].name);
+	sprintf(chatmsg, " * %s %s", player[player_id].name, T("defeated"));
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
@@ -195,7 +195,7 @@ void chat_countdown(int countdown) {
 	char *chatmsg;
 	if(!(chatmsg=malloc(32)))
 		return;
-	sprintf(chatmsg, " * Game starts in %i", countdown);
+	sprintf(chatmsg, " * %s %i", T("Game starts in"), countdown);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);

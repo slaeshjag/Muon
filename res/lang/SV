@@ -49,6 +49,12 @@ Ready			Redo
 Downloading map		Laddar ner karta
 Map			Karta
 
+### Chat
+joined			anslöt
+disconnected		kopplade från
+defeated		utslagen
+Game starts in		Spelet startar om
+
 ### In-game
 Buildings:		Byggnader:
 Scout			Utkikstorn
