@@ -34,7 +34,7 @@ void map_init(char *filename) {
 	powergrid=NULL;
 	powergrid_lines=0;
 	
-	home_x=home_y=0;
+	home_x=home_y=-1;
 	
 	map_selected.border=darnitRenderLineAlloc(4, 1);
 	map_selected.index=-1;
@@ -176,6 +176,10 @@ void map_building_clear() {
 	unsigned int i;
 	for(i=0; i<building_tilemap->w*building_tilemap->h; i++)
 		building_tilemap->data[i]&=~0xFFF;
+}
+
+int map_isset_home() {
+	return !(home_x==-1&&home_y==-1);
 }
 
 void map_set_home(int index) {

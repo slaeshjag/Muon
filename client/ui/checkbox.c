@@ -146,7 +146,6 @@ void ui_checkbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	darnitRenderLineMove(p->border, 1, x+w/2-4, y+h/2+4, x+w/2+4, y+h/2+4);
 	darnitRenderLineMove(p->border, 2, x+w/2-4, y+h/2-4, x+w/2-4, y+h/2+4);
 	darnitRenderLineMove(p->border, 3, x+w/2+4, y+h/2-4, x+w/2+4, y+h/2+4);
-
 	
 	darnitRenderLineMove(p->active_border, 0, x+w/2-4, y+h/2-4, x+w/2+4, y+h/2+4);
 	darnitRenderLineMove(p->active_border, 1, x+w/2+4, y+h/2-4, x+w/2-4, y+h/2+4);
