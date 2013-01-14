@@ -22,11 +22,9 @@
 #include "client.h"
 #include "game.h"
 #include "map.h"
+#include "intmath.h"
 
 #define MAP_INDEX(x, y) ((y)*toplayer_tilemap->w+(x))
-
-#define MIN(a, b) ((a)<(b)?(a):(b))
-#define MAX(a, b) ((a)>(b)?(a):(b))
 
 void map_init(char *filename) {
 	unsigned int i, j;
@@ -129,7 +127,6 @@ void map_calculate_powergrid() {
 	DARNIT_MAP_LAYER *toplayer=&map->layer[map->layers-1];
 	DARNIT_TILEMAP *toplayer_tilemap=map->layer[map->layers-1].tilemap;
 	unsigned int *toplayer_data=map->layer[map->layers-1].tilemap->data;
-	//DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
 	
 	int tile_w=toplayer->tile_w;
 	int tile_h=toplayer->tile_h;

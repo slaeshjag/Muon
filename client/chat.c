@@ -29,17 +29,17 @@ void chat_init() {
 	panelist_chat.pane=ui_pane_create(16, platform.screen_h-256-16, 200, 256, NULL);
 	panelist_chat.next=NULL;
 	ui_pane_set_root_widget(panelist_chat.pane, ui_widget_create_vbox());
-	ui_vbox_add_child(panelist_chat.pane->root_widget, ui_widget_create_label(font_std, "Chat"), 0);
+	ui_vbox_add_child(panelist_chat.pane->root_widget, ui_widget_create_label(font_std, T("Chat")), 0);
 	chat_listbox=ui_widget_create_listbox(font_std);
 	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_listbox, 1);
 	chat_hbox=ui_widget_create_hbox();
-	chat_button_send=ui_widget_create_button_text(font_std, "Send");
+	chat_button_send=ui_widget_create_button_text(font_std, T("Send"));
 	chat_entry=ui_widget_create_entry(font_std);
 	ui_hbox_add_child(chat_hbox, chat_entry, 1);
 	ui_hbox_add_child(chat_hbox, chat_button_send, 0);
 	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_hbox, 0);
-	chat_button_send->event_handler->add(chat_button_send, chat_button_send_click, UI_EVENT_TYPE_UI);
-	chat_entry->event_handler->add(chat_entry, chat_button_send_click, UI_EVENT_TYPE_KEYBOARD);
+	chat_button_send->event_handler->add(chat_button_send, chat_button_send_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	chat_entry->event_handler->add(chat_entry, chat_button_send_click, UI_EVENT_TYPE_KEYBOARD_PRESS);
 	
 	panelist_chat_indicator.pane=ui_pane_create(0, platform.screen_h-(32+UI_PADDING*2), 32+UI_PADDING*2, 32+UI_PADDING*2, NULL);
 	panelist_chat_indicator.next=NULL;
@@ -128,15 +128,12 @@ void chat_indicator_hide(struct UI_PANE_LIST *panelist) {
 }
 
 void chat_indicator_image_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(!e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT)
-		return;
-	
 	chat_indicator_hide(&panelist_game_sidebar);
 	chat_show(&panelist_game_sidebar);
 }
 
 void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(!(type==UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym==KEY(RETURN))))
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
 		return;
 	UI_PROPERTY_VALUE v;
 	v=chat_entry->get_prop(chat_entry, UI_ENTRY_PROP_TEXT);

@@ -96,8 +96,6 @@ void menu_settings_init() {
 }
 
 void settings_game_button_ok_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(!(type==UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym==KEY(RETURN))))
-		return;
 	UI_PROPERTY_VALUE v;
 	v=settings_game_entry_name->get_prop(settings_game_entry_name, UI_ENTRY_PROP_TEXT);
 	if(!strlen(v.p))

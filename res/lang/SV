@@ -50,6 +50,8 @@ Downloading map		Laddar ner karta
 Map			Karta
 
 ### Chat
+Chat			Chatt
+Send			Skicka
 joined			anslöt
 disconnected		kopplade från
 defeated		utslagen
@@ -59,7 +61,7 @@ Game starts in		Spelet startar om
 Buildings:		Byggnader:
 Scout			Utkikstorn
 Attacker		Attackerare
-Pylon			Pylon
+Pylon			Kraftledning
 Wall			Mur
 Build site		Byggplats
 
