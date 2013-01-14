@@ -21,7 +21,18 @@
 
 
 int controlpointClusterbombInit(SERVER_UNIT *unit) {
-	unit->next = NULL;
+	CONTROLPOINT_EXTRA *new;
+
+	if (!(new = malloc(sizeof(CONTROLPOINT_EXTRA))))
+		return -1;
+	new->next = (struct CONTROLPOINT_EXTRA *) server->controlpoint;
+	server->controlpoint = new;
+
+	new->type = unit->type;
+	new->delay = CP_CLUSTERBOMB_DELAY;
+	new->left = new->delay;
+	new->index = unit->x + unit->y * server->w;
+	new->owner = unit->owner;
 
 	return 0;
 }
@@ -39,6 +50,7 @@ int controlpointInit(struct SERVER_UNIT *unit) {
 
 	if ((server->map_c.tile_data[unit->x + unit->y * server->w] & 0xFFF) != UNIT_BUILDSITE)
 		return -1;
+	server->controlpoint = NULL;
 
 	switch (unit->type) {
 		case UNIT_DEF_BUILDSITE:
@@ -61,5 +73,16 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 	server->player[unit->owner].buildspots--;
 	server->player[unit->owner].buildspeed = logf(M_E + server->player[unit->owner].buildspots);
 	
+	return;
+}
+
+
+void controlpointLoop() {
+	CONTROLPOINT_EXTRA *next;
+
+	for (next = server->controlpoint; next; next = (CONTROLPOINT_EXTRA *) next->next) {
+		/* TODO: Implement */
+	}
+
 	return;
 }

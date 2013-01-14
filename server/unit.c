@@ -93,7 +93,7 @@ void unitPylonPulseClimb(UNIT_PYLON *pylon) {
 	
 	for (i = 0; i < pylon->neighbours; i++)
 		if (pylon->neighbour[i])
-			unitPylonPulseClimb(pylon->neighbour[i]);;
+			unitPylonPulseClimb(pylon->neighbour[i]);
 
 	return;
 }
@@ -677,7 +677,7 @@ void unitLoop(int msec) {
 		}
 		
 		if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && next->target > -1) {
-			if (!server->map[next->target])
+			if ((!server->player[next->owner].map[next->target].fog) || (!server->map[next->target]))
 				next->target = -1;
 			else {
 				unitDamageDo(index, unit_damage[next->type], msec);

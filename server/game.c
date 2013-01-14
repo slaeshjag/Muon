@@ -80,7 +80,13 @@ void gameSpawn() {
 					continue;
 				if (building >= UNITS_DEFINED)
 					continue;
-	
+				
+				if (building == UNIT_DEF_GENERATOR) {
+					server->player[j].spawn.x = i % server->w;
+					server->player[j].spawn.y = i / server->w;
+					server->player[j].spawn.index = i;
+				}
+
 				unitSpawn(j, building, i % server->w, i / server->w);
 			}
 	
