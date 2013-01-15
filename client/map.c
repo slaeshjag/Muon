@@ -243,10 +243,12 @@ void map_select_building(int index) {
 	if(selected_building&&building[selected_building].range) {
 		map_selected.circle=darnitRenderCircleAlloc(32, 1);
 		int w=map->layer[map->layers-2].tilemap->w;
-		int h=map->layer[map->layers-2].tilemap->h;
+		//int h=map->layer[map->layers-2].tilemap->h;
+		int tile_w=map->layer[map->layers-2].tile_w;
+		int tile_h=map->layer[map->layers-2].tile_h;
 		int x=index%w;
 		int y=index/w;
-		darnitRenderCircleMove(map_selected.circle, x*w+w/2, y*h+h/2, building[selected_building].range*map->layer[map->layers-2].tile_w);
+		darnitRenderCircleMove(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
 	} else
 		map_selected.circle=NULL;
 }
