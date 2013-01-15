@@ -50,6 +50,10 @@ void game_state(GAME_STATE state) {
 		case GAME_STATE_GAME_MENU:
 		case GAME_STATE_MENU:
 			ui_event_global_remove(menu_buttons, UI_EVENT_TYPE_BUTTONS);
+		case GAME_STATE_CONNECTING:
+		case GAME_STATE_LOBBY:
+		case GAME_STATE_QUIT:
+			break;
 	}
 	//Game state constructors
 	switch(state) {

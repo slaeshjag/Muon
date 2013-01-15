@@ -76,6 +76,7 @@ void map_close(DARNIT_MAP *map) {
 		return;
 	int i;
 	map_selected.border=darnitRenderLineFree(map_selected.border);
+	map_selected.circle=darnitRenderCircleFree(map_sele.circle);
 	powergrid=darnitRenderLineFree(powergrid);
 	minimap_viewport=darnitRenderLineFree(minimap_viewport);
 	map=darnitMapUnload(map);
@@ -223,6 +224,7 @@ void map_set_tile_attributes(int index, int attrib) {
 			break;
 		case MSG_TILE_ATTRIB_FOW_SET:
 			map->layer[map->layers-1].tilemap->data[index]=(map->layer[map->layers-1].tilemap->data[index]&~0xFFF)|0x1;
+			game_attacklist_untarget(index);
 			break;
 		case MSG_TILE_ATTRIB_POWER_CLEAR:
 			map->layer[map->layers-1].tilemap->data[index]&=~0x1000000;
@@ -250,7 +252,7 @@ void map_select_building(int index) {
 		int y=index/w;
 		darnitRenderCircleMove(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
 	} else
-		map_selected.circle=NULL;
+		map_selected.circle=darnitRenderCircleFree(map_sele.circle);
 }
 
 void map_select_nothing() {
