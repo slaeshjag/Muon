@@ -114,6 +114,7 @@ int main() {
 	
 	if(serverIsRunning())
 		serverStop();
-	
+		
+	darnitQuit();	
 	return 0;
 }

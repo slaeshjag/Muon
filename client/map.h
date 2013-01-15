@@ -54,6 +54,7 @@ static const unsigned int minimap_colors[]={
 
 struct MAP_SELECTED {
 	DARNIT_LINE *border;
+	DARNIT_CIRCLE *circle;
 	int index;
 	int building;
 } map_selected;

@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Muon.  If not, see <http://www.gnu.map_selected.circleorg/licenses/>.
  */
 
 #include "muon.h"
@@ -37,6 +37,7 @@ void map_init(char *filename) {
 	map_selected.border=darnitRenderLineAlloc(4, 1);
 	map_selected.index=-1;
 	map_selected.building=0;
+	map_selected.circle=NULL;
 	
 	map_grid_chunk=NULL;
 	map_grid_chunks=0;
@@ -239,6 +240,15 @@ void map_select_building(int index) {
 	if(selected_building<0||selected_building>7)
 		selected_building=0;
 	map_selected.building=selected_building;
+	if(selected_building&&building[selected_building].range) {
+		map_selected.circle=darnitRenderCircleAlloc(32, 1);
+		int w=map->layer[map->layers-2].tilemap->w;
+		int h=map->layer[map->layers-2].tilemap->h;
+		int x=index%w;
+		int y=index/w;
+		darnitRenderCircleMove(map_selected.circle, x*w+w/2, y*h+h/2, building[selected_building].range*map->layer[map->layers-2].tile_w);
+	} else
+		map_selected.circle=NULL;
 }
 
 void map_select_nothing() {
@@ -263,6 +273,7 @@ void map_clear_fow() {
 	for(i=0; i<w*h; i++) {
 		d[i]&=~0xFFF;
 	}
+	darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
 }
 
 void map_draw(int draw_powergrid) {
@@ -292,6 +303,8 @@ void map_draw(int draw_powergrid) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
 		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
+		if(map_selected.circle)
+			darnitRenderCircleDraw(map_selected.circle);
 		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
 		darnitRenderLineDraw(map_selected.border, 4);
 		darnitRenderTint(1, 1, 1, 1);

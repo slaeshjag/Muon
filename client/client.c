@@ -293,6 +293,9 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			player[msg->player_id].team=msg->arg_1;
 			lobby_update_player(msg->player_id);
 			break;
+		case MSG_RECV_UNIT_RANGE:
+			building[msg->arg_1].range=msg->arg_2;
+			break;
 	}
 }
 
