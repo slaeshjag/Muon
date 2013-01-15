@@ -35,7 +35,7 @@ void menu_settings_init() {
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, ui_widget_create_label(font_std, T("Player name")), 1);
 	settings_game_entry_name=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_entry_name, 0);
-	settings_game_entry_name->event_handler->add(settings_game_entry_name, settings_game_button_ok_click, UI_EVENT_TYPE_KEYBOARD);
+	settings_game_entry_name->event_handler->add(settings_game_entry_name, settings_game_button_ok_click, UI_EVENT_TYPE_KEYBOARD_PRESS);
 	v.p=config.player_name;
 	settings_game_entry_name->set_prop(settings_game_entry_name, UI_ENTRY_PROP_TEXT, v);
 	settings_game_button_ok=ui_widget_create_button_text(font_std, T("OK"));
@@ -96,6 +96,8 @@ void menu_settings_init() {
 }
 
 void settings_game_button_ok_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
+		return;
 	UI_PROPERTY_VALUE v;
 	v=settings_game_entry_name->get_prop(settings_game_entry_name, UI_ENTRY_PROP_TEXT);
 	if(!strlen(v.p))

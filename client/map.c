@@ -184,6 +184,11 @@ void map_set_home(int index) {
 	home_x=index%map->layer[map->layers-2].tilemap->w;
 }
 
+int map_get_home() {
+	DARNIT_TILEMAP *toplayer_tilemap=map->layer[map->layers-1].tilemap;
+	return map_isset_home()?MAP_INDEX(home_x, home_y):-1;
+}
+
 int map_get_building_health(int index) {
 	unsigned int health=(map->layer[map->layers-2].tilemap->data[index]>>18)&0x7F;
 	return health>100?100:health;

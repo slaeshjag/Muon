@@ -65,7 +65,7 @@ void menu_multiplayer_init() {
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_entry_host, 0);
 	multiplayer_join_entry_port=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_entry_port, 0);
-	multiplayer_join_entry_host->event_handler->add(multiplayer_join_entry_host, multiplayer_join_button_click, UI_EVENT_TYPE_KEYBOARD);
+	multiplayer_join_entry_host->event_handler->add(multiplayer_join_entry_host, multiplayer_join_button_click, UI_EVENT_TYPE_KEYBOARD_PRESS);
 	multiplayer_join_button=ui_widget_create_button_text(font_std, T("Join"));
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, multiplayer_join_button, 0);
 	multiplayer_join_button->event_handler->add(multiplayer_join_button, multiplayer_join_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
@@ -134,6 +134,8 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 }
 
 void multiplayer_join_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
+		return;
 	UI_PROPERTY_VALUE v;
 	v=multiplayer_join_entry_host->get_prop(multiplayer_join_entry_host, UI_ENTRY_PROP_TEXT);
 	char *host=v.p;
