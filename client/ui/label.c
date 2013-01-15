@@ -100,7 +100,7 @@ void ui_label_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 
 void ui_label_request_size(UI_WIDGET *widget, int *w, int *h) {
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
-	int ww=((w==NULL)||(*w==-1))?darnitFontGetStringWidthPixels(p->font, p->text):*w;
+	int ww=((w==NULL)||(*w==-1))?darnitFontGetStringWidthPixels(p->font, p->text)+UI_PADDING:*w;
 	if(ww==0||*h==0)
 		return;
 	
