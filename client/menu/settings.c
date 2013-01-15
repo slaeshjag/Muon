@@ -29,7 +29,7 @@ void menu_settings_init() {
 	UI_PROPERTY_VALUE v={.p=NULL};
 	
 	//Gameplay settings
-	panelist_settings_game.pane=ui_pane_create(16, 32+320, 256, 128, NULL);
+	panelist_settings_game.pane=ui_pane_create(16, 32+300, 256, 128, NULL);
 	ui_pane_set_root_widget(panelist_settings_game.pane, ui_widget_create_vbox());
 	panelist_settings_game.next=NULL;
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, ui_widget_create_label(font_std, T("Player name")), 1);
@@ -60,7 +60,7 @@ void menu_settings_init() {
 	settings_game_button_ok->event_handler->add(settings_game_button_ok, settings_game_button_ok_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	//Monitor settings
-	panelist_settings_monitor.pane=ui_pane_create(16, 16, 320, 320, NULL);
+	panelist_settings_monitor.pane=ui_pane_create(16, 16, 320, 300, NULL);
 	panelist_settings_monitor.next=&panelist_settings_game;
 	ui_pane_set_root_widget(panelist_settings_monitor.pane, ui_widget_create_hbox());
 	settings_monitor_listbox_modes=ui_widget_create_listbox(font_std);

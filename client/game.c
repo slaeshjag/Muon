@@ -113,7 +113,6 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	//darnit buttons have no press or release events, we have to handle this ourselves
-	static UI_EVENT_BUTTONS prevbuttons={0};
 	
 	//View movement
 	if(!chat_is_visible(&panelist_game_sidebar)) {

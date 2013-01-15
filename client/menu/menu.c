@@ -97,6 +97,13 @@ void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 	game_state(GAME_STATE_QUIT);
 }
 
+void menu_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(e->buttons->start&&!prevbuttons.start)
+		game_state(gamestate==GAME_STATE_MENU?GAME_STATE_QUIT:GAME_STATE_GAME);
+	
+	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));
+}
+
 //In-game menu
 void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(widget==game_menu_button[0]) {
