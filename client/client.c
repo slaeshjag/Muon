@@ -41,7 +41,7 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		player_id=0;
 		if(serverIsRunning())
 			serverStop();
-		map_close(map);
+		map_close();
 	} else
 		game_state(GAME_STATE_LOBBY);
 }
@@ -115,7 +115,7 @@ void client_check_incoming() {
 				return;
 			}
 			client_message_convert_recv(&msg_recv);
-			//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
+			//printf("message: 0x%x (%i, %i) to player %i\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2, msg_recv.player_id);
 			if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
 				client_message_handler(&msg_recv, NULL);
 		}
@@ -254,7 +254,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
 				break;
-			map_close(map);
+			map_close();
 			if(filename) {
 				darnitFSUnmount(filename);
 				free(filename);

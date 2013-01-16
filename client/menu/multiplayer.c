@@ -108,7 +108,7 @@ void menu_multiplayer_host_maps_reload() {
 void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	UI_PROPERTY_VALUE v;
 	int port, players, speed;
-	char *map, buf[256];
+	char buf[256];
 	v=multiplayer_host_entry_port->get_prop(multiplayer_host_entry_port, UI_ENTRY_PROP_TEXT);
 	port=atoi(v.p);
 	v=multiplayer_host_slider_players->get_prop(multiplayer_host_slider_players, UI_SLIDER_PROP_VALUE);
@@ -118,8 +118,7 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	v=multiplayer_host_listbox_maps->get_prop(multiplayer_host_listbox_maps, UI_LISTBOX_PROP_SELECTED);
 	if(v.i==-1)
 		return;
-	map=ui_listbox_get(multiplayer_host_listbox_maps, v.i);
-	sprintf(buf, "%s/%s", mapdir, map);
+	sprintf(buf, "%s/%s", mapdir, ui_listbox_get(multiplayer_host_listbox_maps, v.i));
 	serverStop();
 	if(!serverStart(buf, players, port, speed)) {
 		ui_messagebox(font_std, T("There was a problem starting the server; the port may already be in use. Try waiting for a while or change port."));

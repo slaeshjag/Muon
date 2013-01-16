@@ -60,7 +60,7 @@ struct MAP_SELECTED {
 } map_selected;
 
 void map_init(char *filename);
-void map_close(DARNIT_MAP *map);
+void map_close(/*DARNIT_MAP *map*/);
 void map_update_grid();
 void map_calculate_powergrid();
 void map_building_place(int index, int player, int building);

@@ -71,7 +71,7 @@ void map_init(char *filename) {
 	map_update_grid();
 }
 
-void map_close(DARNIT_MAP *map) {
+void map_close(/*DARNIT_MAP *map*/) {
 	if(!map)
 		return;
 	int i;
