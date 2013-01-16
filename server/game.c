@@ -139,7 +139,9 @@ int gameWorldTransfer(unsigned int player) {
 		if (server->map_c.tile_data[i] & 0x40000)
 			messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, (server->map_c.tile_data[i] & 0x20000) ? 0x11 : 0x10, i, NULL);
 		if (!server->map[i]) {
-			if (server->map_c.tile_data[i] & 0x60000)
+			if ((server->map_c.tile_data[i] & 0xFFF) == UNIT_DEF_BUILDSITE)
+				unitAnnounce(player, player, UNIT_DEF_BUILDSITE_FREE, i);
+			else if (server->map_c.tile_data[i] & 0x60000)
 				unitAnnounce(player, player, 0, i);
 		}
 
