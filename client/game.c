@@ -351,7 +351,7 @@ void game_attacklist_target(int index, int target) {
 	struct GAME_ATTACKLIST *l;
 	for(l=game_attacklist; l; l=l->next) {
 		if(l->index==index) {
-			l->target=target==-1?index:target;
+			l->target=target;
 			game_attacklist_lines_recalculate();
 			break;
 		}
