@@ -7,3 +7,4 @@ all:
 
 clean:
 	@$(RM) *.ldi
+	@$(RM) lang.stz

@@ -54,6 +54,7 @@ static const unsigned int minimap_colors[]={
 
 struct MAP_SELECTED {
 	DARNIT_LINE *border;
+	DARNIT_CIRCLE *circle;
 	int index;
 	int building;
 } map_selected;
@@ -64,7 +65,9 @@ void map_update_grid();
 void map_calculate_powergrid();
 void map_building_place(int index, int player, int building);
 void map_building_clear();
+int map_isset_home();
 void map_set_home(int index);
+int map_get_home();
 int map_get_building_health(int index);
 int map_get_building_shield(int index);
 void map_set_building_health(int index, unsigned int health);

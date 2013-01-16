@@ -166,7 +166,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			map_building_place(msg->arg_2, msg->player_id, msg->arg_1);
 			recalc_map|=1<<(map->layers-2);
 			if(msg->player_id==player_id&&msg->arg_1) {
-				if(msg->arg_1==BUILDING_GENERATOR) {
+				if(msg->arg_1==BUILDING_GENERATOR&&!map_isset_home()) {
 					map_set_home(msg->arg_2);
 					game_view_scroll_to(home_x, home_y);
 				}
@@ -292,6 +292,9 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_PLAYER_INFO:
 			player[msg->player_id].team=msg->arg_1;
 			lobby_update_player(msg->player_id);
+			break;
+		case MSG_RECV_UNIT_RANGE:
+			building[msg->arg_1].range=msg->arg_2;
 			break;
 	}
 }

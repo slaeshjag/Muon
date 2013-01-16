@@ -36,11 +36,16 @@ int building_place;
 int building_ready;
 int building_cancel;
 
+struct BUILDING {
+	int range;
+} building[16];
+
 struct GAME_ATTACKLIST {
 	int index;
 	int target;
 	struct GAME_ATTACKLIST *next;
 } *game_attacklist;
+
 int game_attacklist_length;
 DARNIT_LINE *game_attacklist_lines;
 unsigned int game_attacklist_blink_semaphore;

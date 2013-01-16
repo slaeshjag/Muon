@@ -38,7 +38,8 @@ void game_view_init() {
 	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
 	game_sidebar_minimap->render=map_minimap_render;
 	game_sidebar_minimap->event_handler->add(game_sidebar_minimap, game_sidebar_minimap_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
+	if(!(platform.platform&DARNIT_PLATFORM_PANDORA))
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Buildings:")), 0);
 	game_sidebar_label_build[0]=ui_widget_create_label(font_std, T("Scout"));
 	game_sidebar_label_build[1]=ui_widget_create_label(font_std, T("Attacker"));
@@ -49,7 +50,7 @@ void game_view_init() {
 	for(i=0; i<5; i++) {
 		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
-		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
+		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	}
 	game_sidebar_progress_build=ui_widget_create_progressbar(font_std);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
@@ -59,11 +60,13 @@ void game_view_init() {
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Health")), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
+	if(platform.platform&DARNIT_PLATFORM_PANDORA)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 }
 
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_MOUSE_DOWN)
-		return;
+	/*if(type!=UI_EVENT_TYPE_MOUSE_DOWN)
+		return;*/
 	int x=e->mouse->x-widget->x;
 	int y=e->mouse->y-widget->y;
 	darnitMapCameraMove(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
@@ -77,8 +80,6 @@ void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EV
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	UI_PROPERTY_VALUE v;
 	int i=0;
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
 	// Find the building number.
 	for(; widget!=game_sidebar_button_build[i]; i++);
 	if(!building_cancel) {
@@ -103,8 +104,6 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	//TODO: keysyms of number keys might not be sequential on all platforms
-	if(type!=UI_EVENT_TYPE_KEYBOARD_PRESS)
-		return;
 	if(e->keyboard->keysym>=KEY(1)&&e->keyboard->keysym<=KEY(5)) {
 		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->keysym-KEY(1)], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
 	}
@@ -114,7 +113,6 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	//darnit buttons have no press or release events, we have to handle this ourselves
-	static UI_EVENT_BUTTONS prevbuttons={0};
 	
 	//View movement
 	if(!chat_is_visible(&panelist_game_sidebar)) {

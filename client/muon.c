@@ -38,13 +38,22 @@ void (*state_render[])()={
 
 void game_state(GAME_STATE state) {
 	//Game state destructors
-	if(gamestate==GAME_STATE_GAME) {
-		chat_indicator_hide(&panelist_game_sidebar);
-		ui_event_global_remove(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
-		ui_event_global_remove(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
-		ui_event_global_remove(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
-		ui_event_global_remove(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
-		ui_event_global_remove(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
+	switch(gamestate) {
+		case GAME_STATE_GAME:
+			chat_indicator_hide(&panelist_game_sidebar);
+			ui_event_global_remove(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
+			ui_event_global_remove(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
+			ui_event_global_remove(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_remove(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_remove(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
+			break;
+		case GAME_STATE_GAME_MENU:
+		case GAME_STATE_MENU:
+			ui_event_global_remove(menu_buttons, UI_EVENT_TYPE_BUTTONS);
+		case GAME_STATE_CONNECTING:
+		case GAME_STATE_LOBBY:
+		case GAME_STATE_QUIT:
+			break;
 	}
 	//Game state constructors
 	switch(state) {
@@ -66,11 +75,12 @@ void game_state(GAME_STATE state) {
 		/*case GAME_STATE_CONNECT_SERVER:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
 			ui_selected_widget=connect_server_entry_host;*/
-		case GAME_STATE_LOBBY:
 		case GAME_STATE_MENU:
 			darnitRenderClearColorSet(0x0, 0x0, 0x0);
-		case GAME_STATE_QUIT:
 		case GAME_STATE_GAME_MENU:
+			ui_event_global_add(menu_buttons, UI_EVENT_TYPE_BUTTONS);
+		case GAME_STATE_LOBBY:
+		case GAME_STATE_QUIT:
 			darnitInputUngrab();
 			break;
 	}
@@ -82,6 +92,7 @@ int main() {
 	platform_init();
 	
 	player_id=0;
+	memset(&prevbuttons, 0, sizeof(prevbuttons));
 	serverInit();
 	
 	intmath_init();
@@ -114,6 +125,7 @@ int main() {
 	
 	if(serverIsRunning())
 		serverStop();
-	
+		
+	darnitQuit();	
 	return 0;
 }

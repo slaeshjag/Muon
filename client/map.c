@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  * 
  * You should have received a copy of the GNU General Public License
- * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Muon.  If not, see <http://www.gnu.map_selected.circleorg/licenses/>.
  */
 
 #include "muon.h"
@@ -22,11 +22,9 @@
 #include "client.h"
 #include "game.h"
 #include "map.h"
+#include "intmath.h"
 
 #define MAP_INDEX(x, y) ((y)*toplayer_tilemap->w+(x))
-
-#define MIN(a, b) ((a)<(b)?(a):(b))
-#define MAX(a, b) ((a)>(b)?(a):(b))
 
 void map_init(char *filename) {
 	unsigned int i, j;
@@ -34,11 +32,12 @@ void map_init(char *filename) {
 	powergrid=NULL;
 	powergrid_lines=0;
 	
-	home_x=home_y=0;
+	home_x=home_y=-1;
 	
 	map_selected.border=darnitRenderLineAlloc(4, 1);
 	map_selected.index=-1;
 	map_selected.building=0;
+	map_selected.circle=NULL;
 	
 	map_grid_chunk=NULL;
 	map_grid_chunks=0;
@@ -77,6 +76,7 @@ void map_close(DARNIT_MAP *map) {
 		return;
 	int i;
 	map_selected.border=darnitRenderLineFree(map_selected.border);
+	map_selected.circle=darnitRenderCircleFree(map_sele.circle);
 	powergrid=darnitRenderLineFree(powergrid);
 	minimap_viewport=darnitRenderLineFree(minimap_viewport);
 	map=darnitMapUnload(map);
@@ -129,7 +129,6 @@ void map_calculate_powergrid() {
 	DARNIT_MAP_LAYER *toplayer=&map->layer[map->layers-1];
 	DARNIT_TILEMAP *toplayer_tilemap=map->layer[map->layers-1].tilemap;
 	unsigned int *toplayer_data=map->layer[map->layers-1].tilemap->data;
-	//DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
 	
 	int tile_w=toplayer->tile_w;
 	int tile_h=toplayer->tile_h;
@@ -178,9 +177,18 @@ void map_building_clear() {
 		building_tilemap->data[i]&=~0xFFF;
 }
 
+int map_isset_home() {
+	return !(home_x==-1&&home_y==-1);
+}
+
 void map_set_home(int index) {
 	home_y=index/map->layer[map->layers-2].tilemap->w;
 	home_x=index%map->layer[map->layers-2].tilemap->w;
+}
+
+int map_get_home() {
+	DARNIT_TILEMAP *toplayer_tilemap=map->layer[map->layers-1].tilemap;
+	return map_isset_home()?MAP_INDEX(home_x, home_y):-1;
 }
 
 int map_get_building_health(int index) {
@@ -216,6 +224,7 @@ void map_set_tile_attributes(int index, int attrib) {
 			break;
 		case MSG_TILE_ATTRIB_FOW_SET:
 			map->layer[map->layers-1].tilemap->data[index]=(map->layer[map->layers-1].tilemap->data[index]&~0xFFF)|0x1;
+			game_attacklist_untarget(index);
 			break;
 		case MSG_TILE_ATTRIB_POWER_CLEAR:
 			map->layer[map->layers-1].tilemap->data[index]&=~0x1000000;
@@ -233,6 +242,17 @@ void map_select_building(int index) {
 	if(selected_building<0||selected_building>7)
 		selected_building=0;
 	map_selected.building=selected_building;
+	if(selected_building&&building[selected_building].range) {
+		map_selected.circle=darnitRenderCircleAlloc(32, 1);
+		int w=map->layer[map->layers-2].tilemap->w;
+		//int h=map->layer[map->layers-2].tilemap->h;
+		int tile_w=map->layer[map->layers-2].tile_w;
+		int tile_h=map->layer[map->layers-2].tile_h;
+		int x=index%w;
+		int y=index/w;
+		darnitRenderCircleMove(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
+	} else
+		map_selected.circle=darnitRenderCircleFree(map_sele.circle);
 }
 
 void map_select_nothing() {
@@ -257,6 +277,7 @@ void map_clear_fow() {
 	for(i=0; i<w*h; i++) {
 		d[i]&=~0xFFF;
 	}
+	darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
 }
 
 void map_draw(int draw_powergrid) {
@@ -286,6 +307,8 @@ void map_draw(int draw_powergrid) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
 		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
+		if(map_selected.circle)
+			darnitRenderCircleDraw(map_selected.circle);
 		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
 		darnitRenderLineDraw(map_selected.border, 4);
 		darnitRenderTint(1, 1, 1, 1);

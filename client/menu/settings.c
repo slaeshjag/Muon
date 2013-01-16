@@ -29,21 +29,38 @@ void menu_settings_init() {
 	UI_PROPERTY_VALUE v={.p=NULL};
 	
 	//Gameplay settings
-	panelist_settings_game.pane=ui_pane_create(16, 32+320, 256, 96, NULL);
+	panelist_settings_game.pane=ui_pane_create(16, 32+300, 256, 128, NULL);
 	ui_pane_set_root_widget(panelist_settings_game.pane, ui_widget_create_vbox());
 	panelist_settings_game.next=NULL;
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, ui_widget_create_label(font_std, T("Player name")), 1);
 	settings_game_entry_name=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_entry_name, 0);
-	settings_game_entry_name->event_handler->add(settings_game_entry_name, settings_game_button_ok_click, UI_EVENT_TYPE_KEYBOARD);
+	settings_game_entry_name->event_handler->add(settings_game_entry_name, settings_game_button_ok_click, UI_EVENT_TYPE_KEYBOARD_PRESS);
 	v.p=config.player_name;
 	settings_game_entry_name->set_prop(settings_game_entry_name, UI_ENTRY_PROP_TEXT, v);
+	
+	settings_game_hbox_grid=ui_widget_create_hbox();
+	settings_game_checkbox_grid=ui_widget_create_checkbox();
+	v.i=config.grid;
+	settings_game_checkbox_grid->set_prop(settings_game_checkbox_grid, UI_CHECKBOX_PROP_ACTIVATED, v);
+	ui_hbox_add_child(settings_game_hbox_grid, settings_game_checkbox_grid, 0);
+	ui_hbox_add_child(settings_game_hbox_grid, ui_widget_create_label(font_std, T("Show grid")), 0);
+	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_hbox_grid, 0);
+	
+	settings_game_hbox_powergrid=ui_widget_create_hbox();
+	settings_game_checkbox_powergrid=ui_widget_create_checkbox();
+	v.i=config.powergrid;
+	settings_game_checkbox_powergrid->set_prop(settings_game_checkbox_powergrid, UI_CHECKBOX_PROP_ACTIVATED, v);
+	ui_hbox_add_child(settings_game_hbox_powergrid, settings_game_checkbox_powergrid, 0);
+	ui_hbox_add_child(settings_game_hbox_powergrid, ui_widget_create_label(font_std, T("Always show power grid")), 0);
+	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_hbox_powergrid, 0);
+	
 	settings_game_button_ok=ui_widget_create_button_text(font_std, T("OK"));
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_button_ok, 0);
 	settings_game_button_ok->event_handler->add(settings_game_button_ok, settings_game_button_ok_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	//Monitor settings
-	panelist_settings_monitor.pane=ui_pane_create(16, 16, 320, 320, NULL);
+	panelist_settings_monitor.pane=ui_pane_create(16, 16, 320, 300, NULL);
 	panelist_settings_monitor.next=&panelist_settings_game;
 	ui_pane_set_root_widget(panelist_settings_monitor.pane, ui_widget_create_hbox());
 	settings_monitor_listbox_modes=ui_widget_create_listbox(font_std);
@@ -96,7 +113,7 @@ void menu_settings_init() {
 }
 
 void settings_game_button_ok_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(!(type==UI_EVENT_TYPE_UI_WIDGET_ACTIVATE||(type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym==KEY(RETURN))))
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
 		return;
 	UI_PROPERTY_VALUE v;
 	v=settings_game_entry_name->get_prop(settings_game_entry_name, UI_ENTRY_PROP_TEXT);
@@ -105,6 +122,10 @@ void settings_game_button_ok_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	memset(config.player_name, 0, 32);
 	strncpy(config.player_name, v.p, 31);
 	config.player_name[31]=0;
+	v=settings_game_checkbox_grid->get_prop(settings_game_checkbox_grid, UI_CHECKBOX_PROP_ACTIVATED);
+	config.grid=v.i;
+	v=settings_game_checkbox_powergrid->get_prop(settings_game_checkbox_powergrid, UI_CHECKBOX_PROP_ACTIVATED);
+	config.powergrid=v.i;
 	platform_config_write();
 	//printf("Player name: %s\n", player_name);
 	panelist_menu_sidebar.next=NULL;

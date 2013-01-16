@@ -21,6 +21,9 @@ Fullscreen		Fullscreen
 Plasma scale		Plasma scale
 Alpha blending		Alpha blending
 
+Show grid		Show grid
+Always show power grid	Always show power grid
+
 Please restart Muon for the changes to take place.		Please restart Muon for the changes to take place.
 
 ### Multiplayer
@@ -49,6 +52,14 @@ Ready			Ready
 Downloading map		Downloading map
 Map			Map
 
+### Chat
+Chat			Chat
+Send			Send
+joined			joined
+disconnected		disconnected
+defeated		defeated
+Game starts in		Game starts in
+
 ### In-game
 Buildings:		Buildings:
 Scout			Scout
@@ -59,3 +70,5 @@ Build site		Build site
 
 Shield			Shield
 Health			Health
+
+Resign			Resign

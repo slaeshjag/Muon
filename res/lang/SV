@@ -21,6 +21,9 @@ Fullscreen		Fullskärm
 Plasma scale		Plasmaskala
 Alpha blending		Alpha blending
 
+Show grid		Visa rutnät
+Always show power grid	Visa alltid kraftnät
+
 Please restart Muon for the changes to take place.		Vänligen starta om Muon för att dina inställningar ska börja gälla.
 
 ### Multiplayer
@@ -49,13 +52,23 @@ Ready			Redo
 Downloading map		Laddar ner karta
 Map			Karta
 
+### Chat
+Chat			Chatt
+Send			Skicka
+joined			anslöt
+disconnected		kopplade från
+defeated		utslagen
+Game starts in		Spelet startar om
+
 ### In-game
 Buildings:		Byggnader:
 Scout			Utkikstorn
 Attacker		Attackerare
-Pylon			Pylon
+Pylon			Kraftledning
 Wall			Mur
 Build site		Byggplats
 
 Shield			Sköld
 Health			Liv
+
+Resign			Ge upp

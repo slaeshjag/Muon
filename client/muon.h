@@ -42,6 +42,8 @@ typedef enum {
 GAME_STATE gamestate;
 struct UI_PANE_LIST *gamestate_pane[7];
 
+UI_EVENT_BUTTONS prevbuttons;
+
 void game_state(GAME_STATE state);
 
 #endif
