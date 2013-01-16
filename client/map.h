@@ -61,6 +61,7 @@ struct MAP_SELECTED {
 
 struct MAP_FLARE_LIST {
 	DARNIT_CIRCLE *circle[4];
+	DARNIT_CIRCLE *minimap_circle;
 	int index;
 	int player;
 	unsigned int duration;
