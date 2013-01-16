@@ -66,16 +66,19 @@ void game_view_init() {
 	panelist_game_abilitybar.pane=ui_pane_create(2, 64, 52, 128+44, ui_widget_create_vbox());
 	panelist_game_abilitybar.next=NULL;
 	ability[0].name=T("Flare");
+	ability[0].icon=darnitRenderTilesheetLoad("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[0].action=NULL;
 	ability[0].button=ui_widget_create_button(ui_widget_create_imageview_file("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
 	ability[0].button->event_handler->add(ability[0].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[0].delay=0;
 	ability[1].name=T("Nuke");
+	ability[1].icon=darnitRenderTilesheetLoad("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[1].action=NULL;
 	ability[1].button=ui_widget_create_button(ui_widget_create_imageview_file("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
 	ability[1].button->event_handler->add(ability[1].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[1].delay=0;
 	ability[2].name=T("Radar");
+	ability[2].icon=darnitRenderTilesheetLoad("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[2].action=NULL;
 	ability[2].button=ui_widget_create_button(ui_widget_create_imageview_file("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
 	ability[2].button->event_handler->add(ability[2].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
@@ -86,11 +89,20 @@ void game_view_init() {
 
 void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(widget==ability[0].button) {
-		printf("flare\n");
+		if(building_place==PLACE_FLARE)
+			building_place=-1;
+		else
+			building_place=PLACE_FLARE;
 	} else if(widget==ability[1].button) {
-		printf("nuke\n");
+		if(building_place==PLACE_NUKE)
+			building_place=-1;
+		else
+			building_place=PLACE_NUKE;
 	} else if(widget==ability[2].button) {
-		printf("radar\n");
+		if(building_place==PLACE_RADAR)
+			building_place=-1;
+		else
+			building_place=PLACE_RADAR;
 	}
 }
 
@@ -215,6 +227,15 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			return;
 		if(building_place>-1) {
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, building_place, map_offset, NULL);
+			building_place=-1;
+		} else if(building_place==PLACE_FLARE) {
+			client_message_send(player_id, MSG_SEND_SET_FLARE, 0, map_offset, NULL);
+			building_place=-1;
+		} else if(building_place==PLACE_NUKE) {
+			//TODO: nuke
+			building_place=-1;
+		} else if(building_place==PLACE_RADAR) {
+			//TODO: radar
 			building_place=-1;
 		} else {
 			//status selected clicked building, etc
@@ -364,7 +385,10 @@ void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
 		darnitRenderOffset(map->cam_x, map->cam_y);
 		darnitRenderBlendingEnable();
-		darnitRenderTileBlit(l->ts, player_id*8+building_place+7, x, y);
+		if(building_place<=-1)
+			darnitRenderTileBlit(ability[-building_place-2].icon, 0, x, y);
+		else if(building_place>-1)
+			darnitRenderTileBlit(l->ts, player_id*8+building_place+7, x, y);
 		darnitRenderBlendingDisable();
 		darnitRenderOffset(0, 0);
 	}

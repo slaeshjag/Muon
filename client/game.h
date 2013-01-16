@@ -24,6 +24,10 @@
 #define SCROLL_OFFSET 8
 #define SCROLL_SPEED 4
 
+#define PLACE_FLARE -2
+#define PLACE_NUKE -3
+#define PLACE_RADAR -4
+
 struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_minimap;
 UI_WIDGET *game_sidebar_button_build[5];
@@ -42,6 +46,7 @@ struct BUILDING {
 
 struct ABILITY {
 	UI_WIDGET *button;
+	DARNIT_TILESHEET *icon;
 	const char *name;
 	void (*action)();
 	unsigned int delay;
