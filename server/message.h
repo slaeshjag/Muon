@@ -31,7 +31,7 @@
 #define	MESSAGE_LOBBY_MAX		8
 
 #define	MESSAGE_GAME_MIN		9
-#define	MESSAGE_GAME_MAX		11
+#define	MESSAGE_GAME_MAX		12
 
 /* Messages we can always get */
 #define	MSG_RECV_PONG			0
@@ -50,6 +50,7 @@
 #define	MSG_RECV_START_BUILD		9
 #define	MSG_RECV_PLACE_BUILDING		10
 #define	MSG_RECV_SET_ATTACK		11
+#define	MSG_RECV_SET_FLARE		12
 
 /* Messages we can send */
 
@@ -85,6 +86,7 @@
 #define	MSG_SEND_UNIT_LOS		0x018
 #define	MSG_SEND_PLAYER_STATS_1		0x019
 #define	MSG_SEND_PLAYER_STATS_2		0x01A
+#define	MSG_SEND_MAP_FLARE		0x01B
 
 typedef struct {
 	unsigned int		player_ID;
