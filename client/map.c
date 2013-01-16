@@ -76,7 +76,7 @@ void map_close(DARNIT_MAP *map) {
 		return;
 	int i;
 	map_selected.border=darnitRenderLineFree(map_selected.border);
-	map_selected.circle=darnitRenderCircleFree(map_sele.circle);
+	map_selected.circle=darnitRenderCircleFree(map_selected.circle);
 	powergrid=darnitRenderLineFree(powergrid);
 	minimap_viewport=darnitRenderLineFree(minimap_viewport);
 	map=darnitMapUnload(map);
@@ -252,7 +252,7 @@ void map_select_building(int index) {
 		int y=index/w;
 		darnitRenderCircleMove(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
 	} else
-		map_selected.circle=darnitRenderCircleFree(map_sele.circle);
+		map_selected.circle=darnitRenderCircleFree(map_selected.circle);
 }
 
 void map_select_nothing() {
