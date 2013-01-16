@@ -380,6 +380,9 @@ void game_view_draw() {
 }
 
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	float r, g, b, a;
+	darnitRenderTintGet(&r, &g, &b, &a);
+	darnitRenderTint(1, 1, 1, 1);
 	if(building_place!=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
 		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
 		int x=(e->mouse->x+map->cam_x)/l->tile_w*l->tile_w;
@@ -393,5 +396,6 @@ void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		darnitRenderBlendingDisable();
 		darnitRenderOffset(0, 0);
 	}
+	darnitRenderTint(r, g, b, a);
 	view_mouse_draw(widget, type, e);
 }

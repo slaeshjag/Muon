@@ -25,7 +25,7 @@
 #define CLIENT_DEFAULT_GAMESPEED 3
 #define CLIENT_TIMEOUT 10000
 
-#define MSG_SERVER_DISCONNECT 0xFFFFFFFF
+#define MSG_SERVER_DISCONNECT 0x10000
 
 typedef struct {
 	char name[32];
