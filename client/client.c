@@ -41,6 +41,7 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		player_id=0;
 		if(serverIsRunning())
 			serverStop();
+		map_close(map);
 	} else
 		game_state(GAME_STATE_LOBBY);
 }
