@@ -98,6 +98,7 @@ typedef struct {
 	SERVER_SOCKET		*socket;
 	time_t			id_req_send;
 	time_t			last_ping_sent;
+	time_t			last_ping_reply;
 	MESSAGE_BUFFER		*msg_buf;
 	char			name[PLAYER_NAME_LEN];
 	PLAYER_NETWORK		network;
@@ -131,5 +132,7 @@ void playerDefeatAnnounce(int player);
 unsigned int playerCountPoints(int player);
 
 int playerCanQueueAnotherBuilding(int player);
+
+void playerKickAll();
 
 #endif

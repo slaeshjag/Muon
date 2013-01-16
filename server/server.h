@@ -31,9 +31,13 @@
 #define	SERVER_PROCESS_INCOMPLETE	0
 #define	SERVER_PROCESS_FAIL		-1
 
+#define	SERVER_RUNNING			1
+#define SERVER_SHUTTING_DOWN		2
+
 #define	RANDOM_ATTEMPTS			20000
 
 #define	SERVER_PING_INTERVAL		2
+#define	SERVER_PING_TIMEOUT_DELAY	5
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,6 +101,7 @@ typedef struct {
 	UNIT_PYLON		*pylons;
 	int			server_admin;
 	CONTROLPOINT_EXTRA	*controlpoint;
+	int			state;
 } SERVER;
 
 SERVER *server;

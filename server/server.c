@@ -124,9 +124,14 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 	int i, j, k, map_w, map_h;
 	int max_players, spawn_as;
 
-	if (server)
-		return server;
-	fprintf(stderr, "Stopping server\n");
+	if (server) {
+		if (server->state == SERVER_SHUTTING_DOWN)
+			errorPush(SERVER_ERROR_SHUTTING_DOWN);
+		else
+			errorPush(SERVER_ERROR_ALREADY_RUNNING);
+		return NULL;
+	}
+
 	srand(time(NULL));
 	
 	if (gamespeed < 0) {
@@ -182,6 +187,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		server->map[i] = NULL;
 
 	server->unit = NULL;
+	controlpointInit();
 	if ((max_players = serverInitMap(fname)) < 0) {
 		server = serverStop();
 		return server;
@@ -208,19 +214,30 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		server->player[i].spawn_as = spawn_as;
 	}
 
+	server->state = SERVER_RUNNING;
+
 	return server;
 }
 
 
 SERVER *serverStop() {
+	if (!server)
+		return NULL;
+	playerKickAll();
+	server->state = SERVER_SHUTTING_DOWN;
+
+	return NULL;
+}
+
+
+SERVER *serverKill() {
 	int i;
 	
 	if (!server)
 		return NULL;
-
 	
 	playerDestroy(server->player, server->players);
-	
+
 	for (i = 0; i < server->w * server->h; i++) {
 		free(server->map[i]);
 	}
@@ -259,6 +276,11 @@ void serverSendPing() {
 			msg.extra = NULL;
 			messageBufferPush(server->player[i].msg_buf, &msg);
 			server->player[i].last_ping_sent = now;
+		}
+
+		if (time(NULL) - server->player[i].last_ping_reply > SERVER_PING_TIMEOUT_DELAY) {
+			playerDisconnect(i);
+			continue;
 		}
 	}
 
@@ -458,18 +480,40 @@ int serverRequestMoreData(unsigned int player) {
 }
 
 
+int serverBuffersClear() {
+	int i;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status == PLAYER_UNUSED)
+			continue;
+		if (server->player[i].msg_buf->read_pos == server->player[i].msg_buf->write_pos)
+			continue;
+		return -1;
+	}
+
+	return 0;
+}
+
+
 int serverLoop(unsigned int d_ms) {
 	/* FIXME: STUB */
 	if (!server)
 		return -1;
 
-	if (!server->game.started) {
-		lobbyPoll();
-		playerCheckIdentify();
+	if (server->state != SERVER_SHUTTING_DOWN) {
+		if (!server->game.started) {
+			lobbyPoll();
+			playerCheckIdentify();
+		} else {
+			playerBuildQueueLoop(d_ms);
+			unitLoop(d_ms);
+			gameLoop(d_ms);
+		}
 	} else {
-		playerBuildQueueLoop(d_ms);
-		unitLoop(d_ms);
-		gameLoop(d_ms);
+		if (serverBuffersClear() == 0) {
+			serverKill();
+			return 0;
+		}
 	}
 
 	serverSendPing();
