@@ -189,7 +189,7 @@ void messageHandlerKick(unsigned int player, MESSAGE *message) {
 
 	if (message->arg[0] >= server->players)
 		return;
-	messageSend(server->player[player].socket, message->arg[0], MSG_SEND_KICKED, 0, 0, NULL);
+	messageSend(server->player[message->arg[0]].socket, message->arg[0], MSG_SEND_KICKED, 0, 0, NULL);
 	playerDisconnect(message->arg[0]);
 
 	return;
