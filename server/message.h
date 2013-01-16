@@ -87,6 +87,7 @@
 #define	MSG_SEND_PLAYER_STATS_1		0x019
 #define	MSG_SEND_PLAYER_STATS_2		0x01A
 #define	MSG_SEND_MAP_FLARE		0x01B
+#define	MSG_SEND_CP_DELAY		0x01C
 
 typedef struct {
 	unsigned int		player_ID;

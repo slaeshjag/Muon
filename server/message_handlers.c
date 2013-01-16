@@ -205,7 +205,7 @@ void messageHandlerSetAttack(unsigned int player, MESSAGE *message) {
 
 void messageHandlerSetFlare(unsigned int player, MESSAGE *message) {
 	int i, team;
-	if (message->arg[0] >= server->w * server->h) {
+	if (message->arg[1] >= server->w * server->h) {
 		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		return;
 	}
@@ -219,7 +219,7 @@ void messageHandlerSetFlare(unsigned int player, MESSAGE *message) {
 			continue;
 		if (server->player[i].team != team)
 			continue;
-		messageBufferPushDirect(i, player, MSG_SEND_MAP_FLARE, message->arg[0], 0, NULL);
+		messageBufferPushDirect(i, player, MSG_SEND_MAP_FLARE, 0, message->arg[1], NULL);
 	}
 
 	return;

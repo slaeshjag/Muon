@@ -322,7 +322,7 @@ int unitAdd(int owner, int type, int x, int y) {
 		return -1;
 
 	if (type >= UNIT_DEF_BUILDSITE) {
-		if (controlpointInit(unit) < 0) {
+		if (controlpointNew(unit) < 0) {
 			free(unit);
 			server->map[x + y * server->w] = NULL;
 			return -1;
@@ -331,6 +331,7 @@ int unitAdd(int owner, int type, int x, int y) {
 	
 	unit->next = server->unit;
 	server->unit = unit;
+	server->map_c.tile_data[index] |= 0x60000;
 	server->player[owner].stats.buildings_raised++;
 
 
@@ -629,8 +630,8 @@ void unitDamageDo(int index, int damage, int time) {
 	if (!server->map[next->target]) {
 		if (damage < MAP_TERRAIN_ABSORTION)
 			return;
-		server->map_c.tile_data[index] &= 0x60000;
-		server->map_c.tile_data[index] ^= 0x20000;
+		server->map_c.tile_data[index] &= 0x70000;
+		server->map_c.tile_data[index] |= 0x30000;
 		return;
 	}
 
@@ -689,7 +690,7 @@ void unitLoop(int msec) {
 		next = next->next;
 	}
 
-	controlpointLoop();
+	controlpointLoop(msec);
 
 	return;
 }

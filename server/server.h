@@ -67,6 +67,7 @@ typedef struct SERVER_UNIT {
 	unsigned int		last_no_shield;
 	int			target;
 	UNIT_PYLON		pylon;
+	CONTROLPOINT_EXTRA	*cp;
 	struct SERVER_UNIT	*next;
 } SERVER_UNIT;
 

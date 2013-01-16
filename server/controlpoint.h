@@ -28,7 +28,6 @@
 typedef struct CONTROLPONIT_EXTRA {
 	unsigned int			type;
 	unsigned int			delay;
-	unsigned int			left;
 	unsigned int			index;
 	unsigned int			owner;
 	struct CONTROLPOINT_EXTRA	*next;
@@ -37,7 +36,8 @@ typedef struct CONTROLPONIT_EXTRA {
 
 struct SERVER_UNIT;
 
-int controlpointInit(struct SERVER_UNIT *unit);
+int controlpointInit();
+int controlpointNew(struct SERVER_UNIT *unit);
 void controlpointLoop();
 void controlpointRemove(struct SERVER_UNIT *unit);
 

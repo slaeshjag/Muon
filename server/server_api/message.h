@@ -147,8 +147,11 @@ typedef struct {
 /* arg_1 is the amount of buildings destroyed (by player,) arg_2 is the contruction time utilization efficiency */
 #define	MSG_RECV_PLAYER_STATS_2		0x01A
 
-/* arg_1 is the tile to flare on. arg_2 is nothing */
+/* arg_1 is nothing. arg_2 is tile flare is on */
 #define	MSG_RECV_MAP_FLARE		0x01B
+
+/* arg_1 is the controlpoint tile pos, arg_2 is time left in seconds */
+#define	MSG_RECV_CP_TIMER		0x01C
 
 
 /* These commands have data after them */
@@ -206,6 +209,9 @@ typedef struct {
 
 /* arg_1 is map index the building to set attack from is at, arg_2 the tile index for the target building */
 #define	MSG_SEND_SET_ATTACK		11
+
+/* arg_1 is nothing, arg_2 is tile to set flare on */
+#define	MSG_SEND_SET_FLARE		12
 
 
 #endif
