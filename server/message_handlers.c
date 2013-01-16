@@ -187,10 +187,10 @@ void messageHandlerKick(unsigned int player, MESSAGE *message) {
 		return;
 	}
 
-	if (message->arg[1] >= server->players)
+	if (message->arg[0] >= server->players)
 		return;
-	messageSend(server->player[player].socket, message->arg[1], MSG_SEND_KICKED, 0, 0, NULL);
-	playerDisconnect(message->arg[1]);
+	messageSend(server->player[player].socket, message->arg[0], MSG_SEND_KICKED, 0, 0, NULL);
+	playerDisconnect(message->arg[0]);
 
 	return;
 }
