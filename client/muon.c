@@ -125,7 +125,8 @@ int main() {
 	
 	if(serverIsRunning())
 		serverStop();
-		
+	
+	platform_config_write();
 	darnitQuit();	
 	return 0;
 }

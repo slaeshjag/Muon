@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "muon.h"
+#include "client.h"
 #include "platform.h"
 
 struct CONFIG_PARSER parsers[]={
@@ -30,6 +31,8 @@ struct CONFIG_PARSER parsers[]={
 	{"powergrid", platform_option_read_int, platform_option_write_int, &config.powergrid},
 	{"plasma", platform_option_read_int, platform_option_write_int, &config.plasma},
 	{"alpha", platform_option_read_int, platform_option_write_int, &config.alpha},
+	{"gamespeed", platform_option_read_int, platform_option_write_int, &config.gamespeed},
+	{"players", platform_option_read_int, platform_option_write_int, &config.players},
 	{"lang", platform_option_read_string, platform_option_write_string, &config.lang},
 	{"name", platform_option_read_string, platform_option_write_string, &config.player_name},
 };
@@ -80,6 +83,8 @@ void platform_config_init_defaults() {
 	config.powergrid=0;
 	config.plasma=3;
 	config.alpha=1;
+	config.gamespeed=CLIENT_DEFAULT_GAMESPEED;
+	config.players=CLIENT_DEFAULT_PLAYERS;
 	strcpy(config.lang, "EN");
 	strcpy(config.player_name, "player");
 }

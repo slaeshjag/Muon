@@ -41,12 +41,12 @@ void menu_multiplayer_init() {
 	multiplayer_host_entry_port->set_prop(multiplayer_host_entry_port, UI_ENTRY_PROP_TEXT, v);
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_label(font_std, T("Number of players")), 0);
 	multiplayer_host_slider_players=ui_widget_create_slider(4);
-	v.i=CLIENT_DEFAULT_PLAYERS-1;
+	v.i=config.players-1;
 	multiplayer_host_slider_players->set_prop(multiplayer_host_slider_players, UI_SLIDER_PROP_VALUE, v);
 	ui_vbox_add_child(multiplayer_host_vbox, multiplayer_host_slider_players, 0);
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_label(font_std, T("Game speed")), 0);
 	multiplayer_host_slider_gamespeed=ui_widget_create_slider(10);
-	v.i=CLIENT_DEFAULT_GAMESPEED-1;
+	v.i=config.gamespeed-1;
 	multiplayer_host_slider_gamespeed->set_prop(multiplayer_host_slider_gamespeed, UI_SLIDER_PROP_VALUE, v);
 	ui_vbox_add_child(multiplayer_host_vbox, multiplayer_host_slider_gamespeed, 0);
 	ui_vbox_add_child(multiplayer_host_vbox, ui_widget_create_spacer(), 1);
@@ -115,6 +115,10 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	players=v.i+1;
 	v=multiplayer_host_slider_gamespeed->get_prop(multiplayer_host_slider_gamespeed, UI_SLIDER_PROP_VALUE);
 	speed=v.i+1;
+	
+	config.gamespeed=speed;
+	config.players=players;
+	
 	v=multiplayer_host_listbox_maps->get_prop(multiplayer_host_listbox_maps, UI_LISTBOX_PROP_SELECTED);
 	if(v.i==-1)
 		return;
