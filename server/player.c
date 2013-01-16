@@ -75,6 +75,20 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 }
 
 
+void playerKickAll() {
+	int i;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status == PLAYER_UNUSED)
+			continue;
+		messageBufferPushDirect(i, i, MSG_SEND_KICKED, 0, 0, NULL);
+	}
+
+	return;
+}
+
+
+
 PLAYER *playerDestroy(PLAYER *player, int players) {
 	int i;
 
@@ -82,6 +96,8 @@ PLAYER *playerDestroy(PLAYER *player, int players) {
 		return player;
 	
 	for (i = 0; i < players; i++) {
+		if (server->player[i].status == PLAYER_UNUSED)
+			continue;
 		playerDisconnect(i);
 		messageBufferDelete(server->player[i].msg_buf);
 		free(player[i].map);

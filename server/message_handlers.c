@@ -76,6 +76,8 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 	server->player[player].transfer_pos = 0;
 	messageBufferPushDirect(player, player, MSG_SEND_MAP_BEGIN, server->map_c.data_len, strlen(server->map_c.path), (char *) server->map_c.path);
 
+	server->player[player].last_ping_reply = time(NULL);
+
 	return;
 }
 
@@ -129,7 +131,7 @@ void messageHandlerPlayerReady(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerPong(unsigned int player, MESSAGE *message) {
-	/* TODO: Implement */
+	server->player[player].last_ping_reply = time(NULL);
 	return;
 }
 
@@ -187,7 +189,7 @@ void messageHandlerKick(unsigned int player, MESSAGE *message) {
 
 	if (message->arg[0] >= server->players)
 		return;
-	messageSend(server->player[player].socket, player, MSG_SEND_KICKED, 0, 0, NULL);
+	messageSend(server->player[player].socket, message->arg[1], MSG_SEND_KICKED, 0, 0, NULL);
 	playerDisconnect(message->arg[0]);
 
 	return;

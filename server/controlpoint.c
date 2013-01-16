@@ -124,7 +124,9 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 void controlpointLoop(int msec) {
 	CONTROLPOINT_EXTRA *next;
 
-	#if 0
+	if (!server)
+		return;
+	
 	for (next = server->controlpoint; next; next = (CONTROLPOINT_EXTRA *) next->next) {
 		switch (next->type) {
 			case UNIT_DEF_CLUSTERBOMB:
@@ -136,7 +138,7 @@ void controlpointLoop(int msec) {
 		/* TODO: Implement */
 	}
 
-	#endif
+
 
 	return;
 }

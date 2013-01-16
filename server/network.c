@@ -142,6 +142,7 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 	#else
 	ioctlsocket(sock->socket, FIONBIO, &iMode);
 	#endif
+	setsockopt(sock->socket, IPPROTO_TCP, SO_LINGER, NULL, 0);
 
 	return sock_a;
 
