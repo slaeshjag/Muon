@@ -58,7 +58,7 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 			msg.command = MSG_SEND_JOIN;
 			msg.arg[0] = 0;
 			msg.arg[1] = strlen(server->player[i].name);
-			msg.extra = strdup(server->player[i].name);
+			msg.extra = server->player[i].name;
 			messageBufferPush(server->player[player].msg_buf, &msg);
 
 			msg.player_ID = i;

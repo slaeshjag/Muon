@@ -25,7 +25,6 @@ int gameInit(int gamespeed) {
 	server->game.time_elapsed = 0;
 	server->game.countdown = 0;
 
-	/* FIXME: Make this variable */
 	server->game.gamespeed = gamespeed;
 
 	return 0;

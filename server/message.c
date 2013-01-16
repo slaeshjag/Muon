@@ -49,6 +49,7 @@ MESSAGE_BUFFER *messageBufferDelete(MESSAGE_BUFFER *msg_buf) {
 	messageBufferFlush(msg_buf);
 
 	free(msg_buf->message);
+	free(msg_buf->send_buff);
 	free(msg_buf);
 	return NULL;
 }

@@ -20,6 +20,8 @@
 #ifndef __BUILDING_H__
 #define	__BUILDING_H__
 
+#define	BUILDINGS_DEFINED		8
+
 #define	BUILDING_NONE			0
 #define	BUILDING_GENERATOR		1
 #define	BUILDING_SCOUT			2

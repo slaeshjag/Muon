@@ -689,6 +689,8 @@ void unitLoop(int msec) {
 		next = next->next;
 	}
 
+	controlpointLoop();
+
 	return;
 }
 
