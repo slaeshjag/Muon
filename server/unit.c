@@ -504,7 +504,7 @@ void unitAttackSet(int index_src, int index_dst) {
 	int i, from;
 
 	from = server->map[index_src]->owner;
-	server->map[index_src]->target = index_dst;
+	server->map[index_src]->target = (index_dst > -1) ? index_dst : -1;
 	fprintf(stderr, "Attacking %i->%i\n", index_src, index_dst);
 
 	for (i = 0; i < server->players; i++) {
@@ -678,9 +678,10 @@ void unitLoop(int msec) {
 		}
 		
 		if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && next->target > -1) {
-			if ((!server->player[next->owner].map[next->target].fog) || (!server->map[next->target]))
+			if ((!server->player[next->owner].map[next->target].fog) || (!server->map[next->target])) {
+				unitAttackSet(index, index);
 				next->target = -1;
-			else {
+			} else {
 				unitDamageDo(index, unit_damage[next->type], msec);
 			}
 		} else if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT)) {
