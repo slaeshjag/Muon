@@ -39,7 +39,7 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		game_state(GAME_STATE_MENU);
 		sock=darnitSocketClose(socket);
 		player_id=0;
-		if(serverIsRunning())
+		if(!serverIsRunning())
 			serverStop();
 		map_close();
 	} else
