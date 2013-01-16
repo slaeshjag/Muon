@@ -203,6 +203,29 @@ void messageHandlerSetAttack(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerSetFlare(unsigned int player, MESSAGE *message) {
+	int i, team;
+	if (message->arg[0] >= server->w * server->h) {
+		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		return;
+	}
+	
+	team = server->player[player].team;
+	
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status < PLAYER_IN_GAME_NOW)
+			continue;
+		if (server->player[i].team == -1 && i != player)
+			continue;
+		if (server->player[i].team != team)
+			continue;
+		messageBufferPushDirect(i, player, MSG_SEND_MAP_FLARE, message->arg[0], 0, NULL);
+	}
+
+	return;
+}
+
+
 void messageHandlerSetGamespeed(unsigned int player, MESSAGE *message) {
 	if (message->arg[0] == 0)
 		return;
@@ -242,6 +265,7 @@ int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_START_BUILD]	= messageHandlerStartBuild;
 	server->message_handler.handle[MSG_RECV_PLACE_BUILDING]	= messageHandlerPlaceBuilding;
 	server->message_handler.handle[MSG_RECV_SET_ATTACK]	= messageHandlerSetAttack;
+	server->message_handler.handle[MSG_RECV_SET_FLARE]	= messageHandlerSetFlare;
 
 	return 0;
 }

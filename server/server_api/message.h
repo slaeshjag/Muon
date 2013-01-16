@@ -108,7 +108,7 @@ typedef struct {
 /* arg_1 is the HP value (0..100), arg_2 is index on the map that the building is at. */
 #define	MSG_RECV_BUILDING_HP		0x00D
 
-/* arg_1 is the index on the map that the building is at, arg_2 is the index of the building attacking */
+/* arg_1 is the index on the map that the building is at, arg_2 is the index of the building attacking. If arg_1 and arg_2 is equal, attack is nothing. */
 #define	MSG_RECV_BUILDING_ATTACK	0x00E
 
 /* arg_1 is the building type that is being built, arg_2 is the progress in the range 0..100 */
@@ -146,6 +146,9 @@ typedef struct {
 
 /* arg_1 is the amount of buildings destroyed (by player,) arg_2 is the contruction time utilization efficiency */
 #define	MSG_RECV_PLAYER_STATS_2		0x01A
+
+/* arg_1 is the tile to flare on. arg_2 is nothing */
+#define	MSG_RECV_MAP_FLARE		0x01B
 
 
 /* These commands have data after them */
