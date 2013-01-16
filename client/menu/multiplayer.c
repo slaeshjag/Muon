@@ -121,7 +121,9 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	sprintf(buf, "%s/%s", mapdir, ui_listbox_get(multiplayer_host_listbox_maps, v.i));
 	serverStop();
 	if(!serverStart(buf, players, port, speed)) {
-		ui_messagebox(font_std, T("There was a problem starting the server; the port may already be in use. Try waiting for a while or change port."));
+		const char *error;
+		if((error=errorPop()))
+			ui_messagebox(font_std, T(error));
 		return;
 	}
 	if(client_init("localhost", port)==0)

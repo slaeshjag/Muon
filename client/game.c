@@ -68,17 +68,30 @@ void game_view_init() {
 	ability[0].name=T("Flare");
 	ability[0].action=NULL;
 	ability[0].button=ui_widget_create_button(ui_widget_create_imageview_file("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+	ability[0].button->event_handler->add(ability[0].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[0].delay=0;
 	ability[1].name=T("Nuke");
 	ability[1].action=NULL;
 	ability[1].button=ui_widget_create_button(ui_widget_create_imageview_file("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+	ability[1].button->event_handler->add(ability[1].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[1].delay=0;
 	ability[2].name=T("Radar");
 	ability[2].action=NULL;
 	ability[2].button=ui_widget_create_button(ui_widget_create_imageview_file("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+	ability[2].button->event_handler->add(ability[2].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[2].delay=0;
 	for(i=0; i<3; i++)
 		ui_vbox_add_child(panelist_game_abilitybar.pane->root_widget, ability[i].button, 0);
+}
+
+void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(widget==ability[0].button) {
+		printf("flare\n");
+	} else if(widget==ability[1].button) {
+		printf("nuke\n");
+	} else if(widget==ability[2].button) {
+		printf("radar\n");
+	}
 }
 
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

@@ -1,5 +1,18 @@
 Muon			Muon
 
+### Errors
+Unable to open the map file for caching.							Unable to open the map file for caching.
+Unable to allocate more memory. Your system might've runned out of RAM.				Kunde inte allokera minne, du har möjligtvis slut på RAM.
+The map contains overlapping spawn points. This is not acceptable.				Kartan innehåller överlappande startplaceringar. Detta är inte tillåtet.
+The map file is invalid.									Kartan är trasig.
+The map is missing the property 'max_players'							Kartan saknar egenskapen 'max_players'
+The server was unable to bind the requested port. It's either in use or blocked by a firewall.	Servern kunde inte binda porten, det är möjligt att den redan används eller är blockerad av en brandvägg.
+The map is not defined for this many players							Kartan stöder inte så här många spelare
+Gamespeed must be bigger than 0									Spelhastigheten måste vara högre än noll
+The map is missing a generator for one or more players						Kartan saknar generator för en eller flera spelare
+The number of generators on the map is not equal to the biggest player id			Kartans antal generatorer stämmer inte överens med antal spelare
+rand() wasn't on our side, and spawn randomization took too many tries. Try again.		Slumpen beter sig inte och slumpning av startplaceringar tog för lång tid. Försök igen.
+
 ### Menu
 Singleplayer		En spelare
 Multiplayer		Flera spelare

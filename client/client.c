@@ -188,6 +188,8 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_BUILDING_SHIELD:
 			map_set_building_shield(msg->arg_2, msg->arg_1);
 			break;
+		case MSG_RECV_MAP_FLARE:
+			break;
 	}
 }
 
