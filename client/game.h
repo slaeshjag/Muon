@@ -40,6 +40,14 @@ struct BUILDING {
 	int range;
 } building[16];
 
+struct ABILITY {
+	const char *name;
+	void (*action)();
+	UI_WIDGET *button;
+	unsigned int delay;
+} ability[3];
+struct UI_PANE_LIST panelist_game_abilitybar;
+
 struct GAME_ATTACKLIST {
 	int index;
 	int target;
