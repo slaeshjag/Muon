@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 #include "muon.h"
 #include "client.h"
@@ -75,17 +76,23 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 void client_check_incoming() {
 	int s, i;
 	unsigned int chunk_got=0, chunk_size, chunk_time;
+	static unsigned int chunk_size_time=UINT_MAX;
 	if((s=darnitSocketRecvTry(sock, &chunk_size, 4))<4) {
 		if(s==-1)
-			client_connect_callback(-1, NULL, sock);
-		return;
-	}
+			client_disconnect(MSG_SERVER_DISCONNECT);
+		if(darnitTimeGet()-chunk_size_time>CLIENT_TIMEOUT) {
+			client_disconnect(MSG_SERVER_DISCONNECT);
+			return;
+		} else
+			return;
+	} else
+		chunk_size_time=darnitTimeGet();
 	chunk_size=darnitUtilNtohl(chunk_size)-4;
 	chunk_time=darnitTimeGet();
 	
 	while(chunk_got<chunk_size) {
 		if(darnitTimeGet()-chunk_time>CLIENT_TIMEOUT) {
-			client_connect_callback(-1, NULL, sock);
+			client_disconnect(MSG_SERVER_DISCONNECT);
 			return;
 		}
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
@@ -96,7 +103,7 @@ void client_check_incoming() {
 				continue;
 				//break;
 			if(s==-1) {
-				client_connect_callback(-1, NULL, sock);
+				client_disconnect(MSG_SERVER_DISCONNECT);
 				return;
 			}
 			if(client_message_handler)
@@ -111,7 +118,7 @@ void client_check_incoming() {
 				//break;
 			}
 			if(s==-1) {
-				client_connect_callback(-1, NULL, sock);
+				client_disconnect(MSG_SERVER_DISCONNECT);
 				return;
 			}
 			client_message_convert_recv(&msg_recv);
@@ -341,6 +348,9 @@ void client_disconnect(int cause) {
 			break;
 		case MSG_RECV_BAD_CLIENT:
 			ui_messagebox(font_std, T("You are using an outdated client, please update Muon."));
+			break;
+		case MSG_SERVER_DISCONNECT:
+			ui_messagebox(font_std, T("Lost connection to server."));
 			break;
 	}
 	client_connect_callback(-1, NULL, sock);

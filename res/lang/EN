@@ -12,6 +12,7 @@ Gamespeed must be bigger than 0									Gamespeed must be bigger than 0
 The map is missing a generator for one or more players						The map is missing a generatorfor one or more players
 The number of generators on the map is not equal to the biggest player id			The number of generators on the map is not equal to the biggest player id
 rand() wasn't on our side, and spawn randomization took too many tries. Try again.		rand() wasn't on our side, and spawn randomization took too many tries. Try again.
+Lost connection to server.									Lost connection to server.
 
 ### Menu
 Singleplayer		Singleplayer

@@ -12,6 +12,7 @@ Gamespeed must be bigger than 0									Spelhastigheten måste vara högre än n
 The map is missing a generator for one or more players						Kartan saknar generator för en eller flera spelare
 The number of generators on the map is not equal to the biggest player id			Kartans antal generatorer stämmer inte överens med antal spelare
 rand() wasn't on our side, and spawn randomization took too many tries. Try again.		Slumpen beter sig inte och slumpning av startplaceringar tog för lång tid. Försök igen.
+Lost connection to server.									Tappade anslutning till servern.
 
 ### Menu
 Singleplayer		En spelare
