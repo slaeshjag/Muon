@@ -139,7 +139,7 @@ int gameWorldTransfer(unsigned int player) {
 		if (server->map_c.tile_data[i] & 0x40000)
 			messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, (server->map_c.tile_data[i] & 0x20000) ? 0x11 : 0x10, i, NULL);
 		if (!server->map[i]) {
-			if ((server->map_c.tile_data[i] & 0xFFF) == UNIT_DEF_BUILDSITE)
+			if ((server->map_c.tile_data[i] & 0xFFF) == UNIT_BUILDSITE)
 				unitAnnounce(player, player, UNIT_DEF_BUILDSITE_FREE, i);
 			else if (server->map_c.tile_data[i] & 0x60000)
 				unitAnnounce(player, player, 0, i);
@@ -168,7 +168,7 @@ int gameDetectIfOver() {
 			continue;
 		if (team == -1)
 			return -1;
-		if (server->player[i].team > -1) {
+		if (team > -1) {
 			if (server->player[i].team != team)
 				return -1;
 		}
@@ -187,7 +187,7 @@ void gameEnd() {
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_IN_GAME_NOW)
 			continue;
-		if (server->player[i].status > PLAYER_IN_GAME_NOW) {
+		if (server->player[i].status == PLAYER_SPECTATING) {
 			playerClear(i);
 			continue;
 		}
