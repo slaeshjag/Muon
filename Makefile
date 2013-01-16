@@ -19,9 +19,15 @@ install:
 	@echo " [INST] muon resources"
 	@install -m 0744 -D res/FreeMonoBold.ttf $(DATAPATH)/res/FreeMonoBold.ttf
 	@install -m 0744 -D res/FreeMono.ttf $(DATAPATH)/res/FreeMono.ttf
-	@install -m 0744 -D res/chat.png $(DATAPATH)/res/chat.png
+	
 	@install -m 0744 -D res/mouse.png $(DATAPATH)/res/mouse.png
 	@install -m 0744 -D res/icon.png $(DATAPATH)/res/icon.png
+	
+	@install -m 0744 -D res/chat.png $(DATAPATH)/res/chat.png
+	@install -m 0744 -D res/flare.png $(DATAPATH)/res/flare.png
+	@install -m 0744 -D res/nuke.png $(DATAPATH)/res/nuke.png
+	@install -m 0744 -D res/radar.png $(DATAPATH)/res/radar.png
+	
 	@install -m 0744 -D res/lang.stz $(DATAPATH)/res/lang.stz
 	@install -m 0755 -d $(DATAPATH)/maps
 	@install -m 0744 -D -t $(DATAPATH)/maps/ maps/*

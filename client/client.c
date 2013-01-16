@@ -189,6 +189,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			map_set_building_shield(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_MAP_FLARE:
+			map_flare_add(msg->arg_2, msg->player_id, 1000);
 			break;
 	}
 }

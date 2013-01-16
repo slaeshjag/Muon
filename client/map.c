@@ -280,6 +280,52 @@ void map_clear_fow() {
 	darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
 }
 
+void map_flare_add(int index, int player, unsigned int duration) {
+	int w=map->layer[map->layers-2].tilemap->w;
+	int tile_w=map->layer[map->layers-2].tile_w;
+	int tile_h=map->layer[map->layers-2].tile_h;
+	int x=index%w;
+	int y=index/w;
+	
+	struct MAP_FLARE_LIST **l;
+	for(l=&map_flares; *l; l=&((*l)->next));
+	*l=malloc(sizeof(struct MAP_FLARE_LIST));
+	(*l)->circle[0]=darnitRenderCircleAlloc(16, 1);
+	darnitRenderCircleMove((*l)->circle[0], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 10);
+	(*l)->circle[1]=darnitRenderCircleAlloc(16, 1);
+	darnitRenderCircleMove((*l)->circle[1], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 20);
+	(*l)->circle[2]=darnitRenderCircleAlloc(24, 1);
+	darnitRenderCircleMove((*l)->circle[2], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 30);
+	(*l)->circle[3]=darnitRenderCircleAlloc(24, 1);
+	darnitRenderCircleMove((*l)->circle[3], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 40);
+	(*l)->index=0;
+	(*l)->player=player;
+	(*l)->duration=duration;
+	(*l)->created=darnitTimeGet();
+	(*l)->next=NULL;
+}
+
+void map_flare_draw() {
+	struct MAP_FLARE_LIST **ll, *l;
+	for(ll=&map_flares; *ll; ll=&((*ll)->next)) {
+		l=*ll;
+		if(darnitTimeGet()>l->created+l->duration) {
+			*ll=l->next;
+			free(l);
+			if(*ll)
+				continue;
+			else
+				break;
+		}
+		darnitRenderTint(!(l->player%3), l->player>1, l->player==1, 1);
+		darnitRenderCircleDraw(l->circle[l->index/10]);
+		l->index++;
+		if(l->index>=40)
+			l->index=0;
+		
+	}
+}
+
 void map_draw(int draw_powergrid) {
 	int i;
 	for(i=0; i<map->layers-2; i++)
@@ -303,6 +349,9 @@ void map_draw(int draw_powergrid) {
 	
 	if(powergrid&&(draw_powergrid||config.powergrid))
 		darnitRenderLineDraw(powergrid, powergrid_lines);
+		
+	map_flare_draw();
+	
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
@@ -311,8 +360,8 @@ void map_draw(int draw_powergrid) {
 			darnitRenderCircleDraw(map_selected.circle);
 		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
 		darnitRenderLineDraw(map_selected.border, 4);
-		darnitRenderTint(1, 1, 1, 1);
 	}
+	darnitRenderTint(1, 1, 1, 1);
 	darnitRenderOffset(0, 0);
 }
 

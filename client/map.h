@@ -59,6 +59,15 @@ struct MAP_SELECTED {
 	int building;
 } map_selected;
 
+struct MAP_FLARE_LIST {
+	DARNIT_CIRCLE *circle[4];
+	int index;
+	int player;
+	unsigned int duration;
+	unsigned int created;
+	struct MAP_FLARE_LIST *next;
+} *map_flares;
+
 void map_init(char *filename);
 void map_close(/*DARNIT_MAP *map*/);
 void map_update_grid();
@@ -78,6 +87,10 @@ void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
 void map_clear_fow();
+
+void map_flare_add(int index, int player, unsigned int duration);
+void map_flare_draw();
+
 void map_draw(int draw_powergrid);
 void map_minimap_update_viewport();
 void map_minimap_render(UI_WIDGET *widget);
