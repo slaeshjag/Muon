@@ -94,6 +94,20 @@ void ui_hbox_add_child(UI_WIDGET *widget, UI_WIDGET *child, int expand) {
 	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
 
+void ui_hbox_remove_child(UI_WIDGET *widget, UI_WIDGET *child) {
+	struct UI_HBOX_PROPERTIES *p=widget->properties;
+	UI_WIDGET_LIST **c, *c_next;
+	for(c=&(p->children); *c; c=&((*c)->next)) {
+		if((*c)->widget==child) {
+			c_next=(*c)->next;
+			free(*c);
+			*c=c_next;
+			break;
+		}
+	}
+	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
+}
+
 void ui_hbox_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 	//struct UI_HBOX_PROPERTIES *p=widget->properties;
 	switch(prop) {

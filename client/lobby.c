@@ -96,6 +96,10 @@ void lobby_open() {
 	
 	v=lobby_map_imageview->get_prop(lobby_map_imageview, UI_IMAGEVIEW_PROP_TILESHEET);
 	map_minimap_clear(v.p, lobby_map_imageview->w, lobby_map_imageview->h);
+	
+	ui_hbox_remove_child(lobby_players_hbox, lobby_players_button_kick);
+	if(!serverIsRunning())
+		ui_hbox_add_child(lobby_players_hbox, lobby_players_button_kick, 0);
 }
 
 void lobby_map_preview_generate() {
