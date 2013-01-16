@@ -40,6 +40,14 @@ struct BUILDING {
 	int range;
 } building[16];
 
+struct ABILITY {
+	UI_WIDGET *button;
+	const char *name;
+	void (*action)();
+	unsigned int delay;
+} ability[3];
+struct UI_PANE_LIST panelist_game_abilitybar;
+
 struct GAME_ATTACKLIST {
 	int index;
 	int target;
@@ -51,6 +59,7 @@ DARNIT_LINE *game_attacklist_lines;
 unsigned int game_attacklist_blink_semaphore;
 
 void game_view_init();
+void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

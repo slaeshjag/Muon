@@ -135,7 +135,7 @@ void ui_imageview_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	darnitRenderLineMove(p->border, 3, x+w, y, x+w, y+h);
 	
 	darnitRenderTileMove(p->tile, 0, p->tilesheet, x, y);
-	darnitRenderTileSetTilesheetCoord(p->tile, 0, p->tilesheet, 0, 0, w, h);
+	darnitRenderTileSetTilesheetCoord(p->tile, 0, p->tilesheet, 0, 0, p->image_w, p->image_h);
 }
 
 void ui_imageview_render(UI_WIDGET *widget) {

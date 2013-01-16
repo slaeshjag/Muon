@@ -188,6 +188,8 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_BUILDING_SHIELD:
 			map_set_building_shield(msg->arg_2, msg->arg_1);
 			break;
+		case MSG_RECV_MAP_FLARE:
+			break;
 	}
 }
 
@@ -309,7 +311,7 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(config.player_name), config.player_name);
 	client_message_handler=client_download_map;
 	lobby_open();
-	if(serverIsRunning())
+	if(!serverIsRunning())
 		serverAdminSet(player_id);
 }
 
