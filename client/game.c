@@ -104,6 +104,7 @@ void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT
 		else
 			building_place=PLACE_RADAR;
 	}
+	ui_selected_widget=NULL;
 }
 
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -361,7 +362,7 @@ void game_attacklist_target(int index, int target) {
 void game_view_draw() {
 	view_background_draw();
 	int selected=map_selected_building();
-	if((building_place!=-1||selected==BUILDING_PYLON||selected==BUILDING_GENERATOR))
+	if((building_place>-1||selected==BUILDING_PYLON||selected==BUILDING_GENERATOR))
 		map_draw(1);
 	else
 		map_draw(0);
