@@ -180,6 +180,8 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 				}
 				//printf("cancel build queue!\n");
 				game_reset_building_progress();
+				if(msg->arg_1>=BUILDING_BUILDSITE)
+					panelist_game_sidebar.next=&panelist_game_abilitybar;
 				game_set_building_ready(BUILDING_NONE);
 			}
 			break;
@@ -197,6 +199,13 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_MAP_FLARE:
 			map_flare_add(msg->arg_2, msg->player_id, 10000);
+			break;
+		case MSG_RECV_CP_TIMER:
+			printf("Timer for %s: %i\n", msg->arg_1==BUILDING_CLUSTERBOMB?"clusterbomb":"radar", msg->arg_2);
+			break;
+		case MSG_RECV_CP_DEPLOY:
+			if(msg->arg_1==BUILDING_CLUSTERBOMB)
+				map_flare_add(msg->arg_2, msg->player_id, 2000);
 			break;
 	}
 }

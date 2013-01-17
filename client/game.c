@@ -136,25 +136,37 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	UI_PROPERTY_VALUE v;
 	int i=0;
 	// Find the building number.
-	for(; widget!=game_sidebar_button_build[i]; i++)
-		if(i>=3) {
-			//Special buildings
+	for(; i<4&&widget!=game_sidebar_button_build[i]; i++);
+	if(i==4) {
+		//Special buildings
+		for(; i<7&&widget!=game_specialbar_button_build[i-4]; i++);
+		if(i==7) {
 			panelist_game_sidebar.next=panelist_game_sidebar.next==&panelist_game_abilitybar?&panelist_game_specialbar:&panelist_game_abilitybar;
+			ui_selected_widget=NULL;
 			return;
 		}
+	}
 	if(!building_cancel) {
-		if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
+		if(building_ready==BUILDING_SCOUT+i) {
+			// If the building is ready, place it.
 			building_place=building_ready;
-		} else if(building_ready==BUILDING_NONE) { // Build if no there are no buildings in progress nor other buildings ready.
+		} else if(building_ready==BUILDING_NONE) { 
+			//Build if no there are no buildings in progress nor other buildings ready.
 			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_START, NULL);
 			v.p=game_sidebar_progress_build;
 			widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 			game_set_building_progress(0, 0);
 			game_set_building_ready(-(BUILDING_SCOUT+i));
 		}
-	} else if(ABS(building_ready)==BUILDING_SCOUT+i) {	// Cancel if the building is is in progress or ready and shift is pressed
+	} else if(ABS(building_ready)==BUILDING_SCOUT+i) {
+		//Cancel if the building is is in progress or ready and shift is pressed
 		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
-		v.p=game_sidebar_label_build[i];
+		if(i<4)
+			v.p=game_sidebar_label_build[i];
+		else {
+			v.p=game_specialbar_label_build[i-4];
+			panelist_game_sidebar.next=&panelist_game_abilitybar;
+		}
 		widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 		game_set_building_progress(0, 0);
 		game_set_building_ready(BUILDING_NONE); // No buildings in progress
@@ -250,10 +262,10 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			client_message_send(player_id, MSG_SEND_SET_FLARE, 0, map_offset, NULL);
 			building_place=-1;
 		} else if(building_place==PLACE_NUKE) {
-			//TODO: nuke
+			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_CLUSTERBOMB, map_offset, NULL);
 			building_place=-1;
 		} else if(building_place==PLACE_RADAR) {
-			//TODO: radar
+			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_RADAR, map_offset, NULL);
 			building_place=-1;
 		} else {
 			//status selected clicked building, etc
@@ -288,6 +300,10 @@ void game_reset_building_progress() {
 	for(i=0; i<5; i++) {
 		UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 		game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
+	}
+	for(i=0; i<3; i++) {
+		UI_PROPERTY_VALUE v={.p=game_specialbar_label_build[i]};
+		game_specialbar_button_build[i]->set_prop(game_specialbar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 	}
 }
 
