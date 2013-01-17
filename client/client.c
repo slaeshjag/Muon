@@ -208,6 +208,9 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			if(msg->arg_1==BUILDING_CLUSTERBOMB)
 				map_flare_add(msg->arg_2, msg->player_id, 2000, building[BUILDING_CLUSTERBOMB].range*map->layer[map->layers-2].tile_w);
 			break;
+		case MSG_RECV_MAJOR_IMPACT:
+			map_flare_add(msg->arg_2, msg->player_id, 2000, map->layer[map->layers-2].tile_w);
+			break;
 	}
 }
 
