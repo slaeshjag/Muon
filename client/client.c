@@ -219,6 +219,17 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAJOR_IMPACT:
 			map_flare_add(msg->arg_2, msg->player_id, 2000, map->layer[map->layers-2].tile_w);
 			break;
+		case MSG_RECV_PLAYER_STATS_1:
+			player[msg->player_id].stats.constructed=msg->arg_1;
+			player[msg->player_id].stats.lost=msg->arg_2;
+			break;
+		case MSG_RECV_PLAYER_STATS_2:
+			player[msg->player_id].stats.destroyed=msg->arg_1;
+			player[msg->player_id].stats.efficiency=msg->arg_2;
+			break;
+		case MSG_RECV_GAME_ENDED:
+			ui_messagebox(font_std, "Game over");
+			break;
 	}
 }
 
