@@ -202,7 +202,7 @@ int controlpointClusterbombAlreadyUsed(int tx, int ty, int bombs) {
 
 
 void controlpointDeployClusterbomb(int player, int index_dst) {
-	int bombs, x, y, tx, ty, i, index, target;
+	int bombs, x, y, tx, ty, i, j, index, target;
 
 	bombs = unit_damage[UNIT_DEF_CLUSTERBOMB] / unit_maxshield[UNIT_DEF_GENERATOR];
 	x = index_dst % server->w;
@@ -236,6 +236,10 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 		if (!server->map[server->player[player].spawn.index])
 			return;
 		server->map[server->player[player].spawn.index]->target = target;
+		
+		for (j = 0; j < server->players; j++)
+			if (server->player[j].map[index].fog)
+				messageBufferPushDirect(j, player, MSG_SEND_MAJOR_IMPACT, 0, index, NULL);
 
 	}
 
@@ -257,7 +261,7 @@ void controlpointDeploy(int player, int type, int index_dst) {
 		return;
 	switch (type) {
 		case UNIT_DEF_CLUSTERBOMB:
-			if (!server->player[player].map[index_dst].fow)
+			if (!server->player[player].map[index_dst].fog)
 				return;
 			if (server->player[player].cp.clusterbomb_delay != 0)
 				return;
