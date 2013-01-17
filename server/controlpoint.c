@@ -231,7 +231,7 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 		target = server->map[server->player[player].spawn.index]->target;
 		server->map[server->player[player].spawn.index]->target = index;
 
-		unitDamagePoke(server->player[player].spawn.index, unit_damage[UNIT_DEF_CLUSTERBOMB] % unit_maxshield[UNIT_DEF_GENERATOR]);
+		unitDamagePoke(server->player[player].spawn.index, unit_maxshield[UNIT_DEF_GENERATOR]);
 		/* Another evil hack */
 		if (!server->map[server->player[player].spawn.index])
 			return;
