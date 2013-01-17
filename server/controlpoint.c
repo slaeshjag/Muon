@@ -257,6 +257,8 @@ void controlpointDeploy(int player, int type, int index_dst) {
 		return;
 	switch (type) {
 		case UNIT_DEF_CLUSTERBOMB:
+			if (!server->player[player].map[index_dst].fow)
+				return;
 			if (server->player[player].cp.clusterbomb_delay != 0)
 				return;
 			controlpointDeployClusterbomb(player, index_dst);
