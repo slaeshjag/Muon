@@ -28,6 +28,8 @@
 #define	CP_CLUSTERBOMB_DELAY		60 * 3000
 #define	CP_RADAR_DELAY			60 * 3000
 
+struct SERVER_UNIT;
+
 typedef struct CONTROLPONIT_EXTRA {
 	unsigned int			type;
 	unsigned int			index;
@@ -42,7 +44,6 @@ typedef struct {
 } CONTROLPOINT_DATA;
 
 
-struct SERVER_UNIT;
 
 int controlpointInit();
 void controlpointInitPlayer(int player);

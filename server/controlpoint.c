@@ -155,6 +155,8 @@ void controlpointLoop(int msec) {
 	for (next = server->controlpoint; next; next = (CONTROLPOINT_EXTRA *) next->next) {
 		switch (next->type) {
 			case UNIT_DEF_CLUSTERBOMB:
+				if (!server->player[next->owner].map[next->index].power)
+					continue;
 				delay = server->player[next->owner].cp.clusterbomb_delay;
 				if (delay == -1)
 					delay = CP_CLUSTERBOMB_DELAY;
