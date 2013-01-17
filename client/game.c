@@ -30,7 +30,7 @@ void game_view_init() {
 	building_place=-1;
 	
 	game_attacklist_blink_semaphore=0;
-	
+	/*Game sidebar*/
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
 	ui_pane_set_root_widget(panelist_game_sidebar.pane, ui_widget_create_vbox());
 	panelist_game_sidebar.next=&panelist_game_abilitybar;
@@ -45,7 +45,7 @@ void game_view_init() {
 	game_sidebar_label_build[1]=ui_widget_create_label(font_std, T("Attacker"));
 	game_sidebar_label_build[2]=ui_widget_create_label(font_std, T("Pylon"));
 	game_sidebar_label_build[3]=ui_widget_create_label(font_std, T("Wall"));
-	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Build site"));
+	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Special building"));
 	int i;
 	for(i=0; i<5; i++) {
 		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
@@ -62,7 +62,20 @@ void game_view_init() {
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
 	if(platform.platform&DARNIT_PLATFORM_PANDORA)
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
-		
+	
+	/*Special buildings for control points*/
+	panelist_game_specialbar.pane=ui_pane_create(config.screen_w-SIDEBAR_WIDTH*2, game_sidebar_button_build[4]->y-64, SIDEBAR_WIDTH, 128, ui_widget_create_vbox());
+	panelist_game_specialbar.next=&panelist_game_abilitybar;
+	game_specialbar_label_build[0]=ui_widget_create_label(font_std, T("Construction yard"));
+	game_specialbar_label_build[1]=ui_widget_create_label(font_std, T("Missile silo"));
+	game_specialbar_label_build[2]=ui_widget_create_label(font_std, T("Radar"));
+	for(i=0; i<3; i++) {
+		game_specialbar_button_build[i]=ui_widget_create_button(game_specialbar_label_build[i]);
+		ui_vbox_add_child(panelist_game_specialbar.pane->root_widget, game_specialbar_button_build[i], 0);
+		game_specialbar_button_build[i]->event_handler->add(game_specialbar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	}
+	
+	/*Special abilities*/
 	panelist_game_abilitybar.pane=ui_pane_create(2, 64, 52, 128+44, ui_widget_create_vbox());
 	panelist_game_abilitybar.next=NULL;
 	ability[0].name=T("Flare");
@@ -88,6 +101,7 @@ void game_view_init() {
 }
 
 void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//TODO: clean up
 	if(widget==ability[0].button) {
 		if(building_place==PLACE_FLARE)
 			building_place=-1;
@@ -108,8 +122,6 @@ void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT
 }
 
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	/*if(type!=UI_EVENT_TYPE_MOUSE_DOWN)
-		return;*/
 	int x=e->mouse->x-widget->x;
 	int y=e->mouse->y-widget->y;
 	darnitMapCameraMove(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
@@ -124,7 +136,12 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	UI_PROPERTY_VALUE v;
 	int i=0;
 	// Find the building number.
-	for(; widget!=game_sidebar_button_build[i]; i++);
+	for(; widget!=game_sidebar_button_build[i]; i++)
+		if(i>=3) {
+			//Special buildings
+			panelist_game_sidebar.next=panelist_game_sidebar.next==&panelist_game_abilitybar?&panelist_game_specialbar:&panelist_game_abilitybar;
+			return;
+		}
 	if(!building_cancel) {
 		if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
 			building_place=building_ready;
