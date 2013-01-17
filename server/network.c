@@ -75,6 +75,9 @@ SERVER_SOCKET *networkListen(int port) {
 		return NULL;
 	}
 	
+	flags = 1;
+	setsockopt(sock->socket, SOL_SOCKET, SO_REUSEADDR, &flags, 4);
+	
 	memset(&address, 0, sizeof(struct sockaddr_in));
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);
@@ -104,9 +107,6 @@ SERVER_SOCKET *networkListen(int port) {
 	#else
 	ioctlsocket(sock->socket, FIONBIO, &iMode);
 	#endif
-
-	flags = 1;
-	setsockopt(sock->socket, SOL_SOCKET, SO_REUSEADDR, &flags, 4);
 
 	return sock;
 }

@@ -89,7 +89,7 @@ int map_selected_building();
 int map_selected_index();
 void map_clear_fow();
 
-void map_flare_add(int index, int player, unsigned int duration);
+void map_flare_add(int index, int player, unsigned int duration, unsigned int radius);
 void map_flare_draw();
 
 void map_draw(int draw_powergrid);
