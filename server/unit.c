@@ -76,7 +76,7 @@ int unitPylonListAdd(UNIT_PYLON *to, UNIT_PYLON *add) {
 	range = unit_range[to->unit->type];
 	dx += range;
 	dy += range;
-	i = dx + dy * (range + 1);
+	i = dx + dy * (range * 2 + 1);
 
 	to->neighbour[i] = add;
 
