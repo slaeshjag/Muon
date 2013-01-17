@@ -105,6 +105,8 @@ SERVER_SOCKET *networkListen(int port) {
 	ioctlsocket(sock->socket, FIONBIO, &iMode);
 	#endif
 
+	flags = 1;
+	setsockopt(sock->socket, SOL_SOCKET, SO_REUSEADDR, &flags, 4);
 
 	return sock;
 }

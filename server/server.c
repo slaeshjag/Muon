@@ -279,7 +279,7 @@ void serverSendPing() {
 		}
 
 		if (time(NULL) - server->player[i].last_ping_reply > SERVER_PING_TIMEOUT_DELAY) {
-			playerDisconnect(i);
+			playerDisconnectKill(i);
 			continue;
 		}
 	}
@@ -516,6 +516,7 @@ int serverLoop(unsigned int d_ms) {
 		}
 	}
 
+	playerLoop();
 	serverSendPing();
 	
 	/* This call must ALWAYS be LAST in serverLoop */

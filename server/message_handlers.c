@@ -131,6 +131,8 @@ void messageHandlerPlayerReady(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerPong(unsigned int player, MESSAGE *message) {
+	if (server->player[player].status == PLAYER_BEING_DISCONNECTED)
+		return;
 	server->player[player].last_ping_reply = time(NULL);
 	return;
 }
