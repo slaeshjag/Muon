@@ -197,14 +197,14 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			map_set_building_shield(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_MAP_FLARE:
-			map_flare_add(msg->arg_2, msg->player_id, 10000);
+			map_flare_add(msg->arg_2, msg->player_id, 10000, 40);
 			break;
 		case MSG_RECV_CP_TIMER:
 			printf("Timer for %s: %i\n", msg->arg_1==BUILDING_CLUSTERBOMB?"clusterbomb":"radar", msg->arg_2);
 			break;
 		case MSG_RECV_CP_DEPLOY:
 			if(msg->arg_1==BUILDING_CLUSTERBOMB)
-				map_flare_add(msg->arg_2, msg->player_id, 2000);
+				map_flare_add(msg->arg_2, msg->player_id, 2000, building[BUILDING_CLUSTERBOMB].range*map->layer[map->layers-2].tile_w);
 			break;
 	}
 }
