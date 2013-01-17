@@ -5,12 +5,14 @@ Unable to open the map file for caching.							Unable to open the map file for c
 Unable to allocate more memory. Your system might've runned out of RAM.				Unable to allocate more memory. Your system might've runned out of RAM.
 The map contains overlapping spawn points. This is not acceptable.				The map contains overlapping spawn points. This is not acceptable.
 The map file is invalid.									The map file is invalid.
-The map is missing the property 'max_players'							The map is missing the property 'max_players'
+The map is missing the property 'max_players'.							The map is missing the property 'max_players'.
 The server was unable to bind the requested port. It's either in use or blocked by a firewall.	The server was unable to bind the requested port. It's either in use or blocked by a firewall.
-The map is not defined for this many players							The map is not defined for this many players
-Gamespeed must be bigger than 0									Gamespeed must be bigger than 0
-The map is missing a generator for one or more players						The map is missing a generatorfor one or more players
-The number of generators on the map is not equal to the biggest player id			The number of generators on the map is not equal to the biggest player id
+The map is not defined for this many players.							The map is not defined for this many players.
+Gamespeed must be bigger than 0.								Gamespeed must be bigger than 0.
+The map is missing a generator for one or more players.						The map is missing a generatorfor one or more players.
+The number of generators on the map is not equal to the biggest player id.			The number of generators on the map is not equal to the biggest player id.
+The server is still sending out data to clients and has not yet stopped.			The server is still sending out data to clients and has not yet stopped.
+The server is already running and have no intention on stopping on its own.			The server is already running and have no intention on stopping on its own.
 rand() wasn't on our side, and spawn randomization took too many tries. Try again.		rand() wasn't on our side, and spawn randomization took too many tries. Try again.
 Lost connection to server.									Lost connection to server.
 
@@ -81,6 +83,12 @@ Attacker		Attacker
 Pylon			Pylon
 Wall			Wall
 Special building	Special building
+Construction yard	Construction yard
+Missile silo		Missile silo
+Radar			Radar
+
+Flare			Flare
+Nuke			Nuke
 
 Shield			Shield
 Health			Health
