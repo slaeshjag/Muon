@@ -217,22 +217,42 @@ void map_set_building_shield(int index, unsigned int shield) {
 		game_update_building_status();
 }
 
-void map_set_tile_attributes(int index, int attrib) {
+unsigned int map_set_tile_attributes(int index, int attrib) {
+	int i;
+	unsigned int update=0;
 	switch(attrib) {
 		case MSG_TILE_ATTRIB_FOW_CLEAR:
 			map->layer[map->layers-1].tilemap->data[index]&=~0xFFF;
+			update|=1<<(map->layers-1);
 			break;
 		case MSG_TILE_ATTRIB_FOW_SET:
 			map->layer[map->layers-1].tilemap->data[index]=(map->layer[map->layers-1].tilemap->data[index]&~0xFFF)|0x1;
 			game_attacklist_untarget(index);
+			update|=1<<(map->layers-1);
 			break;
 		case MSG_TILE_ATTRIB_POWER_CLEAR:
 			map->layer[map->layers-1].tilemap->data[index]&=~0x1000000;
+			update|=1<<(map->layers-1);
 			break;
 		case MSG_TILE_ATTRIB_POWER_SET:
 			map->layer[map->layers-1].tilemap->data[index]|=0x1000000;
+			update|=1<<(map->layers-1);
+			break;
+		case MSG_TILE_ATTRIB_TERRAIN_CLEAR:
+			for(i=map->layers-2; i>=0; i--)  {
+				map->layer[i].tilemap->data[index]=0;
+				update|=1<<(i);
+			}
+			break;
+		case MSG_TILE_ATTRIB_TERRAIN_SET:
+			//TODO: fix if ever needed
+			/*for(i=map->layers-3; i>=0; i--) {
+				map->layer[i].tilemap->data[index]=lololol;
+				update|=1<<(i);
+			}*/
 			break;
 	}
+	return update;
 }
 
 void map_select_building(int index) {

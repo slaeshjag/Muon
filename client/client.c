@@ -167,8 +167,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			game_attacklist_target(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
-			map_set_tile_attributes(msg->arg_2, msg->arg_1);
-			recalc_map|=1<<(map->layers-1);
+			recalc_map|=map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map_building_place(msg->arg_2, msg->player_id, msg->arg_1);
