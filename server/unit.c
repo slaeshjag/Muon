@@ -192,6 +192,8 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 		for (k = -1 * radius; k <= radius; k++) {
 			if (k + y < 0 || k + y >= server->w)
 				continue;
+			if (k * k + j * j > radius*radius)
+				continue;
 			index = (y + k) * server->w + (x + j);
 			if (!server->map[index])		/* No building here - don't bother */
 				continue;
