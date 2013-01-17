@@ -646,7 +646,7 @@ void unitDamageDo(int index, int damage, int time) {
 			return;
 		server->map_c.tile_data[index] &= 0xF0000;
 		server->map_c.tile_data[index] |= 0x60000;
-		messageBufferPushDirect(owner, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x11, next->target, NULL);
+		messageBufferPushDirect(owner, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x10, next->target, NULL);
 		return;
 	}
 
