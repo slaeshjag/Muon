@@ -107,6 +107,7 @@ typedef struct {
 	PLAYER_STATS		stats;
 	int			buildspots;
 	float			buildspeed;
+	CONTROLPOINT_DATA	cp;
 
 	PLAYER_DATA_TRANSFER	transfer;
 	int			transfer_pos;

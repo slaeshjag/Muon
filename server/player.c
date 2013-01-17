@@ -27,8 +27,8 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 	if ((player = malloc(sizeof(PLAYER) * players)) == NULL)
 		return NULL;
 	err = 0;
-	server->players = 0;
-	server->player = NULL;
+	server->players = players;
+	server->player = player;
 
 	for (i = 0; i < players; i++) {
 		if ((player[i].map = malloc(sizeof(PLAYER_MAP) * map_w * map_h)) == NULL)
@@ -51,11 +51,10 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].stats.buildings_destroyed = 0;
 		player[i].stats.buildtime = 0;
 		player[i].stats.no_build_time = 0;
+
+		controlpointInitPlayer(i);
 		player[i].team = -1;
 	}
-	
-	server->players = players;
-	server->player = player;
 
 	if (playerBuildQueueInit() < 0)
 		err = 1;

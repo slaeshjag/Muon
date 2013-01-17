@@ -253,6 +253,13 @@ void messageHandlerChunkResend(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerControlpointDeploy(unsigned int player, MESSAGE *message) {
+	controlpointDeploy(player, message->arg[0], message->arg[1]);
+
+	return;
+}
+
+
 int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
@@ -268,6 +275,7 @@ int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PLACE_BUILDING]	= messageHandlerPlaceBuilding;
 	server->message_handler.handle[MSG_RECV_SET_ATTACK]	= messageHandlerSetAttack;
 	server->message_handler.handle[MSG_RECV_SET_FLARE]	= messageHandlerSetFlare;
+	server->message_handler.handle[MSG_RECV_CP_DEPLOY]	= messageHandlerControlpointDeploy;
 
 	return 0;
 }

@@ -29,7 +29,6 @@ int controlpointClusterbombInit(SERVER_UNIT *unit) {
 	server->controlpoint = new;
 
 	new->type = unit->type;
-	new->delay = CP_CLUSTERBOMB_DELAY;
 	new->index = unit->x + unit->y * server->w;
 	new->owner = unit->owner;
 
@@ -45,8 +44,22 @@ int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 }
 
 
+void controlpointInitPlayer(int player) {
+	server->player[player].cp.clusterbomb_delay = -1;
+	server->player[player].cp.radar_delay = -1;
+
+	return;
+}
+
+
 int controlpointInit() {
+	int bombs, i;
+	bombs = unit_damage[UNIT_DEF_CLUSTERBOMB] / unit_maxshield[UNIT_DEF_GENERATOR];
 	server->controlpoint = NULL;
+	server->clusterbomb_buffer = malloc(sizeof(int) * bombs);
+
+	for (i = 0; i < bombs; i++)
+		server->clusterbomb_buffer[i] = ~0;
 
 	return 0;
 }
@@ -123,6 +136,7 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 
 void controlpointLoop(int msec) {
 	CONTROLPOINT_EXTRA *next;
+	int delay;
 
 	if (!server)
 		return;
@@ -130,15 +144,105 @@ void controlpointLoop(int msec) {
 	for (next = server->controlpoint; next; next = (CONTROLPOINT_EXTRA *) next->next) {
 		switch (next->type) {
 			case UNIT_DEF_CLUSTERBOMB:
-				next->delay -= msec * server->game.gamespeed;
-				if (next->delay < 0)
-					next->delay = 0;
+				delay = server->player[next->owner].cp.clusterbomb_delay;
+				if (delay == -1)
+					delay = CP_CLUSTERBOMB_DELAY;
+				delay -= msec * server->game.gamespeed;
+				if (delay < 0)
+					delay = 0;
+				if (CP_DELAY_SEC(delay) != CP_DELAY_SEC(server->player[next->owner].cp.clusterbomb_delay))
+					messageBufferPushDirect(next->owner, next->owner, MSG_SEND_CP_DELAY, UNIT_DEF_CLUSTERBOMB, CP_DELAY_SEC(delay), NULL);
+				server->player[next->owner].cp.clusterbomb_delay = delay;
+				break;
+			case UNIT_DEF_RADAR:
+				delay = server->player[next->owner].cp.radar_delay;
+				if (delay == -1)
+					delay = CP_RADAR_DELAY;
+				delay -= msec * server->game.gamespeed;
+				if (delay < 0)
+					delay = 0;
+				if (CP_DELAY_SEC(delay) != CP_DELAY_SEC(server->player[next->owner].cp.radar_delay))
+					messageBufferPushDirect(next->owner, next->owner, MSG_SEND_CP_DELAY, UNIT_DEF_RADAR, CP_DELAY_SEC(delay), NULL);
+				server->player[next->owner].cp.radar_delay = delay;
+				break;
+			default:
+				break;
 		}
 
 		/* TODO: Implement */
 	}
 
+	return;
+}
 
+
+int controlpointClusterbombAlreadyUsed(int tx, int ty, int bombs) {
+	int index, i;
+
+	index = tx + ty * server->w;
+	
+	for (i = 0; i < bombs && server->clusterbomb_buffer[i] != index; i++);
+	if (i == bombs)
+		return 1;
+	return 0;
+}
+
+
+void controlpointDeployClusterbomb(int player, int index_dst) {
+	int bombs, x, y, tx, ty, i, index;
+
+	bombs = unit_damage[UNIT_DEF_CLUSTERBOMB] / unit_maxshield[UNIT_DEF_GENERATOR];
+	x = index_dst % server->w;
+	y = index_dst / server->w;
+
+	for (i = 0; i < bombs; i++) {
+		do {
+			tx = rand() % (unit_range[UNIT_DEF_CLUSTERBOMB] * 2 + 1) - unit_range[UNIT_DEF_CLUSTERBOMB];
+			ty = rand() % (unit_range[UNIT_DEF_CLUSTERBOMB] * 2 + 1) - unit_range[UNIT_DEF_CLUSTERBOMB];
+		} while (controlpointClusterbombAlreadyUsed(tx, ty, i));
+		
+		index = tx + ty * server->w;
+		server->clusterbomb_buffer[i] = index;
+		tx += x;
+		ty += y;
+		index = tx + ty * server->w;
+		unitDamagePoke(index, unit_damage[UNIT_DEF_CLUSTERBOMB]);
+	}
+
+	for (i = 0; i < bombs; i++)
+		server->clusterbomb_buffer[i] = ~0;
 
 	return;
 }
+
+
+void controlpointDeployRadar(int player, int index_dst) {
+	return;
+}
+
+
+void controlpointDeploy(int player, int type, int index_dst) {
+	
+	if (index_dst < 0 || index_dst > server->w * server->h)
+		return;
+	switch (type) {
+		case UNIT_DEF_CLUSTERBOMB:
+			if (server->player[player].cp.clusterbomb_delay <= 0)
+				return;
+			controlpointDeployClusterbomb(player, index_dst);
+			break;
+		case UNIT_DEF_RADAR:
+			if (server->player[player].cp.radar_delay <= 0)
+				return;
+			controlpointDeployRadar(player, index_dst);
+			break;
+		default:
+			return;
+			break;
+	}
+
+	messageBufferPushDirect(player, player, MSG_SEND_CP_DEPLOY, type, index_dst, NULL);
+
+	return;
+}
+				

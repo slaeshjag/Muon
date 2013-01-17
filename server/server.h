@@ -49,13 +49,13 @@
 #include "unit.h"
 #include "message.h"
 #include "message_handlers.h"
+#include "controlpoint.h"
 #include "player.h"
 #include "game.h"
 #include "lobby.h"
 #include "error.h"
 #include "controlpoint.h"
 #ifndef __TTMZ_H__
-#include "controlpoint.h"
 #include "map.h"
 #endif
 
@@ -101,6 +101,7 @@ typedef struct {
 	UNIT_PYLON		*pylons;
 	int			server_admin;
 	CONTROLPOINT_EXTRA	*controlpoint;
+	int			*clusterbomb_buffer;
 	int			state;
 } SERVER;
 

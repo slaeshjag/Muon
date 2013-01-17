@@ -621,6 +621,19 @@ void unitShieldAnnounce(int index) {
 }
 
 
+/* This is probably *THE* most evil hack in Muon's entire codebase */
+void unitDamagePoke(int index, int damage) {
+	int gamespeed;
+
+	gamespeed = server->game.gamespeed;
+	server->game.gamespeed = 1;
+	unitDamageDo(index, damage, 1);
+	server->game.gamespeed = gamespeed;
+
+	return;
+}
+
+
 void unitDamageDo(int index, int damage, int time) {
 	SERVER_UNIT *next = server->map[index];
 	

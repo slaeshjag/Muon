@@ -212,7 +212,7 @@ void gameEnd() {
 		fprintf(stderr, "Total amount of points for %.31s: %.8u\n", server->player[i].name, playerCountPoints(i));
 	}
 	
-	playerMessageBroadcast(player, MSG_SEND_GAME_ENDED, player, team, NULL);
+	playerMessageBroadcast(player, MSG_SEND_GAME_ENDED, team, player, NULL);
 
 	return;
 }

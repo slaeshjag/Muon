@@ -150,8 +150,11 @@ typedef struct {
 /* arg_1 is nothing. arg_2 is tile flare is on */
 #define	MSG_RECV_MAP_FLARE		0x01B
 
-/* arg_1 is the controlpoint tile pos, arg_2 is time left in seconds */
+/* arg_1 is the controlpoint building ID, arg_2 is time left in seconds */
 #define	MSG_RECV_CP_TIMER		0x01C
+
+/* arg_1 is the controlpoint building type that was deployed, arg_2 is where the center of the deployment was */
+#define	MSG_RECV_CP_DEPLOY		0x01D
 
 
 /* These commands have data after them */
@@ -212,6 +215,9 @@ typedef struct {
 
 /* arg_1 is nothing, arg_2 is tile to set flare on */
 #define	MSG_SEND_SET_FLARE		12
+
+/* arg_1 is the controlpoint building type, arg_2 is the tile ID to center the deployment at */
+#define	MSG_SEND_CP_DEPLOY		13
 
 
 #endif
