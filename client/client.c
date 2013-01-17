@@ -135,7 +135,8 @@ void client_check_incoming() {
 		UI_PROPERTY_VALUE v;
 		v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
 		map_minimap_update(v.p, game_sidebar_minimap->w, game_sidebar_minimap->h, 1);
-		map_update_grid();
+		if(recalc_map&~(3<<(map->layers-2)))
+			map_update_grid();
 	}
 	for(i=0; recalc_map; recalc_map>>=1, i++)
 		if(recalc_map&1) {
