@@ -33,6 +33,8 @@ enum CONFIG_OPTIONS {
 	CONFIG_OPTION_POWERGRID,
 	CONFIG_OPTION_PLASMA,
 	CONFIG_OPTION_ALPHA,
+	CONFIG_OPTION_GAMESPEED,
+	CONFIG_OPTION_PLAYERS,
 	CONFIG_OPTION_PLAYER_NAME,
 	CONFIG_OPTION_LANG,
 } options;
@@ -45,6 +47,8 @@ struct CONFIG {
 	int powergrid;
 	int plasma;
 	int alpha;
+	int gamespeed;
+	int players;
 	char player_name[32];
 	char lang[3];
 } config;
