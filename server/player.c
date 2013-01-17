@@ -125,6 +125,13 @@ void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned 
 
 
 void playerDisconnect(unsigned int player) {
+	server->player[player].status = PLAYER_BEING_DISCONNECTED;
+
+	return;
+}
+
+
+void playerDisconnectKill(unsigned int player) {
 	int broadcast;
 
 	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
@@ -432,4 +439,18 @@ unsigned int playerCountPoints(int player) {
 	}
 
 	return total;
+}
+
+
+void playerLoop() {
+	int i;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_BEING_DISCONNECTED)
+			continue;
+		if (server->player[i].msg_buf->read_pos == server->player[i].msg_buf->write_pos)
+			playerDisconnectKill(i);
+	}
+
+	return;
 }
