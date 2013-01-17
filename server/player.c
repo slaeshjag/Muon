@@ -97,7 +97,7 @@ PLAYER *playerDestroy(PLAYER *player, int players) {
 	for (i = 0; i < players; i++) {
 		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
-		playerDisconnect(i);
+		playerDisconnectKill(i);
 		messageBufferDelete(server->player[i].msg_buf);
 		free(player[i].map);
 	}
@@ -126,6 +126,9 @@ void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned 
 
 void playerDisconnect(unsigned int player) {
 	server->player[player].status = PLAYER_BEING_DISCONNECTED;
+	server->player[player].last_ping_reply = time(NULL);
+
+	fprintf(stderr, "request to disconnect player...\n");
 
 	return;
 }
