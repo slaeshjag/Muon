@@ -108,7 +108,7 @@ static const int unit_damage[] = {
 	0,		/* pylon */
 	0,		/* wall */
 	0,		/* owned control point (buildsite) */
-	2000 * 150 * 5,	/* carpet bomb (this / Generator shield gives bomb count) */
+	2000 * 150 * 30,/* carpet bomb (this / Generator shield gives bomb count) */
 	0		/* radar */
 };
 

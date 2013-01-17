@@ -331,7 +331,7 @@ int unitAdd(int owner, int type, int x, int y) {
 	
 	unit->next = server->unit;
 	server->unit = unit;
-	server->map_c.tile_data[index] |= 0x60000;
+	server->map_c.tile_data[index] |= 0x80000;
 	server->player[owner].stats.buildings_raised++;
 
 
@@ -374,7 +374,7 @@ int unitRemove(int x, int y) {
 	}
 	
 	server->player[owner].stats.buildings_lost++;
-	
+
 	while (next != unit) {
 		parent = &next->next;
 		next = next->next;
@@ -636,6 +636,7 @@ void unitDamagePoke(int index, int damage) {
 
 void unitDamageDo(int index, int damage, int time) {
 	SERVER_UNIT *next = server->map[index];
+	int owner = next->owner;
 	
 	if (next->target < 0 || next->target > server->w * server->h)
 		return;
@@ -643,8 +644,9 @@ void unitDamageDo(int index, int damage, int time) {
 	if (!server->map[next->target]) {
 		if (damage < MAP_TERRAIN_ABSORTION)
 			return;
-		server->map_c.tile_data[index] &= 0x70000;
-		server->map_c.tile_data[index] |= 0x30000;
+		server->map_c.tile_data[index] &= 0xF0000;
+		server->map_c.tile_data[index] |= 0x60000;
+		messageBufferPushDirect(owner, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x11, next->target, NULL);
 		return;
 	}
 

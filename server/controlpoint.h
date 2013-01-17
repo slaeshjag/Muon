@@ -25,8 +25,8 @@
 #define	CP_DELAY_SEC(x)			((x) / server->game.gamespeed / 1000)
 
 /* In gameticks */
-#define	CP_CLUSTERBOMB_DELAY		60 * 180
-#define	CP_RADAR_DELAY			60 * 180
+#define	CP_CLUSTERBOMB_DELAY		60 * 3000
+#define	CP_RADAR_DELAY			60 * 3000
 
 typedef struct CONTROLPONIT_EXTRA {
 	unsigned int			type;

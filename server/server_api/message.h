@@ -156,6 +156,9 @@ typedef struct {
 /* arg_1 is the controlpoint building type that was deployed, arg_2 is where the center of the deployment was */
 #define	MSG_RECV_CP_DEPLOY		0x01D
 
+/* arg_1 is the controlpoint building type that should have its timer removed. arg_2 is nothing. */
+#define	MSG_RECV_CP_CLEAR		0x01E
+
 
 /* These commands have data after them */
 

@@ -90,6 +90,7 @@
 #define	MSG_SEND_MAP_FLARE		0x01B
 #define	MSG_SEND_CP_DELAY		0x01C
 #define	MSG_SEND_CP_DEPLOY		0x01D
+#define	MSG_SEND_CP_CLEAR		0x01E
 
 typedef struct {
 	unsigned int		player_ID;

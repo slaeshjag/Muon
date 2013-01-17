@@ -27,6 +27,7 @@ int controlpointClusterbombInit(SERVER_UNIT *unit) {
 		return -1;
 	new->next = (struct CONTROLPOINT_EXTRA *) server->controlpoint;
 	server->controlpoint = new;
+	unit->cp = new;
 
 	new->type = unit->type;
 	new->index = unit->x + unit->y * server->w;
@@ -39,6 +40,7 @@ int controlpointClusterbombInit(SERVER_UNIT *unit) {
 int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 	server->player[unit->owner].buildspots++;
 	server->player[unit->owner].buildspeed = logf(M_E + server->player[unit->owner].buildspots);
+	unit->cp = NULL;
 
 	return 0;
 }
@@ -96,6 +98,16 @@ void controlpointBuildsiteRemove(SERVER_UNIT *unit) {
 
 
 void controlpointClusterbombRemove(SERVER_UNIT *unit) {
+	CONTROLPOINT_EXTRA *next;
+
+	for (next = server->controlpoint; next; next = (void *) next->next)
+		if (next->owner == unit->owner)
+			if (unit->type == UNIT_DEF_CLUSTERBOMB)
+				if (unit->cp != next)
+					return;
+	server->player[unit->owner].cp.clusterbomb_delay = -1;
+	messageBufferPushDirect(unit->owner, unit->owner, MSG_SEND_CP_CLEAR, UNIT_DEF_CLUSTERBOMB, 0, NULL);
+
 	return;
 }
 
@@ -105,29 +117,28 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 	switch (unit->type) {
 		case UNIT_DEF_BUILDSITE:
 			controlpointBuildsiteRemove(unit);
-			return;
 		case UNIT_DEF_CLUSTERBOMB:
 			controlpointClusterbombRemove(unit);
-			return;
 		default:
 			break;
 	}
 
+	if (!unit->cp)
+		return;
 	if (!server->controlpoint) {
 		fprintf(stderr, "Internal error: Control point free'd but not in list\n");
 		free(unit->cp);
 		return;
 	}
 
-	for (next = server->controlpoint; next->next && (void *) next->next != unit->cp; next = (void *) next->next);
-
-	if (next->next != (void *) unit->cp) {
-		fprintf(stderr, "Internal error: Control point free'd but not in list\n");
-		free(unit->cp);
-		return;
+	if (unit->cp == server->controlpoint)
+		server->controlpoint = (void *) unit->cp->next;
+	else {
+		for (next = server->controlpoint; next->next && (void *) next->next != unit->cp; next = (void *) next->next);
+		if (next->next == (void *) unit->cp)
+			next->next = unit->cp->next;
 	}
 
-	next->next = ((CONTROLPOINT_EXTRA *)((CONTROLPOINT_EXTRA *)next)->next)->next;
 	free(unit->cp);
 
 	return;
@@ -183,13 +194,13 @@ int controlpointClusterbombAlreadyUsed(int tx, int ty, int bombs) {
 	
 	for (i = 0; i < bombs && server->clusterbomb_buffer[i] != index; i++);
 	if (i == bombs)
-		return 1;
-	return 0;
+		return 0;
+	return 1;
 }
 
 
 void controlpointDeployClusterbomb(int player, int index_dst) {
-	int bombs, x, y, tx, ty, i, index;
+	int bombs, x, y, tx, ty, i, index, target;
 
 	bombs = unit_damage[UNIT_DEF_CLUSTERBOMB] / unit_maxshield[UNIT_DEF_GENERATOR];
 	x = index_dst % server->w;
@@ -201,12 +212,29 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 			ty = rand() % (unit_range[UNIT_DEF_CLUSTERBOMB] * 2 + 1) - unit_range[UNIT_DEF_CLUSTERBOMB];
 		} while (controlpointClusterbombAlreadyUsed(tx, ty, i));
 		
+		if (!server->map[server->player[player].spawn.index])
+			return;
+
 		index = tx + ty * server->w;
 		server->clusterbomb_buffer[i] = index;
 		tx += x;
 		ty += y;
+		if (tx < 0 || tx > server->w)
+			continue;
+		if (ty < 0 || ty > server->h)
+			continue;
+		fprintf(stderr, "Deployed at %i, %i; bombing %i %i\n", x, y, tx, ty);
 		index = tx + ty * server->w;
-		unitDamagePoke(index, unit_damage[UNIT_DEF_CLUSTERBOMB]);
+		
+		target = server->map[server->player[player].spawn.index]->target;
+		server->map[server->player[player].spawn.index]->target = index;
+
+		unitDamagePoke(server->player[player].spawn.index, unit_damage[UNIT_DEF_CLUSTERBOMB]);
+		/* Another evil hack */
+		if (!server->map[server->player[player].spawn.index])
+			return;
+		server->map[server->player[player].spawn.index]->target = target;
+
 	}
 
 	for (i = 0; i < bombs; i++)
@@ -227,9 +255,11 @@ void controlpointDeploy(int player, int type, int index_dst) {
 		return;
 	switch (type) {
 		case UNIT_DEF_CLUSTERBOMB:
-			if (server->player[player].cp.clusterbomb_delay <= 0)
+			if (server->player[player].cp.clusterbomb_delay != 0)
 				return;
 			controlpointDeployClusterbomb(player, index_dst);
+			if (server->player[player].cp.clusterbomb_delay == 0)
+				server->player[player].cp.clusterbomb_delay = CP_CLUSTERBOMB_DELAY;
 			break;
 		case UNIT_DEF_RADAR:
 			if (server->player[player].cp.radar_delay <= 0)
@@ -245,4 +275,4 @@ void controlpointDeploy(int player, int type, int index_dst) {
 
 	return;
 }
-				
+
