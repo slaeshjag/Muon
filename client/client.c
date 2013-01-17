@@ -202,11 +202,19 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			map_flare_add(msg->arg_2, msg->player_id, 10000, 40);
 			break;
 		case MSG_RECV_CP_TIMER:
-			printf("Timer for %s: %i\n", msg->arg_1==BUILDING_CLUSTERBOMB?"clusterbomb":"radar", msg->arg_2);
+			printf("Timer for %i %s: %i\n", msg->arg_1-BUILDING_CLUSTERBOMB+1, msg->arg_1==BUILDING_CLUSTERBOMB?"clusterbomb":"radar", msg->arg_2);
+			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].delay=msg->arg_2;
+			if(msg->arg_2==0)
+				ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=1;
 			break;
 		case MSG_RECV_CP_DEPLOY:
-			if(msg->arg_1==BUILDING_CLUSTERBOMB)
+			if(msg->arg_1==BUILDING_CLUSTERBOMB) {
 				map_flare_add(msg->arg_2, msg->player_id, 2000, building[BUILDING_CLUSTERBOMB].range*map->layer[map->layers-2].tile_w);
+				if(msg->player_id==player_id) {
+					ability[1].delay=-1;
+					ability[1].button->enabled=0;
+				}
+			}
 			break;
 		case MSG_RECV_MAJOR_IMPACT:
 			map_flare_add(msg->arg_2, msg->player_id, 2000, map->layer[map->layers-2].tile_w);
