@@ -36,6 +36,10 @@ UI_WIDGET *game_sidebar_progress_build;
 UI_WIDGET *game_sidebar_progress_shield;
 UI_WIDGET *game_sidebar_progress_health;
 
+struct UI_PANE_LIST panelist_game_specialbar;
+UI_WIDGET *game_specialbar_button_build[3];
+UI_WIDGET *game_specialbar_label_build[3];
+
 int building_place;
 int building_ready;
 int building_cancel;
