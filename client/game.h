@@ -53,7 +53,7 @@ struct ABILITY {
 	DARNIT_TILESHEET *icon;
 	const char *name;
 	void (*action)();
-	int delay;
+	int ready;
 } ability[3];
 struct UI_PANE_LIST panelist_game_abilitybar;
 

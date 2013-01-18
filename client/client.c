@@ -203,7 +203,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_CP_TIMER:
 			printf("%s %i%% ready\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar", msg->arg_2);
-			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].delay=msg->arg_2;
+			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].ready=msg->arg_2;
 			if(msg->arg_2==100)
 				ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=1;
 			break;
@@ -211,7 +211,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			if(msg->arg_1==BUILDING_CLUSTERBOMB) {
 				map_flare_add(msg->arg_2, msg->player_id, 2000, building[BUILDING_CLUSTERBOMB].range*map->layer[map->layers-2].tile_w);
 				if(msg->player_id==player_id) {
-					ability[1].delay=-1;
+					ability[1].ready=-1;
 					ability[1].button->enabled=0;
 				}
 			}

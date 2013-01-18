@@ -86,7 +86,7 @@ void game_view_init() {
 	iconwidget->render=game_abilitybar_icon_render;
 	ability[0].button=ui_widget_create_button(iconwidget);
 	ability[0].button->event_handler->add(ability[0].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	ability[0].delay=0;
+	ability[0].ready=100;
 	ability[1].name=T("Nuke");
 	ability[1].icon=d_render_tilesheet_load("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[1].action=NULL;
@@ -95,7 +95,7 @@ void game_view_init() {
 	ability[1].button=ui_widget_create_button(iconwidget);
 	ability[1].button->enabled=0;
 	ability[1].button->event_handler->add(ability[1].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	ability[1].delay=-1;
+	ability[1].ready=-1;
 	ability[2].name=T("Radar");
 	ability[2].icon=d_render_tilesheet_load("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[2].action=NULL;
@@ -104,7 +104,7 @@ void game_view_init() {
 	ability[2].button=ui_widget_create_button(iconwidget);
 	ability[2].button->enabled=0;
 	ability[2].button->event_handler->add(ability[2].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	ability[2].delay=-1;
+	ability[2].ready=-1;
 	for(i=0; i<3; i++)
 		ui_vbox_add_child(panelist_game_abilitybar.pane->root_widget, ability[i].button, 0);
 }
@@ -421,7 +421,7 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 		v=ability[i].button->get_prop(ability[i].button, UI_BUTTON_PROP_CHILD);
 	}
 		
-	if(ability[i].delay==100)
+	if(ability[i].ready==100)
 		d_render_tint(255, 255, 255, 255);
 	else
 		d_render_tint(127, 127, 127, 255);
