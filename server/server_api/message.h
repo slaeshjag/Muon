@@ -159,6 +159,9 @@ typedef struct {
 /* arg_1 is the controlpoint building type that should have its timer removed. arg_2 is nothing. */
 #define	MSG_RECV_CP_CLEAR		0x01E
 
+/* arg_1 is nothing, arg_2 is tile ID of major impact */
+#define	MSG_RECV_MAJOR_IMPACT		0x01F
+
 
 /* These commands have data after them */
 

@@ -112,7 +112,7 @@ int main() {
 		darnitRenderBegin();
 		if(state_render[gamestate])
 			state_render[gamestate]();
-			
+		
 		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
 		if(gamestate==GAME_STATE_GAME_MENU)
 			ui_pane_render(panelist_game_sidebar.pane);

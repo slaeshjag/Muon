@@ -135,6 +135,8 @@ void client_check_incoming() {
 		UI_PROPERTY_VALUE v;
 		v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
 		map_minimap_update(v.p, game_sidebar_minimap->w, game_sidebar_minimap->h, 1);
+		if(recalc_map&~(3<<(map->layers-2)))
+			map_update_grid();
 	}
 	for(i=0; recalc_map; recalc_map>>=1, i++)
 		if(recalc_map&1) {
@@ -167,8 +169,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			game_attacklist_target(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
-			map_set_tile_attributes(msg->arg_2, msg->arg_1);
-			recalc_map|=1<<(map->layers-1);
+			recalc_map|=map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map_building_place(msg->arg_2, msg->player_id, msg->arg_1);
@@ -198,14 +199,36 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			map_set_building_shield(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_MAP_FLARE:
-			map_flare_add(msg->arg_2, msg->player_id, 10000);
+			map_flare_add(msg->arg_2, msg->player_id, 10000, 40);
 			break;
 		case MSG_RECV_CP_TIMER:
-			printf("Timer for %s: %i\n", msg->arg_1==BUILDING_CLUSTERBOMB?"clusterbomb":"radar", msg->arg_2);
+			printf("Timer for %i %s: %i\n", msg->arg_1-BUILDING_CLUSTERBOMB+1, msg->arg_1==BUILDING_CLUSTERBOMB?"clusterbomb":"radar", msg->arg_2);
+			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].delay=msg->arg_2;
+			if(msg->arg_2==0)
+				ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=1;
 			break;
 		case MSG_RECV_CP_DEPLOY:
-			if(msg->arg_1==BUILDING_CLUSTERBOMB)
-				map_flare_add(msg->arg_2, msg->player_id, 2000);
+			if(msg->arg_1==BUILDING_CLUSTERBOMB) {
+				map_flare_add(msg->arg_2, msg->player_id, 2000, building[BUILDING_CLUSTERBOMB].range*map->layer[map->layers-2].tile_w);
+				if(msg->player_id==player_id) {
+					ability[1].delay=-1;
+					ability[1].button->enabled=0;
+				}
+			}
+			break;
+		case MSG_RECV_MAJOR_IMPACT:
+			map_flare_add(msg->arg_2, msg->player_id, 2000, map->layer[map->layers-2].tile_w);
+			break;
+		case MSG_RECV_PLAYER_STATS_1:
+			player[msg->player_id].stats.constructed=msg->arg_1;
+			player[msg->player_id].stats.lost=msg->arg_2;
+			break;
+		case MSG_RECV_PLAYER_STATS_2:
+			player[msg->player_id].stats.destroyed=msg->arg_1;
+			player[msg->player_id].stats.efficiency=msg->arg_2;
+			break;
+		case MSG_RECV_GAME_ENDED:
+			ui_messagebox(font_std, "Game over");
 			break;
 	}
 }

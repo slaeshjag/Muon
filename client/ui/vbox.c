@@ -102,6 +102,7 @@ void ui_vbox_remove_child(UI_WIDGET *widget, UI_WIDGET *child) {
 			c_next=(*c)->next;
 			free(*c);
 			*c=c_next;
+			p->size--;
 			break;
 		}
 	}

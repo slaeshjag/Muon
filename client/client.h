@@ -28,7 +28,16 @@
 #define MSG_SERVER_DISCONNECT 0x10000
 
 typedef struct {
+	unsigned int constructed;
+	unsigned int lost;
+	unsigned int destroyed;
+	unsigned int efficiency;
+	unsigned int score;
+} STATS;
+
+typedef struct {
 	char name[32];
+	STATS stats;
 	unsigned int team;
 	unsigned int ready:1;
 } PLAYER;

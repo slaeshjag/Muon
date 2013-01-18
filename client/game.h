@@ -53,7 +53,7 @@ struct ABILITY {
 	DARNIT_TILESHEET *icon;
 	const char *name;
 	void (*action)();
-	unsigned int delay;
+	int delay;
 } ability[3];
 struct UI_PANE_LIST panelist_game_abilitybar;
 
@@ -87,6 +87,8 @@ void game_attacklist_remove(int index);
 void game_attacklist_clear();
 void game_attacklist_untarget(int target);
 void game_attacklist_target(int index, int target);
+
+void game_abilitybar_icon_render(UI_WIDGET *widget);
 
 void game_view_draw();
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

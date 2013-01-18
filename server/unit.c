@@ -76,7 +76,7 @@ int unitPylonListAdd(UNIT_PYLON *to, UNIT_PYLON *add) {
 	range = unit_range[to->unit->type];
 	dx += range;
 	dy += range;
-	i = dx + dy * (range + 1);
+	i = dx + dy * (range * 2 + 1);
 
 	to->neighbour[i] = add;
 
@@ -191,6 +191,8 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 			continue;
 		for (k = -1 * radius; k <= radius; k++) {
 			if (k + y < 0 || k + y >= server->w)
+				continue;
+			if (k * k + j * j > radius*radius)
 				continue;
 			index = (y + k) * server->w + (x + j);
 			if (!server->map[index])		/* No building here - don't bother */
@@ -644,9 +646,9 @@ void unitDamageDo(int index, int damage, int time) {
 	if (!server->map[next->target]) {
 		if (damage < MAP_TERRAIN_ABSORTION)
 			return;
-		server->map_c.tile_data[index] &= 0xF0000;
-		server->map_c.tile_data[index] |= 0x60000;
-		messageBufferPushDirect(owner, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x11, next->target, NULL);
+		server->map_c.tile_data[next->target] &= 0xF0000;
+		server->map_c.tile_data[next->target] |= 0x70000;
+		messageBufferPushDirect(owner, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x10, next->target, NULL);
 		return;
 	}
 

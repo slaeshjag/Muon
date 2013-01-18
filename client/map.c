@@ -217,22 +217,43 @@ void map_set_building_shield(int index, unsigned int shield) {
 		game_update_building_status();
 }
 
-void map_set_tile_attributes(int index, int attrib) {
+unsigned int map_set_tile_attributes(int index, int attrib) {
+	int i;
+	unsigned int update=0;
 	switch(attrib) {
 		case MSG_TILE_ATTRIB_FOW_CLEAR:
 			map->layer[map->layers-1].tilemap->data[index]&=~0xFFF;
+			update|=1<<(map->layers-1);
 			break;
 		case MSG_TILE_ATTRIB_FOW_SET:
 			map->layer[map->layers-1].tilemap->data[index]=(map->layer[map->layers-1].tilemap->data[index]&~0xFFF)|0x1;
 			game_attacklist_untarget(index);
+			update|=1<<(map->layers-1);
 			break;
 		case MSG_TILE_ATTRIB_POWER_CLEAR:
 			map->layer[map->layers-1].tilemap->data[index]&=~0x1000000;
+			update|=1<<(map->layers-1);
 			break;
 		case MSG_TILE_ATTRIB_POWER_SET:
 			map->layer[map->layers-1].tilemap->data[index]|=0x1000000;
+			update|=1<<(map->layers-1);
+			break;
+		case MSG_TILE_ATTRIB_TERRAIN_CLEAR:
+			for(i=map->layers-2; i>=0; i--)  {
+				map->layer[i].tilemap->data[index]=0;
+				update|=1<<(i);
+			}
+			map->layer[map->layers-2].tilemap->data[index]|=(1<<17);
+			break;
+		case MSG_TILE_ATTRIB_TERRAIN_SET:
+			//TODO: fix if ever needed
+			/*for(i=map->layers-3; i>=0; i--) {
+				map->layer[i].tilemap->data[index]=lololol;
+				update|=1<<(i);
+			}*/
 			break;
 	}
+	return update;
 }
 
 void map_select_building(int index) {
@@ -280,7 +301,7 @@ void map_clear_fow() {
 	darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
 }
 
-void map_flare_add(int index, int player, unsigned int duration) {
+void map_flare_add(int index, int player, unsigned int duration, unsigned int radius) {
 	int w=map->layer[map->layers-2].tilemap->w;
 	int h=map->layer[map->layers-2].tilemap->h;
 	int tile_w=map->layer[map->layers-2].tile_w;
@@ -292,13 +313,13 @@ void map_flare_add(int index, int player, unsigned int duration) {
 	for(l=&map_flares; *l; l=&((*l)->next));
 	*l=malloc(sizeof(struct MAP_FLARE_LIST));
 	(*l)->circle[0]=darnitRenderCircleAlloc(16, 1);
-	darnitRenderCircleMove((*l)->circle[0], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 10);
+	darnitRenderCircleMove((*l)->circle[0], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius/4);
 	(*l)->circle[1]=darnitRenderCircleAlloc(16, 1);
-	darnitRenderCircleMove((*l)->circle[1], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 20);
+	darnitRenderCircleMove((*l)->circle[1], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius/2);
 	(*l)->circle[2]=darnitRenderCircleAlloc(24, 1);
-	darnitRenderCircleMove((*l)->circle[2], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 30);
+	darnitRenderCircleMove((*l)->circle[2], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 3*radius/4);
 	(*l)->circle[3]=darnitRenderCircleAlloc(24, 1);
-	darnitRenderCircleMove((*l)->circle[3], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 40);
+	darnitRenderCircleMove((*l)->circle[3], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius);
 	
 	(*l)->minimap_circle=darnitRenderCircleAlloc(6, 1);
 	darnitRenderCircleMove((*l)->minimap_circle, game_sidebar_minimap->x+(x*(game_sidebar_minimap->w))/(w), game_sidebar_minimap->y+(y*(game_sidebar_minimap->h))/(h), 3);

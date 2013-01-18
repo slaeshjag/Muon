@@ -76,26 +76,35 @@ void game_view_init() {
 	}
 	
 	/*Special abilities*/
+	UI_WIDGET *iconwidget;
 	panelist_game_abilitybar.pane=ui_pane_create(2, 64, 52, 128+44, ui_widget_create_vbox());
 	panelist_game_abilitybar.next=NULL;
 	ability[0].name=T("Flare");
 	ability[0].icon=darnitRenderTilesheetLoad("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[0].action=NULL;
-	ability[0].button=ui_widget_create_button(ui_widget_create_imageview_file("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+	iconwidget=ui_widget_create_imageview_file("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget->render=game_abilitybar_icon_render;
+	ability[0].button=ui_widget_create_button(iconwidget);
 	ability[0].button->event_handler->add(ability[0].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[0].delay=0;
 	ability[1].name=T("Nuke");
 	ability[1].icon=darnitRenderTilesheetLoad("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[1].action=NULL;
-	ability[1].button=ui_widget_create_button(ui_widget_create_imageview_file("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+	iconwidget=ui_widget_create_imageview_file("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget->render=game_abilitybar_icon_render;
+	ability[1].button=ui_widget_create_button(iconwidget);
+	ability[1].button->enabled=0;
 	ability[1].button->event_handler->add(ability[1].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	ability[1].delay=0;
+	ability[1].delay=-1;
 	ability[2].name=T("Radar");
 	ability[2].icon=darnitRenderTilesheetLoad("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[2].action=NULL;
-	ability[2].button=ui_widget_create_button(ui_widget_create_imageview_file("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+	iconwidget=ui_widget_create_imageview_file("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget->render=game_abilitybar_icon_render;
+	ability[2].button=ui_widget_create_button(iconwidget);
+	ability[2].button->enabled=0;
 	ability[2].button->event_handler->add(ability[2].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	ability[2].delay=0;
+	ability[2].delay=-1;
 	for(i=0; i<3; i++)
 		ui_vbox_add_child(panelist_game_abilitybar.pane->root_widget, ability[i].button, 0);
 }
@@ -390,6 +399,27 @@ void game_attacklist_target(int index, int target) {
 			break;
 		}
 	}
+}
+
+void game_abilitybar_icon_render(UI_WIDGET *widget) {
+	//Override for imageview render. tinting the icon if ability is inactive
+	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
+	float r, g, b, a;
+	darnitRenderTintGet(&r, &g, &b, &a);
+	int i=-1;
+	UI_PROPERTY_VALUE v={.p=NULL};
+	while(v.p!=widget) {
+		i++;
+		v=ability[i].button->get_prop(ability[i].button, UI_BUTTON_PROP_CHILD);
+	}
+		
+	if(ability[i].delay==0)
+		darnitRenderTint(1, 1, 1, 1);
+	else
+		darnitRenderTint(0.5, 0.5, 0.5, 1);
+	darnitRenderTileDraw(p->tile, p->tilesheet, 1);
+	darnitRenderTint(r, g, b, a);
+	darnitRenderLineDraw(p->border, 4);
 }
 
 void game_view_draw() {

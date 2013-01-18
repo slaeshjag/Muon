@@ -61,14 +61,21 @@ void view_init() {
 }
 
 void view_background_update(int t) {
-	static int x, y, mov1, mov2, c1, c2, c3;
+	static int x, y, mov1, mov2, c1, c2, c3, xx, yy;
 	for (y=0; y<view_background_h; y++)
 		for (x=0; x<view_background_w; x++) {
-			mov1=360*y/view_background_h+(t>>1);
-			mov2=360*x/view_background_w;
+			if(gamestate==GAME_STATE_GAME) {
+				xx=x+(map->cam_x>>3);
+				yy=y+(map->cam_y>>3);
+			} else {
+				xx=x;
+				yy=y;
+			}
+			mov1=360*yy/view_background_h+(t>>1);
+			mov2=360*xx/view_background_w;
 			c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
-			c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
-			c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
+			c2=sine((c1+sine((yy>>2)+(t>>1))+sine((xx+yy)))/10);
+			c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(xx))/10);
 			view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/360+26;
 		}
 	darnitRenderTilesheetUpdate(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);

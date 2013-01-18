@@ -82,14 +82,14 @@ int map_get_building_health(int index);
 int map_get_building_shield(int index);
 void map_set_building_health(int index, unsigned int health);
 void map_set_building_shield(int index, unsigned int shield);
-void map_set_tile_attributes(int index, int attrib);
+unsigned int map_set_tile_attributes(int index, int attrib);
 void map_select_building(int index);
 void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
 void map_clear_fow();
 
-void map_flare_add(int index, int player, unsigned int duration);
+void map_flare_add(int index, int player, unsigned int duration, unsigned int radius);
 void map_flare_draw();
 
 void map_draw(int draw_powergrid);

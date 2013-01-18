@@ -79,6 +79,14 @@ void menu_init() {
 
 //Main menu
 void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	/*int i;
+	for(i=0; i<8; i++) {
+		if(!menu_sidebar_button_text_main[i])
+			continue;
+		//menu_sidebar_button[i]=ui_widget_create_button(ui_widget_create_label(font_std, menu_sidebar_button_text_main[i]));
+		//menu_sidebar_button[i]->event_handler->add(menu_sidebar_button[i], menu_sidebar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+		ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button[i]);
+	}*/
 	if(widget==menu_sidebar_button[1]) {
 		panelist_menu_sidebar.next=&panelist_multiplayer_host;
 		ui_selected_widget=multiplayer_join_entry_host;
