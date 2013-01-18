@@ -118,6 +118,12 @@ void messageHandlerPlayerReady(unsigned int player, MESSAGE *message) {
 	playerMessageBroadcast(player, MSG_SEND_CLIENT_READY, message->arg[0], message->arg[1], NULL);
 	server->player[player].map_progress = message->arg[1];
 
+	if (server->game.countdown < SERVER_GAME_COUNTDOWN && server->game.started) {
+		fprintf(stderr, "Aborting countdown\n");
+		server->game.started = 0;
+		server->game.time_elapsed = 0;
+	}
+
 	if (!message->arg[0]) {
 		server->player[player].status = PLAYER_IN_LOBBY;
 		return;
