@@ -221,9 +221,9 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 		server->clusterbomb_buffer[i] = index;
 		tx += x;
 		ty += y;
-		if (tx < 0 || tx > server->w)
+		if (tx < 0 || tx >= server->w)
 			continue;
-		if (ty < 0 || ty > server->h)
+		if (ty < 0 || ty >= server->h)
 			continue;
 		fprintf(stderr, "Deployed at %i, %i; bombing %i %i\n", x, y, tx, ty);
 		index = tx + ty * server->w;
