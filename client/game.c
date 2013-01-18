@@ -421,7 +421,7 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 		v=ability[i].button->get_prop(ability[i].button, UI_BUTTON_PROP_CHILD);
 	}
 		
-	if(ability[i].delay==0)
+	if(ability[i].delay==100)
 		darnitRenderTint(1, 1, 1, 1);
 	else
 		darnitRenderTint(0.5, 0.5, 0.5, 1);
