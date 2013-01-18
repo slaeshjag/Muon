@@ -202,6 +202,12 @@ int messageExecute(unsigned int player, MESSAGE *message) {
 		return -1;
 	}
 
+	if (server->player[player].status > PLAYER_IN_GAME_NOW) {
+		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		return -1;
+	}
+		
+
 	(server->message_handler.handle[message->command])(player, message);
 	free(message->extra);
 
