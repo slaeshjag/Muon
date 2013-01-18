@@ -27,6 +27,7 @@
 /* In gameticks */
 #define	CP_CLUSTERBOMB_DELAY		60 * 3000
 #define	CP_RADAR_DELAY			60 * 3000
+#define	CP_RADAR_DEPLOY_TIME		2 * 3000
 
 struct SERVER_UNIT;
 
@@ -41,6 +42,8 @@ typedef struct CONTROLPONIT_EXTRA {
 typedef struct {
 	int				clusterbomb_delay;
 	int				radar_delay;
+	int				radar_deploy;
+	int				radar_pos;
 } CONTROLPOINT_DATA;
 
 

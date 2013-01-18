@@ -20,7 +20,7 @@
 #include "server.h"
 
 
-int controlpointClusterbombInit(SERVER_UNIT *unit) {
+int controlpointStructInit(SERVER_UNIT *unit) {
 	CONTROLPOINT_EXTRA *new;
 
 	if (!(new = malloc(sizeof(CONTROLPOINT_EXTRA))))
@@ -37,6 +37,16 @@ int controlpointClusterbombInit(SERVER_UNIT *unit) {
 }
 
 
+int controlpointClusterbombInit(SERVER_UNIT *unit) {
+	return controlpointStructInit(unit);
+}
+
+
+int controlpointRadarInit(SERVER_UNIT *unit) {
+	return controlpointStructInit(unit);
+}
+
+
 int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 	server->player[unit->owner].buildspots++;
 	server->player[unit->owner].buildspeed = logf(M_E + server->player[unit->owner].buildspots);
@@ -49,6 +59,8 @@ int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 void controlpointInitPlayer(int player) {
 	server->player[player].cp.clusterbomb_delay = -1;
 	server->player[player].cp.radar_delay = -1;
+	server->player[player].cp.radar_deploy = -1;
+	server->player[player].cp.radar_pos = -1;
 
 	return;
 }
@@ -79,6 +91,9 @@ int controlpointNew(struct SERVER_UNIT *unit) {
 		case UNIT_DEF_CLUSTERBOMB:
 			return controlpointClusterbombInit(unit);
 			break;
+		case UNIT_DEF_RADAR:
+			return controlpointRadarInit(unit);
+			break;
 		default:
 			return 0;
 	}
@@ -97,16 +112,42 @@ void controlpointBuildsiteRemove(SERVER_UNIT *unit) {
 }
 
 
-void controlpointClusterbombRemove(SERVER_UNIT *unit) {
+void controlpointDelayReset(SERVER_UNIT *unit) {
+	int *val;
 	CONTROLPOINT_EXTRA *next;
+
+	switch (unit->type) {
+		case UNIT_DEF_CLUSTERBOMB:
+			val = &server->player[unit->owner].cp.clusterbomb_delay;
+			break;
+		case UNIT_DEF_RADAR:
+			val = &server->player[unit->owner].cp.radar_delay;
+			break;
+		default:
+			return;
+	}
 
 	for (next = server->controlpoint; next; next = (void *) next->next)
 		if (next->owner == unit->owner)
-			if (unit->type == UNIT_DEF_CLUSTERBOMB)
+			if (next->type == unit->type)
 				if (unit->cp != next)
 					return;
-	server->player[unit->owner].cp.clusterbomb_delay = -1;
-	messageBufferPushDirect(unit->owner, unit->owner, MSG_SEND_CP_CLEAR, UNIT_DEF_CLUSTERBOMB, 0, NULL);
+	*val = 0;
+	messageBufferPushDirect(unit->owner, unit->owner, MSG_SEND_CP_CLEAR, unit->type, 0, NULL);
+
+	return;
+}
+
+
+void controlpointClusterbombRemove(SERVER_UNIT *unit) {
+	controlpointDelayReset(unit);
+
+	return;
+}
+
+
+void controlpointRadarRemove(SERVER_UNIT *unit) {
+	controlpointDelayReset(unit);
 
 	return;
 }
@@ -117,8 +158,13 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 	switch (unit->type) {
 		case UNIT_DEF_BUILDSITE:
 			controlpointBuildsiteRemove(unit);
+			break;
 		case UNIT_DEF_CLUSTERBOMB:
 			controlpointClusterbombRemove(unit);
+			break;
+		case UNIT_DEF_RADAR:
+			controlpointRadarRemove(unit);
+			break;
 		default:
 			break;
 	}
@@ -145,44 +191,80 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 }
 
 
+void controlpointDelayLoop(int msec, SERVER_UNIT *unit) {
+	int tmp, *delay, defaults;
+
+	switch (unit->type) {
+		case UNIT_DEF_CLUSTERBOMB:
+			delay = &server->player[unit->owner].cp.clusterbomb_delay;
+			defaults = CP_CLUSTERBOMB_DELAY;
+			break;
+		case UNIT_DEF_RADAR:
+			delay = &server->player[unit->owner].cp.radar_delay;
+			defaults = CP_RADAR_DELAY;
+			break;
+		default:
+			return;
+	}
+
+	tmp = *delay;
+	if (tmp == -1)
+		tmp = defaults;
+	tmp -= msec * server->game.gamespeed;
+	if (tmp < 0)
+		tmp = 0;
+	if (CP_DELAY_SEC(tmp) != CP_DELAY_SEC(*delay))
+		messageBufferPushDirect(unit->owner, unit->owner, MSG_SEND_CP_DELAY, unit->type, CP_DELAY_SEC(tmp), NULL);
+	*delay = tmp;
+
+	return;
+}
+
+
+void controlpointRadarEnd(int player) {
+	int index_dst = server->player[player].cp.radar_pos;
+	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, -1);
+
+	return;
+}
+
+
 void controlpointLoop(int msec) {
 	CONTROLPOINT_EXTRA *next;
-	int delay;
+	SERVER_UNIT *unit;
+	int i;
 
 	if (!server)
 		return;
 	
 	for (next = server->controlpoint; next; next = (CONTROLPOINT_EXTRA *) next->next) {
+		unit = server->map[next->index];
 		switch (next->type) {
 			case UNIT_DEF_CLUSTERBOMB:
 				if (!server->player[next->owner].map[next->index].power)
 					continue;
-				delay = server->player[next->owner].cp.clusterbomb_delay;
-				if (delay == -1)
-					delay = CP_CLUSTERBOMB_DELAY;
-				delay -= msec * server->game.gamespeed;
-				if (delay < 0)
-					delay = 0;
-				if (CP_DELAY_SEC(delay) != CP_DELAY_SEC(server->player[next->owner].cp.clusterbomb_delay))
-					messageBufferPushDirect(next->owner, next->owner, MSG_SEND_CP_DELAY, UNIT_DEF_CLUSTERBOMB, CP_DELAY_SEC(delay), NULL);
-				server->player[next->owner].cp.clusterbomb_delay = delay;
+				controlpointDelayLoop(msec, server->map[next->index]);
 				break;
 			case UNIT_DEF_RADAR:
-				delay = server->player[next->owner].cp.radar_delay;
-				if (delay == -1)
-					delay = CP_RADAR_DELAY;
-				delay -= msec * server->game.gamespeed;
-				if (delay < 0)
-					delay = 0;
-				if (CP_DELAY_SEC(delay) != CP_DELAY_SEC(server->player[next->owner].cp.radar_delay))
-					messageBufferPushDirect(next->owner, next->owner, MSG_SEND_CP_DELAY, UNIT_DEF_RADAR, CP_DELAY_SEC(delay), NULL);
-				server->player[next->owner].cp.radar_delay = delay;
+				if (!server->player[next->owner].map[next->index].power)
+					continue;
+				controlpointDelayLoop(msec, server->map[next->index]);
 				break;
 			default:
 				break;
 		}
 
 		/* TODO: Implement */
+	}
+		
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].cp.radar_deploy <= 0)
+			continue;
+		server->player[unit->owner].cp.radar_deploy -= msec * server->game.gamespeed;
+		if (server->player[unit->owner].cp.radar_deploy < 0) {
+			controlpointRadarEnd(unit->owner);
+			server->player[unit->owner].cp.radar_deploy = 0;
+		}
 	}
 
 	return;
@@ -237,9 +319,12 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 			return;
 		server->map[server->player[player].spawn.index]->target = target;
 		
-		for (j = 0; j < server->players; j++)
+		for (j = 0; j < server->players; j++) {
+			if (server->player[j].status != PLAYER_IN_GAME_NOW)
+				continue;
 			if (server->player[j].map[index].fog)
 				messageBufferPushDirect(j, player, MSG_SEND_MAJOR_IMPACT, 0, index, NULL);
+		}
 
 	}
 
@@ -251,6 +336,11 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 
 
 void controlpointDeployRadar(int player, int index_dst) {
+	server->player[player].cp.radar_pos = index_dst;
+	server->player[player].cp.radar_deploy = CP_RADAR_DEPLOY_TIME;
+	
+	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, 1);
+
 	return;
 }
 
@@ -273,6 +363,8 @@ void controlpointDeploy(int player, int type, int index_dst) {
 			if (server->player[player].cp.radar_delay <= 0)
 				return;
 			controlpointDeployRadar(player, index_dst);
+			if (server->player[player].cp.radar_delay == 0)
+				server->player[player].cp.radar_delay = CP_RADAR_DELAY;
 			break;
 		default:
 			return;
