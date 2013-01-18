@@ -256,8 +256,16 @@ void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 }
 
 void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//Make sure there is no pane in the way
 	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH)
 		return;
+	if(panelist_game_sidebar.next==&panelist_game_specialbar&&PINR(e->mouse->x, e->mouse->y, panelist_game_specialbar.pane->x, panelist_game_specialbar.pane->y, panelist_game_specialbar.pane->w, panelist_game_specialbar.pane->h))
+		return;
+	if(chat_is_visible(&panelist_game_sidebar)&&PINR(e->mouse->x, e->mouse->y, panelist_chat.pane->x, panelist_chat.pane->y, panelist_chat.pane->w, panelist_chat.pane->h))
+		return;
+	if(PINR(e->mouse->x, e->mouse->y, panelist_game_abilitybar.pane->x, panelist_game_abilitybar.pane->y, panelist_game_abilitybar.pane->w, panelist_game_abilitybar.pane->h))
+		return ;
+	
 	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT)
 		building_place=-1;
 	else if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {

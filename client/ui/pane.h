@@ -28,7 +28,6 @@ typedef struct {
 	DARNIT_LINE *border;
 	DARNIT_RECT *background;
 	UI_WIDGET *root_widget;
-	UI_EVENT_HANDLER *event_handler;
 } UI_PANE;
 
 struct UI_PANE_LIST {
