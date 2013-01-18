@@ -77,10 +77,12 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int tw;
 	switch(type) {
 		case UI_EVENT_TYPE_KEYBOARD_PRESS:
-			if(e->keyboard->keysym==8&&p->cursor_pos>0) {
+			if(e->keyboard->keysym==8) {
+				if(p->cursor_pos<=0)
+					return;
 				while(d_utf8_valid(&p->text[--p->cursor_pos]));
 				p->text[p->cursor_pos]=0;
-				//TODO: fix for unicode
+				
 				if(p->offset>p->text+d_utf8_char_length(p->text)) {
 					while(d_font_string_w(p->font, p->offset)<widget->w-4)
 						while(d_utf8_valid(p->offset--));
