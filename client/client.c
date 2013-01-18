@@ -233,32 +233,6 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	}
 }
 
-void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
-	//TODO: merge with client_download_map as lobby handler
-	switch(msg->command) {
-		PONG;
-		case MSG_RECV_KICKED:
-		case MSG_RECV_NAME_IN_USE:
-		case MSG_RECV_SERVER_FULL:
-		case MSG_RECV_BAD_CLIENT:
-			client_disconnect(msg->command);
-			break;
-		case MSG_RECV_CHAT:
-			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
-			break;
-		case MSG_RECV_LEAVE:
-			lobby_leave(msg->player_id);
-			break;
-		case MSG_RECV_GAME_START:
-			chat_countdown(msg->arg_1);
-			if(!msg->arg_1) {
-				game_state(GAME_STATE_GAME);
-				client_message_handler=client_game_handler;
-			}
-			break;
-	}
-}
-
 void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static int filesize_bytes=0, downloaded_bytes=0;
 	static char *filename=NULL;
@@ -328,9 +302,11 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			map_building_clear();
 			break;
 		case MSG_RECV_GAME_START:
-			game_state(GAME_STATE_LOBBY);
-			client_message_handler=client_countdown_handler;
-			client_countdown_handler(msg, payload);
+			chat_countdown(msg->arg_1);
+			if(!msg->arg_1) {
+				game_state(GAME_STATE_GAME);
+				client_message_handler=client_game_handler;
+			}
 			break;
 		case MSG_RECV_PLAYER_INFO:
 			player[msg->player_id].team=msg->arg_1;
