@@ -33,8 +33,9 @@ void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 
 //In-game menu
 struct UI_PANE_LIST panelist_game_menu;
-UI_WIDGET *game_menu_button[3];
+UI_WIDGET *game_menu_button[4];
 
+void menu_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif

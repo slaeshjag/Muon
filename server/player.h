@@ -36,6 +36,7 @@ typedef enum PLAYER_DATA_TRANSFER {
 #define	PLAYER_READY_TO_START			3
 #define	PLAYER_IN_GAME_NOW			4
 #define	PLAYER_SPECTATING			5
+#define	PLAYER_BEING_DISCONNECTED		6
 
 #define	PLAYER_BUILDSPOT_MULTIPLIER		5
 
@@ -98,6 +99,7 @@ typedef struct {
 	SERVER_SOCKET		*socket;
 	time_t			id_req_send;
 	time_t			last_ping_sent;
+	time_t			last_ping_reply;
 	MESSAGE_BUFFER		*msg_buf;
 	char			name[PLAYER_NAME_LEN];
 	PLAYER_NETWORK		network;
@@ -106,6 +108,7 @@ typedef struct {
 	PLAYER_STATS		stats;
 	int			buildspots;
 	float			buildspeed;
+	CONTROLPOINT_DATA	cp;
 
 	PLAYER_DATA_TRANSFER	transfer;
 	int			transfer_pos;
@@ -114,6 +117,7 @@ typedef struct {
 PLAYER *playerInit(unsigned int players, int map_w, int map_h);
 PLAYER *playerDestroy(PLAYER *player, int players);
 void playerDisconnect(unsigned int player);
+void playerDisconnectKill(unsigned int player);
 void playerCheckIdentify();
 void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned int arg1, unsigned int arg2, void *data);
 int playerSlot();
@@ -126,10 +130,13 @@ int playerBuildQueueStart(int player, int building);
 int playerBuildQueueStop(int player, int building);
 int playerBuildQueueUnitReady(int player, int building);
 
+void playerLoop();
 void playerClear(int player);
 void playerDefeatAnnounce(int player);
 unsigned int playerCountPoints(int player);
 
 int playerCanQueueAnotherBuilding(int player);
+
+void playerKickAll();
 
 #endif

@@ -38,13 +38,22 @@ void (*state_render[])()={
 
 void game_state(GAME_STATE state) {
 	//Game state destructors
-	if(gamestate==GAME_STATE_GAME) {
-		chat_indicator_hide(&panelist_game_sidebar);
-		ui_event_global_remove(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
-		ui_event_global_remove(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
-		ui_event_global_remove(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
-		ui_event_global_remove(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
-		ui_event_global_remove(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
+	switch(gamestate) {
+		case GAME_STATE_GAME:
+			chat_indicator_hide(&panelist_game_sidebar);
+			ui_event_global_remove(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
+			ui_event_global_remove(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
+			ui_event_global_remove(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_remove(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_remove(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
+			break;
+		case GAME_STATE_GAME_MENU:
+		case GAME_STATE_MENU:
+			ui_event_global_remove(menu_buttons, UI_EVENT_TYPE_BUTTONS);
+		case GAME_STATE_CONNECTING:
+		case GAME_STATE_LOBBY:
+		case GAME_STATE_QUIT:
+			break;
 	}
 	//Game state constructors
 	switch(state) {
@@ -53,25 +62,23 @@ void game_state(GAME_STATE state) {
 			ui_selected_widget=input_name_entry;
 			break;*/
 		case GAME_STATE_GAME:
-			darnitRenderClearColorSet(0x7f, 0x7f, 0x7f);
+			d_render_clearcolor_set(0x7f, 0x7f, 0x7f);
 			ui_event_global_add(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
 			ui_event_global_add(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_add(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_add(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
 			ui_event_global_add(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
-			//darnitInputGrab();
+			//d_input_grab();
 		case GAME_STATE_CONNECTING:
 			ui_selected_widget=NULL;
 			break;
-		/*case GAME_STATE_CONNECT_SERVER:
-			darnitRenderClearColorSet(0x0, 0x0, 0x0);
-			ui_selected_widget=connect_server_entry_host;*/
-		case GAME_STATE_LOBBY:
 		case GAME_STATE_MENU:
-			darnitRenderClearColorSet(0x0, 0x0, 0x0);
-		case GAME_STATE_QUIT:
+			d_render_clearcolor_set(0x0, 0x0, 0x0);
 		case GAME_STATE_GAME_MENU:
-			darnitInputUngrab();
+			ui_event_global_add(menu_buttons, UI_EVENT_TYPE_BUTTONS);
+		case GAME_STATE_LOBBY:
+		case GAME_STATE_QUIT:
+			d_input_release();
 			break;
 	}
 	
@@ -82,6 +89,7 @@ int main() {
 	platform_init();
 	
 	player_id=0;
+	memset(&prevbuttons, 0, sizeof(prevbuttons));
 	serverInit();
 	
 	intmath_init();
@@ -93,27 +101,29 @@ int main() {
 	game_state(GAME_STATE_MENU);
 	
 	while(gamestate!=GAME_STATE_QUIT) {
-		serverLoop(darnitTimeLastFrameTook());
+		serverLoop(d_last_frame_time());
 		
 		if(gamestate>=GAME_STATE_LOBBY)
 			client_check_incoming();
 		
-		darnitRenderBegin();
+		d_render_begin();
 		if(state_render[gamestate])
 			state_render[gamestate]();
-			
-		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
+		
+		d_render_tint(255*(!(player_id%3)), 255*(player_id>1), 255*(player_id==1), 255);
 		if(gamestate==GAME_STATE_GAME_MENU)
 			ui_pane_render(panelist_game_sidebar.pane);
 		ui_events(gamestate_pane[gamestate], 1);
-		darnitRenderTint(1, 1, 1, 1);
+		d_render_tint(255, 255, 255, 255);
 		
-		darnitRenderEnd();
-		darnitLoop();
+		d_render_end();
+		d_loop();
 	}
 	
 	if(serverIsRunning())
 		serverStop();
 	
+	platform_config_write();
+	d_quit();	
 	return 0;
 }

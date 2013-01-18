@@ -30,7 +30,10 @@
 #define	SERVER_ERROR_GAMESPEED_TOO_SMALL	8
 #define	SERVER_ERROR_SPAWN_MISSING		9
 #define	SERVER_ERROR_GENERATOR_COUNT_MISMATCH	10
-#define	SERVER_ERROR_BAD_LUCK			11
+#define	SERVER_ERROR_SHUTTING_DOWN		11
+#define	SERVER_ERROR_ALREADY_RUNNING		12
+#define	SERVER_ERROR_BAD_LUCK			13
+
 
 #ifdef WITH_SERVER_ERROR
 
@@ -41,12 +44,14 @@ const char *server_errors[] = { NULL,
 				"Unable to allocate more memory. Your system might've runned out of RAM.",
 				"The map contains overlapping spawn points. This is not acceptable.",
 				"The map file is invalid.",
-				"The map is missing the property 'max_players'",
+				"The map is missing the property 'max_players'.",
 				"The server was unable to bind the requested port. It's either in use or blocked by a firewall.",
-				"The map is not defined for this many players",
-				"Gamespeed must be bigger than 0",
-				"The map is missing a generator for one or more players",
-				"The number of generators on the map is not equal to the biggest player id",
+				"The map is not defined for this many players.",
+				"Gamespeed must be bigger than 0.",
+				"The map is missing a generator for one or more players.",
+				"The number of generators on the map is not equal to the biggest player id.",
+				"The server is still sending out data to clients and has not yet stopped.",
+				"The server is already running and have no intention on stopping on its own.",
 				"rand() wasn't on our side, and spawn randomization took too many tries. Try again."};
 
 typedef struct {

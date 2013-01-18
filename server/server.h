@@ -31,9 +31,13 @@
 #define	SERVER_PROCESS_INCOMPLETE	0
 #define	SERVER_PROCESS_FAIL		-1
 
+#define	SERVER_RUNNING			1
+#define SERVER_SHUTTING_DOWN		2
+
 #define	RANDOM_ATTEMPTS			20000
 
 #define	SERVER_PING_INTERVAL		2
+#define	SERVER_PING_TIMEOUT_DELAY	20
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,13 +49,13 @@
 #include "unit.h"
 #include "message.h"
 #include "message_handlers.h"
+#include "controlpoint.h"
 #include "player.h"
 #include "game.h"
 #include "lobby.h"
 #include "error.h"
 #include "controlpoint.h"
 #ifndef __TTMZ_H__
-#include "controlpoint.h"
 #include "map.h"
 #endif
 
@@ -67,6 +71,7 @@ typedef struct SERVER_UNIT {
 	unsigned int		last_no_shield;
 	int			target;
 	UNIT_PYLON		pylon;
+	CONTROLPOINT_EXTRA	*cp;
 	struct SERVER_UNIT	*next;
 } SERVER_UNIT;
 
@@ -95,6 +100,9 @@ typedef struct {
 	SERVER_MAP		map_c;
 	UNIT_PYLON		*pylons;
 	int			server_admin;
+	CONTROLPOINT_EXTRA	*controlpoint;
+	int			*clusterbomb_buffer;
+	int			state;
 } SERVER;
 
 SERVER *server;

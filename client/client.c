@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 
 #include "muon.h"
 #include "client.h"
@@ -37,26 +38,27 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		free(player);
 		player=NULL;
 		game_state(GAME_STATE_MENU);
-		sock=darnitSocketClose(socket);
+		sock=d_socket_close(socket);
 		player_id=0;
-		if(serverIsRunning())
+		if(!serverIsRunning())
 			serverStop();
+		map_close();
 	} else
 		game_state(GAME_STATE_LOBBY);
 }
 
 void client_message_convert_send(MESSAGE_RAW *message) {
-	message->player_id=darnitUtilHtonl(message->player_id);
-	message->command=darnitUtilHtonl(message->command);
-	message->arg_1=darnitUtilHtonl(message->arg_1);
-	message->arg_2=darnitUtilHtonl(message->arg_2);
+	message->player_id=d_util_htonl(message->player_id);
+	message->command=d_util_htonl(message->command);
+	message->arg_1=d_util_htonl(message->arg_1);
+	message->arg_2=d_util_htonl(message->arg_2);
 }
 
 void client_message_convert_recv(MESSAGE_RAW *message) {
-	message->player_id=darnitUtilNtohl(message->player_id);
-	message->command=darnitUtilNtohl(message->command);
-	message->arg_1=darnitUtilNtohl(message->arg_1);
-	message->arg_2=darnitUtilNtohl(message->arg_2);
+	message->player_id=d_util_ntohl(message->player_id);
+	message->command=d_util_ntohl(message->command);
+	message->arg_1=d_util_ntohl(message->arg_1);
+	message->arg_2=d_util_ntohl(message->arg_2);
 }
 
 void client_message_send(int player_id, int command, int arg_1, int arg_2, char *payload) {
@@ -66,36 +68,42 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 	msg_send.arg_1=arg_1;
 	msg_send.arg_2=arg_2;
 	client_message_convert_send(&msg_send);
-	darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
+	d_socket_send(sock, &msg_send, sizeof(MESSAGE_RAW));
 	if(payload)
-		darnitSocketSend(sock, payload, arg_2);
+		d_socket_send(sock, payload, arg_2);
 }
 
 void client_check_incoming() {
 	int s, i;
 	unsigned int chunk_got=0, chunk_size, chunk_time;
-	if((s=darnitSocketRecvTry(sock, &chunk_size, 4))<4) {
+	static unsigned int chunk_size_time=UINT_MAX;
+	if((s=d_socket_recv_try(sock, &chunk_size, 4))<4) {
 		if(s==-1)
-			client_connect_callback(-1, NULL, sock);
-		return;
-	}
-	chunk_size=darnitUtilNtohl(chunk_size)-4;
-	chunk_time=darnitTimeGet();
+			client_disconnect(MSG_SERVER_DISCONNECT);
+		if(d_time_get()-chunk_size_time>CLIENT_TIMEOUT) {
+			client_disconnect(MSG_SERVER_DISCONNECT);
+			return;
+		} else
+			return;
+	} else
+		chunk_size_time=d_time_get();
+	chunk_size=d_util_htonl(chunk_size)-4;
+	chunk_time=d_time_get();
 	
 	while(chunk_got<chunk_size) {
-		if(darnitTimeGet()-chunk_time>CLIENT_TIMEOUT) {
-			client_connect_callback(-1, NULL, sock);
+		if(d_time_get()-chunk_time>CLIENT_TIMEOUT) {
+			client_disconnect(MSG_SERVER_DISCONNECT);
 			return;
 		}
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
 			//printf("payload size %i\n", msg_recv.arg_2);
-			s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2);
+			s=d_socket_recv_try(sock, msg_recv_payload, msg_recv.arg_2);
 			if(s==0)
 				continue;
 				//break;
 			if(s==-1) {
-				client_connect_callback(-1, NULL, sock);
+				client_disconnect(MSG_SERVER_DISCONNECT);
 				return;
 			}
 			if(client_message_handler)
@@ -103,18 +111,18 @@ void client_check_incoming() {
 			msg_recv.command=0;
 		} else {
 			//download message
-			s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
+			s=d_socket_recv_try(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
 			if(s==0) {
 				msg_recv.command = 0;
 				continue;
 				//break;
 			}
 			if(s==-1) {
-				client_connect_callback(-1, NULL, sock);
+				client_disconnect(MSG_SERVER_DISCONNECT);
 				return;
 			}
 			client_message_convert_recv(&msg_recv);
-			//printf("message: 0x%x (%i, %i)\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2);
+			//printf("message: 0x%x (%i, %i) to player %i\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2, msg_recv.player_id);
 			if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
 				client_message_handler(&msg_recv, NULL);
 		}
@@ -127,12 +135,14 @@ void client_check_incoming() {
 		UI_PROPERTY_VALUE v;
 		v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
 		map_minimap_update(v.p, game_sidebar_minimap->w, game_sidebar_minimap->h, 1);
+		if(recalc_map&~(3<<(map->layers-2)))
+			map_update_grid();
 	}
 	for(i=0; recalc_map; recalc_map>>=1, i++)
 		if(recalc_map&1) {
 			if(i==map->layers-1)
 				map_calculate_powergrid();
-			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
+			d_tilemap_recalc(map->layer[i].tilemap);
 		}
 	return;
 }
@@ -159,19 +169,20 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			game_attacklist_target(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_MAP_TILE_ATTRIB:
-			map_set_tile_attributes(msg->arg_2, msg->arg_1);
-			recalc_map|=1<<(map->layers-1);
+			recalc_map|=map_set_tile_attributes(msg->arg_2, msg->arg_1);
 			break;
 		case MSG_RECV_BUILDING_PLACE:
 			map_building_place(msg->arg_2, msg->player_id, msg->arg_1);
 			recalc_map|=1<<(map->layers-2);
 			if(msg->player_id==player_id&&msg->arg_1) {
-				if(msg->arg_1==BUILDING_GENERATOR) {
+				if(msg->arg_1==BUILDING_GENERATOR&&!map_isset_home()) {
 					map_set_home(msg->arg_2);
 					game_view_scroll_to(home_x, home_y);
 				}
 				//printf("cancel build queue!\n");
 				game_reset_building_progress();
+				if(msg->arg_1>=BUILDING_BUILDSITE)
+					panelist_game_sidebar.next=&panelist_game_abilitybar;
 				game_set_building_ready(BUILDING_NONE);
 			}
 			break;
@@ -187,31 +198,37 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_BUILDING_SHIELD:
 			map_set_building_shield(msg->arg_2, msg->arg_1);
 			break;
-	}
-}
-
-void client_countdown_handler(MESSAGE_RAW *msg, unsigned char *payload) {
-	//TODO: merge with client_download_map as lobby handler
-	switch(msg->command) {
-		PONG;
-		case MSG_RECV_KICKED:
-		case MSG_RECV_NAME_IN_USE:
-		case MSG_RECV_SERVER_FULL:
-		case MSG_RECV_BAD_CLIENT:
-			client_disconnect(msg->command);
+		case MSG_RECV_MAP_FLARE:
+			map_flare_add(msg->arg_2, msg->player_id, 10000, 40);
 			break;
-		case MSG_RECV_CHAT:
-			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
+		case MSG_RECV_CP_TIMER:
+			printf("%s %i%% ready\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar", msg->arg_2);
+			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].ready=msg->arg_2;
+			if(msg->arg_2==100)
+				ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=1;
 			break;
-		case MSG_RECV_LEAVE:
-			lobby_leave(msg->player_id);
-			break;
-		case MSG_RECV_GAME_START:
-			chat_countdown(msg->arg_1);
-			if(!msg->arg_1) {
-				game_state(GAME_STATE_GAME);
-				client_message_handler=client_game_handler;
+		case MSG_RECV_CP_DEPLOY:
+			if(msg->arg_1==BUILDING_CLUSTERBOMB) {
+				map_flare_add(msg->arg_2, msg->player_id, 2000, building[BUILDING_CLUSTERBOMB].range*map->layer[map->layers-2].tile_w);
+				if(msg->player_id==player_id) {
+					ability[1].ready=-1;
+					ability[1].button->enabled=0;
+				}
 			}
+			break;
+		case MSG_RECV_MAJOR_IMPACT:
+			map_flare_add(msg->arg_2, msg->player_id, 2000, map->layer[map->layers-2].tile_w);
+			break;
+		case MSG_RECV_PLAYER_STATS_1:
+			player[msg->player_id].stats.constructed=msg->arg_1;
+			player[msg->player_id].stats.lost=msg->arg_2;
+			break;
+		case MSG_RECV_PLAYER_STATS_2:
+			player[msg->player_id].stats.destroyed=msg->arg_1;
+			player[msg->player_id].stats.efficiency=msg->arg_2;
+			break;
+		case MSG_RECV_GAME_ENDED:
+			ui_messagebox(font_std, "Game over");
 			break;
 	}
 }
@@ -253,11 +270,11 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_BEGIN:
 			if(!payload)
 				break;
-			map_close(map);
+			map_close();
 			if(filename) {
-				darnitFSUnmount(filename);
+				d_fs_unmount(filename);
 				free(filename);
-				darnitFileClose(f);
+				d_file_close(f);
 			}
 			filesize_bytes=msg->arg_1;
 			filename=malloc(5+msg->arg_2+1);
@@ -265,33 +282,38 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			//filename[msg->arg_2]=0;
 			payload[msg->arg_2]=0;
 			sprintf(filename, "%s/%s", mapdir, payload);
-			f=darnitFileOpen(filename, "wb");
+			f=d_file_open(filename, "wb");
 			break;
 		case MSG_RECV_MAP_CHUNK:
 			if(!payload)
 				break;
 			downloaded_bytes+=msg->arg_2;
-			darnitFileWrite(payload, msg->arg_2, f);
+			d_file_write(payload, msg->arg_2, f);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
 			lobby_set_map_progress(100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
-			darnitFileClose(f);
+			d_file_close(f);
 			f=NULL;
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
-			darnitFSMount(filename);
+			d_fs_mount(filename);
 			map_init("mapdata/map.ldmz");
 			lobby_map_preview_generate();
 			map_building_clear();
 			break;
 		case MSG_RECV_GAME_START:
-			game_state(GAME_STATE_LOBBY);
-			client_message_handler=client_countdown_handler;
-			client_countdown_handler(msg, payload);
+			chat_countdown(msg->arg_1);
+			if(!msg->arg_1) {
+				game_state(GAME_STATE_GAME);
+				client_message_handler=client_game_handler;
+			}
 			break;
 		case MSG_RECV_PLAYER_INFO:
 			player[msg->player_id].team=msg->arg_1;
 			lobby_update_player(msg->player_id);
+			break;
+		case MSG_RECV_UNIT_RANGE:
+			building[msg->arg_1].range=msg->arg_2;
 			break;
 	}
 }
@@ -305,13 +327,13 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(config.player_name), config.player_name);
 	client_message_handler=client_download_map;
 	lobby_open();
-	if(serverIsRunning())
+	if(!serverIsRunning())
 		serverAdminSet(player_id);
 }
 
 int client_init(char *host, int port) {
 	player=NULL;
-	if((sock=darnitSocketConnect(host, port, client_connect_callback, NULL))==NULL)
+	if((sock=d_socket_connect(host, port, client_connect_callback, NULL))==NULL)
 		return -1;
 	msg_recv.command=0;
 	msg_recv_payload_offset=msg_recv_payload;
@@ -334,6 +356,9 @@ void client_disconnect(int cause) {
 			break;
 		case MSG_RECV_BAD_CLIENT:
 			ui_messagebox(font_std, T("You are using an outdated client, please update Muon."));
+			break;
+		case MSG_SERVER_DISCONNECT:
+			ui_messagebox(font_std, T("Lost connection to server."));
 			break;
 	}
 	client_connect_callback(-1, NULL, sock);

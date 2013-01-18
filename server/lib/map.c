@@ -22,9 +22,9 @@
 
 void *ldmzLoad(const char *fname) {
 	void *ret;
-	darnitFSMount(fname);
-	ret = darnitMapLoad("mapdata/map.ldmz");
-	darnitFSUnmount(fname);
+	d_fs_mount(fname);
+	ret = d_map_load("mapdata/map.ldmz");
+	d_fs_unmount(fname);
 
 	return ret;
 }
@@ -47,14 +47,14 @@ unsigned int *ldmzGetData(void *map) {
 
 
 void *ldmzFree(void *map) {
-	return darnitMapUnload(map);
+	return d_map_unload(map);
 }
 
 
 const char *ldmzFindProp(void *map, const char *key) {
 	DARNIT_MAP *dmap = map;
 
-	return darnitMapPropGet(dmap->prop, key);
+	return d_map_prop(dmap->prop, key);
 }
 
 
@@ -62,20 +62,20 @@ void *ldmzCache(const char *fname, unsigned int *len) {
 	DARNIT_FILE *f;
 	void *data;
 
-	if (!(f = darnitFileOpen(fname, "rb")))
+	if (!(f = d_file_open(fname, "rb")))
 		return NULL;
 	
-	darnitFileSeek(f, 0, SEEK_END);
-	*len = darnitFileTell(f);
-	if (!(data = malloc(darnitFileTell(f)))) {
-		darnitFileClose(f);
+	d_file_seek(f, 0, SEEK_END);
+	*len = d_file_tell(f);
+	if (!(data = malloc(d_file_tell(f)))) {
+		d_file_close(f);
 		return NULL;
 	}
 
-	darnitFileSeek(f, 0, SEEK_SET);
-	darnitFileRead(data, *len, f);
+	d_file_seek(f, 0, SEEK_SET);
+	d_file_read(data, *len, f);
 		
-	darnitFileClose(f);
+	d_file_close(f);
 
 	return data;
 }

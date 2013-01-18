@@ -20,22 +20,10 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#define T(s) darnitStringtableEntryGet(stringtable, (s))
+#define T(s) d_stringtable_entry(stringtable, (s))
 
 DARNIT_PLATFORM platform;
 DARNIT_STRINGTABLE *stringtable;
-
-enum CONFIG_OPTIONS {
-	CONFIG_OPTION_SCREEN_W,
-	CONFIG_OPTION_SCREEN_H,
-	CONFIG_OPTION_FULLSCREEN,
-	CONFIG_OPTION_GRID,
-	CONFIG_OPTION_POWERGRID,
-	CONFIG_OPTION_PLASMA,
-	CONFIG_OPTION_ALPHA,
-	CONFIG_OPTION_PLAYER_NAME,
-	CONFIG_OPTION_LANG,
-} options;
 
 struct CONFIG {
 	int screen_w;
@@ -45,6 +33,8 @@ struct CONFIG {
 	int powergrid;
 	int plasma;
 	int alpha;
+	int gamespeed;
+	int players;
 	char player_name[32];
 	char lang[3];
 } config;

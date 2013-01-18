@@ -25,7 +25,6 @@ int gameInit(int gamespeed) {
 	server->game.time_elapsed = 0;
 	server->game.countdown = 0;
 
-	/* FIXME: Make this variable */
 	server->game.gamespeed = gamespeed;
 
 	return 0;
@@ -80,7 +79,13 @@ void gameSpawn() {
 					continue;
 				if (building >= UNITS_DEFINED)
 					continue;
-	
+				
+				if (building == UNIT_DEF_GENERATOR) {
+					server->player[j].spawn.x = i % server->w;
+					server->player[j].spawn.y = i / server->w;
+					server->player[j].spawn.index = i;
+				}
+
 				unitSpawn(j, building, i % server->w, i / server->w);
 			}
 	
@@ -133,9 +138,14 @@ int gameWorldTransfer(unsigned int player) {
 		server->player[player].map[i].fog = 1;
 		if (server->map_c.tile_data[i] & 0x40000)
 			messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, (server->map_c.tile_data[i] & 0x20000) ? 0x11 : 0x10, i, NULL);
-		else if (!server->map[i])
-			continue;
-		if (server->map[i])
+		if (!server->map[i]) {
+			if ((server->map_c.tile_data[i] & 0xFFF) == UNIT_BUILDSITE)
+				unitAnnounce(player, player, UNIT_DEF_BUILDSITE_FREE, i);
+			else if (server->map_c.tile_data[i] & 0x80000)
+				unitAnnounce(player, player, 0, i);
+		}
+
+		else
 			unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
 		server->player[player].transfer_pos = i + 1;
 
@@ -158,7 +168,7 @@ int gameDetectIfOver() {
 			continue;
 		if (team == -1)
 			return -1;
-		if (server->player[i].team > -1) {
+		if (team > -1) {
 			if (server->player[i].team != team)
 				return -1;
 		}
@@ -175,8 +185,13 @@ void gameEnd() {
 	PLAYER_STATS stats;
 
 	for (i = 0; i < server->players; i++) {
-		if (server->player[i].status != PLAYER_IN_GAME_NOW)
+		if (server->player[i].status < PLAYER_IN_GAME_NOW)
 			continue;
+		if (server->player[i].status == PLAYER_SPECTATING) {
+			playerClear(i);
+			continue;
+		}
+
 		if (server->player[i].status == PLAYER_IN_GAME_NOW) {
 			team = server->player[i].team;
 			player = i;
@@ -186,7 +201,6 @@ void gameEnd() {
 	}
 
 	team += 1;
-	playerMessageBroadcast(player, MSG_SEND_GAME_ENDED, player, team, NULL);
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_SPECTATING)
@@ -197,6 +211,8 @@ void gameEnd() {
 		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_2, stats.buildings_destroyed, eff, NULL);
 		fprintf(stderr, "Total amount of points for %.31s: %.8u\n", server->player[i].name, playerCountPoints(i));
 	}
+	
+	playerMessageBroadcast(player, MSG_SEND_GAME_ENDED, team, player, NULL);
 
 	return;
 }

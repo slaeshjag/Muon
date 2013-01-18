@@ -59,7 +59,7 @@ struct UI_PANE_LIST;
 #define UI_EVENT_KEYBOARD_MOD_RSUPER	0x80
 
 typedef struct {
-	char character;
+	int character;
 	unsigned char modifiers;
 	int keysym;
 } UI_EVENT_KEYBOARD;

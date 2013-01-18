@@ -24,6 +24,10 @@
 #define SCROLL_OFFSET 8
 #define SCROLL_SPEED 4
 
+#define PLACE_FLARE -2
+#define PLACE_NUKE -3
+#define PLACE_RADAR -4
+
 struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_minimap;
 UI_WIDGET *game_sidebar_button_build[5];
@@ -32,20 +36,39 @@ UI_WIDGET *game_sidebar_progress_build;
 UI_WIDGET *game_sidebar_progress_shield;
 UI_WIDGET *game_sidebar_progress_health;
 
+struct UI_PANE_LIST panelist_game_specialbar;
+UI_WIDGET *game_specialbar_button_build[3];
+UI_WIDGET *game_specialbar_label_build[3];
+
 int building_place;
 int building_ready;
 int building_cancel;
+
+struct BUILDING {
+	int range;
+} building[16];
+
+struct ABILITY {
+	UI_WIDGET *button;
+	DARNIT_TILESHEET *icon;
+	const char *name;
+	void (*action)();
+	int ready;
+} ability[3];
+struct UI_PANE_LIST panelist_game_abilitybar;
 
 struct GAME_ATTACKLIST {
 	int index;
 	int target;
 	struct GAME_ATTACKLIST *next;
 } *game_attacklist;
+
 int game_attacklist_length;
 DARNIT_LINE *game_attacklist_lines;
 unsigned int game_attacklist_blink_semaphore;
 
 void game_view_init();
+void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
@@ -64,6 +87,8 @@ void game_attacklist_remove(int index);
 void game_attacklist_clear();
 void game_attacklist_untarget(int target);
 void game_attacklist_target(int index, int target);
+
+void game_abilitybar_icon_render(UI_WIDGET *widget);
 
 void game_view_draw();
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

@@ -40,7 +40,7 @@ UI_WIDGET *ui_widget_create_imageview() {
 	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
 	p->tile=NULL;
 	p->tilesheet=NULL;
-	p->border=darnitRenderLineAlloc(4, 1);
+	p->border=d_render_line_new(4, 1);
 	p->image_w=0;
 	p->image_h=0;
 	
@@ -58,9 +58,9 @@ UI_WIDGET *ui_widget_create_imageview() {
 
 void *ui_widget_destroy_imageview(UI_WIDGET *widget) {
 	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
-	darnitRenderTileFree(p->tile);
-	darnitRenderTilesheetFree(p->tilesheet);
-	darnitRenderLineFree(p->border);
+	d_render_tile_free(p->tile);
+	d_render_tilesheet_free(p->tilesheet);
+	d_render_line_free(p->border);
 	return ui_widget_destroy(widget);
 }
 
@@ -71,8 +71,8 @@ UI_WIDGET *ui_widget_create_imageview_raw(int w, int h, int pixel_format) {
 	int tw, th;
 	for(tw=1; w>=tw; tw<<=1);
 	for(th=1; h>=th; th<<=1);
-	p->tilesheet=darnitRenderTilesheetNew(1, 1, tw, th, pixel_format);
-	p->tile=darnitRenderTileAlloc(1);
+	p->tilesheet=d_render_tilesheet_new(1, 1, tw, th, pixel_format);
+	p->tile=d_render_tile_new(1, p->tilesheet);
 	p->image_w=w;
 	p->image_h=h;
 	return widget;
@@ -85,8 +85,8 @@ UI_WIDGET *ui_widget_create_imageview_file(const char *filename, int w, int h, i
 	int tw, th;
 	for(tw=1; w<=tw; tw<<=1);
 	for(th=1; h<=th; th<<=1);
-	p->tilesheet=darnitRenderTilesheetLoad(filename, w, h, pixel_format);
-	p->tile=darnitRenderTileAlloc(1);
+	p->tilesheet=d_render_tilesheet_load(filename, w, h, pixel_format);
+	p->tile=d_render_tile_new(1, p->tilesheet);
 	p->image_w=w;
 	p->image_h=h;
 	return widget;
@@ -129,21 +129,21 @@ void ui_imageview_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
 	
-	darnitRenderLineMove(p->border, 0, x, y, x+w, y);
-	darnitRenderLineMove(p->border, 1, x, y+h, x+w, y+h);
-	darnitRenderLineMove(p->border, 2, x, y, x, y+h);
-	darnitRenderLineMove(p->border, 3, x+w, y, x+w, y+h);
+	d_render_line_move(p->border, 0, x, y, x+w, y);
+	d_render_line_move(p->border, 1, x, y+h, x+w, y+h);
+	d_render_line_move(p->border, 2, x, y, x, y+h);
+	d_render_line_move(p->border, 3, x+w, y, x+w, y+h);
 	
-	darnitRenderTileMove(p->tile, 0, p->tilesheet, x, y);
-	darnitRenderTileSetTilesheetCoord(p->tile, 0, p->tilesheet, 0, 0, w, h);
+	d_render_tile_move(p->tile, 0, x, y);
+	d_render_tile_tilesheet_coord_set(p->tile, 0, 0, 0, p->image_w, p->image_h);
 }
 
 void ui_imageview_render(UI_WIDGET *widget) {
 	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
-	float r, g, b, a;
-	darnitRenderTintGet(&r, &g, &b, &a);
-	darnitRenderTint(1, 1, 1, 1);
-	darnitRenderTileDraw(p->tile, p->tilesheet, 1);
-	darnitRenderTint(r, g, b, a);
-	darnitRenderLineDraw(p->border, 4);
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
+	d_render_tile_draw(p->tile, 1);
+	d_render_tint(r, g, b, a);
+	d_render_line_draw(p->border, 4);
 }

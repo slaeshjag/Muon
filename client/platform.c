@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "muon.h"
+#include "client.h"
 #include "platform.h"
 
 struct CONFIG_PARSER parsers[]={
@@ -30,6 +31,8 @@ struct CONFIG_PARSER parsers[]={
 	{"powergrid", platform_option_read_int, platform_option_write_int, &config.powergrid},
 	{"plasma", platform_option_read_int, platform_option_write_int, &config.plasma},
 	{"alpha", platform_option_read_int, platform_option_write_int, &config.alpha},
+	{"gamespeed", platform_option_read_int, platform_option_write_int, &config.gamespeed},
+	{"players", platform_option_read_int, platform_option_write_int, &config.players},
 	{"lang", platform_option_read_string, platform_option_write_string, &config.lang},
 	{"name", platform_option_read_string, platform_option_write_string, &config.player_name},
 };
@@ -74,12 +77,14 @@ void platform_config_init_defaults() {
 			KEY(F1),
 			KEY(F2),
 		};
-		darnitButtonMappingSet(keymap);
+		d_keymapping_set(keymap);
 	}
 	config.grid=1;
 	config.powergrid=0;
 	config.plasma=3;
 	config.alpha=1;
+	config.gamespeed=CLIENT_DEFAULT_GAMESPEED;
+	config.players=CLIENT_DEFAULT_PLAYERS;
 	strcpy(config.lang, "EN");
 	strcpy(config.player_name, "player");
 }
@@ -88,11 +93,11 @@ void platform_config_read() {
 	char buf[128];
 	int len, i;
 	DARNIT_FILE *f;
-	if(!(f=darnitFileOpen("muon.cfg", "r"))) {
+	if(!(f=d_file_open("muon.cfg", "r"))) {
 		platform_config_write();
 		return;
 	}
-	while((len=darnitFileLineGet(buf, 128, f))) {
+	while((len=d_file_getln(buf, 128, f))) {
 		if(buf[0]=='#')
 			continue;
 		for(i=0; i<sizeof(parsers)/sizeof(struct CONFIG_PARSER); i++) {
@@ -104,33 +109,33 @@ void platform_config_read() {
 			break;
 		}
 	}
-	darnitFileClose(f);
+	d_file_close(f);
 }
 
 void platform_config_write() {
 	char buf[128];
 	int i;
 	DARNIT_FILE *f;
-	if(!(f=darnitFileOpen("muon.cfg", "w")))
+	if(!(f=d_file_open("muon.cfg", "w")))
 		return;
-	darnitFileWrite("#Muon\n", 6, f);
+	d_file_write("#Muon\n", 6, f);
 	for(i=0; i<sizeof(parsers)/sizeof(struct CONFIG_PARSER); i++) {
 		strcpy(buf, parsers[i].option);
 		strcat(buf, "=");
 		parsers[i].writer_func(parsers[i].config_opt, &buf[strlen(buf)]);
 		strcat(buf, "\n");
-		darnitFileWrite(buf, strlen(buf), f);
+		d_file_write(buf, strlen(buf), f);
 	}
-	darnitFileClose(f);
+	d_file_close(f);
 }
 
 /*void platform_config_write_option(enum CONFIG_OPTIONS opt, void *value) {
 	char buf[128];
 	int i;
 	DARNIT_FILE *f;
-	if(!(f=darnitFileOpen("muon.cfg", "r+")))
+	if(!(f=d_file_open("muon.cfg", "r+")))
 		return;
-	while((len=darnitFileLineGet(buf, 128, f))) {
+	while((len=d_file_getln(buf, 128, f))) {
 		if(buf[0]=='#')
 			continue;
 		
@@ -140,19 +145,20 @@ void platform_config_write() {
 		buf[len]=0;
 		parsers[i].parser_func(parsers[i].config_opt, &buf[optlen+1]);
 	}
-	darnitFileClose(f);
+	d_file_close(f);
 }*/
 
 void platform_init() {
-	darnitInitPartial("muon");
-	platform=darnitPlatformGet();
-	videomodes=darnitVideomodeGet();
+	d_init_partial("muon");
+	platform=d_platform_get();
+	videomodes=d_videomode_get();
 	platform_config_init_defaults();
 	platform_config_read();
-	darnitInitRest("Muon", config.screen_w, config.screen_h, config.fullscreen, "res/icon.png");
-	platform=darnitPlatformGet();
-	darnitDirectoryCreate("maps");
-	stringtable=darnitStringtableOpen("res/lang.stz");
-	if(darnitStringtableSectionLoad(stringtable, config.lang)==-1)
-		darnitStringtableSectionLoad(stringtable, "EN");
+	d_init_rest("Muon", config.screen_w, config.screen_h, config.fullscreen, "res/icon.png");
+	platform=d_platform_get();
+	d_directory_create("maps");
+	stringtable=d_stringtable_open("res/lang.stz");
+	if(d_stringtable_section_load(stringtable, config.lang)==-1)
+		d_stringtable_section_load(stringtable, "EN");
+	d_input_unicode(1);
 }

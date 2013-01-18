@@ -76,7 +76,7 @@ int unitPylonListAdd(UNIT_PYLON *to, UNIT_PYLON *add) {
 	range = unit_range[to->unit->type];
 	dx += range;
 	dy += range;
-	i = dx + dy * (range + 1);
+	i = dx + dy * (range * 2 + 1);
 
 	to->neighbour[i] = add;
 
@@ -93,7 +93,7 @@ void unitPylonPulseClimb(UNIT_PYLON *pylon) {
 	
 	for (i = 0; i < pylon->neighbours; i++)
 		if (pylon->neighbour[i])
-			unitPylonPulseClimb(pylon->neighbour[i]);;
+			unitPylonPulseClimb(pylon->neighbour[i]);
 
 	return;
 }
@@ -191,6 +191,8 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 			continue;
 		for (k = -1 * radius; k <= radius; k++) {
 			if (k + y < 0 || k + y >= server->w)
+				continue;
+			if (k * k + j * j > radius*radius)
 				continue;
 			index = (y + k) * server->w + (x + j);
 			if (!server->map[index])		/* No building here - don't bother */
@@ -322,7 +324,7 @@ int unitAdd(int owner, int type, int x, int y) {
 		return -1;
 
 	if (type >= UNIT_DEF_BUILDSITE) {
-		if (controlpointInit(unit) < 0) {
+		if (controlpointNew(unit) < 0) {
 			free(unit);
 			server->map[x + y * server->w] = NULL;
 			return -1;
@@ -331,6 +333,7 @@ int unitAdd(int owner, int type, int x, int y) {
 	
 	unit->next = server->unit;
 	server->unit = unit;
+	server->map_c.tile_data[index] |= 0x80000;
 	server->player[owner].stats.buildings_raised++;
 
 
@@ -373,7 +376,7 @@ int unitRemove(int x, int y) {
 	}
 	
 	server->player[owner].stats.buildings_lost++;
-	
+
 	while (next != unit) {
 		parent = &next->next;
 		next = next->next;
@@ -503,7 +506,7 @@ void unitAttackSet(int index_src, int index_dst) {
 	int i, from;
 
 	from = server->map[index_src]->owner;
-	server->map[index_src]->target = index_dst;
+	server->map[index_src]->target = (index_dst > -1) ? index_dst : -1;
 	fprintf(stderr, "Attacking %i->%i\n", index_src, index_dst);
 
 	for (i = 0; i < server->players; i++) {
@@ -620,8 +623,22 @@ void unitShieldAnnounce(int index) {
 }
 
 
+/* This is probably *THE* most evil hack in Muon's entire codebase */
+void unitDamagePoke(int index, int damage) {
+	int gamespeed;
+
+	gamespeed = server->game.gamespeed;
+	server->game.gamespeed = 1;
+	unitDamageDo(index, damage, 1);
+	server->game.gamespeed = gamespeed;
+
+	return;
+}
+
+
 void unitDamageDo(int index, int damage, int time) {
 	SERVER_UNIT *next = server->map[index];
+	int owner = next->owner;
 	
 	if (next->target < 0 || next->target > server->w * server->h)
 		return;
@@ -629,8 +646,9 @@ void unitDamageDo(int index, int damage, int time) {
 	if (!server->map[next->target]) {
 		if (damage < MAP_TERRAIN_ABSORTION)
 			return;
-		server->map_c.tile_data[index] &= 0x60000;
-		server->map_c.tile_data[index] ^= 0x20000;
+		server->map_c.tile_data[next->target] &= 0xF0000;
+		server->map_c.tile_data[next->target] |= 0x70000;
+		messageBufferPushDirect(owner, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x10, next->target, NULL);
 		return;
 	}
 
@@ -677,9 +695,10 @@ void unitLoop(int msec) {
 		}
 		
 		if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT) && next->target > -1) {
-			if (!server->map[next->target])
+			if ((!server->player[next->owner].map[next->target].fog) || (!server->map[next->target])) {
+				unitAttackSet(index, index);
 				next->target = -1;
-			else {
+			} else {
 				unitDamageDo(index, unit_damage[next->type], msec);
 			}
 		} else if ((next->type == UNIT_DEF_ATTACKER || next->type == UNIT_DEF_SCOUT)) {
@@ -688,6 +707,8 @@ void unitLoop(int msec) {
 
 		next = next->next;
 	}
+
+	controlpointLoop(msec);
 
 	return;
 }

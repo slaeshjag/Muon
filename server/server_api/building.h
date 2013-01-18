@@ -20,6 +20,8 @@
 #ifndef __BUILDING_H__
 #define	__BUILDING_H__
 
+#define	BUILDINGS_DEFINED		9
+
 #define	BUILDING_NONE			0
 #define	BUILDING_GENERATOR		1
 #define	BUILDING_SCOUT			2
@@ -27,6 +29,8 @@
 #define	BUILDING_PYLON			4
 #define	BUILDING_WALL			5
 #define	BUILDING_BUILDSITE		6
+#define	BUILDING_CLUSTERBOMB		7
+#define	BUILDING_RADAR			8
 
 
 #define	BUILDING_CONTROL_POINT		256

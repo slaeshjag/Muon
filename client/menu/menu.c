@@ -23,6 +23,7 @@
 #include "../client.h"
 #include "../chat.h"
 #include "../game.h"
+#include "../map.h"
 #include "menu.h"
 #include "multiplayer.h"
 #include "settings.h"
@@ -64,22 +65,29 @@ void menu_init() {
 	panelist_game_menu.next=&panelist_chat;
 	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);
 	game_menu_button[0]=ui_widget_create_button(ui_widget_create_label(font_std, T("Disconnect")));
-	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, T("Quit game")));
-	game_menu_button[2]=ui_widget_create_button(ui_widget_create_label(font_std, T("Return to game")));
-	for(i=0; i<2; i++) {
+	game_menu_button[1]=ui_widget_create_button(ui_widget_create_label(font_std, T("Resign")));
+	game_menu_button[2]=ui_widget_create_button(ui_widget_create_label(font_std, T("Quit game")));
+	game_menu_button[3]=ui_widget_create_button(ui_widget_create_label(font_std, T("Return to game")));
+	for(i=0; i<3; i++) {
 		ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[i], 0);
-		game_menu_button[i]->event_handler->add(game_menu_button[i], game_menu_button_click, UI_EVENT_TYPE_UI);
+		game_menu_button[i]->event_handler->add(game_menu_button[i], game_menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	}
 	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_spacer(), 1);
-	ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[2], 0);
-	game_menu_button[2]->event_handler->add(game_menu_button[2], game_menu_button_click, UI_EVENT_TYPE_UI);
+	ui_vbox_add_child(panelist_game_menu.pane->root_widget, game_menu_button[3], 0);
+	game_menu_button[3]->event_handler->add(game_menu_button[3], game_menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 }
 
 //Main menu
 void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(widget==menu_sidebar_button[0]) {
-		ui_messagebox(font_std, T("Singleplayer is not yet availble."));
-	} else if(widget==menu_sidebar_button[1]) {
+	/*int i;
+	for(i=0; i<8; i++) {
+		if(!menu_sidebar_button_text_main[i])
+			continue;
+		//menu_sidebar_button[i]=ui_widget_create_button(ui_widget_create_label(font_std, menu_sidebar_button_text_main[i]));
+		//menu_sidebar_button[i]->event_handler->add(menu_sidebar_button[i], menu_sidebar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+		ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button[i]);
+	}*/
+	if(widget==menu_sidebar_button[1]) {
 		panelist_menu_sidebar.next=&panelist_multiplayer_host;
 		ui_selected_widget=multiplayer_join_entry_host;
 		ui_selected_widget=NULL;
@@ -94,23 +102,29 @@ void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e
 }
 
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(panelist_menu_sidebar.next)
-		panelist_menu_sidebar.next=NULL;
-	else
-		game_state(GAME_STATE_QUIT);
+	game_state(GAME_STATE_QUIT);
+}
+
+void menu_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(e->buttons->start&&!prevbuttons.start)
+		game_state(gamestate==GAME_STATE_MENU?GAME_STATE_QUIT:GAME_STATE_GAME);
+	
+	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));
 }
 
 //In-game menu
 void game_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
 	if(widget==game_menu_button[0]) {
 		client_disconnect(-1);
 		game_state(GAME_STATE_MENU);
 		panelist_menu_sidebar.next=NULL;
 	} else if(widget==game_menu_button[1]) {
-		game_state(GAME_STATE_QUIT);
+		client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_NONE, map_get_home(), NULL);
+		game_state(GAME_STATE_GAME);
+		chat_show(&panelist_game_sidebar);
 	} else if(widget==game_menu_button[2]) {
+		game_state(GAME_STATE_QUIT);
+	} else if(widget==game_menu_button[3]) {
 		game_state(GAME_STATE_GAME);
 	}
 }

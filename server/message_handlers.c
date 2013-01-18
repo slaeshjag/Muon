@@ -58,7 +58,7 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 			msg.command = MSG_SEND_JOIN;
 			msg.arg[0] = 0;
 			msg.arg[1] = strlen(server->player[i].name);
-			msg.extra = strdup(server->player[i].name);
+			msg.extra = server->player[i].name;
 			messageBufferPush(server->player[player].msg_buf, &msg);
 
 			msg.player_ID = i;
@@ -75,6 +75,8 @@ void messageHandlerIdentify(unsigned int player, MESSAGE *message) {
 	server->player[player].transfer = MAP;
 	server->player[player].transfer_pos = 0;
 	messageBufferPushDirect(player, player, MSG_SEND_MAP_BEGIN, server->map_c.data_len, strlen(server->map_c.path), (char *) server->map_c.path);
+
+	server->player[player].last_ping_reply = time(NULL);
 
 	return;
 }
@@ -116,6 +118,12 @@ void messageHandlerPlayerReady(unsigned int player, MESSAGE *message) {
 	playerMessageBroadcast(player, MSG_SEND_CLIENT_READY, message->arg[0], message->arg[1], NULL);
 	server->player[player].map_progress = message->arg[1];
 
+	if (server->game.countdown < SERVER_GAME_COUNTDOWN && server->game.started) {
+		fprintf(stderr, "Aborting countdown\n");
+		server->game.started = 0;
+		server->game.time_elapsed = 0;
+	}
+
 	if (!message->arg[0]) {
 		server->player[player].status = PLAYER_IN_LOBBY;
 		return;
@@ -129,7 +137,9 @@ void messageHandlerPlayerReady(unsigned int player, MESSAGE *message) {
 
 
 void messageHandlerPong(unsigned int player, MESSAGE *message) {
-	/* TODO: Implement */
+	if (server->player[player].status == PLAYER_BEING_DISCONNECTED)
+		return;
+	server->player[player].last_ping_reply = time(NULL);
 	return;
 }
 
@@ -187,7 +197,7 @@ void messageHandlerKick(unsigned int player, MESSAGE *message) {
 
 	if (message->arg[0] >= server->players)
 		return;
-	messageSend(server->player[player].socket, player, MSG_SEND_KICKED, 0, 0, NULL);
+	messageSend(server->player[message->arg[0]].socket, message->arg[0], MSG_SEND_KICKED, 0, 0, NULL);
 	playerDisconnect(message->arg[0]);
 
 	return;
@@ -199,6 +209,29 @@ void messageHandlerSetAttack(unsigned int player, MESSAGE *message) {
 		return;
 	unitAttackSet(message->arg[0], message->arg[1]);
 	
+	return;
+}
+
+
+void messageHandlerSetFlare(unsigned int player, MESSAGE *message) {
+	int i, team;
+	if (message->arg[1] >= server->w * server->h) {
+		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		return;
+	}
+	
+	team = server->player[player].team;
+	
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status < PLAYER_IN_GAME_NOW)
+			continue;
+		if (server->player[i].team == -1 && i != player)
+			continue;
+		if (server->player[i].team != team)
+			continue;
+		messageBufferPushDirect(i, player, MSG_SEND_MAP_FLARE, 0, message->arg[1], NULL);
+	}
+
 	return;
 }
 
@@ -228,6 +261,13 @@ void messageHandlerChunkResend(unsigned int player, MESSAGE *message) {
 }
 
 
+void messageHandlerControlpointDeploy(unsigned int player, MESSAGE *message) {
+	controlpointDeploy(player, message->arg[0], message->arg[1]);
+
+	return;
+}
+
+
 int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_PONG] 		= messageHandlerPong;
 	server->message_handler.handle[MSG_RECV_CHAT] 		= messageHandlerChat;
@@ -242,6 +282,8 @@ int messageHandlerInit() {
 	server->message_handler.handle[MSG_RECV_START_BUILD]	= messageHandlerStartBuild;
 	server->message_handler.handle[MSG_RECV_PLACE_BUILDING]	= messageHandlerPlaceBuilding;
 	server->message_handler.handle[MSG_RECV_SET_ATTACK]	= messageHandlerSetAttack;
+	server->message_handler.handle[MSG_RECV_SET_FLARE]	= messageHandlerSetFlare;
+	server->message_handler.handle[MSG_RECV_CP_DEPLOY]	= messageHandlerControlpointDeploy;
 
 	return 0;
 }

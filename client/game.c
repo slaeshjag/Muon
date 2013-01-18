@@ -30,26 +30,27 @@ void game_view_init() {
 	building_place=-1;
 	
 	game_attacklist_blink_semaphore=0;
-	
+	/*Game sidebar*/
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
 	ui_pane_set_root_widget(panelist_game_sidebar.pane, ui_widget_create_vbox());
-	panelist_game_sidebar.next=NULL;
+	panelist_game_sidebar.next=&panelist_game_abilitybar;
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Muon")), 0);
 	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
 	game_sidebar_minimap->render=map_minimap_render;
 	game_sidebar_minimap->event_handler->add(game_sidebar_minimap, game_sidebar_minimap_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
+	if(!(platform.platform&DARNIT_PLATFORM_PANDORA))
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Buildings:")), 0);
 	game_sidebar_label_build[0]=ui_widget_create_label(font_std, T("Scout"));
 	game_sidebar_label_build[1]=ui_widget_create_label(font_std, T("Attacker"));
 	game_sidebar_label_build[2]=ui_widget_create_label(font_std, T("Pylon"));
 	game_sidebar_label_build[3]=ui_widget_create_label(font_std, T("Wall"));
-	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Build site"));
+	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Special building"));
 	int i;
 	for(i=0; i<5; i++) {
 		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
-		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI);
+		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	}
 	game_sidebar_progress_build=ui_widget_create_progressbar(font_std);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
@@ -59,14 +60,80 @@ void game_view_init() {
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Health")), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
+	if(platform.platform&DARNIT_PLATFORM_PANDORA)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
+	
+	/*Special buildings for control points*/
+	panelist_game_specialbar.pane=ui_pane_create(config.screen_w-SIDEBAR_WIDTH*2, game_sidebar_button_build[4]->y-64, SIDEBAR_WIDTH, 128, ui_widget_create_vbox());
+	panelist_game_specialbar.next=&panelist_game_abilitybar;
+	game_specialbar_label_build[0]=ui_widget_create_label(font_std, T("Construction yard"));
+	game_specialbar_label_build[1]=ui_widget_create_label(font_std, T("Missile silo"));
+	game_specialbar_label_build[2]=ui_widget_create_label(font_std, T("Radar"));
+	for(i=0; i<3; i++) {
+		game_specialbar_button_build[i]=ui_widget_create_button(game_specialbar_label_build[i]);
+		ui_vbox_add_child(panelist_game_specialbar.pane->root_widget, game_specialbar_button_build[i], 0);
+		game_specialbar_button_build[i]->event_handler->add(game_specialbar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	}
+	
+	/*Special abilities*/
+	UI_WIDGET *iconwidget;
+	panelist_game_abilitybar.pane=ui_pane_create(2, 64, 52, 128+44, ui_widget_create_vbox());
+	panelist_game_abilitybar.next=NULL;
+	ability[0].name=T("Flare");
+	ability[0].icon=d_render_tilesheet_load("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	ability[0].action=NULL;
+	iconwidget=ui_widget_create_imageview_file("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget->render=game_abilitybar_icon_render;
+	ability[0].button=ui_widget_create_button(iconwidget);
+	ability[0].button->event_handler->add(ability[0].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	ability[0].ready=100;
+	ability[1].name=T("Nuke");
+	ability[1].icon=d_render_tilesheet_load("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	ability[1].action=NULL;
+	iconwidget=ui_widget_create_imageview_file("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget->render=game_abilitybar_icon_render;
+	ability[1].button=ui_widget_create_button(iconwidget);
+	ability[1].button->enabled=0;
+	ability[1].button->event_handler->add(ability[1].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	ability[1].ready=-1;
+	ability[2].name=T("Radar");
+	ability[2].icon=d_render_tilesheet_load("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	ability[2].action=NULL;
+	iconwidget=ui_widget_create_imageview_file("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget->render=game_abilitybar_icon_render;
+	ability[2].button=ui_widget_create_button(iconwidget);
+	ability[2].button->enabled=0;
+	ability[2].button->event_handler->add(ability[2].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	ability[2].ready=-1;
+	for(i=0; i<3; i++)
+		ui_vbox_add_child(panelist_game_abilitybar.pane->root_widget, ability[i].button, 0);
+}
+
+void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//TODO: clean up
+	if(widget==ability[0].button) {
+		if(building_place==PLACE_FLARE)
+			building_place=-1;
+		else
+			building_place=PLACE_FLARE;
+	} else if(widget==ability[1].button) {
+		if(building_place==PLACE_NUKE)
+			building_place=-1;
+		else
+			building_place=PLACE_NUKE;
+	} else if(widget==ability[2].button) {
+		if(building_place==PLACE_RADAR)
+			building_place=-1;
+		else
+			building_place=PLACE_RADAR;
+	}
+	ui_selected_widget=NULL;
 }
 
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(type!=UI_EVENT_TYPE_MOUSE_DOWN)
-		return;
 	int x=e->mouse->x-widget->x;
 	int y=e->mouse->y-widget->y;
-	darnitMapCameraMove(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
+	d_map_camera_move(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
 	map_minimap_update_viewport();
 }
 
@@ -77,23 +144,38 @@ void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EV
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	UI_PROPERTY_VALUE v;
 	int i=0;
-	if(type!=UI_EVENT_TYPE_UI_WIDGET_ACTIVATE)
-		return;
 	// Find the building number.
-	for(; widget!=game_sidebar_button_build[i]; i++);
+	for(; i<4&&widget!=game_sidebar_button_build[i]; i++);
+	if(i==4) {
+		//Special buildings
+		for(; i<7&&widget!=game_specialbar_button_build[i-4]; i++);
+		if(i==7) {
+			panelist_game_sidebar.next=panelist_game_sidebar.next==&panelist_game_abilitybar?&panelist_game_specialbar:&panelist_game_abilitybar;
+			ui_selected_widget=NULL;
+			return;
+		}
+	}
 	if(!building_cancel) {
-		if(building_ready==BUILDING_SCOUT+i) { // If the building is ready, place it.
+		if(building_ready==BUILDING_SCOUT+i) {
+			// If the building is ready, place it.
 			building_place=building_ready;
-		} else if(building_ready==BUILDING_NONE) { // Build if no there are no buildings in progress nor other buildings ready.
+		} else if(building_ready==BUILDING_NONE) { 
+			//Build if no there are no buildings in progress nor other buildings ready.
 			client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_START, NULL);
 			v.p=game_sidebar_progress_build;
 			widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 			game_set_building_progress(0, 0);
 			game_set_building_ready(-(BUILDING_SCOUT+i));
 		}
-	} else if(ABS(building_ready)==BUILDING_SCOUT+i) {	// Cancel if the building is is in progress or ready and shift is pressed
+	} else if(ABS(building_ready)==BUILDING_SCOUT+i) {
+		//Cancel if the building is is in progress or ready and shift is pressed
 		client_message_send(player_id, MSG_SEND_START_BUILD, BUILDING_SCOUT+i, MSG_BUILDING_STOP, NULL);
-		v.p=game_sidebar_label_build[i];
+		if(i<4)
+			v.p=game_sidebar_label_build[i];
+		else {
+			v.p=game_specialbar_label_build[i-4];
+			panelist_game_sidebar.next=&panelist_game_abilitybar;
+		}
 		widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 		game_set_building_progress(0, 0);
 		game_set_building_ready(BUILDING_NONE); // No buildings in progress
@@ -103,8 +185,6 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 
 void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	//TODO: keysyms of number keys might not be sequential on all platforms
-	if(type!=UI_EVENT_TYPE_KEYBOARD_PRESS)
-		return;
 	if(e->keyboard->keysym>=KEY(1)&&e->keyboard->keysym<=KEY(5)) {
 		game_sidebar_button_build_click(game_sidebar_button_build[e->keyboard->keysym-KEY(1)], UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, NULL);
 	}
@@ -114,7 +194,6 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	//darnit buttons have no press or release events, we have to handle this ourselves
-	static UI_EVENT_BUTTONS prevbuttons={0};
 	
 	//View movement
 	if(!chat_is_visible(&panelist_game_sidebar)) {
@@ -132,7 +211,7 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			scroll_y*=2;
 		}
 		if(scroll_x||scroll_y) {
-			darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+			d_map_camera_move(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 			map_minimap_update_viewport();
 		}
 	}
@@ -172,13 +251,21 @@ void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(!scroll_x&&!scroll_y)
 		return;
 	
-	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+	d_map_camera_move(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 	map_minimap_update_viewport();
 }
 
 void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//Make sure there is no pane in the way
 	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH)
 		return;
+	if(panelist_game_sidebar.next==&panelist_game_specialbar&&PINR(e->mouse->x, e->mouse->y, panelist_game_specialbar.pane->x, panelist_game_specialbar.pane->y, panelist_game_specialbar.pane->w, panelist_game_specialbar.pane->h))
+		return;
+	if(chat_is_visible(&panelist_game_sidebar)&&PINR(e->mouse->x, e->mouse->y, panelist_chat.pane->x, panelist_chat.pane->y, panelist_chat.pane->w, panelist_chat.pane->h))
+		return;
+	if(PINR(e->mouse->x, e->mouse->y, panelist_game_abilitybar.pane->x, panelist_game_abilitybar.pane->y, panelist_game_abilitybar.pane->w, panelist_game_abilitybar.pane->h))
+		return ;
+	
 	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT)
 		building_place=-1;
 	else if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
@@ -187,6 +274,15 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			return;
 		if(building_place>-1) {
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, building_place, map_offset, NULL);
+			building_place=-1;
+		} else if(building_place==PLACE_FLARE) {
+			client_message_send(player_id, MSG_SEND_SET_FLARE, 0, map_offset, NULL);
+			building_place=-1;
+		} else if(building_place==PLACE_NUKE) {
+			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_CLUSTERBOMB, map_offset, NULL);
+			building_place=-1;
+		} else if(building_place==PLACE_RADAR) {
+			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_RADAR, map_offset, NULL);
 			building_place=-1;
 		} else {
 			//status selected clicked building, etc
@@ -206,7 +302,7 @@ void game_update_building_status() {
 }
 
 void game_view_scroll_to(int x, int y) {
-	darnitMapCameraMove(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, y*map->layer[map->layers-2].tile_h-platform.screen_h/2);
+	d_map_camera_move(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, y*map->layer[map->layers-2].tile_h-platform.screen_h/2);
 	map_minimap_update_viewport();
 }
 
@@ -222,6 +318,10 @@ void game_reset_building_progress() {
 		UI_PROPERTY_VALUE v={.p=game_sidebar_label_build[i]};
 		game_sidebar_button_build[i]->set_prop(game_sidebar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 	}
+	for(i=0; i<3; i++) {
+		UI_PROPERTY_VALUE v={.p=game_specialbar_label_build[i]};
+		game_specialbar_button_build[i]->set_prop(game_specialbar_button_build[i], UI_BUTTON_PROP_CHILD, v);
+	}
 }
 
 void game_set_building_ready(int building) {
@@ -235,15 +335,15 @@ void game_attacklist_lines_recalculate() {
 	//int map_ht=map->layer[map->layers-2].tilemap->h;
 	int tw=map->layer[map->layers-2].tile_w;
 	int th=map->layer[map->layers-2].tile_h;
-	darnitRenderLineFree(game_attacklist_lines);
-	game_attacklist_lines=darnitRenderLineAlloc(game_attacklist_length, 1);
+	d_render_line_free(game_attacklist_lines);
+	game_attacklist_lines=d_render_line_new(game_attacklist_length, 1);
 	
 	for(l=game_attacklist, i=0; l; l=l->next, i++) {
 		x1=l->index%map_wt*tw+tw/2;
 		y1=l->index/map_wt*th+th/2;
 		x2=l->target%map_wt*tw+tw/2;
 		y2=l->target/map_wt*th+th/2;
-		darnitRenderLineMove(game_attacklist_lines, i, x1, y1, x2, y2);
+		d_render_line_move(game_attacklist_lines, i, x1, y1, x2, y2);
 	}
 }
 
@@ -282,7 +382,7 @@ void game_attacklist_clear() {
 	}
 	game_attacklist=NULL;
 	game_attacklist_length=0;
-	game_attacklist_lines=darnitRenderLineFree(game_attacklist_lines);
+	game_attacklist_lines=d_render_line_free(game_attacklist_lines);
 }
 
 void game_attacklist_untarget(int target) {
@@ -302,43 +402,71 @@ void game_attacklist_target(int index, int target) {
 	struct GAME_ATTACKLIST *l;
 	for(l=game_attacklist; l; l=l->next) {
 		if(l->index==index) {
-			l->target=target==-1?index:target;
+			l->target=target;
 			game_attacklist_lines_recalculate();
 			break;
 		}
 	}
 }
 
+void game_abilitybar_icon_render(UI_WIDGET *widget) {
+	//Override for imageview render. tinting the icon if ability is inactive
+	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	int i=-1;
+	UI_PROPERTY_VALUE v={.p=NULL};
+	while(v.p!=widget) {
+		i++;
+		v=ability[i].button->get_prop(ability[i].button, UI_BUTTON_PROP_CHILD);
+	}
+		
+	if(ability[i].ready==100)
+		d_render_tint(255, 255, 255, 255);
+	else
+		d_render_tint(127, 127, 127, 255);
+	d_render_tile_draw(p->tile, 1);
+	d_render_tint(r, g, b, a);
+	d_render_line_draw(p->border, 4);
+}
+
 void game_view_draw() {
 	view_background_draw();
 	int selected=map_selected_building();
-	if((building_place!=-1||selected==BUILDING_PYLON||selected==BUILDING_GENERATOR))
+	if((building_place>-1||selected==BUILDING_PYLON||selected==BUILDING_GENERATOR))
 		map_draw(1);
 	else
 		map_draw(0);
 	
 	if(game_attacklist_blink_semaphore>30) {
-		darnitRenderOffset(map->cam_x, map->cam_y);
-		darnitRenderLineDraw(game_attacklist_lines, game_attacklist_length);
-		darnitRenderOffset(0, 0);
+		d_render_offset(map->cam_x, map->cam_y);
+		d_render_line_draw(game_attacklist_lines, game_attacklist_length);
+		d_render_offset(0, 0);
 	}
 	if(game_attacklist_blink_semaphore>60)
 		game_attacklist_blink_semaphore=0;
 	game_attacklist_blink_semaphore++;
 		
-	//darnitRenderTileBlit(minimap, 0, 128, 32);
+	//d_render_tile_blit(minimap, 0, 128, 32);
 }
 
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
 	if(building_place!=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
 		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
 		int x=(e->mouse->x+map->cam_x)/l->tile_w*l->tile_w;
 		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
-		darnitRenderOffset(map->cam_x, map->cam_y);
-		darnitRenderBlendingEnable();
-		darnitRenderTileBlit(l->ts, player_id*8+building_place+7, x, y);
-		darnitRenderBlendingDisable();
-		darnitRenderOffset(0, 0);
+		d_render_offset(map->cam_x, map->cam_y);
+		d_render_blend_enable();
+		if(building_place<=-1)
+			d_render_tile_blit(ability[-building_place-2].icon, 0, x, y);
+		else if(building_place>-1)
+			d_render_tile_blit(l->ts, player_id*8+building_place+7, x, y);
+		d_render_blend_disable();
+		d_render_offset(0, 0);
 	}
+	d_render_tint(r, g, b, a);
 	view_mouse_draw(widget, type, e);
 }

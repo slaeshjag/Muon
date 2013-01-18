@@ -42,8 +42,8 @@ UI_WIDGET *ui_widget_create_checkbox() {
 	
 	struct UI_CHECKBOX_PROPERTIES *p=widget->properties;
 	p->activated=0;
-	p->border=darnitRenderLineAlloc(4, 1);
-	p->active_border=darnitRenderLineAlloc(2, 1);
+	p->border=d_render_line_new(4, 1);
+	p->active_border=d_render_line_new(2, 1);
 	widget->destroy=ui_widget_destroy_checkbox;
 	widget->set_prop=ui_checkbox_set_prop;
 	widget->get_prop=ui_checkbox_get_prop;
@@ -59,8 +59,8 @@ UI_WIDGET *ui_widget_create_checkbox() {
 
 void *ui_widget_destroy_checkbox(UI_WIDGET *widget) {
 	struct UI_CHECKBOX_PROPERTIES *p=widget->properties;
-	darnitRenderLineFree(p->border);
-	darnitRenderLineFree(p->active_border);
+	d_render_line_free(p->border);
+	d_render_line_free(p->active_border);
 	return ui_widget_destroy(widget);
 }
 
@@ -142,14 +142,13 @@ void ui_checkbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
 	
-	darnitRenderLineMove(p->border, 0, x+w/2-4, y+h/2-4, x+w/2+4, y+h/2-4);
-	darnitRenderLineMove(p->border, 1, x+w/2-4, y+h/2+4, x+w/2+4, y+h/2+4);
-	darnitRenderLineMove(p->border, 2, x+w/2-4, y+h/2-4, x+w/2-4, y+h/2+4);
-	darnitRenderLineMove(p->border, 3, x+w/2+4, y+h/2-4, x+w/2+4, y+h/2+4);
-
+	d_render_line_move(p->border, 0, x+w/2-4, y+h/2-4, x+w/2+4, y+h/2-4);
+	d_render_line_move(p->border, 1, x+w/2-4, y+h/2+4, x+w/2+4, y+h/2+4);
+	d_render_line_move(p->border, 2, x+w/2-4, y+h/2-4, x+w/2-4, y+h/2+4);
+	d_render_line_move(p->border, 3, x+w/2+4, y+h/2-4, x+w/2+4, y+h/2+4);
 	
-	darnitRenderLineMove(p->active_border, 0, x+w/2-4, y+h/2-4, x+w/2+4, y+h/2+4);
-	darnitRenderLineMove(p->active_border, 1, x+w/2+4, y+h/2-4, x+w/2-4, y+h/2+4);
+	d_render_line_move(p->active_border, 0, x+w/2-4, y+h/2-4, x+w/2+4, y+h/2+4);
+	d_render_line_move(p->active_border, 1, x+w/2+4, y+h/2-4, x+w/2-4, y+h/2+4);
 }
 
 void ui_checkbox_request_size(UI_WIDGET *widget, int *w, int *h) {
@@ -161,7 +160,7 @@ void ui_checkbox_request_size(UI_WIDGET *widget, int *w, int *h) {
 
 void ui_checkbox_render(UI_WIDGET *widget) {
 	struct UI_CHECKBOX_PROPERTIES *p=widget->properties;
-	darnitRenderLineDraw(p->border, 4);
+	d_render_line_draw(p->border, 4);
 	if(p->activated)
-		darnitRenderLineDraw(p->active_border, 2);
+		d_render_line_draw(p->active_border, 2);
 }

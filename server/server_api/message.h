@@ -108,7 +108,7 @@ typedef struct {
 /* arg_1 is the HP value (0..100), arg_2 is index on the map that the building is at. */
 #define	MSG_RECV_BUILDING_HP		0x00D
 
-/* arg_1 is the index on the map that the building is at, arg_2 is the index of the building attacking */
+/* arg_1 is the index on the map that the building is at, arg_2 is the index of the building attacking. If arg_1 and arg_2 is equal, attack is nothing. */
 #define	MSG_RECV_BUILDING_ATTACK	0x00E
 
 /* arg_1 is the building type that is being built, arg_2 is the progress in the range 0..100 */
@@ -146,6 +146,21 @@ typedef struct {
 
 /* arg_1 is the amount of buildings destroyed (by player,) arg_2 is the contruction time utilization efficiency */
 #define	MSG_RECV_PLAYER_STATS_2		0x01A
+
+/* arg_1 is nothing. arg_2 is tile flare is on */
+#define	MSG_RECV_MAP_FLARE		0x01B
+
+/* arg_1 is the controlpoint building ID, arg_2 is ready in percent. 100 is ready */
+#define	MSG_RECV_CP_TIMER		0x01C
+
+/* arg_1 is the controlpoint building type that was deployed, arg_2 is where the center of the deployment was */
+#define	MSG_RECV_CP_DEPLOY		0x01D
+
+/* arg_1 is the controlpoint building type that should have its timer removed. arg_2 is nothing. */
+#define	MSG_RECV_CP_CLEAR		0x01E
+
+/* arg_1 is nothing, arg_2 is tile ID of major impact */
+#define	MSG_RECV_MAJOR_IMPACT		0x01F
 
 
 /* These commands have data after them */
@@ -203,6 +218,12 @@ typedef struct {
 
 /* arg_1 is map index the building to set attack from is at, arg_2 the tile index for the target building */
 #define	MSG_SEND_SET_ATTACK		11
+
+/* arg_1 is nothing, arg_2 is tile to set flare on */
+#define	MSG_SEND_SET_FLARE		12
+
+/* arg_1 is the controlpoint building type, arg_2 is the tile ID to center the deployment at */
+#define	MSG_SEND_CP_DEPLOY		13
 
 
 #endif

@@ -22,6 +22,8 @@
 
 #define cosine(x) (sine((x)+90))
 #define ABS(x) ((x)>0?(x):-(x))
+#define MIN(a, b) ((a)<(b)?(a):(b))
+#define MAX(a, b) ((a)>(b)?(a):(b))
 
 
 

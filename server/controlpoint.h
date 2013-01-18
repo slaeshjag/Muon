@@ -22,9 +22,37 @@
 
 #define	CONTROLPOINT_CLUSTERBOMB_WARMUP	10800
 
+#define	CP_DELAY_SEC(x)			((x) / server->game.gamespeed / 1000)
+
+/* In gameticks */
+#define	CP_CLUSTERBOMB_DELAY		60 * 3000
+#define	CP_RADAR_DELAY			60 * 3000
+#define	CP_RADAR_DEPLOY_TIME		10 * 3000
+
 struct SERVER_UNIT;
 
-int controlpointInit(struct SERVER_UNIT *unit);
+typedef struct CONTROLPONIT_EXTRA {
+	unsigned int			type;
+	unsigned int			index;
+	unsigned int			owner;
+	struct CONTROLPOINT_EXTRA	*next;
+} CONTROLPOINT_EXTRA;
+
+
+typedef struct {
+	int				clusterbomb_delay;
+	int				radar_delay;
+	int				radar_deploy;
+	int				radar_pos;
+} CONTROLPOINT_DATA;
+
+
+
+int controlpointInit();
+void controlpointInitPlayer(int player);
+int controlpointNew(struct SERVER_UNIT *unit);
+void controlpointLoop();
+void controlpointDeploy(int player, int type, int index_dst);
 void controlpointRemove(struct SERVER_UNIT *unit);
 
 #endif

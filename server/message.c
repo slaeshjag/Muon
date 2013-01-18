@@ -49,6 +49,7 @@ MESSAGE_BUFFER *messageBufferDelete(MESSAGE_BUFFER *msg_buf) {
 	messageBufferFlush(msg_buf);
 
 	free(msg_buf->message);
+	free(msg_buf->send_buff);
 	free(msg_buf);
 	return NULL;
 }
@@ -59,6 +60,9 @@ int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 		fprintf(stderr, "Message buffer is NULL, unable to push message\n");
 		return -1;
 	}
+	
+	if (message->command == MSG_SEND_ILLEGAL_COMMAND)
+		fprintf(stderr, "Illegal command!\n");
 
 	if (((msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1) == msg_buf->read_pos)
 		return -1;
@@ -171,9 +175,6 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 
 
 int messageExecute(unsigned int player, MESSAGE *message) {
-	
-
-	
 	if (message->command >= MESSAGE_HANDLERS) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);
@@ -189,17 +190,23 @@ int messageExecute(unsigned int player, MESSAGE *message) {
 		return -1;
 	}
 
-	if ((!server->game.started) && message->command > MESSAGE_LOBBY_MAX) {
+	if ((!server->game.started) && message->command > MESSAGE_LOBBY_MAX && message->command != MSG_RECV_READY) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);
 		return -1;
 	}	
 
-	if (server->game.started && (message->command < MESSAGE_GAME_MIN || message->command > MESSAGE_GAME_MAX) && message->command > MESSAGE_ALWAYS_MAX) {
+	if (server->game.started && (message->command > MESSAGE_GAME_MAX) && message->command > MESSAGE_ALWAYS_MAX) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);
 		return -1;
 	}
+
+	if (server->player[player].status > PLAYER_IN_GAME_NOW && (message->command > MESSAGE_ALWAYS_MAX || message->command == MSG_RECV_CHAT)) {
+		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
+		return -1;
+	}
+		
 
 	(server->message_handler.handle[message->command])(player, message);
 	free(message->extra);

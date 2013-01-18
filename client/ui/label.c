@@ -47,7 +47,7 @@ UI_WIDGET *ui_widget_create_label(DARNIT_FONT *font, const char *text) {
 
 void *ui_widget_destroy_label(UI_WIDGET *widget) {
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
-	darnitTextSurfaceFree(p->surface);
+	d_text_surface_free(p->surface);
 	return ui_widget_destroy(widget);
 }
 
@@ -91,21 +91,21 @@ void ui_label_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
 	if(p->surface!=NULL)
-		darnitTextSurfaceFree(p->surface);
+		d_text_surface_free(p->surface);
 	int text_w;
-	int text_h=darnitTextStringGeometrics(p->font, p->text, w, &text_w);
-	p->surface=darnitTextSurfaceAlloc(p->font, darnitUtf8UnicodeCharactersInString(p->text), w, x+(w/2)-(text_w/2), y+(h/2)-(text_h/2));
-	darnitTextSurfaceStringAppend(p->surface, p->text);
+	int text_h=d_font_string_geometrics(p->font, p->text, w, &text_w);
+	p->surface=d_text_surface_new(p->font, d_utf8_chars_in_string(p->text), w, x+(w/2)-(text_w/2), y+(h/2)-(text_h/2));
+	d_text_surface_string_append(p->surface, p->text);
 }
 
 void ui_label_request_size(UI_WIDGET *widget, int *w, int *h) {
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
-	int ww=((w==NULL)||(*w==-1))?darnitFontGetStringWidthPixels(p->font, p->text):*w;
+	int ww=((w==NULL)||(*w==-1))?d_font_string_w(p->font, p->text)+UI_PADDING:*w;
 	if(ww==0||*h==0)
 		return;
 	
 	int text_w;
-	int text_h=darnitTextStringGeometrics(p->font, p->text, ww, &text_w);
+	int text_h=d_font_string_geometrics(p->font, p->text, ww, &text_w);
 	*h=text_h;
 	if(w&&*w==-1)
 		*w=text_w+UI_PADDING;
@@ -113,7 +113,7 @@ void ui_label_request_size(UI_WIDGET *widget, int *w, int *h) {
 
 void ui_label_render(UI_WIDGET *widget) {
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
-	darnitRenderBlendingEnable();
-	darnitTextSurfaceDraw(p->surface);
-	darnitRenderBlendingDisable();
+	d_render_blend_enable();
+	d_text_surface_draw(p->surface);
+	d_render_blend_disable();
 }
