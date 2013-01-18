@@ -92,7 +92,7 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 				tw=d_font_string_w(p->font, p->offset);
 			} else if(p->cursor_pos>=UI_ENTRY_LENGTH-1||!e->keyboard->character) {
 				return;
-			} else {
+			} else if(e->keyboard->character>=0x20) {
 				char str[5]={0, 0, 0, 0, 0};
 				int len=d_utf8_encode(e->keyboard->character, str, 5);
 				strcat(&p->text[p->cursor_pos], str);
