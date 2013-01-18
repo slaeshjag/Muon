@@ -43,8 +43,8 @@ UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font) {
 	p->list=NULL;
 	p->offset=NULL;
 	p->font=font;
-	p->border=darnitRenderLineAlloc(4, 1);
-	p->selected_rect=darnitRenderRectAlloc(1);
+	p->border=d_render_line_new(4, 1);
+	p->selected_rect=d_render_rect_new(1);
 	p->size=0;
 	p->scroll=0;
 	p->selected=-1;
@@ -64,8 +64,8 @@ UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font) {
 void *ui_widget_destroy_listbox(UI_WIDGET *widget) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	ui_listbox_clear(widget);
-	darnitRenderLineFree(p->border);
-	darnitRenderRectFree(p->selected_rect);
+	d_render_line_free(p->border);
+	d_render_rect_free(p->selected_rect);
 	return ui_widget_destroy(widget);
 }
 
@@ -88,7 +88,7 @@ void ui_listbox_clear(UI_WIDGET *widget) {
 	struct UI_LISTBOX_LIST *l, *next;
 	for(l=p->list; l; l=next) {
 		next=l->next;
-		darnitTextSurfaceFree(l->surface);
+		d_text_surface_free(l->surface);
 		free(l);
 	}
 	p->list=NULL;
@@ -128,13 +128,13 @@ int ui_listbox_index_of(UI_WIDGET *widget, const char *text) {
 
 void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
-	int text_h;//darnitFontGetGlyphH(p->font)+2;
+	int text_h;//d_font_glyph_h(p->font)+2;
 	struct UI_LISTBOX_LIST *l, *ll;
 	int i=0;
 	for(l=p->list; l; l=l->next) {
 		text_h=2;
 		for(ll=l; ll; ll=ll->next)
-			text_h+=darnitTextStringGeometrics(p->font, ll->text, widget->w-UI_PADDING*2, NULL);
+			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-UI_PADDING*2, NULL);
 		if(pos>=0&&i>=pos)
 			break;
 		if(text_h<widget->h-2)
@@ -159,7 +159,7 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int i=p->scroll;
 		int item_y=widget->y+2;
 		for(l=p->offset; l; l=l->next, i++) {
-			int item_h=darnitTextStringGeometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL);
+			int item_h=d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL);
 			if(e->mouse->y>item_y&&e->mouse->y<item_y+item_h) {
 				p->selected=i;
 				widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
@@ -207,38 +207,38 @@ void ui_listbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
 	
-	darnitRenderLineMove(p->border, 0, x, y, x+w, y);
-	darnitRenderLineMove(p->border, 1, x, y+h, x+w, y+h);
-	darnitRenderLineMove(p->border, 2, x, y, x, y+h);
-	darnitRenderLineMove(p->border, 3, x+w, y, x+w, y+h);
+	d_render_line_move(p->border, 0, x, y, x+w, y);
+	d_render_line_move(p->border, 1, x, y+h, x+w, y+h);
+	d_render_line_move(p->border, 2, x, y, x, y+h);
+	d_render_line_move(p->border, 3, x+w, y, x+w, y+h);
 	
 	if(!p->offset)
 		p->offset=p->list;
 	
 	struct UI_LISTBOX_LIST *l=p->offset;
-	int item_y=y+2;//, text_h=darnitFontGetGlyphH(p->font);
-	/*for(l=p->offset; l&&item_y+darnitTextStringGeometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL)<y+h-2; l=l->next) {
+	int item_y=y+2;//, text_h=d_font_glyph_h(p->font);
+	/*for(l=p->offset; l&&item_y+d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL)<y+h-2; l=l->next) {
 		if(l->surface)
-			darnitTextSurfaceFree(l->surface);
-		l->surface=darnitTextSurfaceAlloc(p->font, 128, w-UI_PADDING*2, x+UI_PADDING, item_y);
-		darnitTextSurfaceStringAppend(l->surface, l->text);
-		item_y+=darnitTextStringGeometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL);
-		printf("%s %i\n", l->text, item_y+darnitTextStringGeometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL));
+			d_text_surface_free(l->surface);
+		l->surface=d_text_surface_new(p->font, 128, w-UI_PADDING*2, x+UI_PADDING, item_y);
+		d_text_surface_string_append(l->surface, l->text);
+		item_y+=d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL);
+		printf("%s %i\n", l->text, item_y+d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL));
 	}
 	if(l&&l->next&&l->next->surface) {
-		darnitTextSurfaceFree(l->next->surface);
+		d_text_surface_free(l->next->surface);
 		l->next->surface=NULL;
 	}*/
 	int i=p->scroll;
 	while(l) {
-		l->surface=darnitTextSurfaceFree(l->surface);
-		int item_h=darnitTextStringGeometrics(p->font, l->text, w-UI_PADDING*2, NULL);
+		l->surface=d_text_surface_free(l->surface);
+		int item_h=d_font_string_geometrics(p->font, l->text, w-UI_PADDING*2, NULL);
 		if(item_y+item_h>y+h-2)
 			break;
-		l->surface=darnitTextSurfaceAlloc(p->font, 128, w-UI_PADDING*2, x+UI_PADDING, item_y);
-		darnitTextSurfaceStringAppend(l->surface, l->text);
+		l->surface=d_text_surface_new(p->font, 128, w-UI_PADDING*2, x+UI_PADDING, item_y);
+		d_text_surface_string_append(l->surface, l->text);
 		if(i==p->selected)
-			darnitRenderRectSet(p->selected_rect, 0, x+UI_PADDING, item_y, x+w-UI_PADDING, item_y+item_h);
+			d_render_rect_move(p->selected_rect, 0, x+UI_PADDING, item_y, x+w-UI_PADDING, item_y+item_h);
 		item_y+=item_h;
 		l=l->next; i++;
 	}
@@ -253,21 +253,21 @@ void ui_listbox_request_size(UI_WIDGET *widget, int *w, int *h) {
 
 void ui_listbox_render(UI_WIDGET *widget) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
-	darnitRenderLineDraw(p->border, 4);
+	d_render_line_draw(p->border, 4);
 	if(!p->offset)
 		return;
-	darnitRenderBlendingEnable();
+	d_render_blend_enable();
 	struct UI_LISTBOX_LIST *l;
 	int i=p->scroll;
 	for(l=p->offset; l; l=l->next, i++) {
 		if(!l->surface)
 			break;
-		darnitTextSurfaceDraw(l->surface);
+		d_text_surface_draw(l->surface);
 	}
-	darnitRenderBlendingDisable();
+	d_render_blend_disable();
 	if(p->selected>=p->scroll&&p->selected<i) {
-		darnitRenderLogicOp(DARNIT_RENDER_LOGIC_OP_XOR);
-		darnitRenderRectDraw(p->selected_rect, 1);
-		darnitRenderLogicOp(DARNIT_RENDER_LOGIC_OP_NONE);
+		d_render_logic_op(DARNIT_RENDER_LOGIC_OP_XOR);
+		d_render_rect_draw(p->selected_rect, 1);
+		d_render_logic_op(DARNIT_RENDER_LOGIC_OP_NONE);
 	}
 }

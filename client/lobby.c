@@ -104,7 +104,7 @@ void lobby_open() {
 
 void lobby_map_preview_generate() {
 	UI_PROPERTY_VALUE v;
-	v.p=(void *)darnitMapPropGet(map->prop, "name");
+	v.p=(void *)d_map_prop(map->prop, "name");
 	if(v.p)
 		lobby_map_label->set_prop(lobby_map_label, UI_LABEL_PROP_TEXT, v);
 	v=lobby_map_imageview->get_prop(lobby_map_imageview, UI_IMAGEVIEW_PROP_TILESHEET);

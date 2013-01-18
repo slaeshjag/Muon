@@ -90,19 +90,19 @@ void menu_multiplayer_host_maps_reload() {
 	char buf[256];
 	int dirs;
 	ui_listbox_clear(multiplayer_host_listbox_maps);
-	dir=darnitFileList(mapdir, DARNIT_FILESYSTEM_TYPE_READ|DARNIT_FILESYSTEM_TYPE_WRITE, &dirs);
+	dir=d_file_list(mapdir, DARNIT_FILESYSTEM_TYPE_READ|DARNIT_FILESYSTEM_TYPE_WRITE, &dirs);
 	for(d=dir; d; d=d->next) {
 		if(d->file&&ui_listbox_index_of(multiplayer_host_listbox_maps, d->fname)==-1) {
 			sprintf(buf, "%s/%s", mapdir, d->fname);
-			f=darnitFileOpen(buf, "rb");
-			darnitFileRead(buf, 8, f);
-			darnitFileClose(f);
+			f=d_file_open(buf, "rb");
+			d_file_read(buf, 8, f);
+			d_file_close(f);
 			if(memcmp(buf, ldimagic, 8))
 				continue;
 			ui_listbox_add(multiplayer_host_listbox_maps, d->fname);
 		}
 	}
-	darnitFileListFree(dir);
+	d_file_list_free(dir);
 }
 
 void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

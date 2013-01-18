@@ -35,8 +35,8 @@ UI_WIDGET *ui_widget_create_progressbar(DARNIT_FONT *font) {
 	struct UI_PROGRESSBAR_PROPERTIES *p=widget->properties;
 	p->surface=NULL;
 	p->font=font;
-	p->border=darnitRenderLineAlloc(4, 1);
-	p->bar=darnitRenderRectAlloc(1);
+	p->border=d_render_line_new(4, 1);
+	p->bar=d_render_rect_new(1);
 	p->progress=0;
 	strcpy(p->text, "0%");
 	
@@ -54,9 +54,9 @@ UI_WIDGET *ui_widget_create_progressbar(DARNIT_FONT *font) {
 
 void *ui_widget_destroy_progressbar(UI_WIDGET *widget) {
 	struct UI_PROGRESSBAR_PROPERTIES *p=widget->properties;
-	darnitRenderRectFree(p->bar);
-	darnitRenderLineFree(p->border);
-	darnitTextSurfaceFree(p->surface);
+	d_render_rect_free(p->bar);
+	d_render_line_free(p->border);
+	d_text_surface_free(p->surface);
 	return ui_widget_destroy(widget);
 }
 
@@ -68,13 +68,13 @@ void ui_progressbar_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE valu
 				break;
 			p->progress=value.i;
 			sprintf(p->text, "%i%%", value.i);
-			darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+2+((widget->w-4)*value.i/100), widget->y+widget->h-2);
+			d_render_rect_move(p->bar, 0, widget->x+2, widget->y+2, widget->x+2+((widget->w-4)*value.i/100), widget->y+widget->h-2);
 			if(p->surface!=NULL)
-				darnitTextSurfaceFree(p->surface);
+				d_text_surface_free(p->surface);
 			int text_w;
-			int text_h=darnitTextStringGeometrics(p->font, p->text, widget->w, &text_w);
-			p->surface=darnitTextSurfaceAlloc(p->font, darnitUtf8UnicodeCharactersInString(p->text), widget->w, widget->x+(widget->w/2)-(text_w/2), widget->y+(widget->h/2)-(text_h/2));
-			darnitTextSurfaceStringAppend(p->surface, p->text);
+			int text_h=d_font_string_geometrics(p->font, p->text, widget->w, &text_w);
+			p->surface=d_text_surface_new(p->font, d_utf8_chars_in_string(p->text), widget->w, widget->x+(widget->w/2)-(text_w/2), widget->y+(widget->h/2)-(text_h/2));
+			d_text_surface_string_append(p->surface, p->text);
 			break;
 	}
 }
@@ -106,20 +106,20 @@ void ui_progressbar_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
 	
-	darnitRenderLineMove(p->border, 0, x, y, x+w, y);
-	darnitRenderLineMove(p->border, 1, x, y+h, x+w, y+h);
-	darnitRenderLineMove(p->border, 2, x, y, x, y+h);
-	darnitRenderLineMove(p->border, 3, x+w, y, x+w, y+h);
+	d_render_line_move(p->border, 0, x, y, x+w, y);
+	d_render_line_move(p->border, 1, x, y+h, x+w, y+h);
+	d_render_line_move(p->border, 2, x, y, x, y+h);
+	d_render_line_move(p->border, 3, x+w, y, x+w, y+h);
 	
-	//darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+widget->w-2, widget->y+widget->h-2);
-	darnitRenderRectSet(p->bar, 0, widget->x+2, widget->y+2, widget->x+2+((widget->w-4)*p->progress/100), widget->y+widget->h-2);
+	//d_render_rect_move(p->bar, 0, widget->x+2, widget->y+2, widget->x+widget->w-2, widget->y+widget->h-2);
+	d_render_rect_move(p->bar, 0, widget->x+2, widget->y+2, widget->x+2+((widget->w-4)*p->progress/100), widget->y+widget->h-2);
 	
 	if(p->surface!=NULL)
-		darnitTextSurfaceFree(p->surface);
+		d_text_surface_free(p->surface);
 	int text_w;
-	int text_h=darnitTextStringGeometrics(p->font, p->text, w, &text_w);
-	p->surface=darnitTextSurfaceAlloc(p->font, darnitUtf8UnicodeCharactersInString(p->text), w, x+(w/2)-(text_w/2), y+(h/2)-(text_h/2));
-	darnitTextSurfaceStringAppend(p->surface, p->text);
+	int text_h=d_font_string_geometrics(p->font, p->text, w, &text_w);
+	p->surface=d_text_surface_new(p->font, d_utf8_chars_in_string(p->text), w, x+(w/2)-(text_w/2), y+(h/2)-(text_h/2));
+	d_text_surface_string_append(p->surface, p->text);
 }
 
 void ui_progressbar_request_size(UI_WIDGET *widget, int *w, int *h) {
@@ -129,19 +129,19 @@ void ui_progressbar_request_size(UI_WIDGET *widget, int *w, int *h) {
 	if(!h)
 		return;
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
-	int text_h=darnitFontGetGlyphH(p->font);
-	//darnitTextStringGeometrics(p->font, p->offset, ww, &text_w);
+	int text_h=d_font_glyph_h(p->font);
+	//d_font_string_geometrics(p->font, p->offset, ww, &text_w);
 	*h=text_h+4;
 }
 
 void ui_progressbar_render(UI_WIDGET *widget) {
 	struct UI_PROGRESSBAR_PROPERTIES *p=widget->properties;
-	darnitRenderLineDraw(p->border, 4);
+	d_render_line_draw(p->border, 4);
 	
-	darnitRenderBlendingEnable();
-	darnitTextSurfaceDraw(p->surface);
-	darnitRenderBlendingDisable();
-	darnitRenderLogicOp(DARNIT_RENDER_LOGIC_OP_XOR);
-	darnitRenderRectDraw(p->bar, 1);
-	darnitRenderLogicOp(DARNIT_RENDER_LOGIC_OP_NONE);
+	d_render_blend_enable();
+	d_text_surface_draw(p->surface);
+	d_render_blend_disable();
+	d_render_logic_op(DARNIT_RENDER_LOGIC_OP_XOR);
+	d_render_rect_draw(p->bar, 1);
+	d_render_logic_op(DARNIT_RENDER_LOGIC_OP_NONE);
 }

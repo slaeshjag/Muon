@@ -20,7 +20,7 @@
 #ifndef PLATFORM_H
 #define PLATFORM_H
 
-#define T(s) darnitStringtableEntryGet(stringtable, (s))
+#define T(s) d_stringtable_entry(stringtable, (s))
 
 DARNIT_PLATFORM platform;
 DARNIT_STRINGTABLE *stringtable;

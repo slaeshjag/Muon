@@ -80,7 +80,7 @@ void game_view_init() {
 	panelist_game_abilitybar.pane=ui_pane_create(2, 64, 52, 128+44, ui_widget_create_vbox());
 	panelist_game_abilitybar.next=NULL;
 	ability[0].name=T("Flare");
-	ability[0].icon=darnitRenderTilesheetLoad("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	ability[0].icon=d_render_tilesheet_load("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[0].action=NULL;
 	iconwidget=ui_widget_create_imageview_file("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	iconwidget->render=game_abilitybar_icon_render;
@@ -88,7 +88,7 @@ void game_view_init() {
 	ability[0].button->event_handler->add(ability[0].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[0].delay=0;
 	ability[1].name=T("Nuke");
-	ability[1].icon=darnitRenderTilesheetLoad("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	ability[1].icon=d_render_tilesheet_load("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[1].action=NULL;
 	iconwidget=ui_widget_create_imageview_file("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	iconwidget->render=game_abilitybar_icon_render;
@@ -97,7 +97,7 @@ void game_view_init() {
 	ability[1].button->event_handler->add(ability[1].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[1].delay=-1;
 	ability[2].name=T("Radar");
-	ability[2].icon=darnitRenderTilesheetLoad("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	ability[2].icon=d_render_tilesheet_load("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[2].action=NULL;
 	iconwidget=ui_widget_create_imageview_file("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	iconwidget->render=game_abilitybar_icon_render;
@@ -133,7 +133,7 @@ void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int x=e->mouse->x-widget->x;
 	int y=e->mouse->y-widget->y;
-	darnitMapCameraMove(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
+	d_map_camera_move(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
 	map_minimap_update_viewport();
 }
 
@@ -211,7 +211,7 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			scroll_y*=2;
 		}
 		if(scroll_x||scroll_y) {
-			darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+			d_map_camera_move(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 			map_minimap_update_viewport();
 		}
 	}
@@ -251,7 +251,7 @@ void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(!scroll_x&&!scroll_y)
 		return;
 	
-	darnitMapCameraMove(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
+	d_map_camera_move(map, map->cam_x+scroll_x, map->cam_y+scroll_y);
 	map_minimap_update_viewport();
 }
 
@@ -302,7 +302,7 @@ void game_update_building_status() {
 }
 
 void game_view_scroll_to(int x, int y) {
-	darnitMapCameraMove(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, y*map->layer[map->layers-2].tile_h-platform.screen_h/2);
+	d_map_camera_move(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, y*map->layer[map->layers-2].tile_h-platform.screen_h/2);
 	map_minimap_update_viewport();
 }
 
@@ -335,15 +335,15 @@ void game_attacklist_lines_recalculate() {
 	//int map_ht=map->layer[map->layers-2].tilemap->h;
 	int tw=map->layer[map->layers-2].tile_w;
 	int th=map->layer[map->layers-2].tile_h;
-	darnitRenderLineFree(game_attacklist_lines);
-	game_attacklist_lines=darnitRenderLineAlloc(game_attacklist_length, 1);
+	d_render_line_free(game_attacklist_lines);
+	game_attacklist_lines=d_render_line_new(game_attacklist_length, 1);
 	
 	for(l=game_attacklist, i=0; l; l=l->next, i++) {
 		x1=l->index%map_wt*tw+tw/2;
 		y1=l->index/map_wt*th+th/2;
 		x2=l->target%map_wt*tw+tw/2;
 		y2=l->target/map_wt*th+th/2;
-		darnitRenderLineMove(game_attacklist_lines, i, x1, y1, x2, y2);
+		d_render_line_move(game_attacklist_lines, i, x1, y1, x2, y2);
 	}
 }
 
@@ -382,7 +382,7 @@ void game_attacklist_clear() {
 	}
 	game_attacklist=NULL;
 	game_attacklist_length=0;
-	game_attacklist_lines=darnitRenderLineFree(game_attacklist_lines);
+	game_attacklist_lines=d_render_line_free(game_attacklist_lines);
 }
 
 void game_attacklist_untarget(int target) {
@@ -412,8 +412,8 @@ void game_attacklist_target(int index, int target) {
 void game_abilitybar_icon_render(UI_WIDGET *widget) {
 	//Override for imageview render. tinting the icon if ability is inactive
 	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
-	float r, g, b, a;
-	darnitRenderTintGet(&r, &g, &b, &a);
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
 	int i=-1;
 	UI_PROPERTY_VALUE v={.p=NULL};
 	while(v.p!=widget) {
@@ -422,12 +422,12 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 	}
 		
 	if(ability[i].delay==100)
-		darnitRenderTint(1, 1, 1, 1);
+		d_render_tint(255, 255, 255, 255);
 	else
-		darnitRenderTint(0.5, 0.5, 0.5, 1);
-	darnitRenderTileDraw(p->tile, p->tilesheet, 1);
-	darnitRenderTint(r, g, b, a);
-	darnitRenderLineDraw(p->border, 4);
+		d_render_tint(127, 127, 127, 255);
+	d_render_tile_draw(p->tile, 1);
+	d_render_tint(r, g, b, a);
+	d_render_line_draw(p->border, 4);
 }
 
 void game_view_draw() {
@@ -439,34 +439,34 @@ void game_view_draw() {
 		map_draw(0);
 	
 	if(game_attacklist_blink_semaphore>30) {
-		darnitRenderOffset(map->cam_x, map->cam_y);
-		darnitRenderLineDraw(game_attacklist_lines, game_attacklist_length);
-		darnitRenderOffset(0, 0);
+		d_render_offset(map->cam_x, map->cam_y);
+		d_render_line_draw(game_attacklist_lines, game_attacklist_length);
+		d_render_offset(0, 0);
 	}
 	if(game_attacklist_blink_semaphore>60)
 		game_attacklist_blink_semaphore=0;
 	game_attacklist_blink_semaphore++;
 		
-	//darnitRenderTileBlit(minimap, 0, 128, 32);
+	//d_render_tile_blit(minimap, 0, 128, 32);
 }
 
 void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	float r, g, b, a;
-	darnitRenderTintGet(&r, &g, &b, &a);
-	darnitRenderTint(1, 1, 1, 1);
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
 	if(building_place!=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
 		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
 		int x=(e->mouse->x+map->cam_x)/l->tile_w*l->tile_w;
 		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
-		darnitRenderOffset(map->cam_x, map->cam_y);
-		darnitRenderBlendingEnable();
+		d_render_offset(map->cam_x, map->cam_y);
+		d_render_blend_enable();
 		if(building_place<=-1)
-			darnitRenderTileBlit(ability[-building_place-2].icon, 0, x, y);
+			d_render_tile_blit(ability[-building_place-2].icon, 0, x, y);
 		else if(building_place>-1)
-			darnitRenderTileBlit(l->ts, player_id*8+building_place+7, x, y);
-		darnitRenderBlendingDisable();
-		darnitRenderOffset(0, 0);
+			d_render_tile_blit(l->ts, player_id*8+building_place+7, x, y);
+		d_render_blend_disable();
+		d_render_offset(0, 0);
 	}
-	darnitRenderTint(r, g, b, a);
+	d_render_tint(r, g, b, a);
 	view_mouse_draw(widget, type, e);
 }

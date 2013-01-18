@@ -43,8 +43,8 @@ UI_WIDGET *ui_widget_create_button(UI_WIDGET *child) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	p->child=child;
 	p->activated=0;
-	p->border=darnitRenderLineAlloc(8, 1);
-	p->active_border=darnitRenderLineAlloc(4, 1);
+	p->border=d_render_line_new(8, 1);
+	p->active_border=d_render_line_new(4, 1);
 	widget->destroy=ui_widget_destroy_button;
 	widget->set_prop=ui_button_set_prop;
 	widget->get_prop=ui_button_get_prop;
@@ -72,8 +72,8 @@ UI_WIDGET *ui_widget_create_button_image() {
 
 void *ui_widget_destroy_button(UI_WIDGET *widget) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
-	darnitRenderLineFree(p->border);
-	darnitRenderLineFree(p->active_border);
+	d_render_line_free(p->border);
+	d_render_line_free(p->active_border);
 	return ui_widget_destroy(widget);
 }
 
@@ -171,19 +171,19 @@ void ui_button_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	widget->w=w; widget->h=h;
 	p->child->resize(p->child, x+2+UI_PADDING, y+2+UI_PADDING, w-4-UI_PADDING*2, h-4-UI_PADDING*2);
 	
-	darnitRenderLineMove(p->border, 0, x, y, x+w-1, y);
-	darnitRenderLineMove(p->border, 1, x, y+h, x+w-1, y+h);
-	darnitRenderLineMove(p->border, 2, x, y, x, y+h-1);
-	darnitRenderLineMove(p->border, 3, x+w, y, x+w, y+h-1);
-	darnitRenderLineMove(p->border, 4, x+2, y+2, x+w-3, y+2);
-	darnitRenderLineMove(p->border, 5, x+2, y+h-2, x+w-3, y+h-2);
-	darnitRenderLineMove(p->border, 6, x+2, y+2, x+2, y+h-3);
-	darnitRenderLineMove(p->border, 7, x+w-2, y+2, x+w-2, y+h-3);
+	d_render_line_move(p->border, 0, x, y, x+w-1, y);
+	d_render_line_move(p->border, 1, x, y+h, x+w-1, y+h);
+	d_render_line_move(p->border, 2, x, y, x, y+h-1);
+	d_render_line_move(p->border, 3, x+w, y, x+w, y+h-1);
+	d_render_line_move(p->border, 4, x+2, y+2, x+w-3, y+2);
+	d_render_line_move(p->border, 5, x+2, y+h-2, x+w-3, y+h-2);
+	d_render_line_move(p->border, 6, x+2, y+2, x+2, y+h-3);
+	d_render_line_move(p->border, 7, x+w-2, y+2, x+w-2, y+h-3);
 	
-	darnitRenderLineMove(p->active_border, 0, x, y+1, x+w-1, y+1);
-	darnitRenderLineMove(p->active_border, 1, x, y+h-1, x+w-1, y+h-1);
-	darnitRenderLineMove(p->active_border, 2, x+1, y, x+1, y+h-1);
-	darnitRenderLineMove(p->active_border, 3, x+w-1, y, x+w-1, y+h-1);
+	d_render_line_move(p->active_border, 0, x, y+1, x+w-1, y+1);
+	d_render_line_move(p->active_border, 1, x, y+h-1, x+w-1, y+h-1);
+	d_render_line_move(p->active_border, 2, x+1, y, x+1, y+h-1);
+	d_render_line_move(p->active_border, 3, x+w-1, y, x+w-1, y+h-1);
 }
 
 void ui_button_request_size(UI_WIDGET *widget, int *w, int *h) {
@@ -196,7 +196,7 @@ void ui_button_request_size(UI_WIDGET *widget, int *w, int *h) {
 void ui_button_render(UI_WIDGET *widget) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	p->child->render(p->child);
-	darnitRenderLineDraw(p->border, 8);
+	d_render_line_draw(p->border, 8);
 	if(p->activated)
-		darnitRenderLineDraw(p->active_border, 4);
+		d_render_line_draw(p->active_border, 4);
 }

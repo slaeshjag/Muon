@@ -44,18 +44,21 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 	static int repeat=0;
 	
 	DARNIT_KEYS buttons;
-	buttons=darnitButtonGet();
+	buttons=d_keys_get();
 	memcpy(&e_b, &buttons, sizeof(UI_EVENT_BUTTONS));
 	
 	DARNIT_MOUSE mouse;
-	mouse=darnitMouseGet();
+	mouse=d_mouse_get();
 	
 	e_m.x=mouse.x; e_m.y=mouse.y;
 	e_m.buttons=(mouse.lmb)|(mouse.rmb<<2);
 	e_m.wheel=mouse.wheel;
 	
 	int key_action=0;
-	e_k.keysym=darnitKeyboardRawPop(&key_action);
+	DARNIT_KEY_RAW rawkey=d_key_raw_pop();
+	key_action=rawkey.action;
+	e_k.keysym=rawkey.keysym;
+	
 	switch(e_k.keysym) {
 		case KEY(LCTRL): SETMOD(LCTRL); break;
 		case KEY(RCTRL): SETMOD(RCTRL); break;

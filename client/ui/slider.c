@@ -43,8 +43,8 @@ UI_WIDGET *ui_widget_create_slider(unsigned int steps) {
 	widget->event_handler->add(widget, ui_slider_event_mouse_release, UI_EVENT_TYPE_MOUSE_LEAVE);
 	
 	struct UI_SLIDER_PROPERTIES *p=widget->properties;
-	p->line=darnitRenderLineAlloc(1+steps, 1);
-	p->handle=darnitRenderRectAlloc(1);
+	p->line=d_render_line_new(1+steps, 1);
+	p->handle=d_render_rect_new(1);
 	p->value=0;
 	p->steps=steps;
 	
@@ -62,8 +62,8 @@ UI_WIDGET *ui_widget_create_slider(unsigned int steps) {
 
 void *ui_widget_destroy_slider(UI_WIDGET *widget) {
 	struct UI_SLIDER_PROPERTIES *p=widget->properties;
-	darnitRenderRectFree(p->handle);
-	darnitRenderLineFree(p->line);
+	d_render_rect_free(p->handle);
+	d_render_line_free(p->line);
 	return ui_widget_destroy(widget);
 }
 
@@ -127,14 +127,14 @@ void ui_slider_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
 	
-	darnitRenderLineMove(p->line, 0, x+2, y+h/2, x+w-2, y+h/2);
+	d_render_line_move(p->line, 0, x+2, y+h/2, x+w-2, y+h/2);
 	int i;
 	for(i=0; i<p->steps; i++) {
 		int xx=x+2+i*((w-4)/(p->steps-1));
-		darnitRenderLineMove(p->line, i+1, xx, y+h/2-2, xx, y+h/2+2);
+		d_render_line_move(p->line, i+1, xx, y+h/2-2, xx, y+h/2+2);
 	}
 	int xx=x+2+p->value*((w-4)/(p->steps-1));
-	darnitRenderRectSet(p->handle, 0, xx-2, y+h/2-4, xx+2, y+h/2+4);
+	d_render_rect_move(p->handle, 0, xx-2, y+h/2-4, xx+2, y+h/2+4);
 }
 
 void ui_slider_request_size(UI_WIDGET *widget, int *w, int *h) {
@@ -146,6 +146,6 @@ void ui_slider_request_size(UI_WIDGET *widget, int *w, int *h) {
 
 void ui_slider_render(UI_WIDGET *widget) {
 	struct UI_SLIDER_PROPERTIES *p=widget->properties;
-	darnitRenderLineDraw(p->line, 1+p->steps);
-	darnitRenderRectDraw(p->handle, 1);
+	d_render_line_draw(p->line, 1+p->steps);
+	d_render_rect_draw(p->handle, 1);
 }

@@ -38,7 +38,7 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		free(player);
 		player=NULL;
 		game_state(GAME_STATE_MENU);
-		sock=darnitSocketClose(socket);
+		sock=d_socket_close(socket);
 		player_id=0;
 		if(!serverIsRunning())
 			serverStop();
@@ -48,17 +48,17 @@ void client_connect_callback(int ret, void *data, void *socket) {
 }
 
 void client_message_convert_send(MESSAGE_RAW *message) {
-	message->player_id=darnitUtilHtonl(message->player_id);
-	message->command=darnitUtilHtonl(message->command);
-	message->arg_1=darnitUtilHtonl(message->arg_1);
-	message->arg_2=darnitUtilHtonl(message->arg_2);
+	message->player_id=d_util_htonl(message->player_id);
+	message->command=d_util_htonl(message->command);
+	message->arg_1=d_util_htonl(message->arg_1);
+	message->arg_2=d_util_htonl(message->arg_2);
 }
 
 void client_message_convert_recv(MESSAGE_RAW *message) {
-	message->player_id=darnitUtilNtohl(message->player_id);
-	message->command=darnitUtilNtohl(message->command);
-	message->arg_1=darnitUtilNtohl(message->arg_1);
-	message->arg_2=darnitUtilNtohl(message->arg_2);
+	message->player_id=d_util_ntohl(message->player_id);
+	message->command=d_util_ntohl(message->command);
+	message->arg_1=d_util_ntohl(message->arg_1);
+	message->arg_2=d_util_ntohl(message->arg_2);
 }
 
 void client_message_send(int player_id, int command, int arg_1, int arg_2, char *payload) {
@@ -68,37 +68,37 @@ void client_message_send(int player_id, int command, int arg_1, int arg_2, char 
 	msg_send.arg_1=arg_1;
 	msg_send.arg_2=arg_2;
 	client_message_convert_send(&msg_send);
-	darnitSocketSend(sock, &msg_send, sizeof(MESSAGE_RAW));
+	d_socket_send(sock, &msg_send, sizeof(MESSAGE_RAW));
 	if(payload)
-		darnitSocketSend(sock, payload, arg_2);
+		d_socket_send(sock, payload, arg_2);
 }
 
 void client_check_incoming() {
 	int s, i;
 	unsigned int chunk_got=0, chunk_size, chunk_time;
 	static unsigned int chunk_size_time=UINT_MAX;
-	if((s=darnitSocketRecvTry(sock, &chunk_size, 4))<4) {
+	if((s=d_socket_recv_try(sock, &chunk_size, 4))<4) {
 		if(s==-1)
 			client_disconnect(MSG_SERVER_DISCONNECT);
-		if(darnitTimeGet()-chunk_size_time>CLIENT_TIMEOUT) {
+		if(d_time_get()-chunk_size_time>CLIENT_TIMEOUT) {
 			client_disconnect(MSG_SERVER_DISCONNECT);
 			return;
 		} else
 			return;
 	} else
-		chunk_size_time=darnitTimeGet();
-	chunk_size=darnitUtilNtohl(chunk_size)-4;
-	chunk_time=darnitTimeGet();
+		chunk_size_time=d_time_get();
+	chunk_size=d_util_htonl(chunk_size)-4;
+	chunk_time=d_time_get();
 	
 	while(chunk_got<chunk_size) {
-		if(darnitTimeGet()-chunk_time>CLIENT_TIMEOUT) {
+		if(d_time_get()-chunk_time>CLIENT_TIMEOUT) {
 			client_disconnect(MSG_SERVER_DISCONNECT);
 			return;
 		}
 		if(msg_recv.command&MSG_PAYLOAD_BIT) {
 			//download message payload
 			//printf("payload size %i\n", msg_recv.arg_2);
-			s=darnitSocketRecvTry(sock, msg_recv_payload, msg_recv.arg_2);
+			s=d_socket_recv_try(sock, msg_recv_payload, msg_recv.arg_2);
 			if(s==0)
 				continue;
 				//break;
@@ -111,7 +111,7 @@ void client_check_incoming() {
 			msg_recv.command=0;
 		} else {
 			//download message
-			s=darnitSocketRecvTry(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
+			s=d_socket_recv_try(sock, msg_recv_offset, sizeof(MESSAGE_RAW));
 			if(s==0) {
 				msg_recv.command = 0;
 				continue;
@@ -142,7 +142,7 @@ void client_check_incoming() {
 		if(recalc_map&1) {
 			if(i==map->layers-1)
 				map_calculate_powergrid();
-			darnitRenderTilemapRecalculate(map->layer[i].tilemap);
+			d_tilemap_recalc(map->layer[i].tilemap);
 		}
 	return;
 }
@@ -272,9 +272,9 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 				break;
 			map_close();
 			if(filename) {
-				darnitFSUnmount(filename);
+				d_fs_unmount(filename);
 				free(filename);
-				darnitFileClose(f);
+				d_file_close(f);
 			}
 			filesize_bytes=msg->arg_1;
 			filename=malloc(5+msg->arg_2+1);
@@ -282,21 +282,21 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			//filename[msg->arg_2]=0;
 			payload[msg->arg_2]=0;
 			sprintf(filename, "%s/%s", mapdir, payload);
-			f=darnitFileOpen(filename, "wb");
+			f=d_file_open(filename, "wb");
 			break;
 		case MSG_RECV_MAP_CHUNK:
 			if(!payload)
 				break;
 			downloaded_bytes+=msg->arg_2;
-			darnitFileWrite(payload, msg->arg_2, f);
+			d_file_write(payload, msg->arg_2, f);
 			client_message_send(player_id, MSG_SEND_READY, 0, 100*downloaded_bytes/filesize_bytes, NULL);
 			lobby_set_map_progress(100*downloaded_bytes/filesize_bytes);
 			break;
 		case MSG_RECV_MAP_END:
-			darnitFileClose(f);
+			d_file_close(f);
 			f=NULL;
 			client_message_send(player_id, MSG_SEND_READY, 0, 100, NULL);
-			darnitFSMount(filename);
+			d_fs_mount(filename);
 			map_init("mapdata/map.ldmz");
 			lobby_map_preview_generate();
 			map_building_clear();
@@ -333,7 +333,7 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 
 int client_init(char *host, int port) {
 	player=NULL;
-	if((sock=darnitSocketConnect(host, port, client_connect_callback, NULL))==NULL)
+	if((sock=d_socket_connect(host, port, client_connect_callback, NULL))==NULL)
 		return -1;
 	msg_recv.command=0;
 	msg_recv_payload_offset=msg_recv_payload;

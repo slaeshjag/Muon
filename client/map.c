@@ -34,7 +34,7 @@ void map_init(char *filename) {
 	
 	home_x=home_y=-1;
 	
-	map_selected.border=darnitRenderLineAlloc(4, 1);
+	map_selected.border=d_render_line_new(4, 1);
 	map_selected.index=-1;
 	map_selected.building=0;
 	map_selected.circle=NULL;
@@ -46,17 +46,17 @@ void map_init(char *filename) {
 	game_attacklist_lines=NULL;
 	game_attacklist_length=0;
 	
-	map=darnitMapLoad(filename);
+	map=d_map_load(filename);
 	map_w=map->layer->tilemap->w*map->layer->tile_w;
 	map_h=map->layer->tilemap->h*map->layer->tile_h;
 	
 	DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
-	darnitRenderLineMove(map_selected.border, 0, 0, 0, building_layer->tile_w, 0);
-	darnitRenderLineMove(map_selected.border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
-	darnitRenderLineMove(map_selected.border, 2, 0, 0, 0, building_layer->tile_h);
-	darnitRenderLineMove(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
+	d_render_line_move(map_selected.border, 0, 0, 0, building_layer->tile_w, 0);
+	d_render_line_move(map_selected.border, 1, 0, building_layer->tile_h, building_layer->tile_w, building_layer->tile_h);
+	d_render_line_move(map_selected.border, 2, 0, 0, 0, building_layer->tile_h);
+	d_render_line_move(map_selected.border, 3, building_layer->tile_w, 0, building_layer->tile_w, building_layer->tile_h);
 	
-	minimap_viewport=darnitRenderLineAlloc(4, 1);
+	minimap_viewport=d_render_line_new(4, 1);
 	
 	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
@@ -75,13 +75,13 @@ void map_close(/*DARNIT_MAP *map*/) {
 	if(!map)
 		return;
 	int i;
-	map_selected.border=darnitRenderLineFree(map_selected.border);
-	map_selected.circle=darnitRenderCircleFree(map_selected.circle);
-	powergrid=darnitRenderLineFree(powergrid);
-	minimap_viewport=darnitRenderLineFree(minimap_viewport);
-	map=darnitMapUnload(map);
+	map_selected.border=d_render_line_free(map_selected.border);
+	map_selected.circle=d_render_circle_free(map_selected.circle);
+	powergrid=d_render_line_free(powergrid);
+	minimap_viewport=d_render_line_free(minimap_viewport);
+	map=d_map_unload(map);
 	for(i=0; i<map_grid_chunks; i++)
-		darnitRenderLineFree(map_grid_chunk[i].lines);
+		d_render_line_free(map_grid_chunk[i].lines);
 	free(map_grid_chunk);
 	map_grid_chunk=NULL;
 	map_grid_chunks=0;
@@ -95,7 +95,7 @@ void map_update_grid() {
 	int tile_w=map->layer[map->layers-2].tile_w;
 	int tile_h=map->layer[map->layers-2].tile_h;
 	for(i=0; i<map_grid_chunks; i++)
-		darnitRenderLineFree(map_grid_chunk[i].lines);
+		d_render_line_free(map_grid_chunk[i].lines);
 	cols=(building_tilemap->w+(building_tilemap->w%8>0?8:0))/8;
 	rows=(building_tilemap->h+(building_tilemap->h%8>0?8:0))/8;
 	map_grid_chunks=cols*rows;
@@ -103,7 +103,7 @@ void map_update_grid() {
 	if((map_grid_chunk=malloc(map_grid_chunks*sizeof(struct MAP_GRID_CHUNK)))==NULL)
 		return;
 	for(i=0; i<map_grid_chunks; i++) {
-		map_grid_chunk[i].lines=darnitRenderLineAlloc(128, 1);
+		map_grid_chunk[i].lines=d_render_line_new(128, 1);
 		map_grid_chunk[i].size=0;
 	}
 	
@@ -112,11 +112,11 @@ void map_update_grid() {
 		chunk=(y/8)*cols;
 		for(x=0; x<building_tilemap->w; x++) {
 			if(x+1<building_tilemap->w&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[y*building_tilemap->w+x+1]&(1<<17)))) {
-				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, (x+1)*tile_w, y*tile_h, (x+1)*tile_w, (y+1)*tile_h);
+				d_render_line_move(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, (x+1)*tile_w, y*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				map_grid_chunk[chunk].size++;
 			}
 			if(y+1<building_tilemap->w&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[(y+1)*building_tilemap->w+x]&(1<<17)))) {
-				darnitRenderLineMove(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, x*tile_w, (y+1)*tile_h, (x+1)*tile_w, (y+1)*tile_h);
+				d_render_line_move(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, x*tile_w, (y+1)*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				map_grid_chunk[chunk].size++;
 			}
 			if((x+1)%8==0)
@@ -134,18 +134,18 @@ void map_calculate_powergrid() {
 	int tile_h=toplayer->tile_h;
 
 	if(powergrid)
-		darnitRenderLineFree(powergrid);
-	powergrid=darnitRenderLineAlloc(toplayer_tilemap->w*toplayer_tilemap->h*3, 1);
+		d_render_line_free(powergrid);
+	powergrid=d_render_line_new(toplayer_tilemap->w*toplayer_tilemap->h*3, 1);
 	
 	int x, y, i=0;
 	for(y=0; y<toplayer_tilemap->h; y++) {
 		for(x=0; x<toplayer_tilemap->w; x++) {
 			if(x+1<toplayer_tilemap->w&&(toplayer_data[MAP_INDEX(x, y)]^toplayer_data[MAP_INDEX(x+1, y)])&0x1000000) {
-				darnitRenderLineMove(powergrid, i, (x+1)*tile_w, y*tile_h, (x+1)*tile_w, (y+1)*tile_h);
+				d_render_line_move(powergrid, i, (x+1)*tile_w, y*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				i++;
 			}
 			if(y+1<toplayer_tilemap->h&&(toplayer_data[MAP_INDEX(x, y)]^toplayer_data[MAP_INDEX(x, y+1)])&0x1000000) {
-				darnitRenderLineMove(powergrid, i, x*tile_w, (y+1)*tile_h, (x+1)*tile_w, (y+1)*tile_h);
+				d_render_line_move(powergrid, i, x*tile_w, (y+1)*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				i++;
 			}
 		}
@@ -264,16 +264,16 @@ void map_select_building(int index) {
 		selected_building=0;
 	map_selected.building=selected_building;
 	if(selected_building&&building[selected_building].range) {
-		map_selected.circle=darnitRenderCircleAlloc(32, 1);
+		map_selected.circle=d_render_circle_new(32, 1);
 		int w=map->layer[map->layers-2].tilemap->w;
 		//int h=map->layer[map->layers-2].tilemap->h;
 		int tile_w=map->layer[map->layers-2].tile_w;
 		int tile_h=map->layer[map->layers-2].tile_h;
 		int x=index%w;
 		int y=index/w;
-		darnitRenderCircleMove(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
+		d_render_circle_move(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
 	} else
-		map_selected.circle=darnitRenderCircleFree(map_selected.circle);
+		map_selected.circle=d_render_circle_free(map_selected.circle);
 }
 
 void map_select_nothing() {
@@ -298,7 +298,7 @@ void map_clear_fow() {
 	for(i=0; i<w*h; i++) {
 		d[i]&=~0xFFF;
 	}
-	darnitRenderTilemapRecalculate(map->layer[map->layers-1].tilemap);
+	d_tilemap_recalc(map->layer[map->layers-1].tilemap);
 }
 
 void map_flare_add(int index, int player, unsigned int duration, unsigned int radius) {
@@ -312,22 +312,22 @@ void map_flare_add(int index, int player, unsigned int duration, unsigned int ra
 	struct MAP_FLARE_LIST **l;
 	for(l=&map_flares; *l; l=&((*l)->next));
 	*l=malloc(sizeof(struct MAP_FLARE_LIST));
-	(*l)->circle[0]=darnitRenderCircleAlloc(16, 1);
-	darnitRenderCircleMove((*l)->circle[0], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius/4);
-	(*l)->circle[1]=darnitRenderCircleAlloc(16, 1);
-	darnitRenderCircleMove((*l)->circle[1], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius/2);
-	(*l)->circle[2]=darnitRenderCircleAlloc(24, 1);
-	darnitRenderCircleMove((*l)->circle[2], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 3*radius/4);
-	(*l)->circle[3]=darnitRenderCircleAlloc(24, 1);
-	darnitRenderCircleMove((*l)->circle[3], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius);
+	(*l)->circle[0]=d_render_circle_new(16, 1);
+	d_render_circle_move((*l)->circle[0], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius/4);
+	(*l)->circle[1]=d_render_circle_new(16, 1);
+	d_render_circle_move((*l)->circle[1], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius/2);
+	(*l)->circle[2]=d_render_circle_new(24, 1);
+	d_render_circle_move((*l)->circle[2], x*tile_w+tile_w/2, y*tile_h+tile_h/2, 3*radius/4);
+	(*l)->circle[3]=d_render_circle_new(24, 1);
+	d_render_circle_move((*l)->circle[3], x*tile_w+tile_w/2, y*tile_h+tile_h/2, radius);
 	
-	(*l)->minimap_circle=darnitRenderCircleAlloc(6, 1);
-	darnitRenderCircleMove((*l)->minimap_circle, game_sidebar_minimap->x+(x*(game_sidebar_minimap->w))/(w), game_sidebar_minimap->y+(y*(game_sidebar_minimap->h))/(h), 3);
+	(*l)->minimap_circle=d_render_circle_new(6, 1);
+	d_render_circle_move((*l)->minimap_circle, game_sidebar_minimap->x+(x*(game_sidebar_minimap->w))/(w), game_sidebar_minimap->y+(y*(game_sidebar_minimap->h))/(h), 3);
 	
 	(*l)->index=0;
 	(*l)->player=player;
 	(*l)->duration=duration;
-	(*l)->created=darnitTimeGet();
+	(*l)->created=d_time_get();
 	(*l)->next=NULL;
 }
 
@@ -335,24 +335,24 @@ void map_flare_draw() {
 	struct MAP_FLARE_LIST **ll, *l;
 	for(ll=&map_flares; *ll; ll=&((*ll)->next)) {
 		l=*ll;
-		if(darnitTimeGet()>l->created+l->duration) {
+		if(d_time_get()>l->created+l->duration) {
 			*ll=l->next;
 			int i;
 			for(i=0; i<4; i++)
-				darnitRenderCircleFree(l->circle[i]);
-			darnitRenderCircleFree(l->minimap_circle);
+				d_render_circle_free(l->circle[i]);
+			d_render_circle_free(l->minimap_circle);
 			free(l);
 			if(*ll)
 				continue;
 			else
 				break;
 		}
-		darnitRenderTint(!(l->player%3), l->player>1, l->player==1, 1);
-		darnitRenderCircleDraw(l->circle[l->index/10]);
+		d_render_tint(255*(!(l->player%3)), 255*(l->player>1), 255*(l->player==1), 255);
+		d_render_circle_draw(l->circle[l->index/10]);
 		if(l->index>=20) {
-			darnitRenderOffset(0, 0);
-			darnitRenderCircleDraw(l->minimap_circle);
-			darnitRenderOffset(map->cam_x, map->cam_y);
+			d_render_offset(0, 0);
+			d_render_circle_draw(l->minimap_circle);
+			d_render_offset(map->cam_x, map->cam_y);
 		}
 		l->index++;
 		if(l->index>=40)
@@ -364,40 +364,40 @@ void map_flare_draw() {
 void map_draw(int draw_powergrid) {
 	int i;
 	for(i=0; i<map->layers-2; i++)
-		darnitRenderTilemap(map->layer[i].tilemap);
+		d_tilemap_draw(map->layer[i].tilemap);
 	if(config.alpha)
-		darnitRenderBlendingEnable();
-	darnitRenderTilemap(map->layer[map->layers-2].tilemap);
-	darnitRenderBlendingDisable();
-	darnitRenderTilemap(map->layer[map->layers-1].tilemap);
+		d_render_blend_enable();
+	d_tilemap_draw(map->layer[map->layers-2].tilemap);
+	d_render_blend_disable();
+	d_tilemap_draw(map->layer[map->layers-1].tilemap);
 	
-	darnitRenderOffset(map->cam_x, map->cam_y);
+	d_render_offset(map->cam_x, map->cam_y);
 	if(config.grid) {
-		darnitRenderTint(0.07, 0.07, 0.07, 1);
+		d_render_tint(18, 18, 18, 255);
 		for(i=0; i<map_grid_chunks; i++)
 			if(map_grid_chunk[i].lines)
-				darnitRenderLineDraw(map_grid_chunk[i].lines, map_grid_chunk[i].size);
-		darnitRenderTint(1, 1, 1, 1);
+				d_render_line_draw(map_grid_chunk[i].lines, map_grid_chunk[i].size);
+		d_render_tint(255, 255, 255, 255);
 	}
 	
-	darnitRenderTilemap(map->layer[map->layers-1].tilemap);
+	d_tilemap_draw(map->layer[map->layers-1].tilemap);
 	
 	if(powergrid&&(draw_powergrid||config.powergrid))
-		darnitRenderLineDraw(powergrid, powergrid_lines);
+		d_render_line_draw(powergrid, powergrid_lines);
 		
 	map_flare_draw();
 	
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
-		darnitRenderTint(!(player_id%3), player_id>1, player_id==1, 1);
+		d_render_tint(255*(!(player_id%3)), 255*(player_id>1), 255*(player_id==1), 255);
 		if(map_selected.circle)
-			darnitRenderCircleDraw(map_selected.circle);
-		darnitRenderOffset(map->cam_x-x, map->cam_y-y);
-		darnitRenderLineDraw(map_selected.border, 4);
+			d_render_circle_draw(map_selected.circle);
+		d_render_offset(map->cam_x-x, map->cam_y-y);
+		d_render_line_draw(map_selected.border, 4);
 	}
-	darnitRenderTint(1, 1, 1, 1);
-	darnitRenderOffset(0, 0);
+	d_render_tint(255, 255, 255, 255);
+	d_render_offset(0, 0);
 }
 
 void map_minimap_update_viewport() {
@@ -409,33 +409,33 @@ void map_minimap_update_viewport() {
 	int x2=MIN(x+w, game_sidebar_minimap->x+game_sidebar_minimap->w);
 	int y1=MAX(y, game_sidebar_minimap->y);
 	int y2=MIN(y+h, game_sidebar_minimap->y+game_sidebar_minimap->h);
-	darnitRenderLineMove(minimap_viewport, 0, x1, y1, x2, y1);
-	darnitRenderLineMove(minimap_viewport, 1, x1, y2, x2, y2);
-	darnitRenderLineMove(minimap_viewport, 2, x1, y1, x1, y2);
-	darnitRenderLineMove(minimap_viewport, 3, x2, y1, x2, y2);
+	d_render_line_move(minimap_viewport, 0, x1, y1, x2, y1);
+	d_render_line_move(minimap_viewport, 1, x1, y2, x2, y2);
+	d_render_line_move(minimap_viewport, 2, x1, y1, x1, y2);
+	d_render_line_move(minimap_viewport, 3, x2, y1, x2, y2);
 }
 
 void map_minimap_render(UI_WIDGET *widget) {
 	//override for imagebox render, to render viewport border on minimap
 	ui_imageview_render(widget);
-	float r, g, b, a;
-	darnitRenderTintGet(&r, &g, &b, &a);
-	darnitRenderTint(1, 1, 1, 1);
-	darnitRenderLineDraw(minimap_viewport, 4);
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
+	d_render_line_draw(minimap_viewport, 4);
 	struct MAP_FLARE_LIST *l;
 	for(l=map_flares; l; l=l->next)
 		if(l->index>=20) {
-			darnitRenderTint(!(l->player%3), l->player>1, l->player==1, 1);
-			darnitRenderCircleDraw(l->minimap_circle);
+			d_render_tint(255*(!(l->player%3)), 255*(l->player>1), 255*(l->player==1), 255);
+			d_render_circle_draw(l->minimap_circle);
 		}
-	darnitRenderTint(r, g, b, a);
+	d_render_tint(r, g, b, a);
 }
 
 void map_minimap_clear(DARNIT_TILESHEET *ts, int w, int h) {
 	int i;
 	for(i=0; i<w*h; i++)
 		minimap_data[i]=0;
-	darnitRenderTilesheetUpdate(ts, 0, 0, w, h, minimap_data);
+	d_render_tilesheet_update(ts, 0, 0, w, h, minimap_data);
 }
 
 void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
@@ -460,6 +460,6 @@ void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
 	
 	/*UI_PROPERTY_VALUE v;
 	v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
-	darnitRenderTilesheetUpdate(v.p, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);*/
-	darnitRenderTilesheetUpdate(ts, 0, 0, w, h, minimap_data);
+	d_render_tilesheet_update(v.p, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);*/
+	d_render_tilesheet_update(ts, 0, 0, w, h, minimap_data);
 }
