@@ -190,13 +190,13 @@ int messageExecute(unsigned int player, MESSAGE *message) {
 		return -1;
 	}
 
-	if ((!server->game.started) && message->command > MESSAGE_LOBBY_MAX) {
+	if ((!server->game.started) && message->command > MESSAGE_LOBBY_MAX && message->command != MSG_RECV_READY) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);
 		return -1;
 	}	
 
-	if (server->game.started && (message->command < MESSAGE_GAME_MIN || message->command > MESSAGE_GAME_MAX) && message->command > MESSAGE_ALWAYS_MAX) {
+	if (server->game.started && (message->command > MESSAGE_GAME_MAX) && message->command > MESSAGE_ALWAYS_MAX) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);
 		return -1;

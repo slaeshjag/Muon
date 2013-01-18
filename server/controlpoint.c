@@ -307,7 +307,6 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 			continue;
 		if (ty < 0 || ty >= server->h)
 			continue;
-		fprintf(stderr, "Deployed at %i, %i; bombing %i %i\n", x, y, tx, ty);
 		index = tx + ty * server->w;
 		
 		target = server->map[server->player[player].spawn.index]->target;
