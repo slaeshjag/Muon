@@ -28,7 +28,7 @@
 #include "multiplayer.h"
 #include "settings.h"
 
-const char **menu_sidebar_button_text_main;
+const char *menu_sidebar_button_text_main[8];
 
 void menu_init() {
 	int i;
@@ -41,23 +41,41 @@ void menu_init() {
 	panelist_menu_sidebar.next=NULL;
 	ui_pane_set_root_widget(panelist_menu_sidebar.pane, ui_widget_create_vbox());
 	
-	//TODO: fixfixfix when making proper menues, this is damned ugly
-	menu_sidebar_button_text_main=calloc(sizeof(void *), 8);
-	menu_sidebar_button_text_main[0]=T("Singleplayer");
-	menu_sidebar_button_text_main[1]=T("Multiplayer");
-	menu_sidebar_button_text_main[2]=T("Settings");
+	memset(&menu, 0, sizeof(menu));
+	menustate=MENU_STATE_MAIN;
 	
-	for(i=0; i<8; i++) {
-		if(!menu_sidebar_button_text_main[i])
-			continue;
-		menu_sidebar_button[i]=ui_widget_create_button(ui_widget_create_label(font_std, menu_sidebar_button_text_main[i]));
-		menu_sidebar_button[i]->event_handler->add(menu_sidebar_button[i], menu_sidebar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-		ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button[i], 0);
+	menu[MENU_STATE_MAIN].event_handler=menu_main_button_click;
+	menu[MENU_STATE_MAIN].button[0]=ui_widget_create_button_text(font_std, T("Singleplayer"));
+	menu[MENU_STATE_MAIN].button[1]=ui_widget_create_button_text(font_std, T("Multiplayer"));
+	menu[MENU_STATE_MAIN].button[2]=ui_widget_create_button_text(font_std, T("Settings"));
+	menu[MENU_STATE_MAIN].spacer=ui_widget_create_spacer();
+	menu[MENU_STATE_MAIN].button_back=ui_widget_create_button_text(font_std, T("Quit game"));
+	
+	menu[MENU_STATE_MULTIPLAYER].event_handler=menu_multiplayer_button_click;
+	menu[MENU_STATE_MULTIPLAYER].button[0]=ui_widget_create_button_text(font_std, T("Host game"));
+	menu[MENU_STATE_MULTIPLAYER].button[1]=ui_widget_create_button_text(font_std, T("Join game"));
+	menu[MENU_STATE_MULTIPLAYER].spacer=menu[MENU_STATE_MAIN].spacer;
+	menu[MENU_STATE_MULTIPLAYER].button_back=ui_widget_create_button_text(font_std, T("Back"));
+	
+	menu[MENU_STATE_SETTINGS].event_handler=menu_settings_button_click;
+	menu[MENU_STATE_SETTINGS].button[0]=ui_widget_create_button_text(font_std, T("Game settings"));
+	menu[MENU_STATE_SETTINGS].button[1]=ui_widget_create_button_text(font_std, T("Video settings"));
+	menu[MENU_STATE_SETTINGS].spacer=menu[MENU_STATE_MAIN].spacer;
+	menu[MENU_STATE_SETTINGS].button_back=menu[MENU_STATE_MULTIPLAYER].button_back;
+	
+	menu[MENU_STATE_MAIN].button_back->event_handler->add(menu[MENU_STATE_MAIN].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	menu[MENU_STATE_MULTIPLAYER].button_back->event_handler->add(menu[MENU_STATE_MULTIPLAYER].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	enum MENU_STATE state;
+	for(state=0; state<MENU_STATES; state++) {
+		for(i=0; i<8; i++) {
+			if(!menu[state].button[i])
+				continue;
+			menu[state].button[i]->event_handler->add(menu[state].button[i], menu[state].event_handler, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+		}
 	}
-	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
-	menu_sidebar_button_quit=ui_widget_create_button(ui_widget_create_label(font_std, T("Quit game")));
-	menu_sidebar_button_quit->event_handler->add(menu_sidebar_button_quit, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button_quit, 0);
+	
+	menu_state(MENU_STATE_MAIN);
+	
 	
 	//In-game menu
 	panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);
@@ -77,32 +95,81 @@ void menu_init() {
 	game_menu_button[3]->event_handler->add(game_menu_button[3], game_menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 }
 
-//Main menu
-void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	/*int i;
+void menu_state(enum MENU_STATE state) {
+	//We need to do this the next iteration to not segfault when removing widgets that are running thier eventhandler
+	menu_newstate=state;
+	ui_event_global_add(meni_state_change, UI_EVENT_TYPE_MOUSE_ENTER);
+}
+
+void meni_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int i;
 	for(i=0; i<8; i++) {
-		if(!menu_sidebar_button_text_main[i])
+		if(!menu[menustate].button[i])
 			continue;
-		//menu_sidebar_button[i]=ui_widget_create_button(ui_widget_create_label(font_std, menu_sidebar_button_text_main[i]));
-		//menu_sidebar_button[i]->event_handler->add(menu_sidebar_button[i], menu_sidebar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-		ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu_sidebar_button[i]);
-	}*/
-	if(widget==menu_sidebar_button[1]) {
+		ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].button[i]);
+	}
+	ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].spacer);
+	ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].button_back);
+	
+	menustate=menu_newstate;
+	
+	for(i=0; i<8; i++) {
+		if(!menu[menustate].button[i])
+			continue;
+		ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].button[i], 0);
+	}
+	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].spacer, 1);
+	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].button_back, 0);
+	
+	ui_event_global_remove(meni_state_change, UI_EVENT_TYPE_UI_EVENT);
+}
+
+
+//Main menu
+void menu_main_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int i;
+	for(i=0; i<8&&widget!=menu[MENU_STATE_MAIN].button[i]; i++);
+	if(i==0) {
+		ui_messagebox(font_std, T("Single player is not yet availble."));
+		return;
+	}
+	
+	menu_state(MENU_STATE_SINGLEPLAYER+i);
+}
+
+void menu_singleplayer_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//TODO: implement singleplayer, etc... olol
+}
+
+void menu_multiplayer_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(widget==menu[MENU_STATE_MULTIPLAYER].button[0]) {
 		panelist_menu_sidebar.next=&panelist_multiplayer_host;
+		ui_selected_widget=multiplayer_host_entry_port;
+	} else if(widget==menu[MENU_STATE_MULTIPLAYER].button[1]) {
+		panelist_menu_sidebar.next=&panelist_multiplayer_join;
 		ui_selected_widget=multiplayer_join_entry_host;
-		ui_selected_widget=NULL;
-	} else if(widget==menu_sidebar_button[2]) {
-		//panelist_menu_sidebar.next=&panelist_input_name;
-		panelist_menu_sidebar.next=&panelist_settings_monitor;
-		ui_selected_widget=settings_game_entry_name;
-	} else {
-		panelist_menu_sidebar.next=NULL;
-		ui_selected_widget=NULL;
 	}
 }
 
+void menu_settings_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(widget==menu[MENU_STATE_SETTINGS].button[0]) {
+		panelist_menu_sidebar.next=&panelist_settings_game;
+		ui_selected_widget=settings_game_entry_name;
+	} else if(widget==menu[MENU_STATE_SETTINGS].button[1]) {
+		panelist_menu_sidebar.next=&panelist_settings_monitor;
+		ui_selected_widget=NULL;
+	}
+		
+}
+
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	game_state(GAME_STATE_QUIT);
+	if(menustate==MENU_STATE_MAIN)
+		game_state(GAME_STATE_QUIT);
+	else {
+		menu_state(MENU_STATE_MAIN);
+		panelist_menu_sidebar.next=NULL;
+		ui_selected_widget=NULL;
+	}
 }
 
 void menu_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

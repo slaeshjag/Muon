@@ -20,15 +20,33 @@
 #ifndef MENU_H
 #define MENU_H
 
+enum MENU_STATE {
+	MENU_STATE_MAIN,
+	MENU_STATE_SINGLEPLAYER,
+	MENU_STATE_MULTIPLAYER,
+	MENU_STATE_SETTINGS,
+	
+	MENU_STATES,
+} menustate, menu_newstate;
+
+struct MENU {
+	void (*event_handler)(UI_WIDGET *, unsigned int, UI_EVENT *);
+	UI_WIDGET *button[8];
+	UI_WIDGET *spacer;
+	UI_WIDGET *button_back;
+} menu[MENU_STATES];
+
 //Main menu
 struct UI_PANE_LIST panelist_menu_sidebar;
-UI_WIDGET *menu_sidebar_button[8];
-UI_WIDGET *menu_sidebar_spacer;
-UI_WIDGET *menu_sidebar_button_quit;
 
 void menu_init();
+void menu_state(enum MENU_STATE state);
+void meni_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
-void menu_sidebar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_main_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_singleplayer_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_multiplayer_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_settings_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 //In-game menu

@@ -27,8 +27,8 @@ void menu_multiplayer_init() {
 	UI_PROPERTY_VALUE v={.p=NULL};
 	
 	//Host server
-	panelist_multiplayer_host.pane=ui_pane_create(16, 128+32, 480, 256, NULL);
-	panelist_multiplayer_host.next=&panelist_multiplayer_join;
+	panelist_multiplayer_host.pane=ui_pane_create(16, 16, 480, 256, NULL);
+	panelist_multiplayer_host.next=NULL;
 	ui_pane_set_root_widget(panelist_multiplayer_host.pane, ui_widget_create_hbox());
 	multiplayer_host_listbox_maps=ui_widget_create_listbox(font_std);
 	ui_hbox_add_child(panelist_multiplayer_host.pane->root_widget, multiplayer_host_listbox_maps, 1);

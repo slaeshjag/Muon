@@ -37,10 +37,12 @@ typedef enum {
 	GAME_STATE_GAME,
 	GAME_STATE_GAME_MENU,
 	GAME_STATE_QUIT,
+	
+	GAME_STATES,
 } GAME_STATE;
 
 GAME_STATE gamestate;
-struct UI_PANE_LIST *gamestate_pane[7];
+struct UI_PANE_LIST *gamestate_pane[GAME_STATES];
 
 UI_EVENT_BUTTONS prevbuttons;
 
