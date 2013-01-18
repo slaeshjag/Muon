@@ -231,8 +231,10 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 
 	index = y * server->w + x;
 	team = server->player[player].team;
-
-	if ((los = unitLOS(server->map[index]->type)) < 0)
+	
+	if (!server->map[index])
+		los = unitRange(UNIT_DEF_RADAR);
+	else if ((los = unitLOS(server->map[index]->type)) < 0)
 		return 0;
 
 	for (j = -1 * los; j <= los; j++) {

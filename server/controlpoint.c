@@ -261,7 +261,7 @@ void controlpointLoop(int msec) {
 		if (server->player[i].cp.radar_deploy <= 0)
 			continue;
 		server->player[unit->owner].cp.radar_deploy -= msec * server->game.gamespeed;
-		if (server->player[unit->owner].cp.radar_deploy < 0) {
+		if (server->player[unit->owner].cp.radar_deploy <= 0) {
 			controlpointRadarEnd(unit->owner);
 			server->player[unit->owner].cp.radar_deploy = 0;
 		}
@@ -360,7 +360,7 @@ void controlpointDeploy(int player, int type, int index_dst) {
 				server->player[player].cp.clusterbomb_delay = CP_CLUSTERBOMB_DELAY;
 			break;
 		case UNIT_DEF_RADAR:
-			if (server->player[player].cp.radar_delay <= 0)
+			if (server->player[player].cp.radar_delay > 0 || server->player[player].cp.radar_delay == -1)
 				return;
 			controlpointDeployRadar(player, index_dst);
 			if (server->player[player].cp.radar_delay == 0)
