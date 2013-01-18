@@ -6,7 +6,6 @@ BEGIN
 	BEGIN
 		BLOCK "080904E4"
 		BEGIN
-#			VALUE "CompanyName", ""
 			VALUE "FileDescription", "A new kind of RTS"
 			VALUE "FileVersion", "1.0"
 			VALUE "InternalName", "muon"
