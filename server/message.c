@@ -60,6 +60,9 @@ int messageBufferPush(MESSAGE_BUFFER *msg_buf, MESSAGE *message) {
 		fprintf(stderr, "Message buffer is NULL, unable to push message\n");
 		return -1;
 	}
+	
+	if (message->command == MSG_SEND_ILLEGAL_COMMAND)
+		fprintf(stderr, "Illegal command!\n");
 
 	if (((msg_buf->write_pos + 1 == msg_buf->len) ? 0 : msg_buf->write_pos + 1) == msg_buf->read_pos)
 		return -1;
@@ -172,9 +175,6 @@ int messageSend(SERVER_SOCKET *socket, unsigned int player, unsigned int message
 
 
 int messageExecute(unsigned int player, MESSAGE *message) {
-	
-
-	
 	if (message->command >= MESSAGE_HANDLERS) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		free(message->extra);
@@ -202,7 +202,7 @@ int messageExecute(unsigned int player, MESSAGE *message) {
 		return -1;
 	}
 
-	if (server->player[player].status > PLAYER_IN_GAME_NOW) {
+	if (server->player[player].status > PLAYER_IN_GAME_NOW && (message->command > MESSAGE_ALWAYS_MAX || message->command == MSG_RECV_CHAT)) {
 		messageSend(server->player[player].socket, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		return -1;
 	}

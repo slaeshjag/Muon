@@ -37,7 +37,7 @@
 #define	RANDOM_ATTEMPTS			20000
 
 #define	SERVER_PING_INTERVAL		2
-#define	SERVER_PING_TIMEOUT_DELAY	5
+#define	SERVER_PING_TIMEOUT_DELAY	20
 
 #include <stdio.h>
 #include <stdlib.h>
