@@ -16,6 +16,8 @@ The server is already running and have no intention on stopping on its own.			Se
 rand() wasn't on our side, and spawn randomization took too many tries. Try again.		Slumpen beter sig inte och slumpning av startplaceringar tog för lång tid. Försök igen.
 Lost connection to server.									Tappade anslutning till servern.
 
+Single player is not yet availble.								Enspelarläget är ännu inte tillgängligt.
+
 ### Menu
 Singleplayer		En spelare
 Multiplayer		Flera spelare
@@ -28,6 +30,13 @@ Quit game		Avsluta
 OK			OK
 Cancel			Avbryt
 Back			Tillbaka
+Save			Spara
+
+Host game		Skapa spel
+Join game		Delta i spel
+
+Game settings		Spelinställningar
+Video settings		Skärminställningar
 
 ### Settings
 Player name		Spelarnamn

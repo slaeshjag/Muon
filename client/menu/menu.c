@@ -66,13 +66,12 @@ void menu_init() {
 	menu[MENU_STATE_MAIN].button_back->event_handler->add(menu[MENU_STATE_MAIN].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	menu[MENU_STATE_MULTIPLAYER].button_back->event_handler->add(menu[MENU_STATE_MULTIPLAYER].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	enum MENU_STATE state;
-	for(state=0; state<MENU_STATES; state++) {
+	for(state=0; state<MENU_STATES; state++)
 		for(i=0; i<8; i++) {
 			if(!menu[state].button[i])
 				continue;
 			menu[state].button[i]->event_handler->add(menu[state].button[i], menu[state].event_handler, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 		}
-	}
 	
 	menu_state(MENU_STATE_MAIN);
 	
