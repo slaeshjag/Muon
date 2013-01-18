@@ -150,7 +150,7 @@ typedef struct {
 /* arg_1 is nothing. arg_2 is tile flare is on */
 #define	MSG_RECV_MAP_FLARE		0x01B
 
-/* arg_1 is the controlpoint building ID, arg_2 is time left in seconds */
+/* arg_1 is the controlpoint building ID, arg_2 is ready in percent. 100 is ready */
 #define	MSG_RECV_CP_TIMER		0x01C
 
 /* arg_1 is the controlpoint building type that was deployed, arg_2 is where the center of the deployment was */

@@ -213,8 +213,8 @@ void controlpointDelayLoop(int msec, SERVER_UNIT *unit) {
 	tmp -= msec * server->game.gamespeed;
 	if (tmp < 0)
 		tmp = 0;
-	if (CP_DELAY_SEC(tmp) != CP_DELAY_SEC(*delay))
-		messageBufferPushDirect(unit->owner, unit->owner, MSG_SEND_CP_DELAY, unit->type, CP_DELAY_SEC(tmp), NULL);
+	if (CP_DELAY_SEC(tmp) != CP_DELAY_SEC(*delay) || (tmp == 0 && *delay != 0))
+		messageBufferPushDirect(unit->owner, unit->owner, MSG_SEND_CP_DELAY, unit->type, 100 - (tmp) * 100 / defaults, NULL);
 	*delay = tmp;
 
 	return;
