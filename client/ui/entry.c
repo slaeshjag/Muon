@@ -78,20 +78,24 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	switch(type) {
 		case UI_EVENT_TYPE_KEYBOARD_PRESS:
 			if(e->keyboard->keysym==8&&p->cursor_pos>0) {
-				p->cursor_pos--;
+				while(d_utf8_valid(&p->text[--p->cursor_pos]));
 				p->text[p->cursor_pos]=0;
-				if(p->offset>p->text+1) {
-					for(; d_font_string_w(p->font, p->offset)<widget->w-4; p->offset--);
-					p->offset++;
-				} else if(p->offset==p->text+1)
+				//TODO: fix for unicode
+				if(p->offset>p->text+d_utf8_char_length(p->text)) {
+					while(d_font_string_w(p->font, p->offset)<widget->w-4)
+						while(d_utf8_valid(p->offset--));
+					p->offset+=d_utf8_char_length(p->offset);
+				} else if(p->offset==p->text+d_utf8_char_length(p->text))
 					p->offset=p->text;
 				tw=d_font_string_w(p->font, p->offset);
 			} else if(p->cursor_pos>=UI_ENTRY_LENGTH-1||!e->keyboard->character) {
 				return;
 			} else {
-				p->text[p->cursor_pos]=e->keyboard->character;
-				for(; (tw=d_font_string_w(p->font, p->offset))>widget->w-4; p->offset++);
-				p->cursor_pos++;
+				char str[5]={0, 0, 0, 0, 0};
+				int len=d_utf8_encode(e->keyboard->character, str, 5);
+				strcat(&p->text[p->cursor_pos], str);
+				for(; (tw=d_font_string_w(p->font, p->offset))>widget->w-4; p->offset+=d_utf8_char_length(p->offset));
+				p->cursor_pos+=len;
 			}
 			d_text_surface_reset(p->surface);
 			d_text_surface_string_append(p->surface, p->offset);

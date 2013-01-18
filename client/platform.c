@@ -160,4 +160,5 @@ void platform_init() {
 	stringtable=d_stringtable_open("res/lang.stz");
 	if(d_stringtable_section_load(stringtable, config.lang)==-1)
 		d_stringtable_section_load(stringtable, "EN");
+	d_input_unicode(1);
 }

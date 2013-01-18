@@ -70,7 +70,7 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 		case KEY(RSUPER): SETMOD(RSUPER); break;
 	}
 	
-	//TODO: this should be replaced by a real keymap
+	/*//TODO: this should be replaced by a real keymap
 	//e_k.character=(e_k.keysym>=32&&e_k.keysym<127)?e_k.keysym-0x20*((e_k.modifiers&UI_EVENT_KEYBOARD_MOD_SHIFT)>0&&(e_k.keysym>=0x61&&e_k.keysym<0x7b)):0;
 	if(e_k.keysym>=32&&e_k.keysym<127) {
 		e_k.character=e_k.keysym;
@@ -81,7 +81,8 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 				e_k.character-=0x10;
 		}
 	} else
-		e_k.character=0;
+		e_k.character=0;*/
+	e_k.character=rawkey.unicode;
 	
 	
 	e.keyboard=&e_k;
