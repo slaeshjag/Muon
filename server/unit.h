@@ -138,8 +138,8 @@ static const int unit_buildtime[] = {
 	20000,		/* pylon */
 	15000,		/* wall */
 	50000,		/* owned control point (buildsite) */
-	70000,		/* carpet bomb */
-	60000		/* radar */
+	100000,		/* carpet bomb */
+	70000		/* radar */
 };
 
 /* Points for determening a winner without generators being lost. */
