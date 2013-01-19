@@ -223,7 +223,7 @@ void controlpointDelayLoop(int msec, SERVER_UNIT *unit) {
 
 void controlpointRadarEnd(int player) {
 	int index_dst = server->player[player].cp.radar_pos;
-	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, -1);
+	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, -1 * unitLOS(UNIT_DEF_RADAR));
 
 	return;
 }
@@ -337,7 +337,7 @@ void controlpointDeployRadar(int player, int index_dst) {
 	server->player[player].cp.radar_pos = index_dst;
 	server->player[player].cp.radar_deploy = CP_RADAR_DEPLOY_TIME;
 	
-	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, 1);
+	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, unitRange(UNIT_DEF_RADAR));
 
 	return;
 }
@@ -369,6 +369,7 @@ void controlpointDeploy(int player, int type, int index_dst) {
 	}
 
 	messageBufferPushDirect(player, player, MSG_SEND_CP_DEPLOY, type, index_dst, NULL);
+	messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, type, 0, NULL);
 
 	return;
 }

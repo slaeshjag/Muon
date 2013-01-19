@@ -93,7 +93,7 @@ void platform_config_read() {
 	char buf[128];
 	int len, i;
 	DARNIT_FILE *f;
-	if(!(f=d_file_open("muon.cfg", "r"))) {
+	if(!(f=d_file_open("muon.cfg", "rb"))) {
 		platform_config_write();
 		return;
 	}
@@ -116,7 +116,7 @@ void platform_config_write() {
 	char buf[128];
 	int i;
 	DARNIT_FILE *f;
-	if(!(f=d_file_open("muon.cfg", "w")))
+	if(!(f=d_file_open("muon.cfg", "wb")))
 		return;
 	d_file_write("#Muon\n", 6, f);
 	for(i=0; i<sizeof(parsers)/sizeof(struct CONFIG_PARSER); i++) {

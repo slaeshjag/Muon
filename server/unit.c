@@ -504,11 +504,23 @@ void unitDestroy(int player, unsigned int index) {
 
 
 void unitAttackSet(int index_src, int index_dst) {
-	int i, from;
+	int i, from, range, x, y, tx, ty;
+
+	if (index_dst >= 0) {
+		range = unit_range[server->map[index_src]->type];
+		x = index_src % server->w;
+		y = index_src / server->w;
+		tx = index_dst % server->w;
+		ty = index_dst / server->h;
+		if ((x - tx) * (x - tx) + (y - ty) * (y - ty) >= range * range)
+			return;
+	}
 
 	from = server->map[index_src]->owner;
 	server->map[index_src]->target = (index_dst > -1) ? index_dst : -1;
 	fprintf(stderr, "Attacking %i->%i\n", index_src, index_dst);
+	if (index_dst == -1)
+		index_dst = -1;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME_NOW)
