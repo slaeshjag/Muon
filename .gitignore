@@ -11,3 +11,4 @@ client/res
 *.pnd
 *.stz
 *.res
+res/windows/installer/build
