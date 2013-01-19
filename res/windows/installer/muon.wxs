@@ -114,6 +114,8 @@
 		<Property Id="INSTALLLEVEL" Value="3" />
 		<UIRef Id="WixUI_FeatureTree" />
 		<WixVariable Id="WixUILicenseRtf" Value="muon-copying.rtf" />
+		<WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
+		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
 		<Icon Id="DesktopIcon.exe" SourceFile="build\muon.exe" />
 		<Icon Id="StartMenuIcon.exe" SourceFile="build\muon.exe" />
 	</Product>
