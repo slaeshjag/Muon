@@ -231,14 +231,12 @@ void controlpointRadarEnd(int player) {
 
 void controlpointLoop(int msec) {
 	CONTROLPOINT_EXTRA *next;
-	SERVER_UNIT *unit;
 	int i;
 
 	if (!server)
 		return;
 	
 	for (next = server->controlpoint; next; next = (CONTROLPOINT_EXTRA *) next->next) {
-		unit = server->map[next->index];
 		switch (next->type) {
 			case UNIT_DEF_CLUSTERBOMB:
 				if (!server->player[next->owner].map[next->index].power)
@@ -260,10 +258,10 @@ void controlpointLoop(int msec) {
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].cp.radar_deploy <= 0)
 			continue;
-		server->player[unit->owner].cp.radar_deploy -= msec * server->game.gamespeed;
-		if (server->player[unit->owner].cp.radar_deploy <= 0) {
-			controlpointRadarEnd(unit->owner);
-			server->player[unit->owner].cp.radar_deploy = 0;
+		server->player[i].cp.radar_deploy -= msec * server->game.gamespeed;
+		if (server->player[i].cp.radar_deploy <= 0) {
+			controlpointRadarEnd(i);
+			server->player[i].cp.radar_deploy = 0;
 		}
 	}
 
@@ -346,7 +344,6 @@ void controlpointDeployRadar(int player, int index_dst) {
 
 
 void controlpointDeploy(int player, int type, int index_dst) {
-	
 	if (index_dst < 0 || index_dst > server->w * server->h)
 		return;
 	switch (type) {

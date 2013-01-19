@@ -252,8 +252,9 @@ int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned i
 	index = x + server->w * y;
 	if (server->map[index])
 		return -1;
-	if (unitAdd(player, unit, x, y) >= 0) 	
-		server->player[player].queue.queue.ready = 0;
+	if (unitAdd(player, unit, x, y) < 0)
+		return -1;
+	server->player[player].queue.queue.ready = 0;
 
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_IN_GAME_NOW)
@@ -639,6 +640,7 @@ void unitDamagePoke(int index, int damage) {
 void unitDamageDo(int index, int damage, int time) {
 	SERVER_UNIT *next = server->map[index];
 	int owner = next->owner;
+	int i;
 	
 	if (next->target < 0 || next->target > server->w * server->h)
 		return;
@@ -648,7 +650,15 @@ void unitDamageDo(int index, int damage, int time) {
 			return;
 		server->map_c.tile_data[next->target] &= 0xF0000;
 		server->map_c.tile_data[next->target] |= 0x70000;
-		messageBufferPushDirect(owner, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x10, next->target, NULL);
+		for (i = 0; i < server->players; i++) {
+			if (server->player[i].status == PLAYER_UNUSED)
+				continue;
+			if (!server->player[i].map[next->target].fog)
+				continue;
+
+			messageBufferPushDirect(i, owner, MSG_SEND_MAP_TILE_ATTRIB, 0x10, next->target, NULL);
+		}
+
 		return;
 	}
 

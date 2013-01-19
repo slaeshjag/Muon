@@ -74,7 +74,7 @@ SERVER_SOCKET *networkListen(int port) {
 	}
 	
 	flags = 1;
-	setsockopt(sock->socket, SOL_SOCKET, SO_REUSEADDR, &flags, 4);
+	setsockopt(sock->socket, SOL_SOCKET, SO_REUSEADDR, (void *) &flags, 4);
 	
 	memset((void *) &address, 0, sizeof(struct sockaddr_in));
 	address.sin_family = AF_INET;
