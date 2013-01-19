@@ -51,7 +51,7 @@ const char *server_errors[] = { NULL,
 				"The map is missing a generator for one or more players.",
 				"The number of generators on the map is not equal to the biggest player id.",
 				"The server is still sending out data to clients and has not yet stopped.",
-				"The server is already running and have no intention on stopping on its own.",
+				"The server is already running and has no intention of stopping on its own.",
 				"rand() wasn't on our side, and spawn randomization took too many tries. Try again."};
 
 typedef struct {

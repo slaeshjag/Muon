@@ -58,8 +58,8 @@ void menu_init() {
 	menu[MENU_STATE_MULTIPLAYER].button_back=ui_widget_create_button_text(font_std, T("Back"));
 	
 	menu[MENU_STATE_SETTINGS].event_handler=menu_settings_button_click;
-	menu[MENU_STATE_SETTINGS].button[0]=ui_widget_create_button_text(font_std, T("Game settings"));
-	menu[MENU_STATE_SETTINGS].button[1]=ui_widget_create_button_text(font_std, T("Video settings"));
+	menu[MENU_STATE_SETTINGS].button[0]=ui_widget_create_button_text(font_std, T("Game"));
+	menu[MENU_STATE_SETTINGS].button[1]=ui_widget_create_button_text(font_std, T("Video"));
 	menu[MENU_STATE_SETTINGS].spacer=menu[MENU_STATE_MAIN].spacer;
 	menu[MENU_STATE_SETTINGS].button_back=menu[MENU_STATE_MULTIPLAYER].button_back;
 	
@@ -129,7 +129,7 @@ void menu_main_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
 	for(i=0; i<8&&widget!=menu[MENU_STATE_MAIN].button[i]; i++);
 	if(i==0) {
-		ui_messagebox(font_std, T("Single player is not yet availble."));
+		ui_messagebox(font_std, T("Singleplayer is not yet availble."));
 		return;
 	}
 	

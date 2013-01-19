@@ -12,11 +12,11 @@ Gamespeed must be bigger than 0.								Gamespeed must be bigger than 0.
 The map is missing a generator for one or more players.						The map is missing a generatorfor one or more players.
 The number of generators on the map is not equal to the biggest player id.			The number of generators on the map is not equal to the biggest player id.
 The server is still sending out data to clients and has not yet stopped.			The server is still sending out data to clients and has not yet stopped.
-The server is already running and have no intention on stopping on its own.			The server is already running and have no intention on stopping on its own.
+The server is already running and has no intention of stopping on its own.			The server is already running and has no intention of stopping on its own.
 rand() wasn't on our side, and spawn randomization took too many tries. Try again.		rand() wasn't on our side, and spawn randomization took too many tries. Try again.
 Lost connection to server.									Lost connection to server.
 
-Single player is not yet availble.								Single player is not yet availble.
+Singleplayer is not yet availble.								Singleplayer is not yet availble.
 
 ### Menu
 Singleplayer		Singleplayer
@@ -35,8 +35,8 @@ Save			Save
 Host game		Host game
 Join game		Join game
 
-Game settings		Game settings
-Video settings		Video settings
+Game			Game
+Video			Video
 
 ### Settings
 Player name		Player name
@@ -91,15 +91,15 @@ Scout			Scout
 Attacker		Attacker
 Pylon			Pylon
 Wall			Wall
-Special building	Special building
-Construction yard	Construction yard
+Battle support		Battle support
+Buildsite		Buildsite
 Missile silo		Missile silo
 Radar			Radar
 
 Flare			Flare
 Nuke			Nuke
 
-Shield			Shield
+Shields			Shields
 Health			Health
 
 Resign			Resign

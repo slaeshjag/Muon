@@ -45,7 +45,7 @@ void game_view_init() {
 	game_sidebar_label_build[1]=ui_widget_create_label(font_std, T("Attacker"));
 	game_sidebar_label_build[2]=ui_widget_create_label(font_std, T("Pylon"));
 	game_sidebar_label_build[3]=ui_widget_create_label(font_std, T("Wall"));
-	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Special building"));
+	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Battle support"));
 	int i;
 	for(i=0; i<5; i++) {
 		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
@@ -56,7 +56,7 @@ void game_view_init() {
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
 	game_sidebar_progress_shield=ui_widget_create_progressbar(font_std);
 	game_sidebar_progress_health=ui_widget_create_progressbar(font_std);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Shield")), 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Shields")), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Health")), 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
@@ -66,7 +66,7 @@ void game_view_init() {
 	/*Special buildings for control points*/
 	panelist_game_specialbar.pane=ui_pane_create(config.screen_w-SIDEBAR_WIDTH*2, game_sidebar_button_build[4]->y-64, SIDEBAR_WIDTH, 128, ui_widget_create_vbox());
 	panelist_game_specialbar.next=&panelist_game_abilitybar;
-	game_specialbar_label_build[0]=ui_widget_create_label(font_std, T("Construction yard"));
+	game_specialbar_label_build[0]=ui_widget_create_label(font_std, T("Buildsite"));
 	game_specialbar_label_build[1]=ui_widget_create_label(font_std, T("Missile silo"));
 	game_specialbar_label_build[2]=ui_widget_create_label(font_std, T("Radar"));
 	for(i=0; i<3; i++) {
