@@ -63,7 +63,7 @@ static const int unit_los[] = {
 static const int unit_maxhp[] = {
 	2000 * 0,       /* nothing */
 	2000 * 150,     /* generator */
-	2000 * 50,      /* scout */
+	2000 * 75,      /* scout */
 	2000 * 90,      /* attacker */
 	2000 * 40,      /* pylon */
 	1,              /* wall */
@@ -79,7 +79,7 @@ static const int unit_maxshield[] = {
 	0,		/* nothing */
 	2000 * 150,	/* generator */
 	1,		/* scout */
-	2000 * 60,	/* attacker */
+	2000 * 90,	/* attacker */
 	2000 * 30,	/* pylon */
 	2000 * 200,	/* wall */
 	1,		/* owned control point (buildsite) */
@@ -103,7 +103,7 @@ static const int unit_shieldreg[] = {
 static const int unit_damage[] = {
 	0,		/* nothing */
 	0,		/* generator */
-	1,		/* scout */
+	2,		/* scout */
 	5,		/* attacker */
 	0,		/* pylon */
 	0,		/* wall */
@@ -133,8 +133,8 @@ static const int unit_range[] = {
 static const int unit_buildtime[] = {
 	0,		/* nothing */
 	0,		/* generator */
-	10000,		/* scout */
-	40000,		/* attacker */
+	8000,		/* scout */
+	60000,		/* attacker */
 	20000,		/* pylon */
 	15000,		/* wall */
 	50000,		/* owned control point (buildsite) */
@@ -143,16 +143,18 @@ static const int unit_buildtime[] = {
 };
 
 /* Points for determening a winner without generators being lost. */
+/* this is really just based off of the cost of building them,
+ * normalised against the scout... */
 static const int unit_points[] = { 
 	1,		/* Powered tile */
 	0,		/* Generator */
-	2,		/* Scout */
-	4,		/* Attacker */
+	1,		/* Scout */
+	8,		/* Attacker */
 	0,		/* Pylon */
 	2,		/* Wall */
-	20,		/* Owned control point */
-	30,		/* carpet bomb */
-	30		/* radar */
+	6,		/* Owned control point */
+	13,		/* carpet bomb */
+	9		/* radar */
 };
 
 struct SERVER_UNIT;
