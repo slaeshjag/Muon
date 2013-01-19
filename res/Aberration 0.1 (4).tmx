@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="64" height="64" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="author" value="Kalops"/>
+  <property name="max_players" value="4"/>
+  <property name="name" value="Aberration"/>
+  <property name="size" value="64x64"/>
+  <property name="version" value="1.0"/>
+  <property name="tileset" value="mapdata/default.png"/>
+ </properties>
+ <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
+  <image source="maps/Aberration 0.1 (4)/default.png" width="256" height="256"/>
+ </tileset>
+ <layer name="terrain" width="64" height="64">
+  <data encoding="base64" compression="zlib">
+   eJzt1VGOwzAIBFB6rNz/Yv2ppSpKtmBmGLyxJX8m8CbYeZnZ62Ifzn31bHSPFX0O2ZfXy8hiLM97GX0h7Bk/qv5Mb1V1VO5fvan81fa7/ipnbfu3f/v/rl3dm8qumpHt335mHaTfCnvrmAHSXz1vXfyq89blDlDeOUo/sl62L6YdNWdR/0wWaD/aPutnZVBtz/jROXSxM+Y2c7ew7Eh/NIPD+RzTzqgdzaCrPVN/+5/tR2Wg9LOz9e6xnuyv/v6IdxvI/nQ/y36XAeq9q/irZ6vT/G9/b3/mDDDOtMI/0z/rTl/Bj8yRZbd/7PfeaawMlH6vwYLPRfpX+Ct6976n2o+c3bEy70P6v1fkrGbqeurNfhP0d0XbvRmw/Uo7YgYy/aDsx8cw487OAHpuKu3n9cuCnEelP/r9GedR7b+agwo/skYkb+85YPbEss/6q2dgBT8ygyp7xj8yYN+Dnf3nOVjNb9sPzWA1/13NDhko/JksWH5lBpEczotVd5UM2DU7+pEZeGp1s6MyyP6PumwLfjN1v532G8JD1xY=
+  </data>
+ </layer>
+ <layer name="buildings" width="64" height="64">
+  <data encoding="base64" compression="zlib">
+   eJzt2DEKACEMRUErYcstLb3/Jbe0XEHxg8yc4BFCipQCQEpNB1yspQMu8aQDAAAAAIBlftGcZN8GswDYy10FAAAA4M+bDoBJPR3AFH9pIOkDrX8AeQ==
+  </data>
+ </layer>
+ <layer name="collision" width="64" height="64">
+  <data encoding="base64" compression="zlib">
+   eJztlMEKwzAMQ3vo/3/zToMyAnNsSVaoBb41lp5Ic1/XdS8mqtVZ1SBzIcTiqeZUsEd82P6ZbCqfLu5/2RQeDuxfKXIM//APf64DdTb2/sowNPzDz/RB8iuzqXy6+J26VvI73jVXfscO1N7RXV1ZULur/Jku0Pxo9iw/qwPUHgU/uofKWSR7xm9HLuxI/t0Onh6Rb9T8WW+kOtkr/igN/5n8qA46+dndRjX8en5FvxF13f+38K8yKvp14lffreEffkUHiB0O/Jn8iB2n8qP2MNl3+zmJf4dlRyfwZxmicuVXZI/uqWboYkfcIyZ/RWi/7FkVb9YTxVHNghLz32LxI1Xlz7Jk8yCFYI+wIDMhxeZnZFJ6OfGzdEIHTA2/Xwcq9l8vF/5nLrbezI9kH35ONqWcOujgX/l383d28JtD2YPiH6tm6eA/6V1geyrU8R4i3mHXeSv37nwARmYfeQ==
+  </data>
+ </layer>
+ <layer name="fow" width="64" height="64" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztw8EJAAAMA6Ej+w/dMfpRcNVUVVVVVVVVVVVVVVVVVVXV1we8ACAB
+  </data>
+ </layer>
+</map>
