@@ -14,12 +14,9 @@
 					<Component Id="DLLFILES" DiskId="1" Guid="F820662C-3C11-43E1-B3CF-4EAF3DB16E8C">
 						<File Id="LIBDARNIT.DLL" Name="libdarnit.dll" Source="build\libdarnit.dll" />
 						<File Id="LIBBZ2_2.DLL" Name="libbz2-2.dll" Source="build\libbz2-2.dll" />
-						<File Id="LIBDL.DLL" Name="libdl.dll" Source="build\libdl.dll" />
 						<File Id="LIBGCC_S_DW2_1.DLL" Name="libgcc_s_dw2-1.dll" Source="build\libgcc_s_dw2-1.dll" />
 						<File Id="LIBMODPLUG_1.DLL" Name="libmodplug-1.dll" Source="build\libmodplug-1.dll" />
 						<File Id="LIBSTDC___6.DLL" Name="libstdc++-6.dll" Source="build\libstdc++-6.dll" />
-						<File Id="MINGWM10.DLL" Name="mingwm10.dll" Source="build\mingwm10.dll" />
-						<File Id="PTHREADGC2.DLL" Name="pthreadGC2.dll" Source="build\pthreadGC2.dll" />
 						<File Id="SDL.DLL" Name="SDL.dll" Source="build\SDL.dll" />
 						<File Id="ZLIB1.DLL" Name="zlib1.dll" Source="build\zlib1.dll" />
 					</Component>
@@ -58,14 +55,9 @@
 							<File Id="FREEMONOBOLD.TTF" Name="FreeMonoBold.ttf" Source="build\res\FreeMonoBold.ttf" />
 						</Component>
 						
-						<Directory Id="LANG" Name="lang">
-							<Component Id="EN" DiskId="1" Guid="E63117AC-E331-4B57-B046-FCBC5D1C3655">
-								<File Id="EN" Name="EN" Source="build\res\lang\EN" />
-							</Component>
-							<Component Id="SV" DiskId="1" Guid="E2ECB32C-DB93-4ECB-87A6-766EAD89B378">
-								<File Id="SV" Name="SV" Source="build\res\lang\SV" />
-							</Component>
-						</Directory>
+						<Component Id="LANG" DiskId="1" Guid="E63117AC-E331-4B57-B046-FCBC5D1C3655">
+							<File Id="LANG.STZ" Name="lang.stz" Source="build\res\lang.stz" />
+						</Component>
 					</Directory>
 				</Directory>
 			</Directory>
@@ -101,13 +93,8 @@
 			<Feature Id="Server" Level="1" Title="Server" Description="Dedicated server for muon">
 				<ComponentRef Id="SERVERBIN" />
 			</Feature>
-			<Feature Id="Languages" Level="1" Title="Languages" Description="Extra language packs for muon">
-				<Feature Id="EN" Level="1" Title="English" Absent="disallow">
-					<ComponentRef Id="EN" />
-				</Feature>
-				<Feature Id="SV" Level="2" Title="Swedish">
-					<ComponentRef Id="SV" />
-				</Feature>
+			<Feature Id="Internationalization" Level="1" Title="Languages" Description="Extra language packs for muon">
+				<ComponentRef Id="LANG" />
 			</Feature>
 		</Feature>
 		<UI />
