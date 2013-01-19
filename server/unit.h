@@ -126,7 +126,7 @@ static const int unit_range[] = {
 	0,		/* wall */
 	0,		/* owned control point (buildsite) */
 	7,		/* carpet bomb (radius of spread) */
-	5,		/* Radius of the FoW "window" that opens */
+	8,		/* Radius of the FoW "window" that opens */
 };
 
 /* measured in ticks, of which there are 3000/s with normal game speed. */
