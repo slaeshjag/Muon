@@ -25,8 +25,6 @@ int networkInit() {
 	
 	WSADATA wsaData;
 	WORD version;
-	struct hostent *hp;
-	u_long iMode=1;
 	
 	version = MAKEWORD(2, 0);
 	if (WSAStartup(version, &wsaData) != 0) {
@@ -78,7 +76,7 @@ SERVER_SOCKET *networkListen(int port) {
 	flags = 1;
 	setsockopt(sock->socket, SOL_SOCKET, SO_REUSEADDR, &flags, 4);
 	
-	memset(&address, 0, sizeof(struct sockaddr_in));
+	memset((void *) &address, 0, sizeof(struct sockaddr_in));
 	address.sin_family = AF_INET;
 	address.sin_port = htons(port);
 	address.sin_addr.s_addr = 0x0;		/* Listen on ALL the interfaces! */
@@ -124,11 +122,11 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 	SOCKET socket;
 	u_long iMode = 1;
 	#endif
-	int address_len, flags;
+	int address_len;
 	struct sockaddr_in address;
 	address_len = sizeof(struct sockaddr_in);
 
-	if ((socket = accept(sock->socket, (struct sockaddr *) &address, (unsigned int *) &address_len)) == INVALID_SOCKET)
+	if ((socket = accept(sock->socket, (void *) &address, (void *) &address_len)) == INVALID_SOCKET)
 		return NULL;
 
 	if ((sock_a = malloc(sizeof(SERVER_SOCKET))) == NULL)
@@ -136,7 +134,8 @@ SERVER_SOCKET *networkAccept(SERVER_SOCKET *sock) {
 
 	sock_a->socket = socket;
 	#ifndef _WIN32
-	
+	int flags;
+
 	if ((flags = fcntl(sock_a->socket, F_GETFL, 0)) < 0)
 		flags = 0;
 	if (fcntl(sock_a->socket, F_SETFL, flags | O_NONBLOCK) < 0)
