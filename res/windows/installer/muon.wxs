@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="1.0.0.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
+		<Package Description="Muon" InstallerVersion="200" Compressed="yes" />
+		<Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder" Name="PFiles">
+				<Directory Id="INSTALLDIR" Name="muon">
+					<Component Id="TEXTFILES" DiskId="1" Guid="0E4BABE6-DCD8-4885-B9B7-C39FFB189CFD">
+						<File Id="COPYING.TXT" Name="COPYING.txt" Source="build\COPYING.txt" />
+						<File Id="README.TXT" Name="README.txt" Source="build\README.txt" />
+					</Component>
+					
+					<Component Id="DLLFILES" DiskId="1" Guid="F820662C-3C11-43E1-B3CF-4EAF3DB16E8C">
+						<File Id="LIBDARNIT.DLL" Name="libdarnit.dll" Source="build\libdarnit.dll" />
+						<File Id="LIBBZ2_2.DLL" Name="libbz2-2.dll" Source="build\libbz2-2.dll" />
+						<File Id="LIBDL.DLL" Name="libdl.dll" Source="build\libdl.dll" />
+						<File Id="LIBGCC_S_DW2_1.DLL" Name="libgcc_s_dw2-1.dll" Source="build\libgcc_s_dw2-1.dll" />
+						<File Id="LIBMODPLUG_1.DLL" Name="libmodplug-1.dll" Source="build\libmodplug-1.dll" />
+						<File Id="LIBSTDC___6.DLL" Name="libstdc++-6.dll" Source="build\libstdc++-6.dll" />
+						<File Id="MINGWM10.DLL" Name="mingwm10.dll" Source="build\mingwm10.dll" />
+						<File Id="PTHREADGC2.DLL" Name="pthreadGC2.dll" Source="build\pthreadGC2.dll" />
+						<File Id="SDL.DLL" Name="SDL.dll" Source="build\SDL.dll" />
+						<File Id="ZLIB1.DLL" Name="zlib1.dll" Source="build\zlib1.dll" />
+					</Component>
+					
+					<Component Id="SERVERBIN" DiskId="1" Guid="572BEE36-5FD4-4DF7-BD84-E391555DA671">
+						<File Id="MUON_SERVER.EXE" Name="muon-server.exe" Source="build\muon-server.exe" />
+					</Component>
+					
+					<Component Id="MUONBIN" DiskId="1" Guid="9355DEEA-54C9-4BAE-ACDE-4CF1865EE668">
+						<File Id="MUON.EXE" Name="muon.exe" Source="build\muon.exe">
+							<Shortcut Id="desktopShortcut" Directory="DesktopFolder" Name="Muon" WorkingDirectory="INSTALLDIR" Advertise="yes" Icon="DesktopIcon.exe" IconIndex="0" />
+							<Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Muon" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+						</File>
+					</Component>
+					
+					<Directory Id="MAPS" Name="maps">
+						<Component Id="MAPS" DiskId="1" Guid="33A49397-EC64-45A9-BD2B-8368DEFC2B2A">
+							<File Id="TESTMAP.LDI" Name="testmap.ldi" Source="build\maps\testmap.ldi" />
+							<File Id="TWIRLY_0.1__2_.LDI" Name="Twirly 0.1 (2).ldi" Source="build\maps\Twirly 0.1 (2).ldi" />
+							<File Id="WHEEL_OF_FORTUNE_0.1__4_.LDI" Name="Wheel of Fortune 0.1 (4).ldi" Source="build\maps\Wheel of Fortune 0.1 (4).ldi" />
+						</Component>
+					</Directory>
+					
+					<Directory Id="RES" Name="res">
+						<Component Id="IMAGEFILES" DiskId="1" Guid="EA3D8088-A367-4C69-A04E-9A4CCFC9869D">
+							<File Id="CHAT.PNG" Name="chat.png" Source="build\res\chat.png" />
+							<File Id="FLARE.PNG" Name="flare.png" Source="build\res\flare.png" />
+							<File Id="NUKE.PNG" Name="nuke.png" Source="build\res\nuke.png" />
+							<File Id="RADAR.PNG" Name="radar.png" Source="build\res\radar.png" />
+							<File Id="MOUSE.PNG" Name="mouse.png" Source="build\res\mouse.png" />
+							<File Id="ICON.PNG" Name="icon.png" Source="build\res\icon.png" />
+						</Component>
+						
+						<Component Id="FONTFILES" DiskId="1" Guid="0C11EA58-96F7-4574-8A42-221F5A98DD9F">
+							<File Id="FREEMONO.TTF" Name="FreeMono.ttf" Source="build\res\FreeMono.ttf" />
+							<File Id="FREEMONOBOLD.TTF" Name="FreeMonoBold.ttf" Source="build\res\FreeMonoBold.ttf" />
+						</Component>
+						
+						<Directory Id="LANG" Name="lang">
+							<Component Id="EN" DiskId="1" Guid="E63117AC-E331-4B57-B046-FCBC5D1C3655">
+								<File Id="EN" Name="EN" Source="build\res\lang\EN" />
+							</Component>
+							<Component Id="SV" DiskId="1" Guid="E2ECB32C-DB93-4ECB-87A6-766EAD89B378">
+								<File Id="SV" Name="SV" Source="build\res\lang\SV" />
+							</Component>
+						</Directory>
+					</Directory>
+				</Directory>
+			</Directory>
+			<Directory Id="DesktopFolder" />
+			<Directory Id="ProgramMenuFolder">
+				<Directory Id="ProgramMenuDir" Name="Muon">
+					<Component Id="StartMenuShortcuts" Guid="66B798CA-0B05-4AF5-A33E-DBAD6EC0B71B">
+						<RemoveFolder Id="ProgramMenuDir" On="uninstall" />
+						<RegistryValue Root="HKCU" Key="Software\[Manufacturer]\[ProductName]" Type="string" Value="" />
+						<Shortcut Id="UninstallProduct" Name="Uninstall" Description="Uninstalls Muon" Target="[System64Folder]msiexec.exe" Arguments="/x [ProductCode]" />
+					</Component>
+				</Directory>
+			</Directory>
+			<Component Id="RegistryEntries" Guid="e90e9f02-c126-4980-bcbe-bfc052caa433">
+				<RegistryKey Root="HKLM" Key="Software\libdarnit\[ProductName]" Action="createAndRemoveOnUninstall">
+					<RegistryValue Type="string" Name="path" Value="[INSTALLDIR]" KeyPath="yes" />
+					<RegistryValue Type="string" Value="Default Value" />
+				</RegistryKey>
+			</Component>
+		</Directory>
+		<Feature Id="Muon" Title="Muon" Level="1" ConfigurableDirectory="INSTALLDIR" Display="expand" Absent="disallow">
+			<ComponentRef Id="MUONBIN" />
+			<ComponentRef Id="DLLFILES" />
+			<ComponentRef Id="TEXTFILES" />
+			<ComponentRef Id="IMAGEFILES" />
+			<ComponentRef Id="FONTFILES" />
+			
+			<ComponentRef Id="StartMenuShortcuts" />
+			<ComponentRef Id="RegistryEntries" />
+			<Feature Id="Maps" Level="2" Title="Maps" Description="Standard map pack with a variety of different maps">
+				<ComponentRef Id="MAPS" />
+			</Feature>
+			<Feature Id="Server" Level="1" Title="Server" Description="Dedicated server for muon">
+				<ComponentRef Id="SERVERBIN" />
+			</Feature>
+			<Feature Id="Languages" Level="1" Title="Languages" Description="Extra language packs for muon">
+				<Feature Id="EN" Level="1" Title="English" Absent="disallow">
+					<ComponentRef Id="EN" />
+				</Feature>
+				<Feature Id="SV" Level="2" Title="Swedish">
+					<ComponentRef Id="SV" />
+				</Feature>
+			</Feature>
+		</Feature>
+		<UI />
+		<Property Id="INSTALLLEVEL" Value="3" />
+		<UIRef Id="WixUI_FeatureTree" />
+		<WixVariable Id="WixUILicenseRtf" Value="muon-copying.rtf" />
+		<WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
+		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
+		<Icon Id="DesktopIcon.exe" SourceFile="build\muon.exe" />
+		<Icon Id="StartMenuIcon.exe" SourceFile="build\muon.exe" />
+	</Product>
+</Wix>

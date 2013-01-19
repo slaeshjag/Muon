@@ -11,3 +11,8 @@ client/res
 *.pnd
 *.stz
 *.res
+*.exe
+*.msi
+*.wixobj
+*.wixpdb
+res/windows/installer/build
