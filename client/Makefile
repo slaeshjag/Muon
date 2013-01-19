@@ -9,10 +9,11 @@ CFLAGS 	+= -Wall $(INCS) $(DBGFLAGS)
 LDFLAGS += -ldarnit
 RM	= rm -f
 
-DEPENDS=
+DEPENDS =
 
 ifeq ($(strip $(OS)), Windows_NT)
-	DEPENDS+=muon.res
+	DEPENDS += muon.res
+	LDFLAGS += -lws2_32
 endif
 
 SRCFILES=$(wildcard *.c)
