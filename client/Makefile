@@ -47,4 +47,4 @@ clean:
 	@$(CC) $(CFLAGS) -c -o $@ $< 
 
 muon.res:
-	windres ../res/muon.rc -O coff -o muon.res
+	@windres ../res/muon.rc -O coff -o muon.res
