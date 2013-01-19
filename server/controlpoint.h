@@ -24,7 +24,7 @@
 
 /* In gameticks */
 #define	CP_CLUSTERBOMB_DELAY		60 * 3000
-#define	CP_RADAR_DELAY			60 * 3000
+#define	CP_RADAR_DELAY			90 * 3000
 #define	CP_RADAR_DEPLOY_TIME		10 * 3000
 
 struct SERVER_UNIT;
