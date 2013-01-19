@@ -234,7 +234,10 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 	
 	if (!server->map[index])
 		los = unitRange(UNIT_DEF_RADAR);
-	else if ((los = unitLOS(server->map[index]->type)) < 0)
+	else if (abs(mode) > 1) {
+		los = abs(mode);
+		mode = mode / abs(mode);
+	} else if ((los = unitLOS(server->map[index]->type)) < 0)
 		return 0;
 
 	for (j = -1 * los; j <= los; j++) {
