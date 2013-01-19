@@ -207,13 +207,18 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			if(msg->arg_2==100)
 				ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=1;
 			break;
+		case MSG_RECV_CP_CLEAR:
+			printf("%s cleared\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar");
+			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].ready=-1;
+			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=0;
+			break;
 		case MSG_RECV_CP_DEPLOY:
 			if(msg->arg_1==BUILDING_CLUSTERBOMB) {
 				map_flare_add(msg->arg_2, msg->player_id, 2000, building[BUILDING_CLUSTERBOMB].range*map->layer[map->layers-2].tile_w);
-				if(msg->player_id==player_id) {
+				/*if(msg->player_id==player_id) {
 					ability[1].ready=-1;
 					ability[1].button->enabled=0;
-				}
+				}*/
 			}
 			break;
 		case MSG_RECV_MAJOR_IMPACT:

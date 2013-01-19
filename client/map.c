@@ -69,6 +69,15 @@ void map_init(char *filename) {
 			map->layer[map->layers-2].tilemap->data[i]|=1<<17;
 	}
 	map_update_grid();
+	
+	//TODO: move somewhere else
+	//Update abilities
+	ability[0].ready=100;
+	ability[0].button->enabled=1;
+	ability[1].ready=-1;
+	ability[1].button->enabled=0;
+	ability[2].ready=-1;
+	ability[2].button->enabled=0;
 }
 
 void map_close(/*DARNIT_MAP *map*/) {
