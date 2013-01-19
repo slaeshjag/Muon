@@ -132,7 +132,7 @@ void controlpointDelayReset(SERVER_UNIT *unit) {
 			if (next->type == unit->type)
 				if (unit->cp != next)
 					return;
-	*val = 0;
+	*val = -1;
 	messageBufferPushDirect(unit->owner, unit->owner, MSG_SEND_CP_CLEAR, unit->type, 0, NULL);
 
 	return;
