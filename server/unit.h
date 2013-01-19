@@ -112,6 +112,8 @@ static const int unit_damage[] = {
 	0		/* radar */
 };
 
+#define	UNIT_NUKE_MAX_DEFLECTION	2000 * 75
+
 /* Pylons and generators must have the same distribution range... */
 /* range is for shooting and power distribution, whereever
  * applicable. units that don't do either have a range of 0. */

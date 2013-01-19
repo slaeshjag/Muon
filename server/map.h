@@ -22,7 +22,7 @@
 #ifndef __MAP_H__
 #define	__MAP_H__
 
-#define	MAP_TERRAIN_ABSORTION		4000
+#define	MAP_TERRAIN_ABSORTION		2000 * 100
 
 
 #endif

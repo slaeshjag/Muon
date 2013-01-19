@@ -284,7 +284,7 @@ int controlpointClusterbombAlreadyUsed(int tx, int ty, int bombs) {
 
 
 void controlpointDeployClusterbomb(int player, int index_dst) {
-	int bombs, x, y, tx, ty, i, j, index, target;
+	int bombs, x, y, tx, ty, i, j, index, target, damage_deflection;
 
 	bombs = unit_damage[UNIT_DEF_CLUSTERBOMB] / unit_maxshield[UNIT_DEF_GENERATOR];
 	x = index_dst % server->w;
@@ -299,6 +299,7 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 		if (!server->map[server->player[player].spawn.index])
 			return;
 
+		damage_deflection = rand() % UNIT_NUKE_MAX_DEFLECTION;
 		index = tx + ty * server->w;
 		server->clusterbomb_buffer[i] = index;
 		tx += x;
@@ -312,7 +313,7 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 		target = server->map[server->player[player].spawn.index]->target;
 		server->map[server->player[player].spawn.index]->target = index;
 
-		unitDamagePoke(server->player[player].spawn.index, unit_maxshield[UNIT_DEF_GENERATOR]);
+		unitDamagePoke(server->player[player].spawn.index, unit_maxshield[UNIT_DEF_GENERATOR] - damage_deflection);
 		/* Another evil hack */
 		if (!server->map[server->player[player].spawn.index])
 			return;
