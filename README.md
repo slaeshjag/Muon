@@ -1,8 +1,8 @@
-Muon -- a new kind of RTS
--------------------------
+Muon – a new kind of RTS
+=========================
 
 *Muon* is a real time strategy game currently under heavy development. The
-game has an unusual twist -- there are no moving units. To win the game,
+game has an unusual twist – there are no moving units. To win the game,
 you must conquer your opponent using only static buildings!
 
 The game is fairly minimalistic but offers many opportunities for cunning
@@ -17,7 +17,7 @@ wave? Or are you looking for that technological advantage that can just be
 gained with a few cluster bombs delivered with surgical precision?
 
 Buildings
-=========
+---------
 
 There are five normal buildings in the game:
 
@@ -59,7 +59,7 @@ strategic points (control points) on the map.
 
 
 Note to developers
-==================
+------------------
 
 If you are allergic to fugly code, hate quick and dirty hacks, think function
 pointers are an abomination or curse upon lack of comments or documentation:
