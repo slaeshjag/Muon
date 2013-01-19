@@ -53,6 +53,8 @@ void game_state(GAME_STATE state) {
 		case GAME_STATE_CONNECTING:
 		case GAME_STATE_LOBBY:
 		case GAME_STATE_QUIT:
+		
+		case GAME_STATES:
 			break;
 	}
 	//Game state constructors
@@ -79,6 +81,8 @@ void game_state(GAME_STATE state) {
 		case GAME_STATE_LOBBY:
 		case GAME_STATE_QUIT:
 			d_input_release();
+		
+		case GAME_STATES:
 			break;
 	}
 	

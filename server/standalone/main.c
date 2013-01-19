@@ -19,30 +19,59 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifndef _WIN32
 #include <unistd.h>
+#else
+#include <time.h>
+#include <windows.h>
+#endif
 
 #include "server.h"
 
-int main(int argc, char **argv) {
-	int port;
+struct timeval time_d;
 
-	if (argc <3) {
-		fprintf(stdout, "Usage: %s <map> <players> [port]\n", argv[0]);
+
+int deltaTime() {
+	struct timeval time_now;
+	int delta;
+
+	gettimeofday(&time_now, NULL);
+	delta = time_now.tv_usec - time_d.tv_usec;
+	delta /= 1000;
+	delta += (time_now.tv_sec - time_d.tv_sec) * 1000;
+	time_d = time_now;
+
+	return delta;
+}
+
+
+int main(int argc, char **argv) {
+	int port, gamespeed;
+
+	if (argc < 4) {
+		fprintf(stdout, "Usage: %s <map> <gamespeed (1-10)> <players> [port]\n", argv[0]);
 		return -1;
 	}
 
-	if (argc >= 4)
-		port = atoi(argv[3]);
+	if (argc >= 5)
+		port = atoi(argv[4]);
 	else
 		port = SERVER_PORT_DEFAULT;
 	
 	serverInit();
+	gettimeofday(&time_d, NULL);
+	gamespeed = atoi(argv[2]);
 
-	if (serverStart(argv[1], atoi(argv[2]), port, 10) == NULL)
+	if (serverStart(argv[1], atoi(argv[2]), port, gamespeed) == NULL)
 		return -1;
 	for (;;) {
-		sleep(1);
-		serverLoop(1000);
+		serverLoop(deltaTime());
+		#ifdef _WIN32
+		Sleep(15);
+		#else
+		usleep(15000);
+		#endif
 	}
 
 	
