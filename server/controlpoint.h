@@ -20,8 +20,6 @@
 #ifndef __CONTROLPOINT_H__
 #define	__CONTROLPOINT_H__
 
-#define	CONTROLPOINT_CLUSTERBOMB_WARMUP	10800
-
 #define	CP_DELAY_SEC(x)			((x) / server->game.gamespeed / 1000)
 
 /* In gameticks */
