@@ -13,7 +13,7 @@ DEPENDS =
 
 ifeq ($(strip $(OS)), Windows_NT)
 	DEPENDS += muon.res
-	LDFLAGS += -lws2_32
+	LDFLAGS += -lws2_32 -mwindows
 endif
 
 SRCFILES=$(wildcard *.c)
