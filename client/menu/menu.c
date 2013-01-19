@@ -45,6 +45,7 @@ void menu_init() {
 	menustate=MENU_STATE_MAIN;
 	
 	menu[MENU_STATE_MAIN].event_handler=menu_main_button_click;
+	menu[MENU_STATE_MAIN].label=ui_widget_create_label(font_std, T("Muon"));
 	menu[MENU_STATE_MAIN].button[0]=ui_widget_create_button_text(font_std, T("Singleplayer"));
 	menu[MENU_STATE_MAIN].button[1]=ui_widget_create_button_text(font_std, T("Multiplayer"));
 	menu[MENU_STATE_MAIN].button[2]=ui_widget_create_button_text(font_std, T("Settings"));
@@ -52,12 +53,14 @@ void menu_init() {
 	menu[MENU_STATE_MAIN].button_back=ui_widget_create_button_text(font_std, T("Quit game"));
 	
 	menu[MENU_STATE_MULTIPLAYER].event_handler=menu_multiplayer_button_click;
+	menu[MENU_STATE_MULTIPLAYER].label=ui_widget_create_label(font_std, T("Multiplayer"));
 	menu[MENU_STATE_MULTIPLAYER].button[0]=ui_widget_create_button_text(font_std, T("Host game"));
 	menu[MENU_STATE_MULTIPLAYER].button[1]=ui_widget_create_button_text(font_std, T("Join game"));
 	menu[MENU_STATE_MULTIPLAYER].spacer=menu[MENU_STATE_MAIN].spacer;
 	menu[MENU_STATE_MULTIPLAYER].button_back=ui_widget_create_button_text(font_std, T("Back"));
 	
 	menu[MENU_STATE_SETTINGS].event_handler=menu_settings_button_click;
+	menu[MENU_STATE_SETTINGS].label=ui_widget_create_label(font_std, T("Settings"));
 	menu[MENU_STATE_SETTINGS].button[0]=ui_widget_create_button_text(font_std, T("Game"));
 	menu[MENU_STATE_SETTINGS].button[1]=ui_widget_create_button_text(font_std, T("Video"));
 	menu[MENU_STATE_SETTINGS].spacer=menu[MENU_STATE_MAIN].spacer;
@@ -102,6 +105,7 @@ void menu_state(enum MENU_STATE state) {
 
 void meni_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
+	ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].label);
 	for(i=0; i<8; i++) {
 		if(!menu[menustate].button[i])
 			continue;
@@ -112,6 +116,7 @@ void meni_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	
 	menustate=menu_newstate;
 	
+	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].label, 0);
 	for(i=0; i<8; i++) {
 		if(!menu[menustate].button[i])
 			continue;

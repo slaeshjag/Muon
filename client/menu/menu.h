@@ -31,6 +31,7 @@ enum MENU_STATE {
 
 struct MENU {
 	void (*event_handler)(UI_WIDGET *, unsigned int, UI_EVENT *);
+	UI_WIDGET *label;
 	UI_WIDGET *button[8];
 	UI_WIDGET *spacer;
 	UI_WIDGET *button_back;
