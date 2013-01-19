@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 	for (;;) {
 		serverLoop(deltaTime());
 		#ifdef _WIN32
-		sleep(1);
+		Sleep(15);
 		#else
 		usleep(15000);
 		#endif
