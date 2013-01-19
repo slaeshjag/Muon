@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="1.0.0.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
+	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.3.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
 		<Package Description="Muon" InstallerVersion="200" Compressed="yes" />
 		<Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
 		<Directory Id="TARGETDIR" Name="SourceDir">
@@ -14,12 +14,9 @@
 					<Component Id="DLLFILES" DiskId="1" Guid="F820662C-3C11-43E1-B3CF-4EAF3DB16E8C">
 						<File Id="LIBDARNIT.DLL" Name="libdarnit.dll" Source="build\libdarnit.dll" />
 						<File Id="LIBBZ2_2.DLL" Name="libbz2-2.dll" Source="build\libbz2-2.dll" />
-						<File Id="LIBDL.DLL" Name="libdl.dll" Source="build\libdl.dll" />
 						<File Id="LIBGCC_S_DW2_1.DLL" Name="libgcc_s_dw2-1.dll" Source="build\libgcc_s_dw2-1.dll" />
 						<File Id="LIBMODPLUG_1.DLL" Name="libmodplug-1.dll" Source="build\libmodplug-1.dll" />
 						<File Id="LIBSTDC___6.DLL" Name="libstdc++-6.dll" Source="build\libstdc++-6.dll" />
-						<File Id="MINGWM10.DLL" Name="mingwm10.dll" Source="build\mingwm10.dll" />
-						<File Id="PTHREADGC2.DLL" Name="pthreadGC2.dll" Source="build\pthreadGC2.dll" />
 						<File Id="SDL.DLL" Name="SDL.dll" Source="build\SDL.dll" />
 						<File Id="ZLIB1.DLL" Name="zlib1.dll" Source="build\zlib1.dll" />
 					</Component>
@@ -40,6 +37,7 @@
 							<File Id="TESTMAP.LDI" Name="testmap.ldi" Source="build\maps\testmap.ldi" />
 							<File Id="TWIRLY_0.1__2_.LDI" Name="Twirly 0.1 (2).ldi" Source="build\maps\Twirly 0.1 (2).ldi" />
 							<File Id="WHEEL_OF_FORTUNE_0.1__4_.LDI" Name="Wheel of Fortune 0.1 (4).ldi" Source="build\maps\Wheel of Fortune 0.1 (4).ldi" />
+							<File Id="ABERRATION_0.1__4_.LDI" Name="Aberration 0.1 (4).ldi" Source="build\maps\Aberration 0.1 (4).ldi" />
 						</Component>
 					</Directory>
 					
@@ -58,14 +56,9 @@
 							<File Id="FREEMONOBOLD.TTF" Name="FreeMonoBold.ttf" Source="build\res\FreeMonoBold.ttf" />
 						</Component>
 						
-						<Directory Id="LANG" Name="lang">
-							<Component Id="EN" DiskId="1" Guid="E63117AC-E331-4B57-B046-FCBC5D1C3655">
-								<File Id="EN" Name="EN" Source="build\res\lang\EN" />
-							</Component>
-							<Component Id="SV" DiskId="1" Guid="E2ECB32C-DB93-4ECB-87A6-766EAD89B378">
-								<File Id="SV" Name="SV" Source="build\res\lang\SV" />
-							</Component>
-						</Directory>
+						<Component Id="LANG" DiskId="1" Guid="E63117AC-E331-4B57-B046-FCBC5D1C3655">
+							<File Id="LANG.STZ" Name="lang.stz" Source="build\res\lang.stz" />
+						</Component>
 					</Directory>
 				</Directory>
 			</Directory>
@@ -101,13 +94,8 @@
 			<Feature Id="Server" Level="1" Title="Server" Description="Dedicated server for muon">
 				<ComponentRef Id="SERVERBIN" />
 			</Feature>
-			<Feature Id="Languages" Level="1" Title="Languages" Description="Extra language packs for muon">
-				<Feature Id="EN" Level="1" Title="English" Absent="disallow">
-					<ComponentRef Id="EN" />
-				</Feature>
-				<Feature Id="SV" Level="2" Title="Swedish">
-					<ComponentRef Id="SV" />
-				</Feature>
+			<Feature Id="Internationalization" Level="1" Title="Languages" Description="Extra language packs for muon">
+				<ComponentRef Id="LANG" />
 			</Feature>
 		</Feature>
 		<UI />

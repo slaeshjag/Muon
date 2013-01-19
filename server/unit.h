@@ -136,7 +136,7 @@ static const int unit_buildtime[] = {
 	10000,		/* scout */
 	40000,		/* attacker */
 	20000,		/* pylon */
-	20000,		/* wall */
+	15000,		/* wall */
 	50000,		/* owned control point (buildsite) */
 	70000,		/* carpet bomb */
 	70000		/* radar */
