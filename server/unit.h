@@ -126,7 +126,7 @@ static const int unit_range[] = {
 	0,		/* wall */
 	0,		/* owned control point (buildsite) */
 	7,		/* carpet bomb (radius of spread) */
-	8,		/* Radius of the FoW "window" that opens */
+	7,		/* Radius of the FoW "window" that opens */
 };
 
 /* measured in ticks, of which there are 3000/s with normal game speed. */
@@ -139,7 +139,7 @@ static const int unit_buildtime[] = {
 	15000,		/* wall */
 	50000,		/* owned control point (buildsite) */
 	70000,		/* carpet bomb */
-	70000		/* radar */
+	60000		/* radar */
 };
 
 /* Points for determening a winner without generators being lost. */
