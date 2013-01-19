@@ -3,7 +3,7 @@
 INCS =  -I../server_api
 DEBUGFLAGS = -O0 -g -D__DEBUG__
 CFLAGS += $(INCS) $(DEBUGFLAGS)
-LDFLAGS += 
+LDFLAGS +=
 RM = rm -f
 
 SRCFILES=$(wildcard *.c)
