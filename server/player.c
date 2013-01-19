@@ -227,7 +227,7 @@ int playerCalcSetPower(unsigned int player, int x, int y, int mode) {
 
 
 int playerCalcLOS(unsigned int player, int x, int y, int mode) {
-	int i, j, k, los, index, building, owner, haz_los, t, team, oldfog, fogdiff;
+	int i, j, k, los, index, building, owner, haz_los, t, team, oldfog, fogdiff, p;
 
 	index = y * server->w + x;
 	team = server->player[player].team;
@@ -263,10 +263,15 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					fogdiff = (server->player[i].map[index].fog > 0);
 					fogdiff = (oldfog ^ fogdiff);
 					if (fogdiff || (j == 0 && k == 0)) {
+						p = server->map_c.tile_data[index] & 0x20000;
+						if (server->map_c.tile_data[index] & 0x40000) 
+							messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, (p) ? 0x10 : 0x11, index, NULL);
 						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 						if (mode > 0)
 							unitAnnounce(owner, i, (!t) ? building : 0, index);
 					}
+
+						
 				}
 			else {
 				oldfog = (server->player[player].map[index].fog > 0);
@@ -278,6 +283,8 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
 					if (mode > 0)
 						unitAnnounce(owner, player, (!t) ? building : 0, index);
+					if (server->map_c.tile_data[index] & 0x40000) 
+						messageBufferPushDirect(player, player, MSG_SEND_MAP_TILE_ATTRIB, (p) ? 0x10 : 0x11, index, NULL);
 				}
 			}
 

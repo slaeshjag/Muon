@@ -173,8 +173,10 @@ void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
 		return;
 	if (unitValidateWall(message->arg[1], player) < 0)		/* D: */
 		return;
+	if (server->map_c.tile_data[message->arg[1]] & 0x10000)		/* Nope.jpg */
+		return;
 	
-	/* Congratulations great commander, you have passed the six trials! */
+	/* Congratulations great commander, you have passed the seven trials! */
 	/* Now, your building is being placed and you can enjoy the havoc it may cause */
 	unitSpawn(player, message->arg[0], message->arg[1] % server->w, message->arg[1] / server->w);
 
