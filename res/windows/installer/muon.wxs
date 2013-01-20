@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.3.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
+	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.4.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
 		<Package Description="Muon" InstallerVersion="200" Compressed="yes" />
 		<Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
 		<Directory Id="TARGETDIR" Name="SourceDir">
