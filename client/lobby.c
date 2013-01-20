@@ -85,6 +85,8 @@ void lobby_open() {
 	int i;
 	UI_PROPERTY_VALUE v={.i=0};
 	lobby_players_slider_team->set_prop(lobby_players_slider_team, UI_SLIDER_PROP_VALUE, v);
+	chat_checkbox_team->set_prop(chat_checkbox_team, UI_CHECKBOX_PROP_ACTIVATED, v);
+	chat_checkbox_team->enabled=0;
 	lobby_players_checkbox_ready->set_prop(lobby_players_checkbox_ready, UI_CHECKBOX_PROP_ACTIVATED, v);
 	lobby_players_checkbox_ready->enabled=0;
 	ui_listbox_clear(lobby_players_listbox);
@@ -154,6 +156,10 @@ void lobby_players_slider_team_changed(UI_WIDGET *widget, unsigned int type, UI_
 	UI_PROPERTY_VALUE v;
 	v=lobby_players_slider_team->get_prop(lobby_players_slider_team, UI_SLIDER_PROP_VALUE);
 	client_message_send(player_id, MSG_SEND_PLAYER_INFO, v.i, 0, NULL);
+	
+	if(!v.i)
+		chat_checkbox_team->set_prop(chat_checkbox_team, UI_CHECKBOX_PROP_ACTIVATED, v);
+	chat_checkbox_team->enabled=v.i;
 }
 
 void lobby_players_button_kick_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

@@ -154,7 +154,7 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			client_disconnect(msg->command);
 			break;
 		case MSG_RECV_CHAT:
-			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
+			chat_recv(msg->player_id, msg->arg_1, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_LEAVE:
 			chat_leave(msg->player_id);
@@ -260,7 +260,7 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 				lobby_progress(msg->player_id, msg->arg_2);
 			break;
 		case MSG_RECV_CHAT:
-			chat_recv(msg->player_id, (char *)payload, msg->arg_2);
+			chat_recv(msg->player_id, msg->arg_1, (char *)payload, msg->arg_2);
 			break;
 		case MSG_RECV_JOIN:
 			if(!payload)

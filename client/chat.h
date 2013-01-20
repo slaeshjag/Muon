@@ -22,6 +22,8 @@
 
 struct UI_PANE_LIST panelist_chat;
 UI_WIDGET *chat_listbox;
+UI_WIDGET *chat_hbox_team;
+UI_WIDGET *chat_checkbox_team;
 UI_WIDGET *chat_hbox;
 UI_WIDGET *chat_entry;
 UI_WIDGET *chat_button_send;
@@ -39,7 +41,7 @@ void chat_indicator_show(struct UI_PANE_LIST *panelist);
 void chat_indicator_hide(struct UI_PANE_LIST *panelist);
 void chat_indicator_image_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
-void chat_recv(int player_id, char *buf, int len);
+void chat_recv(int player_id, unsigned int team, char *buf, int len);
 void chat_join(int player_id);
 void chat_leave(int player_id);
 void chat_defeated(int player_id);

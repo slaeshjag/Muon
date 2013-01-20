@@ -32,6 +32,11 @@ void chat_init() {
 	ui_vbox_add_child(panelist_chat.pane->root_widget, ui_widget_create_label(font_std, T("Chat")), 0);
 	chat_listbox=ui_widget_create_listbox(font_std);
 	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_listbox, 1);
+	chat_hbox_team=ui_widget_create_hbox();
+	chat_checkbox_team=ui_widget_create_checkbox();
+	ui_hbox_add_child(chat_hbox_team, chat_checkbox_team, 0);
+	ui_hbox_add_child(chat_hbox_team, ui_widget_create_label(font_std, T("Send to team")), 0);
+	ui_vbox_add_child(panelist_chat.pane->root_widget, chat_hbox_team, 0);
 	chat_hbox=ui_widget_create_hbox();
 	chat_button_send=ui_widget_create_button_text(font_std, T("Send"));
 	chat_entry=ui_widget_create_entry(font_std);
@@ -136,21 +141,24 @@ void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
 		return;
 	UI_PROPERTY_VALUE v;
+	v=chat_checkbox_team->get_prop(chat_checkbox_team, UI_CHECKBOX_PROP_ACTIVATED);
+	unsigned int team=v.i?player[player_id].team:0;
 	v=chat_entry->get_prop(chat_entry, UI_ENTRY_PROP_TEXT);
 	if(strlen(v.p)==0)
 		return;
-	client_message_send(player_id, MSG_SEND_CHAT, 0, strlen(v.p), v.p);
+	client_message_send(player_id, MSG_SEND_CHAT, team, strlen(v.p), v.p);
 	v.p="";
 	chat_entry->set_prop(chat_entry, UI_ENTRY_PROP_TEXT, v);
 }
 
-void chat_recv(int player_id, char *buf, int len) {
+void chat_recv(int player_id, unsigned int team, char *buf, int len) {
 	//buf must be at least one byte larger than len!
 	char *chatmsg;
 	if(!(chatmsg=malloc(len+36)))
 		return;
 	buf[len]=0;
-	sprintf(chatmsg, "<%s> %s\n", player[player_id].name, buf);
+	char *format=team?"[%s] %s\n":"<%s> %s\n";
+	sprintf(chatmsg, format, player[player_id].name, buf);
 	ui_listbox_add(chat_listbox, chatmsg);
 	ui_listbox_scroll(chat_listbox, -1);
 	free(chatmsg);
