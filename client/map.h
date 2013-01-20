@@ -88,6 +88,7 @@ void map_select_building(int index);
 void map_select_nothing();
 int map_selected_building();
 int map_selected_index();
+int map_selected_owner();
 void map_clear_fow();
 
 void map_flare_add(int index, int player, unsigned int duration, unsigned int radius);

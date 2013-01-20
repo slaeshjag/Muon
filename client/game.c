@@ -471,7 +471,7 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 void game_view_draw() {
 	view_background_draw();
 	int selected=map_selected_building();
-	if((building_place>-1||selected==BUILDING_PYLON||selected==BUILDING_GENERATOR))
+	if((building_place>-1||((selected==BUILDING_PYLON||selected==BUILDING_GENERATOR)&&map_selected_owner()==player_id)))
 		map_draw(1);
 	else
 		map_draw(0);

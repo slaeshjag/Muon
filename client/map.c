@@ -36,6 +36,7 @@ void map_init(char *filename) {
 	
 	map_selected.border=d_render_line_new(4, 1);
 	map_selected.index=-1;
+	map_selected.owner=-1;
 	map_selected.building=0;
 	map_selected.circle=NULL;
 	
@@ -267,14 +268,17 @@ unsigned int map_set_tile_attributes(int index, int attrib) {
 
 void map_select_building(int index) {
 	map_selected.index=index;
-	int selected_building=map->layer[map->layers-2].tilemap->data[index]&0xFFFF;
-	selected_building-=(player_id+1)*8-1;
-	if(selected_building<0||selected_building>7) {
-		selected_building=0;
+	int selected_building=(map->layer[map->layers-2].tilemap->data[index]&0xFFFF);
+	map_selected.owner=selected_building/8-1;
+	map_selected.building=selected_building%8+1;
+	
+	if(map_selected.owner<0||map_selected.owner>3) {
+		map_selected.building=0;
 		map_selected.index=-1;
+		map_selected.owner=-1;
 	}
-	map_selected.building=selected_building;
-	if(selected_building&&building[selected_building].range) {
+	
+	if(map_selected.building&&building[map_selected.building].range) {
 		map_selected.circle=d_render_circle_new(32, 1);
 		int w=map->layer[map->layers-2].tilemap->w;
 		//int h=map->layer[map->layers-2].tilemap->h;
@@ -282,7 +286,7 @@ void map_select_building(int index) {
 		int tile_h=map->layer[map->layers-2].tile_h;
 		int x=index%w;
 		int y=index/w;
-		d_render_circle_move(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
+		d_render_circle_move(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[map_selected.building].range*tile_w);
 	} else
 		map_selected.circle=d_render_circle_free(map_selected.circle);
 	game_update_building_status();
@@ -291,6 +295,7 @@ void map_select_building(int index) {
 void map_select_nothing() {
 	map_selected.building=0;
 	map_selected.index=-1;
+	map_selected.owner=-1;
 	game_update_building_status();
 }
 
@@ -300,6 +305,10 @@ int map_selected_building() {
 
 int map_selected_index() {
 	return map_selected.index;
+}
+
+int map_selected_owner() {
+	return map_selected.owner;
 }
 
 void map_clear_fow() {
@@ -402,7 +411,7 @@ void map_draw(int draw_powergrid) {
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
-		d_render_tint(255*(!(player_id%3)), 255*(player_id>1), 255*(player_id==1), 255);
+		d_render_tint(255*(!(map_selected.owner%3)), 255*(map_selected.owner>1), 255*(map_selected.owner==1), 255);
 		if(map_selected.circle)
 			d_render_circle_draw(map_selected.circle);
 		d_render_offset(map->cam_x-x, map->cam_y-y);
