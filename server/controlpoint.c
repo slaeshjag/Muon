@@ -223,7 +223,7 @@ void controlpointDelayLoop(int msec, SERVER_UNIT *unit) {
 
 void controlpointRadarEnd(int player) {
 	int index_dst = server->player[player].cp.radar_pos;
-	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, -1 * unitLOS(UNIT_DEF_RADAR));
+	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, -1 * unitRange(UNIT_DEF_RADAR));
 
 	return;
 }
