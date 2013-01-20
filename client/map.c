@@ -269,8 +269,10 @@ void map_select_building(int index) {
 	map_selected.index=index;
 	int selected_building=map->layer[map->layers-2].tilemap->data[index]&0xFFFF;
 	selected_building-=(player_id+1)*8-1;
-	if(selected_building<0||selected_building>7)
+	if(selected_building<0||selected_building>7) {
 		selected_building=0;
+		map_selected.index=-1;
+	}
 	map_selected.building=selected_building;
 	if(selected_building&&building[selected_building].range) {
 		map_selected.circle=d_render_circle_new(32, 1);
@@ -283,11 +285,12 @@ void map_select_building(int index) {
 		d_render_circle_move(map_selected.circle, x*tile_w+tile_w/2, y*tile_h+tile_h/2, building[selected_building].range*tile_w);
 	} else
 		map_selected.circle=d_render_circle_free(map_selected.circle);
+	game_update_building_status();
 }
 
 void map_select_nothing() {
 	map_selected.building=0;
-	map_selected.index=0;
+	map_selected.index=-1;
 	game_update_building_status();
 }
 

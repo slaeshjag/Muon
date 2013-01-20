@@ -219,10 +219,10 @@ void ui_event_global_remove(void (*handler)(UI_WIDGET *, unsigned int, UI_EVENT 
 
 void ui_event_global_send(unsigned int type, UI_EVENT *e) {
 	ui_event_global_removed=0;
-	struct UI_EVENT_HANDLER_LIST **h;
-	for(h=&ui_event_global_handlers; *h; h=&((*h)->next))
-		if((type&(*h)->mask)==type) {
-			(*h)->handler(NULL, type&(*h)->mask, e);
+	struct UI_EVENT_HANDLER_LIST *h;
+	for(h=ui_event_global_handlers; h; h=h->next)
+		if((type&h->mask)==type) {
+			h->handler(NULL, type&h->mask, e);
 			if(ui_event_global_removed)
 				break;
 		}

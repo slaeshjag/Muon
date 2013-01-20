@@ -33,8 +33,15 @@ UI_WIDGET *game_sidebar_minimap;
 UI_WIDGET *game_sidebar_button_build[5];
 UI_WIDGET *game_sidebar_label_build[5];
 UI_WIDGET *game_sidebar_progress_build;
-UI_WIDGET *game_sidebar_progress_shield;
-UI_WIDGET *game_sidebar_progress_health;
+
+struct {
+	UI_WIDGET *spacer;
+	UI_WIDGET *label_name;
+	UI_WIDGET *label_shield;
+	UI_WIDGET *progress_shield;
+	UI_WIDGET *label_health;
+	UI_WIDGET *progress_health;
+} game_sidebar_status;
 
 struct UI_PANE_LIST panelist_game_specialbar;
 UI_WIDGET *game_specialbar_button_build[3];
@@ -46,6 +53,7 @@ int building_cancel;
 int ability_place;
 
 struct BUILDING {
+	const char *name;
 	int range;
 } building[16];
 

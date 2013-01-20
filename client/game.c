@@ -30,6 +30,16 @@ void game_view_init() {
 	building_place=-1;
 	ability_place=0;
 	
+	building[0].name="";
+	building[1].name=T("Generator");
+	building[2].name=T("Scout");
+	building[3].name=T("Attacker");
+	building[4].name=T("Pylon");
+	building[5].name=T("Wall");
+	building[6].name=T("Buildsite");
+	building[7].name=T("Missile silo");
+	building[8].name=T("Radar");
+	
 	game_attacklist_blink_semaphore=0;
 	/*Game sidebar*/
 	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
@@ -39,38 +49,38 @@ void game_view_init() {
 	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
 	game_sidebar_minimap->render=map_minimap_render;
 	game_sidebar_minimap->event_handler->add(game_sidebar_minimap, game_sidebar_minimap_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
-	if(!(platform.platform&DARNIT_PLATFORM_PANDORA))
+	//if(!(platform.platform&DARNIT_PLATFORM_PANDORA))
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Buildings:")), 0);
-	game_sidebar_label_build[0]=ui_widget_create_label(font_std, T("Scout"));
-	game_sidebar_label_build[1]=ui_widget_create_label(font_std, T("Attacker"));
-	game_sidebar_label_build[2]=ui_widget_create_label(font_std, T("Pylon"));
-	game_sidebar_label_build[3]=ui_widget_create_label(font_std, T("Wall"));
-	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Battle support"));
+	
 	int i;
+	for(i=0; i<4; i++)
+		game_sidebar_label_build[i]=ui_widget_create_label(font_std, building[i+BUILDING_SCOUT].name);
+	game_sidebar_label_build[4]=ui_widget_create_label(font_std, T("Battle support"));
+	
 	for(i=0; i<5; i++) {
 		game_sidebar_button_build[i]=ui_widget_create_button(game_sidebar_label_build[i]);
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_button_build[i], 0);
 		game_sidebar_button_build[i]->event_handler->add(game_sidebar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	}
 	game_sidebar_progress_build=ui_widget_create_progressbar(font_std);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
-	game_sidebar_progress_shield=ui_widget_create_progressbar(font_std);
-	game_sidebar_progress_health=ui_widget_create_progressbar(font_std);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Shields")), 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_shield, 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Health")), 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_progress_health, 0);
-	if(platform.platform&DARNIT_PLATFORM_PANDORA)
-		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
+	
+	game_sidebar_status.spacer=ui_widget_create_spacer();
+	game_sidebar_status.label_name=ui_widget_create_label(font_std, "name");
+	game_sidebar_status.progress_shield=ui_widget_create_progressbar(font_std);
+	game_sidebar_status.progress_health=ui_widget_create_progressbar(font_std);
+	game_sidebar_status.label_shield=ui_widget_create_label(font_std, T("Shields"));
+	game_sidebar_status.label_health=ui_widget_create_label(font_std, T("Health"));
+	
+	/*if(platform.platform&DARNIT_PLATFORM_PANDORA)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);*/
 	
 	/*Special buildings for control points*/
 	panelist_game_specialbar.pane=ui_pane_create(config.screen_w-SIDEBAR_WIDTH*2, game_sidebar_button_build[4]->y-64, SIDEBAR_WIDTH, 128, ui_widget_create_vbox());
 	panelist_game_specialbar.next=&panelist_game_abilitybar;
-	game_specialbar_label_build[0]=ui_widget_create_label(font_std, T("Buildsite"));
-	game_specialbar_label_build[1]=ui_widget_create_label(font_std, T("Missile silo"));
-	game_specialbar_label_build[2]=ui_widget_create_label(font_std, T("Radar"));
+	
 	for(i=0; i<3; i++) {
+		game_specialbar_label_build[i]=ui_widget_create_label(font_std, building[i+BUILDING_BUILDSITE].name);
 		game_specialbar_button_build[i]=ui_widget_create_button(game_specialbar_label_build[i]);
 		ui_vbox_add_child(panelist_game_specialbar.pane->root_widget, game_specialbar_button_build[i], 0);
 		game_specialbar_button_build[i]->event_handler->add(game_specialbar_button_build[i], game_sidebar_button_build_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
@@ -277,7 +287,6 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		} else if(!game_ability_place(map_offset)) {
 			//status selected clicked building, etc
 			map_select_building(map_offset);
-			game_update_building_status();
 		}
 	}
 }
@@ -287,12 +296,29 @@ void game_view_mouse_release(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 }
 
 void game_update_building_status() {
-	int map_offset=map_selected.index;
+	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_health);
+	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_health);
+	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield);
+	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_shield);
+	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_name);
+	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer);
+	if(map_selected_index()<0)
+		return;
+	
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer, 1);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_name, 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_shield, 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield, 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_health, 0);
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_health, 0);
 	UI_PROPERTY_VALUE v;
-	v.i=map_get_building_shield(map_offset);
-	game_sidebar_progress_shield->set_prop(game_sidebar_progress_shield, UI_PROGRESSBAR_PROP_PROGRESS, v);
-	v.i=map_get_building_health(map_offset);
-	game_sidebar_progress_health->set_prop(game_sidebar_progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
+	v.p=(void *)building[map_selected_building()].name;
+	
+	game_sidebar_status.label_name->set_prop(game_sidebar_status.label_name, UI_LABEL_PROP_TEXT, v);
+	v.i=map_get_building_shield(map_selected_index());
+	game_sidebar_status.progress_shield->set_prop(game_sidebar_status.progress_shield, UI_PROGRESSBAR_PROP_PROGRESS, v);
+	v.i=map_get_building_health(map_selected_index());
+	game_sidebar_status.progress_health->set_prop(game_sidebar_status.progress_health, UI_PROGRESSBAR_PROP_PROGRESS, v);
 }
 
 void game_view_scroll_to(int x, int y) {

@@ -57,6 +57,7 @@ struct MAP_SELECTED {
 	DARNIT_CIRCLE *circle;
 	int index;
 	int building;
+	int owner;
 } map_selected;
 
 struct MAP_FLARE_LIST {
