@@ -43,6 +43,7 @@ UI_WIDGET *game_specialbar_label_build[3];
 int building_place;
 int building_ready;
 int building_cancel;
+int ability_place;
 
 struct BUILDING {
 	int range;
@@ -75,11 +76,13 @@ void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void game_view_mouse_release(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void game_update_building_status();
 void game_view_scroll_to(int x, int y);
 void game_set_building_progress(int building, int progress);
 void game_reset_building_progress();
 void game_set_building_ready(int building);
+int game_ability_place(int index);
 
 void game_attacklist_lines_recalculate();
 void game_attacklist_add(int index);

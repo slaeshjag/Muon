@@ -28,6 +28,7 @@
 
 void game_view_init() {
 	building_place=-1;
+	ability_place=0;
 	
 	game_attacklist_blink_semaphore=0;
 	/*Game sidebar*/
@@ -107,34 +108,32 @@ void game_view_init() {
 	ability[2].ready=-1;
 	for(i=0; i<3; i++)
 		ui_vbox_add_child(panelist_game_abilitybar.pane->root_widget, ability[i].button, 0);
+	
+	ui_event_global_add(game_view_mouse_release, UI_EVENT_TYPE_MOUSE_RELEASE);
 }
 
 void game_abilitybar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	//TODO: clean up
-	if(widget==ability[0].button) {
-		if(building_place==PLACE_FLARE)
-			building_place=-1;
-		else
-			building_place=PLACE_FLARE;
-	} else if(widget==ability[1].button) {
-		if(building_place==PLACE_NUKE)
-			building_place=-1;
-		else
-			building_place=PLACE_NUKE;
-	} else if(widget==ability[2].button) {
-		if(building_place==PLACE_RADAR)
-			building_place=-1;
-		else
-			building_place=PLACE_RADAR;
-	}
+	int i;
+	for(i=0; i<3; i++)
+		if(widget==ability[i].button) {
+			building_place=building_place==PLACE_FLARE-i?-1:PLACE_FLARE-i;
+			break;
+		}
+	
 	ui_selected_widget=NULL;
 }
 
 void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	int x=e->mouse->x-widget->x;
-	int y=e->mouse->y-widget->y;
-	d_map_camera_move(map, (map_w*x/widget->w)-platform.screen_w/2, (map_h*y/widget->h)-platform.screen_h/2);
-	map_minimap_update_viewport();
+	int x=(map_w*(e->mouse->x-widget->x)/widget->w);
+	int y=(map_h*(e->mouse->y-widget->y)/widget->h);
+	int map_offset=(y/map->layer->tile_h)*map->layer->tilemap->w+(x/map->layer->tile_w)%map->layer->tilemap->w;
+	x-=platform.screen_w/2;
+	y-=platform.screen_h/2;
+	ability_place|=game_ability_place(map_offset);
+	if(!ability_place) {
+		d_map_camera_move(map, x, y);
+		map_minimap_update_viewport();
+	}
 }
 
 /* building_ready values:
@@ -275,21 +274,16 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		if(building_place>-1) {
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, building_place, map_offset, NULL);
 			building_place=-1;
-		} else if(building_place==PLACE_FLARE) {
-			client_message_send(player_id, MSG_SEND_SET_FLARE, 0, map_offset, NULL);
-			building_place=-1;
-		} else if(building_place==PLACE_NUKE) {
-			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_CLUSTERBOMB, map_offset, NULL);
-			building_place=-1;
-		} else if(building_place==PLACE_RADAR) {
-			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_RADAR, map_offset, NULL);
-			building_place=-1;
-		} else {
+		} else if(!game_ability_place(map_offset)) {
 			//status selected clicked building, etc
 			map_select_building(map_offset);
 			game_update_building_status();
 		}
 	}
+}
+
+void game_view_mouse_release(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	ability_place=0;
 }
 
 void game_update_building_status() {
@@ -326,6 +320,24 @@ void game_reset_building_progress() {
 
 void game_set_building_ready(int building) {
 	building_ready = building;
+}
+
+int game_ability_place(int index) {
+	switch(building_place) {
+		case PLACE_FLARE:
+			client_message_send(player_id, MSG_SEND_SET_FLARE, 0, index, NULL);
+			break;
+		case PLACE_NUKE:
+			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_CLUSTERBOMB, index, NULL);
+			break;
+		case PLACE_RADAR:
+			client_message_send(player_id, MSG_SEND_CP_DEPLOY, BUILDING_RADAR, index, NULL);
+			break;
+		default:
+			return 0;
+	}
+	building_place=-1;
+	return 1;
 }
 
 void game_attacklist_lines_recalculate() {
