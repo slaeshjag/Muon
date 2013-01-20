@@ -119,6 +119,7 @@ PLAYER *playerDestroy(PLAYER *player, int players);
 void playerDisconnect(unsigned int player);
 void playerDisconnectKill(unsigned int player);
 void playerCheckIdentify();
+void playerBroadcastTeam(int team, unsigned int player, unsigned int command, unsigned int arg1, unsigned int arg2, void *data);
 void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned int arg1, unsigned int arg2, void *data);
 int playerSlot();
 int playerCalcLOS(unsigned int player, int x, int y, int mode);
