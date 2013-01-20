@@ -107,6 +107,21 @@ PLAYER *playerDestroy(PLAYER *player, int players) {
 }
 
 
+void playerBroadcastTeam(int team, unsigned int player, unsigned int command, unsigned int arg1, unsigned int arg2, void *data) {
+	int i;
+
+	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status < PLAYER_IN_LOBBY)
+			continue;
+		if (server->player[i].team != team)
+			continue;
+		messageBufferPushDirect(i, player, command, arg1, arg2, data);
+	}
+
+	return;
+}
+
+
 void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned int arg1, unsigned int arg2, void *data) {
 	MESSAGE msg;
 	int i;

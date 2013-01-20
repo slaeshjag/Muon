@@ -87,8 +87,11 @@ void messageHandlerChat(unsigned int player, MESSAGE *message) {
 		messageBufferPushDirect(player, player, MSG_SEND_ILLEGAL_COMMAND, 0, 0, NULL);
 		return;
 	}
-
-	playerMessageBroadcast(player, MSG_SEND_CHAT, 0, message->arg[1], message->extra);
+	
+	if (!message->arg[0])
+		playerMessageBroadcast(player, MSG_SEND_CHAT, 0, message->arg[1], message->extra);
+	else
+		playerBroadcastTeam((int) message->arg[0] - 1, player, MSG_SEND_CHAT, message->arg[0], message->arg[1], message->extra);
 
 	return;
 }
