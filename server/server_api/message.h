@@ -185,7 +185,7 @@ typedef struct {
 /* No arguments. No data. Not used at the moment, but must be send when the server sends a PING. */
 #define	MSG_SEND_PONG			0
 
-/* arg_1 is the team to send to. -1 is everyone. Message must have data (the message that is send.) */
+/* arg_1 is the team to send to. 0 is everyone. Message must have data (the message that is send.) */
 #define	MSG_SEND_CHAT			1
 
 
