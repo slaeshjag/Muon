@@ -82,9 +82,9 @@ UI_WIDGET *ui_widget_create_imageview_file(const char *filename, int w, int h, i
 	UI_WIDGET *widget;
 	widget=ui_widget_create_imageview();
 	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
-	int tw, th;
+	/*int tw, th;
 	for(tw=1; w<=tw; tw<<=1);
-	for(th=1; h<=th; th<<=1);
+	for(th=1; h<=th; th<<=1);*/
 	p->tilesheet=d_render_tilesheet_load(filename, w, h, pixel_format);
 	p->tile=d_render_tile_new(1, p->tilesheet);
 	p->image_w=w;
@@ -134,7 +134,7 @@ void ui_imageview_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	d_render_line_move(p->border, 2, x, y, x, y+h);
 	d_render_line_move(p->border, 3, x+w, y, x+w, y+h);
 	
-	d_render_tile_move(p->tile, 0, x, y);
+	d_render_tile_move(p->tile, 0, x+w/2-p->image_w/2, y+h/2-p->image_h/2);
 	d_render_tile_tilesheet_coord_set(p->tile, 0, 0, 0, p->image_w, p->image_h);
 }
 
