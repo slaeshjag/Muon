@@ -41,6 +41,5 @@ void ui_messagebox(DARNIT_FONT *font, const char *text) {
 }
 
 void ui_messagebox_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	//ui_pane_destroy(ui_panelist_dialogue.pane);
 	ui_panelist_dialogue.pane=NULL;
 }

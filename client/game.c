@@ -377,7 +377,6 @@ int game_ability_place(int index) {
 }
 
 void game_attacklist_lines_recalculate() {
-	//TODO: split lines out to array so we can handle different colours for different players
 	struct GAME_ATTACKLIST *l;
 	int i, x1, x2, y1, y2;
 	int map_wt=map->layer[map->layers-2].tilemap->w;
@@ -484,7 +483,7 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 		d_render_tint(255, 255, 255, 255);
 	else
 		d_render_tint(95, 95, 95, 255);
-		//d_render_tint(100+ability[i].ready, 100+ability[i].ready, 100+ability[i].ready, 255);
+	
 	d_render_tile_draw(p->tile, 1);
 	d_render_tint(255, 255, 255, 255);
 	if(ability[i].ready>=0&&ability[i].ready<100) {
@@ -516,8 +515,6 @@ void game_view_draw() {
 		game_attacklist_blink_semaphore=0;
 	else
 		game_attacklist_blink_semaphore++;
-		
-	//d_render_tile_blit(minimap, 0, 128, 32);
 }
 
 void game_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

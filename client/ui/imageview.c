@@ -82,9 +82,6 @@ UI_WIDGET *ui_widget_create_imageview_file(const char *filename, int w, int h, i
 	UI_WIDGET *widget;
 	widget=ui_widget_create_imageview();
 	struct UI_IMAGEVIEW_PROPERTIES *p=widget->properties;
-	/*int tw, th;
-	for(tw=1; w<=tw; tw<<=1);
-	for(th=1; h<=th; th<<=1);*/
 	p->tilesheet=d_render_tilesheet_load(filename, w, h, pixel_format);
 	p->tile=d_render_tile_new(1, p->tilesheet);
 	p->image_w=w;

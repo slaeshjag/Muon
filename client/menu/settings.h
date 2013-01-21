@@ -38,7 +38,6 @@ UI_WIDGET *settings_monitor_entry_h;
 UI_WIDGET *settings_monitor_checkbox_fullscreen;
 UI_WIDGET *settings_monitor_checkbox_alpha;
 UI_WIDGET *settings_monitor_slider_plasma;
-//UI_WIDGET *settings_monitor_button_cancel;
 UI_WIDGET *settings_monitor_button_ok;
 
 void menu_settings_init();

@@ -101,7 +101,6 @@ void client_check_incoming() {
 			s=d_socket_recv_try(sock, msg_recv_payload, msg_recv.arg_2);
 			if(s==0)
 				continue;
-				//break;
 			if(s==-1) {
 				client_disconnect(MSG_SERVER_DISCONNECT);
 				return;
@@ -115,7 +114,6 @@ void client_check_incoming() {
 			if(s==0) {
 				msg_recv.command = 0;
 				continue;
-				//break;
 			}
 			if(s==-1) {
 				client_disconnect(MSG_SERVER_DISCONNECT);
@@ -179,7 +177,6 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 					map_set_home(msg->arg_2);
 					game_view_scroll_to(home_x, home_y);
 				}
-				//printf("cancel build queue!\n");
 				game_reset_building_progress();
 				if(msg->arg_1>=BUILDING_BUILDSITE)
 					panelist_game_sidebar.next=&panelist_game_abilitybar;
@@ -204,7 +201,6 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_CP_TIMER: {
 			int i=msg->arg_1-BUILDING_CLUSTERBOMB+1;
 			char s[5];
-			//printf("%s %i%% ready\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar", msg->arg_2);
 			ability[i].ready=msg->arg_2;
 			d_text_surface_reset(ability[i].text);
 			sprintf(s, "%i%%", ability[i].ready);
@@ -216,7 +212,6 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		}
 		case MSG_RECV_CP_CLEAR:
-			//printf("%s cleared\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar");
 			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].ready=-1;
 			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=0;
 			break;
@@ -291,8 +286,6 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			}
 			filesize_bytes=msg->arg_1;
 			filename=malloc(5+msg->arg_2+1);
-			//memcpy(filename, payload, msg->arg_2);
-			//filename[msg->arg_2]=0;
 			payload[msg->arg_2]=0;
 			sprintf(filename, "%s/%s", mapdir, payload);
 			f=d_file_open(filename, "wb");
@@ -334,7 +327,6 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	player_id=msg->player_id;
 	players=msg->arg_2;
-	//player_names=(char *)calloc(players, 32);
 	player=calloc(players, sizeof(PLAYER));
 	config.player_name[31]=0;
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(config.player_name), config.player_name);

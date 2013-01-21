@@ -481,8 +481,5 @@ void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
 					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
 			}
 	
-	/*UI_PROPERTY_VALUE v;
-	v=game_sidebar_minimap->get_prop(game_sidebar_minimap, UI_IMAGEVIEW_PROP_TILESHEET);
-	d_render_tilesheet_update(v.p, 0, 0, SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, minimap_data);*/
 	d_render_tilesheet_update(ts, 0, 0, w, h, minimap_data);
 }
