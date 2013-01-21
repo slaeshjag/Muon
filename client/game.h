@@ -51,6 +51,7 @@ int building_place;
 int building_ready;
 int building_cancel;
 int ability_place;
+int attacker_target;
 
 struct BUILDING {
 	const char *name;
@@ -109,6 +110,7 @@ void game_attacklist_target(int index, int target);
 void game_abilitybar_icon_render(UI_WIDGET *widget);
 
 void game_view_draw();
-void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void game_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void game_mouse_target_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif

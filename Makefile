@@ -18,9 +18,9 @@ install:
 	@install -m 0755 -D muon-server $(PREFIX)/bin/muon-server
 	@echo " [INST] muon resources"
 	@install -m 0744 -D res/FreeMonoBold.ttf $(DATAPATH)/res/FreeMonoBold.ttf
-	@install -m 0744 -D res/FreeMono.ttf $(DATAPATH)/res/FreeMono.ttf
 	
 	@install -m 0744 -D res/mouse.png $(DATAPATH)/res/mouse.png
+	@install -m 0744 -D res/target.png $(DATAPATH)/res/target.png
 	@install -m 0744 -D res/icon.png $(DATAPATH)/res/icon.png
 	
 	@install -m 0744 -D res/chat.png $(DATAPATH)/res/chat.png

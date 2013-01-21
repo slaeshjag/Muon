@@ -48,6 +48,7 @@
 							<File Id="NUKE.PNG" Name="nuke.png" Source="build\res\nuke.png" />
 							<File Id="RADAR.PNG" Name="radar.png" Source="build\res\radar.png" />
 							<File Id="MOUSE.PNG" Name="mouse.png" Source="build\res\mouse.png" />
+							<File Id="TARGET.PNG" Name="target.png" Source="build\res\target.png" />
 							<File Id="ICON.PNG" Name="icon.png" Source="build\res\icon.png" />
 						</Component>
 						
