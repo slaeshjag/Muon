@@ -60,6 +60,7 @@ struct BUILDING {
 struct ABILITY {
 	UI_WIDGET *button;
 	DARNIT_TILESHEET *icon;
+	DARNIT_TEXT_SURFACE *text;
 	const char *name;
 	void (*action)();
 	int ready;

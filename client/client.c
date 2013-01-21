@@ -201,14 +201,22 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_MAP_FLARE:
 			map_flare_add(msg->arg_2, msg->player_id, 10000, 40);
 			break;
-		case MSG_RECV_CP_TIMER:
-			printf("%s %i%% ready\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar", msg->arg_2);
-			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].ready=msg->arg_2;
+		case MSG_RECV_CP_TIMER: {
+			int i=msg->arg_1-BUILDING_CLUSTERBOMB+1;
+			char s[5];
+			//printf("%s %i%% ready\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar", msg->arg_2);
+			ability[i].ready=msg->arg_2;
+			d_text_surface_reset(ability[i].text);
+			sprintf(s, "%i%%", ability[i].ready);
+			d_text_surface_offset_next_set(ability[i].text, ability[i].button->w/2-d_font_string_w(font_std, s)/2);
+			d_text_surface_string_append(ability[i].text, s);
+			
 			if(msg->arg_2==100)
-				ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=1;
+				ability[i].button->enabled=1;
 			break;
+		}
 		case MSG_RECV_CP_CLEAR:
-			printf("%s cleared\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar");
+			//printf("%s cleared\n", msg->arg_1==BUILDING_CLUSTERBOMB?"Clusterbomb":"Radar");
 			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].ready=-1;
 			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=0;
 			break;

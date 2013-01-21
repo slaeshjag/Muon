@@ -116,8 +116,10 @@ void game_view_init() {
 	ability[2].button->enabled=0;
 	ability[2].button->event_handler->add(ability[2].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[2].ready=-1;
-	for(i=0; i<3; i++)
+	for(i=0; i<3; i++) {
 		ui_vbox_add_child(panelist_game_abilitybar.pane->root_widget, ability[i].button, 0);
+		ability[i].text=d_text_surface_new(font_std, 4, 64, ability[i].button->x, ability[i].button->y+24);
+	}
 	
 	ui_event_global_add(game_view_mouse_release, UI_EVENT_TYPE_MOUSE_RELEASE);
 }
@@ -478,6 +480,11 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 	d_render_tile_draw(p->tile, 1);
 	d_render_tint(r, g, b, a);
 	d_render_line_draw(p->border, 4);
+	if(ability[i].ready>=0&&ability[i].ready<100) {
+		d_render_blend_enable();
+		d_text_surface_draw(ability[i].text);
+		d_render_blend_disable();
+	}
 }
 
 void game_view_draw() {
