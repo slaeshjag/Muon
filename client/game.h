@@ -69,11 +69,17 @@ struct UI_PANE_LIST panelist_game_abilitybar;
 struct GAME_ATTACKLIST {
 	int index;
 	int target;
+	int owner;
 	struct GAME_ATTACKLIST *next;
 } *game_attacklist;
 
-int game_attacklist_length;
-DARNIT_LINE *game_attacklist_lines;
+struct {
+	int length;
+	DARNIT_LINE *lines;
+} game_attacklist_render[4];
+
+//int game_attacklist_length;
+//DARNIT_LINE *game_attacklist_lines;
 unsigned int game_attacklist_blink_semaphore;
 
 void game_view_init();

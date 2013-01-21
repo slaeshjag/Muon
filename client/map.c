@@ -44,8 +44,10 @@ void map_init(char *filename) {
 	map_grid_chunks=0;
 	
 	game_attacklist=NULL;
-	game_attacklist_lines=NULL;
-	game_attacklist_length=0;
+	for(i=0; i<4; i++) {
+		game_attacklist_render[i].length=0;
+		game_attacklist_render[i].lines=NULL;
+	}
 	
 	map=d_map_load(filename);
 	map_w=map->layer->tilemap->w*map->layer->tile_w;

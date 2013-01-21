@@ -345,7 +345,7 @@ void game_reset_building_progress() {
 }
 
 void game_set_building_ready(int building) {
-	building_ready = building;
+	building_ready=building;
 }
 
 int game_ability_place(int index) {
@@ -367,21 +367,27 @@ int game_ability_place(int index) {
 }
 
 void game_attacklist_lines_recalculate() {
+	//TODO: split lines out to array so we can handle different colours for different players
 	struct GAME_ATTACKLIST *l;
 	int i, x1, x2, y1, y2;
 	int map_wt=map->layer[map->layers-2].tilemap->w;
 	//int map_ht=map->layer[map->layers-2].tilemap->h;
 	int tw=map->layer[map->layers-2].tile_w;
 	int th=map->layer[map->layers-2].tile_h;
-	d_render_line_free(game_attacklist_lines);
-	game_attacklist_lines=d_render_line_new(game_attacklist_length, 1);
+	for(i=0; i<4; i++) {
+		d_render_line_free(game_attacklist_render[i].lines);
+		game_attacklist_render[i].lines=d_render_line_new(game_attacklist_render[i].length, 1);
+	}
 	
-	for(l=game_attacklist, i=0; l; l=l->next, i++) {
+	int j[4]={0, 0, 0, 0};
+	
+	for(l=game_attacklist; l; l=l->next) {
 		x1=l->index%map_wt*tw+tw/2;
 		y1=l->index/map_wt*th+th/2;
 		x2=l->target%map_wt*tw+tw/2;
 		y2=l->target/map_wt*th+th/2;
-		d_render_line_move(game_attacklist_lines, i, x1, y1, x2, y2);
+		d_render_line_move(game_attacklist_render[l->owner].lines, j[l->owner], x1, y1, x2, y2);
+		j[l->owner]++;
 	}
 }
 
@@ -393,8 +399,9 @@ void game_attacklist_add(int index) {
 	ll=*l;
 	ll->index=index;
 	ll->target=index;
+	ll->owner=(map->layer[map->layers-2].tilemap->data[index]&0xFFFF)/8-1;
 	ll->next=NULL;
-	game_attacklist_length++;
+	game_attacklist_render[ll->owner].length++;
 	game_attacklist_lines_recalculate();
 }
 
@@ -403,9 +410,10 @@ void game_attacklist_remove(int index) {
 	for(l=&(game_attacklist); *l; l=&((*l)->next)) {
 		if((*l)->index==index) {
 			l_next=(*l)->next;
+			int owner=(*l)->owner;
 			free(*l);
 			*l=l_next;
-			game_attacklist_length--;
+			game_attacklist_render[owner].length--;
 			game_attacklist_lines_recalculate();
 			break;
 		}
@@ -414,13 +422,16 @@ void game_attacklist_remove(int index) {
 
 void game_attacklist_clear() {
 	struct GAME_ATTACKLIST *l, *next;
+	int i;
 	for(l=game_attacklist; l; l=next) {
 		next=l->next;
 		free(l);
 	}
 	game_attacklist=NULL;
-	game_attacklist_length=0;
-	game_attacklist_lines=d_render_line_free(game_attacklist_lines);
+	for(i=0; i<4; i++) {
+		game_attacklist_render[i].length=0;
+		game_attacklist_render[i].lines=d_render_line_free(game_attacklist_render[i].lines);
+	}
 }
 
 void game_attacklist_untarget(int target) {
@@ -463,6 +474,7 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 		d_render_tint(255, 255, 255, 255);
 	else
 		d_render_tint(127, 127, 127, 255);
+		//d_render_tint(100+ability[i].ready, 100+ability[i].ready, 100+ability[i].ready, 255);
 	d_render_tile_draw(p->tile, 1);
 	d_render_tint(r, g, b, a);
 	d_render_line_draw(p->border, 4);
@@ -476,14 +488,18 @@ void game_view_draw() {
 	else
 		map_draw(0);
 	
-	if(game_attacklist_blink_semaphore>30) {
-		d_render_offset(map->cam_x, map->cam_y);
-		d_render_line_draw(game_attacklist_lines, game_attacklist_length);
-		d_render_offset(0, 0);
-	}
-	if(game_attacklist_blink_semaphore>60)
+	int i=game_attacklist_blink_semaphore/16;
+	d_render_offset(map->cam_x, map->cam_y);
+	d_render_tint(255*(!(i%3)), 255*(i>1), 255*(i==1), 255);
+	if(game_attacklist_render[i].lines)
+		d_render_line_draw(game_attacklist_render[i].lines, game_attacklist_render[i].length);
+	d_render_offset(0, 0);
+	d_render_tint(255, 255, 255, 255);
+	
+	if(game_attacklist_blink_semaphore>=63)
 		game_attacklist_blink_semaphore=0;
-	game_attacklist_blink_semaphore++;
+	else
+		game_attacklist_blink_semaphore++;
 		
 	//d_render_tile_blit(minimap, 0, 128, 32);
 }
