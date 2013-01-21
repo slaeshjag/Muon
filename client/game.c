@@ -29,6 +29,7 @@
 void game_view_init() {
 	building_place=-1;
 	ability_place=0;
+	attacker_target=0;
 	
 	building[0].name="";
 	building[1].name=T("Generator");
@@ -286,9 +287,16 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		if(building_place>-1) {
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, building_place, map_offset, NULL);
 			building_place=-1;
+		} else if(attacker_target) {
+			client_message_send(player_id, MSG_SEND_SET_ATTACK, map_selected_index(), map_offset, NULL);
+			attacker_target=0;
 		} else if(!game_ability_place(map_offset)) {
 			//status selected clicked building, etc
-			map_select_building(map_offset);
+			int selected_building=map_selected_building();
+			if(map_offset==map_selected_index()&&map_selected_owner()==player_id&&(selected_building==BUILDING_ATTACKER||selected_building==BUILDING_SCOUT))
+				attacker_target=1;
+			else
+				map_select_building(map_offset);
 		}
 	}
 }
@@ -512,7 +520,7 @@ void game_view_draw() {
 	//d_render_tile_blit(minimap, 0, 128, 32);
 }
 
-void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+void game_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	unsigned char r, g, b, a;
 	d_render_tint_get(&r, &g, &b, &a);
 	d_render_tint(255, 255, 255, 255);
@@ -530,5 +538,18 @@ void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		d_render_offset(0, 0);
 	}
 	d_render_tint(r, g, b, a);
-	view_mouse_draw(widget, type, e);
+	if(attacker_target)
+		game_mouse_target_draw(widget, type, e);
+	/*else
+		view_mouse_draw(widget, type, e);*/
+}
+
+void game_mouse_target_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
+	d_render_blend_enable();
+	d_render_tile_blit(mouse_target_tilesheet, 0, e->mouse->x-16, e->mouse->y-16);
+	d_render_blend_disable();
+	d_render_tint(r, g, b, a);
 }
