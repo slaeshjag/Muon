@@ -290,6 +290,7 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 
 	for (i = 0; i < bombs; i++) {
 			do {
+				tx = ty = -1;
 				for (radius = 1; radius < unit_range[UNIT_DEF_CLUSTERBOMB]; radius++) {
 					/* drop the bomb at this distance from ground with 7/10 chance */
 					if (rand() % 10 < 7) {
@@ -310,14 +311,16 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 
 				}
 				/* if not dropped yet, just drop it for gods sake */
-				/* will be responsible for 0.7^range percent of the bombs,
+				/* will be responsible for (0.7^range * bombs) drops,
 				 * plus some stray ones. */
 				/* by this time we're desperate, so just do a loop which may
 				 * never terminate... */
-				do {
-					tx = rand() % (radius * 2 + 1) - radius;
-					ty = rand() % (radius * 2 + 1) - radius;
-				} while (controlpointClusterbombAlreadyUsed(tx, ty, i));
+				if (tx == -1 && ty == -1) {
+					do {
+						tx = rand() % (radius * 2 + 1) - radius;
+						ty = rand() % (radius * 2 + 1) - radius;
+					} while (controlpointClusterbombAlreadyUsed(tx, ty, i));
+				}
 
 				/* this is outside of the (circular) radius and thus not a valid
 				 * dropping point! */
