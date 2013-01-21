@@ -475,16 +475,17 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 	if(ability[i].ready==100)
 		d_render_tint(255, 255, 255, 255);
 	else
-		d_render_tint(127, 127, 127, 255);
+		d_render_tint(95, 95, 95, 255);
 		//d_render_tint(100+ability[i].ready, 100+ability[i].ready, 100+ability[i].ready, 255);
 	d_render_tile_draw(p->tile, 1);
-	d_render_tint(r, g, b, a);
-	d_render_line_draw(p->border, 4);
+	d_render_tint(255, 255, 255, 255);
 	if(ability[i].ready>=0&&ability[i].ready<100) {
 		d_render_blend_enable();
 		d_text_surface_draw(ability[i].text);
 		d_render_blend_disable();
 	}
+	d_render_tint(r, g, b, a);
+	d_render_line_draw(p->border, 4);
 }
 
 void game_view_draw() {
