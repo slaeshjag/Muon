@@ -51,8 +51,14 @@ void gameover_update_stats() {
 	int i;
 	if(gameover_statlabel) {
 		for(i=0; i<players; i++) {
-			if(!player[i].name[0])
+			if(!(gameover_statlabel[i].built&&gameover_statlabel[i].lost&&gameover_statlabel[i].destroyed&&gameover_statlabel[i].efficiency&&gameover_statlabel[i].score&&gameover_statlabel[i].name))
 				continue;
+			ui_vbox_remove_child(gameover_stats_vbox_stat[0], gameover_statlabel[i].built);
+			ui_vbox_remove_child(gameover_stats_vbox_stat[1], gameover_statlabel[i].lost);
+			ui_vbox_remove_child(gameover_stats_vbox_stat[2], gameover_statlabel[i].destroyed);
+			ui_vbox_remove_child(gameover_stats_vbox_stat[3], gameover_statlabel[i].efficiency);
+			ui_vbox_remove_child(gameover_stats_vbox_stat[4], gameover_statlabel[i].score);
+			ui_vbox_remove_child(gameover_stats_vbox_stat[5], gameover_statlabel[i].name);
 			gameover_statlabel[i].built->destroy(gameover_statlabel[i].built);
 			gameover_statlabel[i].lost->destroy(gameover_statlabel[i].lost);
 			gameover_statlabel[i].destroyed->destroy(gameover_statlabel[i].destroyed);

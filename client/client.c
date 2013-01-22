@@ -37,7 +37,8 @@ void client_connect_callback(int ret, void *data, void *socket) {
 	if(ret) {
 		free(player);
 		player=NULL;
-		game_state(GAME_STATE_MENU);
+		if(ret==-1)
+			game_state(GAME_STATE_MENU);
 		sock=d_socket_close(socket);
 		player_id=0;
 		if(!server_is_running())
@@ -106,7 +107,10 @@ void client_check_incoming() {
 				return;
 			}
 			if(client_message_handler)
-				client_message_handler(&msg_recv, msg_recv_payload);
+				if(client_message_handler(&msg_recv, msg_recv_payload)) {
+					chunk_size_time=UINT_MAX;
+					return;
+				}
 			msg_recv.command=0;
 		} else {
 			//download message
@@ -122,7 +126,10 @@ void client_check_incoming() {
 			client_message_convert_recv(&msg_recv);
 			//printf("message: 0x%x (%i, %i) to player %i\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2, msg_recv.player_id);
 			if(client_message_handler&&!(msg_recv.command&MSG_PAYLOAD_BIT))
-				client_message_handler(&msg_recv, NULL);
+				if(client_message_handler(&msg_recv, NULL)) {
+					chunk_size_time=UINT_MAX;
+					return;
+				}
 		}
 		chunk_got+=s;
 	}
@@ -145,7 +152,7 @@ void client_check_incoming() {
 	return;
 }
 
-void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
+int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 	switch(msg->command) {
 		PONG;
 		case MSG_RECV_KICKED:
@@ -241,11 +248,13 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_GAME_ENDED:
 			//ui_messagebox(font_std, T("Game over"));
 			game_state(GAME_STATE_GAME_OVER);
-			break;
+			recalc_map=0;
+			return -1;
 	}
+	return 0;
 }
 
-void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
+int client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 	static int filesize_bytes=0, downloaded_bytes=0;
 	static char *filename=NULL;
 	static DARNIT_FILE *f=NULL;
@@ -326,9 +335,10 @@ void client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 			building[msg->arg_1].range=msg->arg_2;
 			break;
 	}
+	return 0;
 }
 
-void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
+int client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	player_id=msg->player_id;
 	players=msg->arg_2;
 	player=calloc(players, sizeof(PLAYER));
@@ -338,6 +348,7 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	lobby_open();
 	if(!server_is_running())
 		server_admin_set(player_id);
+	return 0;
 }
 
 int client_init(char *host, int port) {
@@ -370,6 +381,6 @@ void client_disconnect(int cause) {
 			ui_messagebox(font_std, T("Lost connection to server."));
 			break;
 	}
-	client_connect_callback(-1, NULL, sock);
+	client_connect_callback(cause==MSG_RECV_GAME_ENDED?-2:-1, NULL, sock);
 	sock=NULL;
 }
