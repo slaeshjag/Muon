@@ -123,10 +123,10 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	if(v.i==-1)
 		return;
 	sprintf(buf, "%s/%s", mapdir, ui_listbox_get(multiplayer_host_listbox_maps, v.i));
-	serverStop();
-	if(!serverStart(buf, players, port, speed)) {
+	server_stop();
+	if(!server_start(buf, players, port, speed)) {
 		const char *error;
-		if((error=errorPop()))
+		if((error=server_error_pop()))
 			ui_messagebox(font_std, T(error));
 		return;
 	}
@@ -134,7 +134,7 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 		game_state(GAME_STATE_CONNECTING);
 	else {
 		ui_messagebox(font_std, T("Unable to connect to server."));
-		serverStop();
+		server_stop();
 	}
 }
 

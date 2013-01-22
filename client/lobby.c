@@ -92,7 +92,7 @@ void lobby_open() {
 	map_minimap_clear(v.p, lobby_map_imageview->w, lobby_map_imageview->h);
 	
 	ui_hbox_remove_child(lobby_players_hbox, lobby_players_button_kick);
-	if(!serverIsRunning())
+	if(!server_is_running())
 		ui_hbox_add_child(lobby_players_hbox, lobby_players_button_kick, 0);
 }
 

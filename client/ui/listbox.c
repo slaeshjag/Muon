@@ -131,7 +131,7 @@ int ui_listbox_index_of(UI_WIDGET *widget, const char *text) {
 
 void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
-	int text_h;//d_font_glyph_h(p->font)+2;
+	int text_h;
 	struct UI_LISTBOX_LIST *l, *ll;
 	int i=0;
 	for(l=p->list; l; l=l->next) {
@@ -161,16 +161,29 @@ void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 }
 
 void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
+	static int scroll_y=0;
 	if(!widget->enabled)
 		return;
-	struct UI_LISTBOX_PROPERTIES *p=widget->properties;
 	if(type==UI_EVENT_TYPE_MOUSE_SCROLL) {
 		p->scroll+=e->mouse->wheel;
 		p->scroll=p->scroll<0?0:p->scroll;
 		ui_listbox_scroll(widget, p->scroll);
 	} else if(e->mouse->x>=widget->x+widget->w-UI_PADDING*2&&e->mouse->x<widget->x+widget->w-UI_PADDING) {
-		if(type==UI_EVENT_TYPE_MOUSE_DOWN&&e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
-			int scroll=p->scroll_max*(e->mouse->y-widget->y)/(widget->h-UI_PADDING);
+		if(type==UI_EVENT_TYPE_MOUSE_PRESS) {
+			int sb_y1, sb_y2;
+			d_render_rect_get(p->scrollbar, 0, NULL, &sb_y1, NULL, &sb_y2);
+			printf("lol %i %i\n", sb_y1, sb_y2);
+			if(e->mouse->y<sb_y1||e->mouse->y>=sb_y2) {
+				int scroll=p->scroll_max*((sb_y2-sb_y1)/2)/(widget->h-UI_PADDING);
+				ui_listbox_scroll(widget, scroll);
+			} else {
+				scroll_y=e->mouse->y-sb_y1;
+			}
+		} else if(type==UI_EVENT_TYPE_MOUSE_DOWN&&e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
+			int sb_y1, sb_y2;
+			d_render_rect_get(p->scrollbar, 0, NULL, &sb_y1, NULL, &sb_y2);
+			int scroll=p->scroll_max*((sb_y2-sb_y1)/2+scroll_y)/(widget->h-UI_PADDING);
 			ui_listbox_scroll(widget, scroll);
 			return;
 		}
@@ -236,19 +249,7 @@ void ui_listbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 		p->offset=p->list;
 	
 	struct UI_LISTBOX_LIST *l=p->offset;
-	int item_y=y+2;//, text_h=d_font_glyph_h(p->font);
-	/*for(l=p->offset; l&&item_y+d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL)<y+h-2; l=l->next) {
-		if(l->surface)
-			d_text_surface_free(l->surface);
-		l->surface=d_text_surface_new(p->font, 128, w-UI_PADDING*2, x+UI_PADDING, item_y);
-		d_text_surface_string_append(l->surface, l->text);
-		item_y+=d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL);
-		printf("%s %i\n", l->text, item_y+d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL));
-	}
-	if(l&&l->next&&l->next->surface) {
-		d_text_surface_free(l->next->surface);
-		l->next->surface=NULL;
-	}*/
+	int item_y=y+2;
 	int i=p->scroll;
 	while(l) {
 		l->surface=d_text_surface_free(l->surface);
