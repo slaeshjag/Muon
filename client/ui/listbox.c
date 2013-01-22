@@ -189,7 +189,11 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			int sb_y1, sb_y2;
 			d_render_rect_get(p->scrollbar, 0, NULL, &sb_y1, NULL, &sb_y2);
 			int delta=e->mouse->y-(widget->y+UI_PADDING/2)-scroll_y;
-			int scroll=p->scroll_max*(delta<0?0:delta)/(widget->h-UI_PADDING-(sb_y2-sb_y1));
+			int scroll;
+			if((widget->h-UI_PADDING-(sb_y2-sb_y1))==0)
+				scroll=0;
+			else
+				scroll=p->scroll_max*(delta<0?0:delta)/(widget->h-UI_PADDING-(sb_y2-sb_y1));
 			ui_listbox_scroll(widget, scroll<0?0:scroll);
 			return;
 		}

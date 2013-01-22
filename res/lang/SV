@@ -19,6 +19,7 @@ Lost connection to server.									Tappade anslutning till servern.
 Singleplayer is not yet availble.								Enspelarläget är ännu inte tillgängligt.
 
 ### Menu
+Menu			Meny
 Singleplayer		En spelare
 Multiplayer		Flera spelare
 Settings		Inställningar
@@ -76,6 +77,17 @@ Ready			Redo
 
 Downloading map		Laddar ner karta
 Map			Karta
+
+### Game over
+Game over		Spelet är slut
+Game statistics		Spelstatistik
+
+Built			Byggt
+Lost			Förlorat
+Destroyed		Förstört
+Efficiency		Effektivitet
+Score			Poäng
+Player			Spelare
 
 ### Chat
 Chat			Chatt

@@ -25,6 +25,7 @@
 #include "client.h"
 #include "chat.h"
 #include "game.h"
+#include "gameover.h"
 #include "intmath.h"
 
 void (*state_render[])()={
@@ -48,10 +49,10 @@ void game_state(GAME_STATE state) {
 			ui_event_global_remove(game_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_remove(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
 			break;
+		case GAME_STATE_GAME_OVER:
 		case GAME_STATE_GAME_MENU:
 		case GAME_STATE_MENU:
 			ui_event_global_remove(menu_buttons, UI_EVENT_TYPE_BUTTONS);
-		case GAME_STATE_GAME_OVER:
 		case GAME_STATE_CONNECTING:
 		case GAME_STATE_LOBBY:
 		case GAME_STATE_QUIT:
@@ -74,11 +75,12 @@ void game_state(GAME_STATE state) {
 		case GAME_STATE_CONNECTING:
 			ui_selected_widget=NULL;
 			break;
+		case GAME_STATE_GAME_OVER:
+			gameover_update_stats();
 		case GAME_STATE_MENU:
 			d_render_clearcolor_set(0x0, 0x0, 0x0);
 		case GAME_STATE_GAME_MENU:
 			ui_event_global_add(menu_buttons, UI_EVENT_TYPE_BUTTONS);
-		case GAME_STATE_GAME_OVER:
 		case GAME_STATE_LOBBY:
 		case GAME_STATE_QUIT:
 			d_input_release();

@@ -28,7 +28,7 @@
 #define MSG_SERVER_DISCONNECT 0x10000
 
 typedef struct {
-	unsigned int constructed;
+	unsigned int built;
 	unsigned int lost;
 	unsigned int destroyed;
 	unsigned int efficiency;
