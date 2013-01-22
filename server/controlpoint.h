@@ -24,11 +24,13 @@
 
 #define	CP_RADAR_SPEED(x)		((x))
 #define	CP_CLUSTERBOMB_SPEED(x)		((x))
+#define	CP_GROUNDGEN_SPEED(x)		((x))
 
 /* In gameticks */
 #define	CP_CLUSTERBOMB_DELAY		180 * 3000
 #define	CP_RADAR_DELAY			90 * 3000
 #define	CP_RADAR_DEPLOY_TIME		10 * 3000
+#define	CP_GROUNDGEN_DELAY		30 * 3000
 
 struct SERVER_UNIT;
 
@@ -52,9 +54,11 @@ typedef struct {
 	int				radar_delay;
 	int				radar_deploy;
 	int				radar_pos;
+	int				groundgen_delay;
 
 	CONTROLPOINT_ENTRY		clusterbomb;
 	CONTROLPOINT_ENTRY		radar;
+	CONTROLPOINT_ENTRY		groundgen;
 } CONTROLPOINT_DATA;
 
 

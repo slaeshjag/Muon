@@ -47,6 +47,11 @@ int controlpointRadarInit(SERVER_UNIT *unit) {
 }
 
 
+int controlpointGroundgenInit(SERVER_UNIT *unit) {
+	return controlpointStructInit(unit);
+}
+
+
 int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 	server->player[unit->owner].buildspots++;
 	server->player[unit->owner].buildspeed = powf(1.3, server->player[unit->owner].buildspots);
@@ -61,6 +66,7 @@ void controlpointInitPlayer(int player) {
 	server->player[player].cp.radar_delay = -1;
 	server->player[player].cp.radar_deploy = -1;
 	server->player[player].cp.radar_pos = -1;
+	server->player[player].cp.groundgen_delay = 0;
 
 	server->player[player].cp.radar.count = 0;
 	server->player[player].cp.radar.speed = 0;
@@ -69,6 +75,10 @@ void controlpointInitPlayer(int player) {
 	server->player[player].cp.clusterbomb.count = 0;
 	server->player[player].cp.clusterbomb.speed = 0;
 	server->player[player].cp.clusterbomb.temp = 0;
+	
+	server->player[player].cp.groundgen.count = 0;
+	server->player[player].cp.groundgen.speed = 0;
+	server->player[player].cp.groundgen.temp = 0;
 
 	return;
 }
@@ -102,6 +112,9 @@ int controlpointNew(struct SERVER_UNIT *unit) {
 		case UNIT_DEF_RADAR:
 			return controlpointRadarInit(unit);
 			break;
+		case UNIT_DEF_GROUNDGEN:
+			return controlpointGroundgenInit(unit);
+			break;
 		default:
 			return 0;
 	}
@@ -130,6 +143,9 @@ void controlpointDelayReset(SERVER_UNIT *unit) {
 			break;
 		case UNIT_DEF_RADAR:
 			val = &server->player[unit->owner].cp.radar_delay;
+			break;
+		case UNIT_DEF_GROUNDGEN:
+			val = &server->player[unit->owner].cp.groundgen_delay;
 			break;
 		default:
 			return;
@@ -163,6 +179,14 @@ void controlpointRadarRemove(SERVER_UNIT *unit) {
 }
 
 
+void controlpointGroundgenRemove(SERVER_UNIT *unit) {
+	controlpointDelayReset(unit);
+	server->player[unit->owner].cp.groundgen.count = 0;
+
+	return;
+}
+
+
 void controlpointRemove(struct SERVER_UNIT *unit) {
 	CONTROLPOINT_EXTRA *next;
 	switch (unit->type) {
@@ -174,6 +198,9 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 			break;
 		case UNIT_DEF_RADAR:
 			controlpointRadarRemove(unit);
+			break;
+		case UNIT_DEF_GROUNDGEN:
+			controlpointGroundgenRemove(unit);
 			break;
 		default:
 			break;
@@ -207,7 +234,7 @@ void controlpointDelayLoopConst(int msec, int player) {
 	CONTROLPOINT_DATA *cp = &server->player[player].cp;
 	CONTROLPOINT_ENTRY *e;
 
-	for (i = UNIT_DEF_CLUSTERBOMB; i <= UNIT_DEF_RADAR; i++) {
+	for (i = UNIT_DEF_CLUSTERBOMB; i <= UNIT_DEF_GROUNDGEN; i++) {
 		switch (i) {
 			case UNIT_DEF_CLUSTERBOMB:
 				e = &cp->clusterbomb;
@@ -218,6 +245,11 @@ void controlpointDelayLoopConst(int msec, int player) {
 				e = &cp->radar;
 				delay = &cp->radar_delay;
 				defaults = CP_RADAR_DELAY;
+				break;
+			case UNIT_DEF_GROUNDGEN:
+				e = &cp->groundgen;
+				delay = &cp->groundgen_delay;
+				defaults = CP_GROUNDGEN_DELAY;
 				break;
 			default:
 				continue;
@@ -238,17 +270,21 @@ void controlpointDelayLoopConst(int msec, int player) {
 				(*speed) = CP_CLUSTERBOMB_SPEED(*count);
 			else if (i == UNIT_DEF_RADAR)
 				(*speed) = CP_RADAR_SPEED(*count);
+			else if (i == UNIT_DEF_GROUNDGEN)
+				(*speed) = CP_GROUNDGEN_SPEED(*count);
 		}
 		
 		if ((*delay) == -1)
 			if ((*count) > 0)
 				(*delay) = defaults;
+		if (*delay == -1)
+			continue;
 		tmp = (*delay);
 		tmp -= (*speed) * msec * server->game.gamespeed;
 		if ((tmp) < 0 && (*speed) > 0 && msec > 0)
 			tmp = 0;
 		if (CP_DELAY_SEC(tmp) != CP_DELAY_SEC(*delay) || (tmp == 0 && (*delay) != 0))
-			messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, UNIT_DEF_CLUSTERBOMB, 100 - (tmp) * 100 / defaults, NULL);
+			messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, i, 100 - (tmp) * 100 / defaults, NULL);
 		(*delay) = tmp;
 		e->temp = 0;
 	}
@@ -261,14 +297,6 @@ void controlpointDelayLoop(int msec, SERVER_UNIT *unit) {
 	int tmp, *delay, defaults;
 
 	switch (unit->type) {
-		case UNIT_DEF_CLUSTERBOMB:
-			delay = &server->player[unit->owner].cp.clusterbomb_delay;
-			defaults = CP_CLUSTERBOMB_DELAY;
-			break;
-		case UNIT_DEF_RADAR:
-			delay = &server->player[unit->owner].cp.radar_delay;
-			defaults = CP_RADAR_DELAY;
-			break;
 		default:
 			return;
 	}
@@ -313,6 +341,11 @@ void controlpointLoop(int msec) {
 				if (!server->player[next->owner].map[next->index].power)
 					continue;
 				server->player[next->owner].cp.radar.temp++;
+				break;
+			case UNIT_DEF_GROUNDGEN:
+				if (!server->player[next->owner].map[next->index].power)
+					continue;
+				server->player[next->owner].cp.groundgen.temp++;
 				break;
 			default:
 				break;
@@ -445,6 +478,38 @@ void controlpointDeployRadar(int player, int index_dst) {
 }
 
 
+void controlpointDeployGroundgen(int player, int index_dst) {
+	int i, j, range, x, y, index, k;
+
+	x = index_dst % server->w;
+	y = index_dst / server->w;
+
+	range = unit_range[UNIT_DEF_GROUNDGEN];
+	for (i = range * -1; i < range + 1; i++) {
+		if (x + i < 0 || x + i >= server->w)
+			continue;
+		for (j = range * -1; j < range + 1; j++) {
+			if (y + j < 0 || y + j >= server->h)
+				continue;
+			index = (x + i) + (j + y) * server->w;
+			if (!(server->map_c.tile_data[index] & 0x20000))
+				continue;
+			server->map_c.tile_data[index] &= 0xE00FF;
+			server->map_c.tile_data[index] |= 0x60000;
+			for (k = 0; k < server->players; k++) {
+				if (server->player[i].status == PLAYER_UNUSED)
+					continue;
+				if (!server->player[i].map[index].fog)
+					continue;
+				messageBufferPushDirect(i, player, MSG_SEND_MAP_TILE_ATTRIB, 0x11, index, NULL);
+			}
+		}
+	}
+
+	return;
+}
+				
+
 void controlpointDeploy(int player, int type, int index_dst) {
 	if (index_dst < 0 || index_dst > server->w * server->h)
 		return;
@@ -459,19 +524,28 @@ void controlpointDeploy(int player, int type, int index_dst) {
 				server->player[player].cp.clusterbomb_delay = CP_CLUSTERBOMB_DELAY;
 			break;
 		case UNIT_DEF_RADAR:
-			if (server->player[player].cp.radar_delay > 0 || server->player[player].cp.radar_delay == -1)
+			if (server->player[player].cp.radar_delay != 0)
 				return;
 			controlpointDeployRadar(player, index_dst);
 			if (server->player[player].cp.radar_delay == 0)
 				server->player[player].cp.radar_delay = CP_RADAR_DELAY;
 			break;
+		case UNIT_DEF_GROUNDGEN:
+			if (!server->player[player].map[index_dst].fog)
+				return;
+			if (server->player[player].cp.groundgen_delay != 0)
+				return;
+			controlpointDeployGroundgen(player, index_dst);
+			if (server->player[player].cp.groundgen_delay == 0)
+				server->player[player].cp.groundgen_delay = CP_GROUNDGEN_DELAY;
 		default:
 			return;
 			break;
 	}
 
 	messageBufferPushDirect(player, player, MSG_SEND_CP_DEPLOY, type, index_dst, NULL);
-	messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, type, 0, NULL);
+	if (type != UNIT_DEF_CLUSTERBOMB)
+		messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, type, 0, NULL);
 
 	return;
 }

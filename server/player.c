@@ -269,6 +269,8 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 			if ((!building) && (server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE) {
 				building = UNIT_DEF_BUILDSITE_FREE;
 			}
+			
+			p = server->map_c.tile_data[index] & 0x20000;
 
 			if (team > -1)
 				for (i = 0; i < server->players; i++) {
@@ -282,7 +284,6 @@ int playerCalcLOS(unsigned int player, int x, int y, int mode) {
 					fogdiff = (server->player[i].map[index].fog > 0);
 					fogdiff = (oldfog ^ fogdiff);
 					if (fogdiff || (j == 0 && k == 0)) {
-						p = server->map_c.tile_data[index] & 0x20000;
 						if (server->map_c.tile_data[index] & 0x40000) 
 							messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, (p) ? 0x10 : 0x11, index, NULL);
 						messageBufferPushDirect(i, i, MSG_SEND_MAP_TILE_ATTRIB, 1 << (1 + 2*(t)), index, NULL);
