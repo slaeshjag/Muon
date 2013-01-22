@@ -40,8 +40,8 @@ void client_connect_callback(int ret, void *data, void *socket) {
 		game_state(GAME_STATE_MENU);
 		sock=d_socket_close(socket);
 		player_id=0;
-		if(!serverIsRunning())
-			serverStop();
+		if(!server_is_running())
+			server_stop();
 		map_close();
 	} else
 		game_state(GAME_STATE_LOBBY);
@@ -332,8 +332,8 @@ void client_identify(MESSAGE_RAW *msg, unsigned char *payload) {
 	client_message_send(player_id, MSG_SEND_IDENTIFY, API_VERSION, strlen(config.player_name), config.player_name);
 	client_message_handler=client_download_map;
 	lobby_open();
-	if(!serverIsRunning())
-		serverAdminSet(player_id);
+	if(!server_is_running())
+		server_admin_set(player_id);
 }
 
 int client_init(char *host, int port) {

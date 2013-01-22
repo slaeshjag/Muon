@@ -92,7 +92,7 @@ int main() {
 	
 	player_id=0;
 	memset(&prevbuttons, 0, sizeof(prevbuttons));
-	serverInit();
+	server_init();
 	
 	intmath_init();
 	ui_init();
@@ -103,7 +103,7 @@ int main() {
 	game_state(GAME_STATE_MENU);
 	
 	while(gamestate!=GAME_STATE_QUIT) {
-		serverLoop(d_last_frame_time());
+		server_loop(d_last_frame_time());
 		
 		if(gamestate>=GAME_STATE_LOBBY)
 			client_check_incoming();
@@ -122,8 +122,8 @@ int main() {
 		d_loop();
 	}
 	
-	if(serverIsRunning())
-		serverStop();
+	if(server_is_running())
+		server_stop();
 	
 	platform_config_write();
 	d_quit();	
