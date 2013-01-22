@@ -30,12 +30,12 @@
 typedef void SERVER;
 
 void serverInit();
-SERVER *serverStart(const char *map, unsigned int players, int port, int gamespeed);
-void serverLoop(unsigned int msec);
-void serverStop();
-int serverIsRunning();
-int serverPlayersPlaying();
-void serverAdminSet(int player);
+SERVER *server_start(const char *map, unsigned int players, int port, int gamespeed);
+void server_loop(unsigned int msec);
+void server_stop();
+int server_is_running();
+int server_players_playing();
+void server_admin_set(int player);
 
 
 #endif

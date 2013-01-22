@@ -59,14 +59,14 @@ int main(int argc, char **argv) {
 	else
 		port = SERVER_PORT_DEFAULT;
 	
-	serverInit();
+	server_init();
 	gettimeofday(&time_d, NULL);
 	gamespeed = atoi(argv[2]);
 
-	if (serverStart(argv[1], atoi(argv[2]), port, gamespeed) == NULL)
+	if (server_start(argv[1], atoi(argv[2]), port, gamespeed) == NULL)
 		return -1;
 	for (;;) {
-		serverLoop(deltaTime());
+		server_loop(deltaTime());
 		#ifdef _WIN32
 		Sleep(15);
 		#else
