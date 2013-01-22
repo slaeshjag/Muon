@@ -233,7 +233,7 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 
 
 SERVER *server_start(const char *map, unsigned int players, int port, int gamespeed) {
-	return server_start(map, players, port, gamespeed);
+	return serverStart(map, players, port, gamespeed);
 }
 
 
