@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.4.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
+	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.5.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
 		<Package Description="Muon" InstallerVersion="200" Compressed="yes" />
 		<Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
 		<Directory Id="TARGETDIR" Name="SourceDir">
@@ -48,11 +48,11 @@
 							<File Id="NUKE.PNG" Name="nuke.png" Source="build\res\nuke.png" />
 							<File Id="RADAR.PNG" Name="radar.png" Source="build\res\radar.png" />
 							<File Id="MOUSE.PNG" Name="mouse.png" Source="build\res\mouse.png" />
+							<File Id="TARGET.PNG" Name="target.png" Source="build\res\target.png" />
 							<File Id="ICON.PNG" Name="icon.png" Source="build\res\icon.png" />
 						</Component>
 						
 						<Component Id="FONTFILES" DiskId="1" Guid="0C11EA58-96F7-4574-8A42-221F5A98DD9F">
-							<File Id="FREEMONO.TTF" Name="FreeMono.ttf" Source="build\res\FreeMono.ttf" />
 							<File Id="FREEMONOBOLD.TTF" Name="FreeMonoBold.ttf" Source="build\res\FreeMonoBold.ttf" />
 						</Component>
 						

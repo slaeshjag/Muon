@@ -146,7 +146,6 @@ void multiplayer_join_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 	char *host=v.p;
 	v=multiplayer_join_entry_port->get_prop(multiplayer_join_entry_port, UI_ENTRY_PROP_TEXT);
 	int port=atoi(v.p);
-	//printf("Server: %s:%i\n", host, port);
 	if(client_init(host, port)==0)
 		game_state(GAME_STATE_CONNECTING);
 }

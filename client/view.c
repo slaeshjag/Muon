@@ -32,6 +32,7 @@
 void view_init() {
 	font_std=d_font_load("res/FreeMonoBold.ttf", 12, 512, 512);
 	mouse_tilesheet=d_render_tilesheet_load("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
+	mouse_target_tilesheet=d_render_tilesheet_load("res/target.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	
 	//Menu background
 	int scale=config.plasma==0?1:(1<<(5-config.plasma));
@@ -61,21 +62,14 @@ void view_init() {
 }
 
 void view_background_update(int t) {
-	static int x, y, mov1, mov2, c1, c2, c3, xx, yy;
+	static int x, y, mov1, mov2, c1, c2, c3;
 	for (y=0; y<view_background_h; y++)
 		for (x=0; x<view_background_w; x++) {
-			if(gamestate==GAME_STATE_GAME) {
-				xx=x+(map->cam_x>>3);
-				yy=y+(map->cam_y>>3);
-			} else {
-				xx=x;
-				yy=y;
-			}
-			mov1=360*yy/view_background_h+(t>>1);
-			mov2=360*xx/view_background_w;
+			mov1=360*y/view_background_h+(t>>1);
+			mov2=360*x/view_background_w;
 			c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
-			c2=sine((c1+sine((yy>>2)+(t>>1))+sine((xx+yy)))/10);
-			c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(xx))/10);
+			c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
+			c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
 			view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/360+26;
 		}
 	d_render_tilesheet_update(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);

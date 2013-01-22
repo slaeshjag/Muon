@@ -90,10 +90,8 @@ void menu_settings_init() {
 	ui_vbox_add_child(settings_monitor_vbox, ui_widget_create_spacer(), 1);
 	settings_monitor_button_ok=ui_widget_create_button_text(font_std, T("Save"));
 	settings_monitor_button_ok->event_handler->add(settings_monitor_button_ok, settings_monitor_button_save_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	//settings_monitor_button_cancel=ui_widget_create_button_text(font_std, T("Cancel"));
-	//settings_monitor_button_cancel->event_handler->add(settings_monitor_button_cancel, settings_monitor_button_save_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ui_vbox_add_child(settings_monitor_vbox, settings_monitor_button_ok, 0);
-	//ui_vbox_add_child(settings_monitor_vbox, settings_monitor_button_cancel, 0);
+	
 	char buf[32];
 	v.p=buf;
 	sprintf(buf, "%i", config.screen_w);
@@ -127,7 +125,6 @@ void settings_game_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	v=settings_game_checkbox_powergrid->get_prop(settings_game_checkbox_powergrid, UI_CHECKBOX_PROP_ACTIVATED);
 	config.powergrid=v.i;
 	platform_config_write();
-	//printf("Player name: %s\n", player_name);
 	panelist_menu_sidebar.next=NULL;
 }
 

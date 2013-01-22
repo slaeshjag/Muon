@@ -29,6 +29,7 @@
 void game_view_init() {
 	building_place=-1;
 	ability_place=0;
+	attacker_target=0;
 	
 	building[0].name="";
 	building[1].name=T("Generator");
@@ -116,8 +117,10 @@ void game_view_init() {
 	ability[2].button->enabled=0;
 	ability[2].button->event_handler->add(ability[2].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ability[2].ready=-1;
-	for(i=0; i<3; i++)
+	for(i=0; i<3; i++) {
 		ui_vbox_add_child(panelist_game_abilitybar.pane->root_widget, ability[i].button, 0);
+		ability[i].text=d_text_surface_new(font_std, 4, 64, ability[i].button->x, ability[i].button->y+24);
+	}
 	
 	ui_event_global_add(game_view_mouse_release, UI_EVENT_TYPE_MOUSE_RELEASE);
 }
@@ -151,6 +154,8 @@ void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EV
  *  - positive if a building is ready
  *  - zero (BUILDING_NONE) if no building is ready */
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT)
+		building_cancel=1;
 	UI_PROPERTY_VALUE v;
 	int i=0;
 	// Find the building number.
@@ -284,9 +289,16 @@ void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		if(building_place>-1) {
 			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, building_place, map_offset, NULL);
 			building_place=-1;
+		} else if(attacker_target) {
+			client_message_send(player_id, MSG_SEND_SET_ATTACK, map_selected_index(), map_offset, NULL);
+			attacker_target=0;
 		} else if(!game_ability_place(map_offset)) {
 			//status selected clicked building, etc
-			map_select_building(map_offset);
+			int selected_building=map_selected_building();
+			if(map_offset==map_selected_index()&&map_selected_owner()==player_id&&(selected_building==BUILDING_ATTACKER||selected_building==BUILDING_SCOUT))
+				attacker_target=1;
+			else
+				map_select_building(map_offset);
 		}
 	}
 }
@@ -367,7 +379,6 @@ int game_ability_place(int index) {
 }
 
 void game_attacklist_lines_recalculate() {
-	//TODO: split lines out to array so we can handle different colours for different players
 	struct GAME_ATTACKLIST *l;
 	int i, x1, x2, y1, y2;
 	int map_wt=map->layer[map->layers-2].tilemap->w;
@@ -473,9 +484,15 @@ void game_abilitybar_icon_render(UI_WIDGET *widget) {
 	if(ability[i].ready==100)
 		d_render_tint(255, 255, 255, 255);
 	else
-		d_render_tint(127, 127, 127, 255);
-		//d_render_tint(100+ability[i].ready, 100+ability[i].ready, 100+ability[i].ready, 255);
+		d_render_tint(95, 95, 95, 255);
+	
 	d_render_tile_draw(p->tile, 1);
+	d_render_tint(255, 255, 255, 255);
+	if(ability[i].ready>=0&&ability[i].ready<100) {
+		d_render_blend_enable();
+		d_text_surface_draw(ability[i].text);
+		d_render_blend_disable();
+	}
 	d_render_tint(r, g, b, a);
 	d_render_line_draw(p->border, 4);
 }
@@ -500,11 +517,9 @@ void game_view_draw() {
 		game_attacklist_blink_semaphore=0;
 	else
 		game_attacklist_blink_semaphore++;
-		
-	//d_render_tile_blit(minimap, 0, 128, 32);
 }
 
-void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+void game_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	unsigned char r, g, b, a;
 	d_render_tint_get(&r, &g, &b, &a);
 	d_render_tint(255, 255, 255, 255);
@@ -522,5 +537,18 @@ void game_draw_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		d_render_offset(0, 0);
 	}
 	d_render_tint(r, g, b, a);
-	view_mouse_draw(widget, type, e);
+	if(attacker_target)
+		game_mouse_target_draw(widget, type, e);
+	/*else
+		view_mouse_draw(widget, type, e);*/
+}
+
+void game_mouse_target_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
+	d_render_blend_enable();
+	d_render_tile_blit(mouse_target_tilesheet, 0, e->mouse->x-16, e->mouse->y-16);
+	d_render_blend_disable();
+	d_render_tint(r, g, b, a);
 }

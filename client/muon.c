@@ -44,7 +44,7 @@ void game_state(GAME_STATE state) {
 			ui_event_global_remove(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
 			ui_event_global_remove(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
 			ui_event_global_remove(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
-			ui_event_global_remove(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_remove(game_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_remove(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
 			break;
 		case GAME_STATE_GAME_MENU:
@@ -59,15 +59,11 @@ void game_state(GAME_STATE state) {
 	}
 	//Game state constructors
 	switch(state) {
-		/*case GAME_STATE_INPUT_NAME:
-			darnitRenderClearColorSet(0x0, 0x0, 0x0);
-			ui_selected_widget=input_name_entry;
-			break;*/
 		case GAME_STATE_GAME:
 			d_render_clearcolor_set(0x7f, 0x7f, 0x7f);
 			ui_event_global_add(game_view_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
 			ui_event_global_add(game_view_mouse_move, UI_EVENT_TYPE_MOUSE_ENTER);
-			ui_event_global_add(game_draw_mouse, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_add(game_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_add(game_view_buttons, UI_EVENT_TYPE_BUTTONS);
 			ui_event_global_add(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
 			#ifndef __DEBUG__

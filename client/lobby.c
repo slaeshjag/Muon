@@ -47,7 +47,6 @@ void lobby_init() {
 	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_label(font_std, T("Ready")), 0);
 	ui_hbox_add_child(lobby_players_hbox, ui_widget_create_spacer(), 1);
 	ui_hbox_add_child(lobby_players_hbox, lobby_players_button_kick, 0);
-	//ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_spacer_size(1, 8), 0);
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, lobby_players_hbox, 0);
 	lobby_players_checkbox_ready->event_handler->add(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
@@ -72,13 +71,6 @@ void lobby_init() {
 	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_imageview, 0);
 	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, ui_widget_create_spacer(), 1);
 	ui_vbox_add_child(panelist_lobby_map.pane->root_widget, lobby_map_button_back, 0);
-	
-	//panelist_lobby.next=&panelist_lobby_ready;
-	/*panelist_lobby_ready.pane=ui_pane_create(16, 16, 64, 32, NULL);
-	ui_pane_set_root_widget(panelist_lobby_ready.pane, ui_widget_create_hbox());
-	lobby_checkbox_ready=ui_widget_create_checkbox();
-	ui_hbox_add_child(panelist_lobby_ready.pane->root_widget, lobby_checkbox_ready, 0);
-	ui_hbox_add_child(panelist_lobby_ready.pane->root_widget, ui_widget_create_label(font_std, "Ready"), 1);*/
 }
 
 void lobby_open() {
@@ -147,7 +139,6 @@ void lobby_progress(int player_id, int progress) {
 }
 
 void lobby_download_complete() {
-	//lobby_players_checkbox_ready->event_handler->remove(lobby_players_checkbox_ready, lobby_players_checkbox_ready_toggle, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	panelist_lobby_players.next=panelist_lobby_download.next;
 	lobby_players_checkbox_ready->enabled=1;
 }

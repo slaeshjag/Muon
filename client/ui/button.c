@@ -107,14 +107,15 @@ void ui_button_event_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		case UI_EVENT_TYPE_MOUSE_PRESS:
 			if(e->mouse->buttons==UI_EVENT_MOUSE_BUTTON_LEFT)
 				ui_selected_widget=widget;
-				p->activated=1;
+			p->activated=1;
 			break;
 		case UI_EVENT_TYPE_MOUSE_RELEASE:
 			if(((e->mouse->buttons)&UI_EVENT_MOUSE_BUTTON_LEFT)==UI_EVENT_MOUSE_BUTTON_LEFT||!p->activated)
 				break;
 			UI_EVENT ee;
-			UI_EVENT_UI e_u={};
-			ee.ui=&e_u;
+			/*UI_EVENT_UI e_u={};
+			ee.ui=&e_u;*/
+			ee.mouse=&ui_e_m_prev;
 			widget->event_handler->send(widget, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE, &ee);
 		case UI_EVENT_TYPE_MOUSE_LEAVE:
 			p->activated=0;

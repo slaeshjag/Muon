@@ -36,7 +36,7 @@ struct MAP_GRID_CHUNK {
 } *map_grid_chunk;
 int map_grid_chunks;
 
-unsigned int minimap_data[(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8)];
+unsigned int minimap_data[(SIDEBAR_WIDTH-UI_PADDING*2)*(SIDEBAR_WIDTH-UI_PADDING*2)];
 DARNIT_LINE *minimap_viewport;
 
 static const unsigned int minimap_colors[]={
@@ -71,7 +71,7 @@ struct MAP_FLARE_LIST {
 } *map_flares;
 
 void map_init(char *filename);
-void map_close(/*DARNIT_MAP *map*/);
+void map_close();
 void map_update_grid();
 void map_calculate_powergrid();
 void map_building_place(int index, int player, int building);
@@ -97,7 +97,6 @@ void map_flare_draw();
 void map_draw(int draw_powergrid);
 void map_minimap_update_viewport();
 void map_minimap_render(UI_WIDGET *widget);
-//void map_minimap_update();
 void map_minimap_clear(DARNIT_TILESHEET *ts, int w, int h);
 void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow);
 

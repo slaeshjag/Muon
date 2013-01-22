@@ -130,7 +130,6 @@ void ui_progressbar_request_size(UI_WIDGET *widget, int *w, int *h) {
 		return;
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
 	int text_h=d_font_glyph_h(p->font);
-	//d_font_string_geometrics(p->font, p->offset, ww, &text_w);
 	*h=text_h+4;
 }
 

@@ -1,18 +1,18 @@
 /* Muon - a new kind of rts
  * Copyright 2012 Steven Arnow <s@rdw.se> and Axel Isaksson (mr3d/h4xxel)
- * 
+ *
  * This file is part of Muon.
- * 
+ *
  * Muon is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * Muon is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -299,7 +299,7 @@ void controlpointLoop(int msec) {
 
 	if (!server)
 		return;
-	
+
 	for (next = server->controlpoint; next; next = (CONTROLPOINT_EXTRA *) next->next) {
 		switch (next->type) {
 			case UNIT_DEF_CLUSTERBOMB:
@@ -318,7 +318,7 @@ void controlpointLoop(int msec) {
 
 		/* TODO: Implement */
 	}
-		
+
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status != PLAYER_IN_GAME_NOW)
 			continue;
@@ -341,7 +341,7 @@ int controlpointClusterbombAlreadyUsed(int tx, int ty, int bombs) {
 	int index, i;
 
 	index = tx + ty * server->w;
-	
+
 	for (i = 0; i < bombs && server->clusterbomb_buffer[i] != index; i++);
 	if (i == bombs)
 		return 0;
@@ -350,18 +350,50 @@ int controlpointClusterbombAlreadyUsed(int tx, int ty, int bombs) {
 
 
 void controlpointDeployClusterbomb(int player, int index_dst) {
-	int bombs, x, y, tx, ty, i, j, index, target, damage_deflection;
+	int bombs, x, y, tx, ty, i, radius, j, index, target, damage_deflection;
 
 	bombs = unit_damage[UNIT_DEF_CLUSTERBOMB] / unit_maxshield[UNIT_DEF_GENERATOR];
 	x = index_dst % server->w;
 	y = index_dst / server->w;
 
 	for (i = 0; i < bombs; i++) {
-		do {
-			tx = rand() % (unit_range[UNIT_DEF_CLUSTERBOMB] * 2 + 1) - unit_range[UNIT_DEF_CLUSTERBOMB];
-			ty = rand() % (unit_range[UNIT_DEF_CLUSTERBOMB] * 2 + 1) - unit_range[UNIT_DEF_CLUSTERBOMB];
-		} while (controlpointClusterbombAlreadyUsed(tx, ty, i));
-		
+			do {
+				tx = ty = -1;
+				for (radius = 1; radius < unit_range[UNIT_DEF_CLUSTERBOMB]; radius++) {
+					/* drop the bomb at this distance from ground with 7/10 chance */
+					if (rand() % 10 < 7) {
+						tx = rand() % (radius * 2 + 1) - radius;
+						ty = rand() % (radius * 2 + 1) - radius;
+
+						if (controlpointClusterbombAlreadyUsed(tx, ty, i)) {
+							/* if this spot is occupied, just try the next size radius */
+							/* will hopefully prevent lockups where all spots
+							 * within a particular radius is used up */
+							continue;
+						} else {
+							/* get out of here and see if this is within
+							 * the radius */
+							break;
+						}
+					}
+
+				}
+				/* if not dropped yet, just drop it for gods sake */
+				/* will be responsible for (0.7^range * bombs) drops,
+				 * plus some stray ones. */
+				/* by this time we're desperate, so just do a loop which may
+				 * never terminate... */
+				if (tx == -1 && ty == -1) {
+					do {
+						tx = rand() % (radius * 2 + 1) - radius;
+						ty = rand() % (radius * 2 + 1) - radius;
+					} while (controlpointClusterbombAlreadyUsed(tx, ty, i));
+				}
+
+				/* this is outside of the (circular) radius and thus not a valid
+				 * dropping point! */
+			} while (tx*tx + ty*ty > radius*radius);
+
 		if (!server->map[server->player[player].spawn.index])
 			return;
 
@@ -375,7 +407,7 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 		if (ty < 0 || ty >= server->h)
 			continue;
 		index = tx + ty * server->w;
-		
+
 		target = server->map[server->player[player].spawn.index]->target;
 		server->map[server->player[player].spawn.index]->target = index;
 
@@ -384,7 +416,7 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 		if (!server->map[server->player[player].spawn.index])
 			return;
 		server->map[server->player[player].spawn.index]->target = target;
-		
+
 		for (j = 0; j < server->players; j++) {
 			if (server->player[j].status != PLAYER_IN_GAME_NOW)
 				continue;
@@ -404,7 +436,7 @@ void controlpointDeployClusterbomb(int player, int index_dst) {
 void controlpointDeployRadar(int player, int index_dst) {
 	server->player[player].cp.radar_pos = index_dst;
 	server->player[player].cp.radar_deploy = CP_RADAR_DEPLOY_TIME;
-	
+
 	playerCalcLOS(player, index_dst % server->w, index_dst / server->w, unitRange(UNIT_DEF_RADAR));
 
 	return;

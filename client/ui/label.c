@@ -58,9 +58,6 @@ void ui_label_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 			p->text=value.p;
 			ui_label_resize(widget, widget->x, widget->y, widget->w, widget->h);
 			break;
-		/*case UI_LABEL_PROP_SURFACE:
-			p->text=value.p;
-			break;*/
 		case UI_LABEL_PROP_FONT:
 			p->font=value.p;
 			break;

@@ -83,7 +83,6 @@ void chat_hide(struct UI_PANE_LIST *panelist) {
 	for(p=panelist; p->next; p=p->next) {
 		if(p->next==&panelist_chat) {
 			p->next=panelist_chat.next;
-			//p->next=NULL;
 			ui_selected_widget=NULL;
 			return;
 		}
@@ -99,7 +98,6 @@ void chat_toggle(struct UI_PANE_LIST *panelist) {
 			return;
 		}
 		if(p->next==NULL) {
-			//p->next=&panelist_chat;
 			chat_show(panelist);
 			ui_selected_widget=chat_entry;
 			return;
@@ -126,7 +124,6 @@ void chat_indicator_hide(struct UI_PANE_LIST *panelist) {
 	for(p=panelist; p->next; p=p->next) {
 		if(p->next==&panelist_chat_indicator) {
 			p->next=panelist_chat_indicator.next;
-			//p->next=NULL;
 			return;
 		}
 	}

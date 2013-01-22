@@ -24,6 +24,7 @@
 
 DARNIT_FONT *font_std;
 DARNIT_TILESHEET *mouse_tilesheet;
+DARNIT_TILESHEET *mouse_target_tilesheet;
 
 int view_background_w, view_background_h;
 DARNIT_TILESHEET *view_background_ts;

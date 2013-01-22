@@ -102,7 +102,6 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			d_text_surface_reset(p->surface);
 			d_text_surface_string_append(p->surface, p->offset);
 			d_render_line_move(p->cursor, 0, widget->x+tw+3, widget->y+2, widget->x+tw+3, widget->y+widget->h-2);
-			//darnitTextSurfaceCharAppend(p->surface, &e->keyboard->character);
 			break;
 	}
 }
@@ -166,7 +165,7 @@ void ui_entry_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	
 	if(p->surface!=NULL)
 		d_text_surface_free(p->surface);
-	int text_h=d_font_glyph_h(p->font);//d_font_string_geometrics(p->font, p->offset, w, &text_w);
+	int text_h=d_font_glyph_h(p->font);
 	p->surface=d_text_surface_new(p->font, UI_ENTRY_LENGTH, w, x+2, y+(h/2)-(text_h/2));
 	d_text_surface_string_append(p->surface, p->offset);
 	tw=d_font_string_w(p->font, p->offset);
@@ -181,7 +180,7 @@ void ui_entry_request_size(UI_WIDGET *widget, int *w, int *h) {
 		return;
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
 	int text_h=d_font_glyph_h(p->font);
-	//d_font_string_geometrics(p->font, p->offset, ww, &text_w);
+	
 	*h=text_h+4;
 }
 
