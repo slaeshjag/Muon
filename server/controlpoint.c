@@ -52,6 +52,11 @@ int controlpointGroundgenInit(SERVER_UNIT *unit) {
 }
 
 
+int controlpointShieldregenInit(SERVER_UNIT *unit) {
+	return controlpointStructInit(unit);
+}
+
+
 int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 	server->player[unit->owner].buildspots++;
 	server->player[unit->owner].buildspeed = powf(1.3, server->player[unit->owner].buildspots);
@@ -67,6 +72,7 @@ void controlpointInitPlayer(int player) {
 	server->player[player].cp.radar_deploy = -1;
 	server->player[player].cp.radar_pos = -1;
 	server->player[player].cp.groundgen_delay = 0;
+	server->player[player].cp.shieldregen_delay = 0;
 
 	server->player[player].cp.radar.count = 0;
 	server->player[player].cp.radar.speed = 0;
@@ -79,6 +85,10 @@ void controlpointInitPlayer(int player) {
 	server->player[player].cp.groundgen.count = 0;
 	server->player[player].cp.groundgen.speed = 0;
 	server->player[player].cp.groundgen.temp = 0;
+
+	server->player[player].cp.shieldregen.count = 0;
+	server->player[player].cp.shieldregen.speed = 0;
+	server->player[player].cp.shieldregen.temp = 0;
 
 	return;
 }
@@ -115,6 +125,9 @@ int controlpointNew(struct SERVER_UNIT *unit) {
 		case UNIT_DEF_GROUNDGEN:
 			return controlpointGroundgenInit(unit);
 			break;
+		case UNIT_DEF_SHIELDREGEN:
+			return controlpointShieldregenInit(unit);
+			break;
 		default:
 			return 0;
 	}
@@ -146,6 +159,9 @@ void controlpointDelayReset(SERVER_UNIT *unit) {
 			break;
 		case UNIT_DEF_GROUNDGEN:
 			val = &server->player[unit->owner].cp.groundgen_delay;
+			break;
+		case UNIT_DEF_SHIELDREGEN:
+			val = &server->player[unit->owner].cp.shieldregen_delay;
 			break;
 		default:
 			return;
@@ -187,6 +203,14 @@ void controlpointGroundgenRemove(SERVER_UNIT *unit) {
 }
 
 
+void controlpointShieldregenRemove(SERVER_UNIT *unit) {
+	controlpointDelayReset(unit);
+	server->player[unit->owner].cp.shieldregen.count = 0;
+
+	return;
+}
+
+
 void controlpointRemove(struct SERVER_UNIT *unit) {
 	CONTROLPOINT_EXTRA *next;
 	switch (unit->type) {
@@ -201,6 +225,9 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 			break;
 		case UNIT_DEF_GROUNDGEN:
 			controlpointGroundgenRemove(unit);
+			break;
+		case UNIT_DEF_SHIELDREGEN:
+			controlpointShieldregenRemove(unit);
 			break;
 		default:
 			break;
@@ -251,6 +278,11 @@ void controlpointDelayLoopConst(int msec, int player) {
 				delay = &cp->groundgen_delay;
 				defaults = CP_GROUNDGEN_DELAY;
 				break;
+			case UNIT_DEF_SHIELDREGEN:
+				e = &cp->shieldregen;
+				delay = &cp->shieldregen_delay;
+				defaults = CP_SHIELDREGEN_DELAY;
+				break;
 			default:
 				continue;
 		}
@@ -272,6 +304,8 @@ void controlpointDelayLoopConst(int msec, int player) {
 				(*speed) = CP_RADAR_SPEED(*count);
 			else if (i == UNIT_DEF_GROUNDGEN)
 				(*speed) = CP_GROUNDGEN_SPEED(*count);
+			else if (i == UNIT_DEF_SHIELDREGEN)
+				(*speed) = CP_SHIELDREGEN_SPEED(*count);
 		}
 		
 		if ((*delay) == -1)
@@ -346,6 +380,11 @@ void controlpointLoop(int msec) {
 				if (!server->player[next->owner].map[next->index].power)
 					continue;
 				server->player[next->owner].cp.groundgen.temp++;
+				break;
+			case UNIT_DEF_SHIELDREGEN:
+				if (!server->player[next->owner].map[next->index].power)
+					continue;
+				server->player[next->owner].cp.shieldregen.temp++;
 				break;
 			default:
 				break;
@@ -491,6 +530,8 @@ void controlpointDeployGroundgen(int player, int index_dst) {
 		for (j = range * -1; j < range + 1; j++) {
 			if (y + j < 0 || y + j >= server->h)
 				continue;
+			if (i*i + j*j > range*range)
+				continue;
 			index = (x + i) + (j + y) * server->w;
 			if (!(server->map_c.tile_data[index] & 0x20000))
 				continue;
@@ -510,7 +551,50 @@ void controlpointDeployGroundgen(int player, int index_dst) {
 
 	return;
 }
-				
+
+
+void controlpointDeployShieldregen(int player, int index_dst) {
+	int i, j, k, range, index, x, y, deflection;
+	SERVER_UNIT *unit;
+
+	x = index_dst % server->w;
+	y = index_dst / server->w;
+	range = unit_range[UNIT_DEF_SHIELDREGEN];
+
+	for (i = range * -1; i < range + 1; i++) {
+		if (x + i < 0 || x + i >= server->w)
+			continue;
+		for (j = range * -1; j < range + 1; j++) {
+			if (y + j < 0 || y + j >= server->h)
+				continue;
+			if (i*i + j*j > range*range)
+				continue;
+			index = (x + i) + (j + y) * server->w;
+			if (!server->map[index])
+				continue;
+			if (server->map[index]->owner != player && server->player[player].team == -1)
+				continue;
+			if (server->player[server->map[index]->owner].team != server->player[player].team)
+				continue;
+			unit = server->map[index];
+
+			deflection = rand() % UNIT_SHIELDREGEN_MAX_DEFLECTION;
+			unit->shield += unit_damage[UNIT_DEF_SHIELDREGEN] - deflection;
+			if (unit->shield > unit_maxshield[unit->type])
+				server->map[index]->shield = unit_maxshield[unit->type];
+			for (k = 0; k < server->players; k++) {
+				if (server->player[k].status == PLAYER_UNUSED)
+					continue;
+				if (!server->player[k].map[index].fog)
+					continue;
+				messageBufferPushDirect(i, player, MSG_SEND_BUILDING_SHIELD, 100 * unit->shield / unit_maxshield[unit->type], index, NULL);
+			}
+		}
+	}
+
+	return;
+}
+
 
 void controlpointDeploy(int player, int type, int index_dst) {
 	if (index_dst < 0 || index_dst > server->w * server->h)
@@ -540,13 +624,23 @@ void controlpointDeploy(int player, int type, int index_dst) {
 			controlpointDeployGroundgen(player, index_dst);
 			if (server->player[player].cp.groundgen_delay == 0)
 				server->player[player].cp.groundgen_delay = CP_GROUNDGEN_DELAY;
+			break;
+		case UNIT_DEF_SHIELDREGEN:
+			if (!server->player[player].map[index_dst].fog)
+				return;
+			if (server->player[player].cp.shieldregen_delay != 0)
+				return;
+			controlpointDeployShieldregen(player, index_dst);
+			if (server->player[player].cp.shieldregen_delay == 0)
+				server->player[player].cp.shieldregen_delay = CP_SHIELDREGEN_DELAY;
+			break;
 		default:
 			return;
 			break;
 	}
 
 	messageBufferPushDirect(player, player, MSG_SEND_CP_DEPLOY, type, index_dst, NULL);
-	if (type != UNIT_DEF_CLUSTERBOMB)
+	if (type != UNIT_DEF_CLUSTERBOMB || server->player[player].cp.clusterbomb.count == 0)
 		messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, type, 0, NULL);
 
 	return;

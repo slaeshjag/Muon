@@ -20,7 +20,7 @@
 #ifndef __UNIT_H__
 #define	__UNIT_H__
 
-#define	UNITS_DEFINED			9
+#define	UNITS_DEFINED			10
 
 #define	UNIT_DEF_NOTHING		0
 #define	UNIT_DEF_GENERATOR		1
@@ -34,6 +34,7 @@
 #define	UNIT_DEF_CLUSTERBOMB		7
 #define	UNIT_DEF_RADAR			8
 #define UNIT_DEF_GROUNDGEN		9
+#define	UNIT_DEF_SHIELDREGEN		10
 
 #define	UNIT_DEF_BUILDSITE_FREE		0x100
 
@@ -51,7 +52,8 @@ static const int unit_los[] = {
 	0,		/* wall */
 	7,		/* owned control point (buildsite) */
 	2,		/* carpet bomb */
-	2		/* radar */
+	2,		/* radar */
+	2,		/* shield regenerator */
 };
 
 /* 2000 is the base coefficient for hp,
@@ -70,7 +72,8 @@ static const int unit_maxhp[] = {
 	1,              /* wall */
 	2000 * 50,	/* owned control point (buildsite) */
 	2000 * 50,	/* carpet bomb */
-	2000 * 30	/* radar */
+	2000 * 30,	/* radar */
+	2000 * 30,	/* shield regenerator */
 };
 
 /* Shield must not be 0 for any existing building! */
@@ -85,7 +88,9 @@ static const int unit_maxshield[] = {
 	2000 * 200,	/* wall */
 	1,		/* owned control point (buildsite) */
 	1,		/* carpet bomb */
-	1		/* radar */
+	1,		/* radar */
+	1,		/* shield regenerator */
+
 };
 
 static const int unit_shieldreg[] = {
@@ -98,6 +103,7 @@ static const int unit_shieldreg[] = {
 	1,		/* owned control point (buildsite) */
 	1,		/* carpet bomb */
 	1,		/* radar */
+	1,		/* shield regenerator */
 };
 
 /* Meant to replace UNIT_ATTACKER_DMGP */
@@ -111,10 +117,12 @@ static const int unit_damage[] = {
 	0,		/* owned control point (buildsite) */
 	2000 * 150 * 50,/* carpet bomb (this / Generator shield gives bomb count) */
 	0,		/* radar */
-	0		/* ground generator */
+	0,		/* ground generator */
+	2000 * 50,	/* shield regenerator */
 };
 
 #define	UNIT_NUKE_MAX_DEFLECTION	2000 * 75
+#define	UNIT_SHIELDREGEN_MAX_DEFLECTION	2000 * 50
 
 /* Pylons and generators must have the same distribution range... */
 /* range is for shooting and power distribution, whereever
@@ -130,6 +138,7 @@ static const int unit_range[] = {
 	7,		/* carpet bomb (radius of spread) */
 	7,		/* Radius of the FoW "window" that opens */
 	2,		/* Radius of ground to regenerate */
+	4,		/* Shield regen deploy radius */
 };
 
 /* measured in ticks, of which there are 3000/s with normal game speed. */
@@ -144,6 +153,7 @@ static const int unit_buildtime[] = {
 	100000,		/* carpet bomb */
 	70000,		/* radar */
 	70000,		/* ground generator */
+	70000,		/* shield regenerator */
 };
 
 /* Points for determening a winner without generators being lost. */
@@ -160,6 +170,7 @@ static const int unit_points[] = {
 	13,		/* carpet bomb */
 	9,		/* radar */
 	9,		/* ground generator */
+	9,		/* shield regenerator */
 };
 
 struct SERVER_UNIT;
