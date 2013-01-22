@@ -62,6 +62,14 @@ void controlpointInitPlayer(int player) {
 	server->player[player].cp.radar_deploy = -1;
 	server->player[player].cp.radar_pos = -1;
 
+	server->player[player].cp.radar.count = 0;
+	server->player[player].cp.radar.speed = 0;
+	server->player[player].cp.radar.temp = 0;
+
+	server->player[player].cp.clusterbomb.count = 0;
+	server->player[player].cp.clusterbomb.speed = 0;
+	server->player[player].cp.clusterbomb.temp = 0;
+
 	return;
 }
 
@@ -191,6 +199,62 @@ void controlpointRemove(struct SERVER_UNIT *unit) {
 }
 
 
+void controlpointDelayLoopConst(int msec, int player) {
+	int tmp, *delay, *count, t_tmp, defaults, i;
+	float *speed;
+	CONTROLPOINT_DATA *cp = &server->player[player].cp;
+	CONTROLPOINT_ENTRY *e;
+
+	for (i = UNIT_DEF_CLUSTERBOMB; i <= UNIT_DEF_RADAR; i++) {
+		switch (i) {
+			case UNIT_DEF_CLUSTERBOMB:
+				e = &cp->clusterbomb;
+				delay = &cp->clusterbomb_delay;
+				defaults = CP_CLUSTERBOMB_DELAY;
+				break;
+			case UNIT_DEF_RADAR:
+				e = &cp->radar;
+				delay = &cp->radar_delay;
+				defaults = CP_RADAR_DELAY;
+				break;
+			default:
+				continue;
+		}
+
+		count = &e->count;
+		t_tmp = e->temp;
+		speed = &e->speed;
+
+		if (!(*delay)) {
+			e->temp = 0;
+			continue;
+		}
+		
+		if (t_tmp != *count) {
+			(*count) = t_tmp;
+			if (i == UNIT_DEF_CLUSTERBOMB)
+				(*speed) = CP_CLUSTERBOMB_SPEED(*count);
+			else if (i == UNIT_DEF_RADAR)
+				(*speed) = CP_RADAR_SPEED(*count);
+		}
+		
+		if ((*delay) == -1)
+			if ((*count) > 0)
+				(*delay) = defaults;
+		tmp = (*delay);
+		tmp -= (*speed) * msec * server->game.gamespeed;
+		if ((tmp) < 0 && (*speed) > 0 && msec > 0)
+			tmp = 0;
+		if (CP_DELAY_SEC(tmp) != CP_DELAY_SEC(*delay) || (tmp == 0 && (*delay) != 0))
+			messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, UNIT_DEF_CLUSTERBOMB, 100 - (tmp) * 100 / defaults, NULL);
+		(*delay) = tmp;
+		e->temp = 0;
+	}
+
+	return;
+}
+
+
 void controlpointDelayLoop(int msec, SERVER_UNIT *unit) {
 	int tmp, *delay, defaults;
 
@@ -241,12 +305,12 @@ void controlpointLoop(int msec) {
 			case UNIT_DEF_CLUSTERBOMB:
 				if (!server->player[next->owner].map[next->index].power)
 					continue;
-				controlpointDelayLoop(msec, server->map[next->index]);
+				server->player[next->owner].cp.clusterbomb.temp++;
 				break;
 			case UNIT_DEF_RADAR:
 				if (!server->player[next->owner].map[next->index].power)
 					continue;
-				controlpointDelayLoop(msec, server->map[next->index]);
+				server->player[next->owner].cp.radar.temp++;
 				break;
 			default:
 				break;
@@ -256,6 +320,10 @@ void controlpointLoop(int msec) {
 	}
 
 	for (i = 0; i < server->players; i++) {
+		if (server->player[i].status != PLAYER_IN_GAME_NOW)
+			continue;
+		controlpointDelayLoopConst(msec, i);
+
 		if (server->player[i].cp.radar_deploy <= 0)
 			continue;
 		server->player[i].cp.radar_deploy -= msec * server->game.gamespeed;

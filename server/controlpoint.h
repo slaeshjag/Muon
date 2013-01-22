@@ -22,6 +22,9 @@
 
 #define	CP_DELAY_SEC(x)			((x) / server->game.gamespeed / 1000)
 
+#define	CP_RADAR_SPEED(x)		((x))
+#define	CP_CLUSTERBOMB_SPEED(x)		((x))
+
 /* In gameticks */
 #define	CP_CLUSTERBOMB_DELAY		180 * 3000
 #define	CP_RADAR_DELAY			90 * 3000
@@ -38,10 +41,20 @@ typedef struct CONTROLPONIT_EXTRA {
 
 
 typedef struct {
+	int				count;
+	int				temp;
+	float				speed;
+} CONTROLPOINT_ENTRY;
+
+
+typedef struct {
 	int				clusterbomb_delay;
 	int				radar_delay;
 	int				radar_deploy;
 	int				radar_pos;
+
+	CONTROLPOINT_ENTRY		clusterbomb;
+	CONTROLPOINT_ENTRY		radar;
 } CONTROLPOINT_DATA;
 
 
