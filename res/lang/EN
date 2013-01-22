@@ -19,6 +19,7 @@ Lost connection to server.									Lost connection to server.
 Singleplayer is not yet availble.								Singleplayer is not yet availble.
 
 ### Menu
+Menu			Menu
 Singleplayer		Singleplayer
 Multiplayer		Multiplayer
 Settings		Settings
@@ -76,6 +77,17 @@ Ready			Ready
 
 Downloading map		Downloading map
 Map			Map
+
+### Game over
+Game over		Game over
+Game statistics		Game statistics
+
+Built			Built
+Lost			Lost
+Destroyed		Destroyed
+Efficiency		Efficiency
+Score			Score
+Player			Player
 
 ### Chat
 Chat			Chat

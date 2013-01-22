@@ -179,8 +179,19 @@ void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 }
 
 void menu_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(e->buttons->start&&!prevbuttons.start)
-		game_state(gamestate==GAME_STATE_MENU?GAME_STATE_QUIT:GAME_STATE_GAME);
+	if(e->buttons->start&&!prevbuttons.start) {
+		switch(gamestate) {
+			case GAME_STATE_MENU:
+				game_state(GAME_STATE_QUIT);
+				break;
+			case GAME_STATE_GAME_MENU:
+				game_state(GAME_STATE_GAME);
+				break;
+			default:
+				game_state(GAME_STATE_MENU);
+				break;
+		}
+	}
 	
 	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));
 }
