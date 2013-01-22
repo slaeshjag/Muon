@@ -100,6 +100,8 @@ void menu_init() {
 void menu_state(enum MENU_STATE state) {
 	//We need to do this the next iteration to not segfault when removing widgets that are running thier eventhandler
 	menu_newstate=state;
+	panelist_menu_sidebar.next=NULL;
+	ui_selected_widget=NULL;
 	ui_event_global_add(meni_state_change, UI_EVENT_TYPE_MOUSE_ENTER);
 }
 

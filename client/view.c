@@ -24,6 +24,7 @@
 #include "menu/multiplayer.h"
 #include "view.h"
 #include "game.h"
+#include "gameover.h"
 #include "chat.h"
 #include "lobby.h"
 #include "intmath.h"
@@ -50,13 +51,16 @@ void view_init() {
 	menu_init();
 	lobby_init();
 	game_view_init();
+	gameover_init();
+	chat_init();
 	
-	gamestate_pane[0]=&panelist_menu_sidebar;
-	gamestate_pane[1]=&panelist_multiplayer_connecting;
-	gamestate_pane[2]=&panelist_lobby_players;
-	gamestate_pane[3]=&panelist_game_sidebar;
-	gamestate_pane[4]=&panelist_game_menu;
-	gamestate_pane[5]=NULL;
+	gamestate_pane[GAME_STATE_MENU]=&panelist_menu_sidebar;
+	gamestate_pane[GAME_STATE_CONNECTING]=&panelist_multiplayer_connecting;
+	gamestate_pane[GAME_STATE_LOBBY]=&panelist_lobby_players;
+	gamestate_pane[GAME_STATE_GAME]=&panelist_game_sidebar;
+	gamestate_pane[GAME_STATE_GAME_MENU]=&panelist_game_menu;
+	gamestate_pane[GAME_STATE_GAME_OVER]=&panelist_gameover_sidebar;
+	gamestate_pane[GAME_STATE_QUIT]=NULL;
 	
 	map=NULL;
 }

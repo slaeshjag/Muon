@@ -236,7 +236,8 @@ void client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			player[msg->player_id].stats.efficiency=msg->arg_2;
 			break;
 		case MSG_RECV_GAME_ENDED:
-			ui_messagebox(font_std, "Game over");
+			//ui_messagebox(font_std, T("Game over"));
+			game_state(GAME_STATE_GAME_OVER);
 			break;
 	}
 }
