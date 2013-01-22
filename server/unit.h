@@ -20,7 +20,7 @@
 #ifndef __UNIT_H__
 #define	__UNIT_H__
 
-#define	UNITS_DEFINED			8
+#define	UNITS_DEFINED			9
 
 #define	UNIT_DEF_NOTHING		0
 #define	UNIT_DEF_GENERATOR		1
@@ -33,6 +33,7 @@
 #define	UNIT_DEF_BUILDSITE		6
 #define	UNIT_DEF_CLUSTERBOMB		7
 #define	UNIT_DEF_RADAR			8
+#define UNIT_DEF_GROUNDGEN		9
 
 #define	UNIT_DEF_BUILDSITE_FREE		0x100
 
@@ -109,7 +110,8 @@ static const int unit_damage[] = {
 	0,		/* wall */
 	0,		/* owned control point (buildsite) */
 	2000 * 150 * 50,/* carpet bomb (this / Generator shield gives bomb count) */
-	0		/* radar */
+	0,		/* radar */
+	0		/* ground generator */
 };
 
 #define	UNIT_NUKE_MAX_DEFLECTION	2000 * 75
@@ -127,6 +129,7 @@ static const int unit_range[] = {
 	0,		/* owned control point (buildsite) */
 	7,		/* carpet bomb (radius of spread) */
 	7,		/* Radius of the FoW "window" that opens */
+	2,		/* Radius of ground to regenerate */
 };
 
 /* measured in ticks, of which there are 3000/s with normal game speed. */
@@ -139,7 +142,8 @@ static const int unit_buildtime[] = {
 	15000,		/* wall */
 	50000,		/* owned control point (buildsite) */
 	100000,		/* carpet bomb */
-	70000		/* radar */
+	70000,		/* radar */
+	70000,		/* ground generator */
 };
 
 /* Points for determening a winner without generators being lost. */
@@ -154,7 +158,8 @@ static const int unit_points[] = {
 	2,		/* Wall */
 	6,		/* Owned control point */
 	13,		/* carpet bomb */
-	9		/* radar */
+	9,		/* radar */
+	9,		/* ground generator */
 };
 
 struct SERVER_UNIT;
