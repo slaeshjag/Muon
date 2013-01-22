@@ -154,7 +154,7 @@ void game_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EV
  *  - positive if a building is ready
  *  - zero (BUILDING_NONE) if no building is ready */
 void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT)
+	if(e&&e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT)
 		building_cancel=1;
 	UI_PROPERTY_VALUE v;
 	int i=0;
