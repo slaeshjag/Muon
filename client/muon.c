@@ -33,6 +33,7 @@ void (*state_render[])()={
 		view_background_draw,
 		game_view_draw,
 		game_view_draw,
+		view_background_draw,
 		NULL,
 };
 
@@ -50,6 +51,7 @@ void game_state(GAME_STATE state) {
 		case GAME_STATE_GAME_MENU:
 		case GAME_STATE_MENU:
 			ui_event_global_remove(menu_buttons, UI_EVENT_TYPE_BUTTONS);
+		case GAME_STATE_GAME_OVER:
 		case GAME_STATE_CONNECTING:
 		case GAME_STATE_LOBBY:
 		case GAME_STATE_QUIT:
@@ -76,6 +78,7 @@ void game_state(GAME_STATE state) {
 			d_render_clearcolor_set(0x0, 0x0, 0x0);
 		case GAME_STATE_GAME_MENU:
 			ui_event_global_add(menu_buttons, UI_EVENT_TYPE_BUTTONS);
+		case GAME_STATE_GAME_OVER:
 		case GAME_STATE_LOBBY:
 		case GAME_STATE_QUIT:
 			d_input_release();
@@ -97,7 +100,6 @@ int main() {
 	intmath_init();
 	ui_init();
 	view_init();
-	chat_init();
 	
 	ui_event_global_add(view_mouse_draw, UI_EVENT_TYPE_UI);
 	game_state(GAME_STATE_MENU);
