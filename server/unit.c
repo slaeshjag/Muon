@@ -335,7 +335,9 @@ int unitAdd(int owner, int type, int x, int y) {
 	unit->next = server->unit;
 	server->unit = unit;
 	server->map_c.tile_data[index] |= 0x80000;
-	server->player[owner].stats.buildings_raised++;
+	
+	if (server->game.time_elapsed > SERVER_GAME_START_DELAY)
+		server->player[owner].stats.buildings_raised++;
 
 
 	playerCalcLOS(owner, x , y, 1);
