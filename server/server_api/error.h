@@ -20,6 +20,6 @@
 #ifndef __ERROR_H__
 #define	__ERROR_H__
 
-const char *error_pop();
+const char *server_error_pop();
 
 #endif

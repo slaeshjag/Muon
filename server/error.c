@@ -55,6 +55,6 @@ const char *errorPop() {
 }
 
 
-const char *error_pop() {
+const char *server_error_pop() {
 	return errorPop();
 }
