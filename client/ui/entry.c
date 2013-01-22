@@ -74,7 +74,7 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	if(!widget->enabled)
 		return;
 	struct UI_ENTRY_PROPERTIES *p=widget->properties;
-	int tw;
+	int tw=0;
 	switch(type) {
 		case UI_EVENT_TYPE_KEYBOARD_PRESS:
 			if(e->keyboard->keysym==8) {
