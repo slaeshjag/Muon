@@ -38,8 +38,8 @@ int serverInitMap(const char *path) {
 	for (i = 0; i < n; i++)
 		if (server->map_c.tile_data[i] != 0) {
 			t = server->map_c.tile_data[i] & 0xFFF;
-			building = (t % 8) + 1;
-			owner = (t / 8) - 1;
+			building = (t % MAP_BUILDINGS_PER_PLAYER) + 1;
+			owner = (t / MAP_BUILDINGS_PER_PLAYER) - 1;
 			max_players = (owner + 1 > max_players) ? owner + 1 : max_players;
 			if (building == UNIT_DEF_GENERATOR && owner >= 0) {
 				spawns++;

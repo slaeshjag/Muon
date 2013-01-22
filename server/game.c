@@ -71,8 +71,8 @@ void gameSpawn() {
 				t = server->map_c.tile_data[i] & 0xFFF;
 				if (!t)
 					continue;
-				building = (t % 8) + 1;
-				owner = (t / 8) - 1;
+				building = (t % MAP_BUILDINGS_PER_PLAYER) + 1;
+				owner = (t / MAP_BUILDINGS_PER_PLAYER) - 1;
 				if (owner != server->player[j].spawn_as)
 					continue;
 				if (server->player[j].status != PLAYER_IN_GAME_NOW) 
