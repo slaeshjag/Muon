@@ -269,6 +269,7 @@ SERVER *serverKill() {
 	server->map_data = ldmzFree(server->map_data);
 	free(server->map_c.data);
 	free((void *) server->map_c.path);
+	free(server->clusterbomb_buffer);
 
 	free(server);
 	server = NULL;
