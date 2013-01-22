@@ -59,7 +59,7 @@ int controlpointShieldregenInit(SERVER_UNIT *unit) {
 
 int controlpointBuildsiteInit(SERVER_UNIT *unit) {
 	server->player[unit->owner].buildspots++;
-	server->player[unit->owner].buildspeed = powf(1.3, server->player[unit->owner].buildspots);
+	server->player[unit->owner].buildspeed = CP_BUILDSITE_SPEED(server->player[unit->owner].buildspots);
 	unit->cp = NULL;
 
 	return 0;
@@ -140,7 +140,7 @@ int controlpointNew(struct SERVER_UNIT *unit) {
 
 void controlpointBuildsiteRemove(SERVER_UNIT *unit) {
 	server->player[unit->owner].buildspots--;
-	server->player[unit->owner].buildspeed = powf(1.3, server->player[unit->owner].buildspots);
+	server->player[unit->owner].buildspeed = CP_BUILDSITE_SPEED(server->player[unit->owner].buildspots);
 
 	return;
 }

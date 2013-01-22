@@ -22,6 +22,7 @@
 
 #define	CP_DELAY_SEC(x)			((x) / server->game.gamespeed / 1000)
 
+#define	CP_BUILDSITE_SPEED(x)		(powf(1.3, (x)))
 #define	CP_RADAR_SPEED(x)		((x))
 #define	CP_CLUSTERBOMB_SPEED(x)		((x))
 #define	CP_GROUNDGEN_SPEED(x)		((x))
