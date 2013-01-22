@@ -29,7 +29,7 @@
 
 typedef void SERVER;
 
-void serverInit();
+void server_init();
 SERVER *server_start(const char *map, unsigned int players, int port, int gamespeed);
 void server_loop(unsigned int msec);
 void server_stop();

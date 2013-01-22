@@ -53,3 +53,8 @@ const char *errorPop() {
 
 	return server_errors[err];
 }
+
+
+const char *error_pop() {
+	return errorPop();
+}
