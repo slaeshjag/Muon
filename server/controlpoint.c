@@ -149,6 +149,7 @@ void controlpointDelayReset(SERVER_UNIT *unit) {
 
 void controlpointClusterbombRemove(SERVER_UNIT *unit) {
 	controlpointDelayReset(unit);
+	server->player[unit->owner].cp.clusterbomb.count = 0;
 
 	return;
 }
@@ -156,6 +157,7 @@ void controlpointClusterbombRemove(SERVER_UNIT *unit) {
 
 void controlpointRadarRemove(SERVER_UNIT *unit) {
 	controlpointDelayReset(unit);
+	server->player[unit->owner].cp.radar.count = 0;
 
 	return;
 }
