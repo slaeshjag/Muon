@@ -95,8 +95,8 @@ PLAYER *playerDestroy(PLAYER *player, int players) {
 		return player;
 	
 	for (i = 0; i < players; i++) {
-		if (server->player[i].status == PLAYER_UNUSED)
-			continue;
+	//	if (server->player[i].status == PLAYER_UNUSED)
+	//		continue;
 		playerDisconnectKill(i);
 		messageBufferDelete(server->player[i].msg_buf);
 		free(player[i].map);
