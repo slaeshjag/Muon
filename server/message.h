@@ -92,6 +92,7 @@
 #define	MSG_SEND_CP_DEPLOY		0x01D
 #define	MSG_SEND_CP_CLEAR		0x01E
 #define	MSG_SEND_MAJOR_IMPACT		0x01F
+#define	MSG_SEND_PLAYER_POINTS		0x020
 
 typedef struct {
 	unsigned int		player_ID;
