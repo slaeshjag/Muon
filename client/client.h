@@ -55,7 +55,7 @@ int player_id;
 PLAYER *player;
 int players;
 
-void (*client_message_handler)(MESSAGE_RAW *, unsigned char *);
+int (*client_message_handler)(MESSAGE_RAW *, unsigned char *);
 
 void client_chat(int id, char *buf, int len);
 

@@ -32,9 +32,9 @@ void (*state_render[])()={
 		view_background_draw,
 		view_background_draw,
 		view_background_draw,
-		game_view_draw,
-		game_view_draw,
 		view_background_draw,
+		game_view_draw,
+		game_view_draw,
 		NULL,
 };
 
@@ -77,6 +77,7 @@ void game_state(GAME_STATE state) {
 			break;
 		case GAME_STATE_GAME_OVER:
 			gameover_update_stats();
+			client_connect_callback(-2, NULL, sock);
 		case GAME_STATE_MENU:
 			d_render_clearcolor_set(0x0, 0x0, 0x0);
 		case GAME_STATE_GAME_MENU:
@@ -117,8 +118,10 @@ int main() {
 			state_render[gamestate]();
 		
 		d_render_tint(255*(!(player_id%3)), 255*(player_id>1), 255*(player_id==1), 255);
-		if(gamestate==GAME_STATE_GAME_MENU)
+		if(gamestate==GAME_STATE_GAME_MENU) {
 			ui_pane_render(panelist_game_sidebar.pane);
+			ui_pane_render(panelist_game_abilitybar.pane);
+		}
 		ui_events(gamestate_pane[gamestate], 1);
 		d_render_tint(255, 255, 255, 255);
 		
