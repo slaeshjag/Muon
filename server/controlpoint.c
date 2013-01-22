@@ -494,8 +494,10 @@ void controlpointDeployGroundgen(int player, int index_dst) {
 			index = (x + i) + (j + y) * server->w;
 			if (!(server->map_c.tile_data[index] & 0x20000))
 				continue;
-			server->map_c.tile_data[index] &= 0xE00FF;
+			server->map_c.tile_data[index] &= 0xE0FFF;
 			server->map_c.tile_data[index] |= 0x60000;
+			if ((server->map_c.tile_data[index] & 0xFFF) == UNIT_BUILDSITE)
+				unitAnnounce(0, player, UNIT_BUILDSITE, index);
 			for (k = 0; k < server->players; k++) {
 				if (server->player[i].status == PLAYER_UNUSED)
 					continue;

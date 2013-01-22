@@ -660,7 +660,7 @@ void unitDamageDo(int index, int damage, int time) {
 	if (!server->map[next->target]) {
 		if (damage < MAP_TERRAIN_ABSORTION)
 			return;
-		server->map_c.tile_data[next->target] &= 0xF00FF;
+		server->map_c.tile_data[next->target] &= 0xF0FFF;
 		server->map_c.tile_data[next->target] |= 0x70000;
 		for (i = 0; i < server->players; i++) {
 			if (server->player[i].status == PLAYER_UNUSED)
