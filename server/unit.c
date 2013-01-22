@@ -376,7 +376,8 @@ int unitRemove(int x, int y) {
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_SHIELD, 0, index, NULL);
 	}
 	
-	server->player[owner].stats.buildings_lost++;
+	if (server->player[owner].status == PLAYER_IN_GAME_NOW)
+		server->player[owner].stats.buildings_lost++;
 
 	while (next != unit) {
 		parent = &next->next;
