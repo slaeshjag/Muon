@@ -162,6 +162,9 @@ typedef struct {
 /* arg_1 is nothing, arg_2 is tile ID of major impact */
 #define	MSG_RECV_MAJOR_IMPACT		0x01F
 
+/* arg_1 is the amount of points the player got, arg_2 is nothing. */
+#define	MSG_RECV_PLAYER_POINTS		0x020
+
 
 /* These commands have data after them */
 

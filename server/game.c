@@ -209,6 +209,7 @@ void gameEnd() {
 		eff = stats.buildtime * 100 / (stats.buildtime + stats.no_build_time);
 		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_1, stats.buildings_raised, stats.buildings_lost, NULL);
 		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_2, stats.buildings_destroyed, eff, NULL);
+		playerMessageBroadcast(i, MSG_SEND_PLAYER_POINTS, playerCountPoints(i), 0, NULL);
 		fprintf(stderr, "Total amount of points for %.31s: %.8u\n", server->player[i].name, playerCountPoints(i));
 	}
 	

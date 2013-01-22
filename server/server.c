@@ -115,8 +115,20 @@ void serverInit() {
 }
 
 
+void server_init() {
+	serverInit();
+
+	return;
+}
+
+
 int serverIsRunning() {
 	return (server) ? 0 : -1;
+}
+
+
+int server_is_running() {
+	return serverIsRunning();
 }
 
 
@@ -220,6 +232,11 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 }
 
 
+SERVER *server_start(const char *map, unsigned int players, int port, int gamespeed) {
+	return server_start(map, players, port, gamespeed);
+}
+
+
 SERVER *serverStop() {
 	if (!server)
 		return NULL;
@@ -227,6 +244,11 @@ SERVER *serverStop() {
 	server->state = SERVER_SHUTTING_DOWN;
 
 	return NULL;
+}
+
+
+SERVER *server_stop() {
+	return serverStop();
 }
 
 
@@ -526,6 +548,11 @@ int serverLoop(unsigned int d_ms) {
 }
 
 
+int server_loop(unsigned int d_ms) {
+	return serverLoop(d_ms);
+}
+
+
 int serverPlayersPlaying() {
 	int i, p;
 
@@ -538,10 +565,20 @@ int serverPlayersPlaying() {
 }
 
 
+int server_players_playing() {
+	return serverPlayersPlaying();
+}
+
+
 void serverAdminSet(int player) {
 	if (!server)
 		return;
 	server->server_admin = player;
 
 	return;
+}
+
+
+void server_admin_set(int player) {
+	serverAdminSet(player);
 }
