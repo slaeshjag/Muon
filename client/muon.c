@@ -77,7 +77,7 @@ void game_state(GAME_STATE state) {
 			break;
 		case GAME_STATE_GAME_OVER:
 			gameover_update_stats();
-			client_connect_callback(-2, NULL, sock);
+			client_disconnect(MSG_RECV_GAME_ENDED);
 		case GAME_STATE_MENU:
 			d_render_clearcolor_set(0x0, 0x0, 0x0);
 		case GAME_STATE_GAME_MENU:

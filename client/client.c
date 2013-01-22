@@ -381,6 +381,6 @@ void client_disconnect(int cause) {
 			ui_messagebox(font_std, T("Lost connection to server."));
 			break;
 	}
-	client_connect_callback(-1, NULL, sock);
+	client_connect_callback(cause==MSG_RECV_GAME_ENDED?-2:-1, NULL, sock);
 	sock=NULL;
 }
