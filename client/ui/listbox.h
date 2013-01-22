@@ -34,8 +34,10 @@ struct UI_LISTBOX_PROPERTIES {
 	struct UI_LISTBOX_LIST *list;
 	struct UI_LISTBOX_LIST *offset;
 	DARNIT_LINE *border;
+	DARNIT_LINE *scrollbar;
 	int size;
 	int scroll;
+	int scroll_max;
 	int selected;
 	DARNIT_RECT *selected_rect;
 };

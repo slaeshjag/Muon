@@ -45,8 +45,10 @@ UI_WIDGET *ui_widget_create_listbox(DARNIT_FONT *font) {
 	p->font=font;
 	p->border=d_render_line_new(4, 1);
 	p->selected_rect=d_render_rect_new(1);
+	p->scrollbar=d_render_rect_new(1);
 	p->size=0;
 	p->scroll=0;
+	p->scroll_max=0;
 	p->selected=-1;
 	
 	widget->destroy=ui_widget_destroy_listbox;
@@ -66,6 +68,7 @@ void *ui_widget_destroy_listbox(UI_WIDGET *widget) {
 	ui_listbox_clear(widget);
 	d_render_line_free(p->border);
 	d_render_rect_free(p->selected_rect);
+	d_render_rect_free(p->scrollbar);
 	return ui_widget_destroy(widget);
 }
 
@@ -134,8 +137,8 @@ void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	for(l=p->list; l; l=l->next) {
 		text_h=2;
 		for(ll=l; ll; ll=ll->next)
-			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-UI_PADDING*2, NULL);
-		if(pos>=0&&i>=pos)
+			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-UI_PADDING*3, NULL);
+		if((pos>=0&&i>=pos))
 			break;
 		if(text_h<widget->h-2)
 			break;
@@ -143,6 +146,17 @@ void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	}
 	p->offset=l;
 	p->scroll=i;
+	
+	pos=-1;
+	for(; l; l=l->next) {
+		text_h=2;
+		for(ll=l; ll; ll=ll->next)
+			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-UI_PADDING*3, NULL);
+		if(text_h<widget->h-2)
+			break;
+		i++;
+	}
+	p->scroll_max=i;	
 	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
 
@@ -159,7 +173,7 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int i=p->scroll;
 		int item_y=widget->y+2;
 		for(l=p->offset; l; l=l->next, i++) {
-			int item_h=d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*2, NULL);
+			int item_h=d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*3, NULL);
 			if(e->mouse->y>item_y&&e->mouse->y<item_y+item_h) {
 				p->selected=i;
 				widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
@@ -232,16 +246,19 @@ void ui_listbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	int i=p->scroll;
 	while(l) {
 		l->surface=d_text_surface_free(l->surface);
-		int item_h=d_font_string_geometrics(p->font, l->text, w-UI_PADDING*2, NULL);
+		int item_h=d_font_string_geometrics(p->font, l->text, w-UI_PADDING*3, NULL);
 		if(item_y+item_h>y+h-2)
 			break;
-		l->surface=d_text_surface_new(p->font, 128, w-UI_PADDING*2, x+UI_PADDING, item_y);
+		l->surface=d_text_surface_new(p->font, 128, w-UI_PADDING*3, x+UI_PADDING, item_y);
 		d_text_surface_string_append(l->surface, l->text);
 		if(i==p->selected)
-			d_render_rect_move(p->selected_rect, 0, x+UI_PADDING, item_y, x+w-UI_PADDING, item_y+item_h);
+			d_render_rect_move(p->selected_rect, 0, x+UI_PADDING, item_y, x+w-UI_PADDING*3, item_y+item_h);
 		item_y+=item_h;
 		l=l->next; i++;
 	}
+	int scroll=p->size?(widget->h-UI_PADDING)*p->scroll/p->size:0;
+	int scroll_left=p->size?(widget->h-UI_PADDING)*(p->scroll_max)/p->size:0;
+	d_render_rect_move(p->scrollbar, 0, widget->x+widget->w-UI_PADDING*2, widget->y+UI_PADDING/2+scroll, widget->x+widget->w-UI_PADDING, widget->y+widget->h-UI_PADDING/2-scroll_left+scroll);
 }
 
 void ui_listbox_request_size(UI_WIDGET *widget, int *w, int *h) {
@@ -270,4 +287,5 @@ void ui_listbox_render(UI_WIDGET *widget) {
 		d_render_rect_draw(p->selected_rect, 1);
 		d_render_logic_op(DARNIT_RENDER_LOGIC_OP_NONE);
 	}
+	d_render_rect_draw(p->scrollbar, 1);
 }
