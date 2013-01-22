@@ -168,6 +168,12 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		p->scroll+=e->mouse->wheel;
 		p->scroll=p->scroll<0?0:p->scroll;
 		ui_listbox_scroll(widget, p->scroll);
+	} else if(e->mouse->x>=widget->x+widget->w-UI_PADDING*2&&e->mouse->x<widget->x+widget->w-UI_PADDING) {
+		if(type==UI_EVENT_TYPE_MOUSE_DOWN&&e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
+			int scroll=p->scroll_max*(e->mouse->y-widget->y)/(widget->h-UI_PADDING);
+			ui_listbox_scroll(widget, scroll);
+			return;
+		}
 	} else if(type==UI_EVENT_TYPE_MOUSE_PRESS&&e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
 		struct UI_LISTBOX_LIST *l;
 		int i=p->scroll;
