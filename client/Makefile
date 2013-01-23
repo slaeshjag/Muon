@@ -1,5 +1,6 @@
 # Project: muon
 include $(TOPDIR)/config.mk
+LDFLAGS		+=	-ldarnit
 
 SERVER		=	../server/server.a
 BIN		=	../muon

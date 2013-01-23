@@ -7,7 +7,7 @@ APPLICATIONSPATH=	/usr/share/applications
 
 DBGFLAGS	=	-O0 -g -D__DEBUG__
 CFLAGS		+=	-Wall $(INCS) $(DBGFLAGS)
-LDFLAGS		+=	-ldarnit -lm
+LDFLAGS		+=	-lm
 RM		=	rm -f
 
 ifeq ($(strip $(OS)), Windows_NT)
