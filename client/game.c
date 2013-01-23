@@ -385,12 +385,12 @@ void game_attacklist_lines_recalculate() {
 	//int map_ht=map->layer[map->layers-2].tilemap->h;
 	int tw=map->layer[map->layers-2].tile_w;
 	int th=map->layer[map->layers-2].tile_h;
-	for(i=0; i<4; i++) {
+	for(i=0; i<MAX_PLAYERS; i++) {
 		d_render_line_free(game_attacklist_render[i].lines);
 		game_attacklist_render[i].lines=d_render_line_new(game_attacklist_render[i].length, 1);
 	}
 	
-	int j[4]={0, 0, 0, 0};
+	int *j=malloc(players);
 	
 	for(l=game_attacklist; l; l=l->next) {
 		x1=l->index%map_wt*tw+tw/2;
@@ -400,6 +400,7 @@ void game_attacklist_lines_recalculate() {
 		d_render_line_move(game_attacklist_render[l->owner].lines, j[l->owner], x1, y1, x2, y2);
 		j[l->owner]++;
 	}
+	free(j);
 }
 
 void game_attacklist_add(int index) {
@@ -410,7 +411,7 @@ void game_attacklist_add(int index) {
 	ll=*l;
 	ll->index=index;
 	ll->target=index;
-	ll->owner=(map->layer[map->layers-2].tilemap->data[index]&0xFFFF)/8-1;
+	ll->owner=(map->layer[map->layers-2].tilemap->data[index]&0xFFFF)/tilesx-1;
 	ll->next=NULL;
 	game_attacklist_render[ll->owner].length++;
 	game_attacklist_lines_recalculate();
@@ -439,7 +440,7 @@ void game_attacklist_clear() {
 		free(l);
 	}
 	game_attacklist=NULL;
-	for(i=0; i<4; i++) {
+	for(i=0; i<MAX_PLAYERS; i++)  {
 		game_attacklist_render[i].length=0;
 		game_attacklist_render[i].lines=d_render_line_free(game_attacklist_render[i].lines);
 	}
@@ -505,7 +506,7 @@ void game_view_draw() {
 	else
 		map_draw(0);
 	
-	int i=game_attacklist_blink_semaphore/16;
+	int i=game_attacklist_blink_semaphore/(4*players);
 	d_render_offset(map->cam_x, map->cam_y);
 	d_render_tint(255*(!(i%3)), 255*(i>1), 255*(i==1), 255);
 	if(game_attacklist_render[i].lines)
@@ -513,7 +514,7 @@ void game_view_draw() {
 	d_render_offset(0, 0);
 	d_render_tint(255, 255, 255, 255);
 	
-	if(game_attacklist_blink_semaphore>=63)
+	if(game_attacklist_blink_semaphore>=(16*players-1))
 		game_attacklist_blink_semaphore=0;
 	else
 		game_attacklist_blink_semaphore++;
@@ -532,7 +533,7 @@ void game_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		if(building_place<=-1)
 			d_render_tile_blit(ability[-building_place-2].icon, 0, x, y);
 		else if(building_place>-1)
-			d_render_tile_blit(l->ts, player_id*8+building_place+7, x, y);
+			d_render_tile_blit(l->ts, ((player_id+1)*tilesx)+building_place-1, x, y);
 		d_render_blend_disable();
 		d_render_offset(0, 0);
 	}

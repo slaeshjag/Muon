@@ -27,6 +27,7 @@
 #define MAP_INDEX(x, y) ((y)*toplayer_tilemap->w+(x))
 
 void map_init(char *filename) {
+	int w, h;
 	unsigned int i, j;
 	
 	powergrid=NULL;
@@ -44,7 +45,7 @@ void map_init(char *filename) {
 	map_grid_chunks=0;
 	
 	game_attacklist=NULL;
-	for(i=0; i<4; i++) {
+	for(i=0; i<MAX_PLAYERS; i++) {
 		game_attacklist_render[i].length=0;
 		game_attacklist_render[i].lines=NULL;
 	}
@@ -52,6 +53,9 @@ void map_init(char *filename) {
 	map=d_map_load(filename);
 	map_w=map->layer->tilemap->w*map->layer->tile_w;
 	map_h=map->layer->tilemap->h*map->layer->tile_h;
+	d_render_tilesheet_geometrics(map->layer->ts, &w, &h, NULL, NULL);
+	tilesx=w/map->layer->tile_w;
+	tilesy=h/map->layer->tile_h;
 	
 	DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
 	d_render_line_move(map_selected.border, 0, 0, 0, building_layer->tile_w, 0);
@@ -167,7 +171,7 @@ void map_calculate_powergrid() {
 
 void map_building_place(int index, int player, int building) {
 	/*unsigned int old=map->layer[map->layers-2].tilemap->data[index]&0xFFF;*/
-	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_CONTROL_POINT)?5:(building!=0)*(player*8+building+7)|(map->layer[map->layers-2].tilemap->data[index]&(1<<17));
+	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_CONTROL_POINT)?5:(building!=0)*(((player_id+1)*tilesx)+building-1)|(map->layer[map->layers-2].tilemap->data[index]&(1<<17));
 	if(building==BUILDING_ATTACKER||building==BUILDING_SCOUT) {
 		game_attacklist_add(index);
 	} else if(building==BUILDING_NONE) {
@@ -271,10 +275,10 @@ unsigned int map_set_tile_attributes(int index, int attrib) {
 void map_select_building(int index) {
 	map_selected.index=index;
 	int selected_building=(map->layer[map->layers-2].tilemap->data[index]&0xFFFF);
-	map_selected.owner=selected_building/8-1;
-	map_selected.building=selected_building%8+1;
+	map_selected.owner=selected_building/tilesx-1;
+	map_selected.building=selected_building%tilesx+1;
 	
-	if(map_selected.owner<0||map_selected.owner>3) {
+	if(map_selected.owner<0||map_selected.owner>players-1) {
 		map_selected.building=0;
 		map_selected.index=-1;
 		map_selected.owner=-1;
@@ -478,7 +482,7 @@ void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
 				if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==5)
 					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[6];
 				else if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)>0)
-					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
+					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/tilesx+1];
 			}
 	
 	d_render_tilesheet_update(ts, 0, 0, w, h, minimap_data);

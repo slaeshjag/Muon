@@ -29,6 +29,7 @@ int powergrid_lines;
 DARNIT_MAP *map;
 int map_w, map_h;
 int home_x, home_y;
+int tilesx, tilesy;
 
 struct MAP_GRID_CHUNK {
 	DARNIT_LINE *lines;

@@ -27,6 +27,8 @@
 
 #define MSG_SERVER_DISCONNECT 0x10000
 
+#define MAX_PLAYERS 8
+
 typedef struct {
 	unsigned int built;
 	unsigned int lost;
