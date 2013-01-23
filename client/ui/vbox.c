@@ -180,7 +180,7 @@ void ui_vbox_request_size(UI_WIDGET *widget, int *w, int *h) {
 		if(!c->expand) {
 			req_h=*h; req_w=-1;
 			c->widget->request_size(c->widget, &req_w, &req_h);
-			h+=req_h;
+			hh+=req_h;
 			ww=req_w>ww?req_w:ww;
 		}
 	}
