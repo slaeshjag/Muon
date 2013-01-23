@@ -1,25 +1,19 @@
 # Project: muon
+include $(TOPDIR)/config.mk
 
-MAKEFLAGS += --no-print-directory
+BIN		=	../muon-server
+LIBOUT		=	server.a
+STANDALONE	=	standalone/*.o
+LIBOBJ		=	lib/*.o
 
-BIN  = ../muon-server
-LIBOUT = server.a
-STANDALONE = standalone/*.o
-LIBOBJ = lib/*.o
-DEBUGFLAGS = -O0 -g -D__DEBUG__
-CFLAGS += $(INCS) $(DEBUGFLAGS) -Wall
-LDFLAGS +=  -lm
-RM = rm -f
-
-DEPENDS = server_tester
+DEPENDS		=	server_tester
 
 ifeq ($(strip $(OS)), Windows_NT)
 	DEPENDS =
-	LDFLAGS += -lws2_32
 endif
 
-SRCFILES=$(wildcard *.c)
-OBJFILES=$(SRCFILES:.c=.o)
+SRCFILES	=	$(wildcard *.c)
+OBJFILES	=	$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES) $(DEPENDS)

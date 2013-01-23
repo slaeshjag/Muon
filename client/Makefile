@@ -1,19 +1,13 @@
 # Project: muon
+include $(TOPDIR)/config.mk
 
-MAKEFLAGS += --no-print-directory
+SERVER		=	../server/server.a
+BIN		=	../muon
 
-SERVER	= ../server/server.a
-BIN	= ../muon
-DBGFLAGS= -g -D__DEBUG__
-CFLAGS 	+= -Wall $(INCS) $(DBGFLAGS)
-LDFLAGS += -ldarnit
-RM	= rm -f
-
-DEPENDS =
+DEPENDS		=
 
 ifeq ($(strip $(OS)), Windows_NT)
 	DEPENDS += muon.res
-	LDFLAGS += -lws2_32 -mwindows
 endif
 
 SRCFILES=$(wildcard *.c)

@@ -1,7 +1,9 @@
-MAKEFLAGS += --no-print-directory
-PREFIX = /usr/local
-DATAPATH=/usr/share/games/muon
-APPLICATIONSPATH=/usr/share/applications
+# Project: muon
+include config.mk
+MAKEFLAGS	+=	--no-print-directory
+
+TOPDIR		=	$(shell pwd)
+export TOPDIR
 
 all:
 	@echo " [ CD ] server/"
