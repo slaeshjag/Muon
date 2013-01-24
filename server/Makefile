@@ -1,44 +1,43 @@
 # Project: muon
+include $(TOPDIR)/config.mk
 
-MAKEFLAGS += --no-print-directory
+BIN		=	../muon-server
+LIBOUT		=	server.a
+STANDALONE	=	standalone/*.o
+LIBOBJ		=	lib/*.o
 
-BIN  = ../muon-server
-LIBOUT = server.a
-STANDALONE = standalone/*.o
-LIBOBJ = lib/*.o
-DEBUGFLAGS = -O0 -g -D__DEBUG__
-CFLAGS += $(INCS) $(DEBUGFLAGS) -Wall
-LDFLAGS +=  -lm
-RM = rm -f
-
-DEPENDS = server_tester
+DEPENDS		=	server_tester
 
 ifeq ($(strip $(OS)), Windows_NT)
 	DEPENDS =
-	LDFLAGS += -lws2_32
 endif
 
-SRCFILES=$(wildcard *.c)
-OBJFILES=$(SRCFILES:.c=.o)
+SRCFILES	=	$(wildcard *.c)
+OBJFILES	=	$(SRCFILES:.c=.o)
 .PHONY: all clean
 
-all: $(OBJFILES) $(DEPENDS)
-	@echo ""
-	@echo " [ CD ] server/standalone/"
-	+@make -C standalone/
-	@echo ""
-	@echo " [ CD ] server/lib/"
-	+@make -C lib/
-	@echo " [ LD ]	$(BIN)"
-	@$(CC) $(CFLAGS) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
-	@echo " [ AR ] $(LIBOUT)"
-	@$(AR) -cr $(LIBOUT) $(OBJFILES) $(LIBOBJ)
+all: server_lib server_standalone $(DEPENDS)
 	@echo " Done."
 	@echo
 	
 server_tester:
 	@echo " [ CD ] server/server_tester/"
 	+@make -C server_tester/
+	
+server_standalone: $(OBJFILES)
+	@echo ""
+	@echo " [ CD ] server/standalone/"
+	+@make -C standalone/
+	@echo ""
+	
+	@echo " [ LD ]	$(BIN)"
+	@$(CC) $(CFLAGS) $(OBJFILES) $(STANDALONE) -o $(BIN) $(LIBS) $(LDFLAGS)
+
+server_lib: $(OBJFILES)
+	@echo " [ CD ] server/lib/"
+	+@make -C lib/
+	@echo " [ AR ] $(LIBOUT)"
+	@$(AR) -cr $(LIBOUT) $(OBJFILES) $(LIBOBJ)
 
 clean:
 	@echo " [ RM ]	$(OBJFILES)"

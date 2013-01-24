@@ -19,6 +19,7 @@
 
 #ifndef GAME_H
 #define GAME_H
+#include "client.h"
 
 #define SIDEBAR_WIDTH 128
 #define SCROLL_OFFSET 8
@@ -56,7 +57,7 @@ int attacker_target;
 struct BUILDING {
 	const char *name;
 	int range;
-} building[16];
+} building[20];
 
 struct ABILITY {
 	UI_WIDGET *button;
@@ -75,10 +76,10 @@ struct GAME_ATTACKLIST {
 	struct GAME_ATTACKLIST *next;
 } *game_attacklist;
 
-struct {
+struct GAME_ATTACKLIST_RENDER {
 	int length;
 	DARNIT_LINE *lines;
-} game_attacklist_render[4];
+} game_attacklist_render[MAX_PLAYERS];
 
 //int game_attacklist_length;
 //DARNIT_LINE *game_attacklist_lines;

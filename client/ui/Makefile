@@ -1,13 +1,8 @@
 # Project: muon
+include $(TOPDIR)/config.mk
 
-MAKEFLAGS += --no-print-directory
-DBGFLAGS= -g -D__DEBUG__
-CFLAGS 	+= -Wall $(INCS) $(DBGFLAGS)
-LDFLAGS += -ldarnit
-RM	= rm -f
-
-SRCFILES=$(wildcard *.c)
-OBJFILES=$(SRCFILES:.c=.o)
+SRCFILES	=	$(wildcard *.c)
+OBJFILES	=	$(SRCFILES:.c=.o)
 .PHONY: all clean
 
 all: $(OBJFILES)

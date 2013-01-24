@@ -38,7 +38,7 @@ void gameover_init() {
 	gameover_stats_vbox_stat[i]=ui_widget_create_vbox();
 	ui_vbox_add_child(gameover_stats_vbox_stat[i], ui_widget_create_label(font_std, T(gameover_stats_headers[i])), 0);
 	ui_hbox_add_child(gameover_stats_hbox, gameover_stats_vbox_stat[i], 0);
-	ui_hbox_add_child(gameover_stats_hbox, ui_widget_create_spacer_size(1, 1), 0);
+	//ui_hbox_add_child(gameover_stats_hbox, ui_widget_create_spacer_size(1, 1), 0);
 	
 	ui_vbox_add_child(panelist_gameover_stats.pane->root_widget, ui_widget_create_label(font_std, T("Game statistics")), 0);
 	ui_vbox_add_child(panelist_gameover_stats.pane->root_widget, gameover_stats_hbox, 0);

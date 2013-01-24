@@ -1,7 +1,11 @@
-MAKEFLAGS += --no-print-directory
-PREFIX = /usr/local
-DATAPATH=/usr/share/games/muon
-APPLICATIONSPATH=/usr/share/applications
+# Project: muon
+include config.mk
+MAKEFLAGS	+=	--no-print-directory
+
+TOPDIR		=	$(shell pwd)
+export TOPDIR
+
+.PHONY: all server install pandora clean
 
 all:
 	@echo " [ CD ] server/"
@@ -10,6 +14,10 @@ all:
 	+@make -C client/
 	@echo " [ CD ] res/"
 	+@make -C res/
+
+server:
+	@echo " [ CD ] server/"
+	+@make -C server/ server_standalone
 	
 install:
 	@echo " [INST] muon"

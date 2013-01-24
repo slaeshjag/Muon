@@ -1,10 +1,7 @@
 # Project: muon
+include $(TOPDIR)/config.mk
 
-INCS =  -I../
-DEBUGFLAGS = -O0 -g -D__DEBUG__
-CFLAGS += $(INCS) $(DEBUGFLAGS)
-LDFLAGS += 
-RM = rm -f
+INCS		=	-I../
 
 SRCFILES=$(wildcard *.c)
 OBJFILES=$(SRCFILES:.c=.o)
@@ -20,4 +17,4 @@ clean:
 
 %.o: %.c %.h
 	@echo " [ CC ]	server/lib/$<"
-	@$(CC) $(CFLAGS) -c -o $@ $< 
+	@$(CC) $(CFLAGS) $(INCS) -c -o $@ $< 

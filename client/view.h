@@ -22,6 +22,24 @@
 
 #include "ui/ui.h"
 
+struct COLOR {
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+};
+
+static const struct COLOR player_color[]={
+	{255, 0, 0},
+	{0, 0, 255},
+	{0, 255, 0},
+	{255, 255, 0},
+	
+	{255, 0, 255},
+	{0, 255, 255},
+	{127, 127, 127},
+	{191, 127, 31},
+};
+
 DARNIT_FONT *font_std;
 DARNIT_TILESHEET *mouse_tilesheet;
 DARNIT_TILESHEET *mouse_target_tilesheet;

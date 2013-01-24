@@ -27,6 +27,7 @@
 #define MAP_INDEX(x, y) ((y)*toplayer_tilemap->w+(x))
 
 void map_init(char *filename) {
+	int w, h;
 	unsigned int i, j;
 	
 	powergrid=NULL;
@@ -44,7 +45,7 @@ void map_init(char *filename) {
 	map_grid_chunks=0;
 	
 	game_attacklist=NULL;
-	for(i=0; i<4; i++) {
+	for(i=0; i<MAX_PLAYERS; i++) {
 		game_attacklist_render[i].length=0;
 		game_attacklist_render[i].lines=NULL;
 	}
@@ -52,6 +53,9 @@ void map_init(char *filename) {
 	map=d_map_load(filename);
 	map_w=map->layer->tilemap->w*map->layer->tile_w;
 	map_h=map->layer->tilemap->h*map->layer->tile_h;
+	d_render_tilesheet_geometrics(map->layer->ts, &w, &h, NULL, NULL);
+	tilesx=w/map->layer->tile_w;
+	tilesy=h/map->layer->tile_h;
 	
 	DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
 	d_render_line_move(map_selected.border, 0, 0, 0, building_layer->tile_w, 0);
@@ -166,17 +170,13 @@ void map_calculate_powergrid() {
 }
 
 void map_building_place(int index, int player, int building) {
-	/*unsigned int old=map->layer[map->layers-2].tilemap->data[index]&0xFFF;*/
-	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_CONTROL_POINT)?5:(building!=0)*(player*8+building+7)|(map->layer[map->layers-2].tilemap->data[index]&(1<<17));
+	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_CONTROL_POINT)?5:(building!=0)*(((player+1)*tilesx)+building-1)|(map->layer[map->layers-2].tilemap->data[index]&(1<<17));
 	if(building==BUILDING_ATTACKER||building==BUILDING_SCOUT) {
 		game_attacklist_add(index);
 	} else if(building==BUILDING_NONE) {
 		game_attacklist_remove(index);
 		game_attacklist_untarget(index);
-		/*//buildsite
-		if(old&0x4)
-			map->layer[map->layers-2].tilemap->data[index]=5;
-		*/
+		
 		if(index==map_selected_index())
 			map_select_nothing();
 	}
@@ -271,10 +271,10 @@ unsigned int map_set_tile_attributes(int index, int attrib) {
 void map_select_building(int index) {
 	map_selected.index=index;
 	int selected_building=(map->layer[map->layers-2].tilemap->data[index]&0xFFFF);
-	map_selected.owner=selected_building/8-1;
-	map_selected.building=selected_building%8+1;
+	map_selected.owner=selected_building/tilesx-1;
+	map_selected.building=selected_building%tilesx+1;
 	
-	if(map_selected.owner<0||map_selected.owner>3) {
+	if(map_selected.owner<0||map_selected.owner>players-1) {
 		map_selected.building=0;
 		map_selected.index=-1;
 		map_selected.owner=-1;
@@ -370,7 +370,7 @@ void map_flare_draw() {
 			else
 				break;
 		}
-		d_render_tint(255*(!(l->player%3)), 255*(l->player>1), 255*(l->player==1), 255);
+		d_render_tint(player_color[l->player].r, player_color[l->player].g, player_color[l->player].b, 255);
 		d_render_circle_draw(l->circle[l->index/10]);
 		if(l->index>=20) {
 			d_render_offset(0, 0);
@@ -413,7 +413,7 @@ void map_draw(int draw_powergrid) {
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
-		d_render_tint(255*(!(map_selected.owner%3)), 255*(map_selected.owner>1), 255*(map_selected.owner==1), 255);
+		d_render_tint(player_color[map_selected.owner].r, player_color[map_selected.owner].r, player_color[map_selected.owner].r, 255);
 		if(map_selected.circle)
 			d_render_circle_draw(map_selected.circle);
 		d_render_offset(map->cam_x-x, map->cam_y-y);
@@ -448,7 +448,7 @@ void map_minimap_render(UI_WIDGET *widget) {
 	struct MAP_FLARE_LIST *l;
 	for(l=map_flares; l; l=l->next)
 		if(l->index>=20) {
-			d_render_tint(255*(!(l->player%3)), 255*(l->player>1), 255*(l->player==1), 255);
+			d_render_tint(player_color[l->player].r, player_color[l->player].r, player_color[l->player].r, 255);
 			d_render_circle_draw(l->minimap_circle);
 		}
 	d_render_tint(r, g, b, a);
@@ -478,7 +478,7 @@ void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h, int show_fow) {
 				if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==5)
 					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[6];
 				else if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)>0)
-					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/8+1];
+					minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_colors[((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/tilesx+1];
 			}
 	
 	d_render_tilesheet_update(ts, 0, 0, w, h, minimap_data);
