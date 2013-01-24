@@ -179,10 +179,13 @@ void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVE
 }
 
 void menu_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(e->buttons->start&&!prevbuttons.start) {
+	if(e->buttons->start&&!prevbuttons.start&&(!(platform.platform&DARNIT_PLATFORM_MAEMO)||e->buttons->select)) {
 		switch(gamestate) {
 			case GAME_STATE_MENU:
-				game_state(GAME_STATE_QUIT);
+				if(menustate==MENU_STATE_MAIN)
+					game_state(GAME_STATE_QUIT);
+				else
+					menu_state(MENU_STATE_MAIN);
 				break;
 			case GAME_STATE_GAME_MENU:
 				game_state(GAME_STATE_GAME);

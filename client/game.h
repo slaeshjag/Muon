@@ -54,6 +54,8 @@ int building_cancel;
 int ability_place;
 int attacker_target;
 
+unsigned int game_time_start;
+
 struct BUILDING {
 	const char *name;
 	int range;

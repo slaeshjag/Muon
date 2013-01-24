@@ -135,7 +135,7 @@ void chat_indicator_image_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 }
 
 void chat_button_send_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)&&e->keyboard->keysym!=KEY(KP_ENTER)))
 		return;
 	UI_PROPERTY_VALUE v;
 	v=chat_checkbox_team->get_prop(chat_checkbox_team, UI_CHECKBOX_PROP_ACTIVATED);
