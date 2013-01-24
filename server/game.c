@@ -184,6 +184,9 @@ void gameEnd() {
 	int i, team, player, eff;
 	PLAYER_STATS stats;
 
+	team = -1;
+	player = 0;
+
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status < PLAYER_IN_GAME_NOW)
 			continue;

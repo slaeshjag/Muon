@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 	gettimeofday(&time_d, NULL);
 	gamespeed = atoi(argv[2]);
 
-	if (server_start(argv[1], atoi(argv[2]), port, gamespeed) == NULL)
+	if (server_start(argv[1], atoi(argv[3]), port, gamespeed) == NULL)
 		return -1;
 	for (;;) {
 		server_loop(deltaTime());

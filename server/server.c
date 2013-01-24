@@ -468,6 +468,7 @@ void serverProcessNetwork() {
 	for (i = 0; i < server->players; i++) {
 		if (server->player[i].status == PLAYER_UNUSED)
 			continue;
+		network = &server->player[i].network;
 
 		if (!server->player[i].network.ready_to_send)
 			continue;
