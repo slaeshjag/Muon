@@ -23,7 +23,7 @@
 #define	__MAP_H__
 
 #define	MAP_TERRAIN_ABSORTION		2000 * 100
-#define	MAP_BUILDINGS_PER_PLAYER	8
+#define	MAP_BUILDINGS_PER_PLAYER	16
 
 
 #endif

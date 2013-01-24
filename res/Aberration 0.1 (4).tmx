@@ -5,20 +5,20 @@
   <property name="max_players" value="4"/>
   <property name="name" value="Aberration"/>
   <property name="size" value="64x64"/>
-  <property name="version" value="1.0"/>
   <property name="tileset" value="mapdata/default.png"/>
+  <property name="version" value="0.1"/>
  </properties>
  <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
-  <image source="maps/Aberration 0.1 (4)/default.png" width="256" height="256"/>
+  <image source="default.png" width="512" height="512"/>
  </tileset>
  <layer name="terrain" width="64" height="64">
   <data encoding="base64" compression="zlib">
-   eJzt1VGOwzAIBFB6rNz/Yv2ppSpKtmBmGLyxJX8m8CbYeZnZ62Ifzn31bHSPFX0O2ZfXy8hiLM97GX0h7Bk/qv5Mb1V1VO5fvan81fa7/ipnbfu3f/v/rl3dm8qumpHt335mHaTfCnvrmAHSXz1vXfyq89blDlDeOUo/sl62L6YdNWdR/0wWaD/aPutnZVBtz/jROXSxM+Y2c7ew7Eh/NIPD+RzTzqgdzaCrPVN/+5/tR2Wg9LOz9e6xnuyv/v6IdxvI/nQ/y36XAeq9q/irZ6vT/G9/b3/mDDDOtMI/0z/rTl/Bj8yRZbd/7PfeaawMlH6vwYLPRfpX+Ct6976n2o+c3bEy70P6v1fkrGbqeurNfhP0d0XbvRmw/Uo7YgYy/aDsx8cw487OAHpuKu3n9cuCnEelP/r9GedR7b+agwo/skYkb+85YPbEss/6q2dgBT8ygyp7xj8yYN+Dnf3nOVjNb9sPzWA1/13NDhko/JksWH5lBpEczotVd5UM2DU7+pEZeGp1s6MyyP6PumwLfjN1v532G8JD1xY=
+   eJzt1cGOwzAIBFD6/6f8cS+1VEXJFswMgze25GMCb4Kdl5m9Lvbh3FfPRvdY0eeQfXm9jCzG8ryX0RfCnvGj6s/0VlVH5f7Vm8pfbb/rr3LWtn/7t//v2tW9qeyqGdn+7WfWQfqtsLeOGSD91fPWxa86b13uAOWdo/Qj62X7YtpRcxb1z2SB9qPts35WBtX2jB+dQxc7Y24zdwvLjvRHMziczzHtjNrRDLraM/W3/9l+VAZKPztb7x7ryf7q7494t4HsT/ez7HcZoN67ir96tjrN//b39mfOAONMK/wz/bPu9BX8yBxZdvvHfu+dxspA6fcaLPhcpH+Fv6J373uq/cjZHSvzPqT/e0XOaqaup97sN0F/V7TdmwHbr7QjZiDTD8p+fAwz7uwMoOem0n5evyzIeVT6o9+fcR7V/qs5qPAja0Ty9p4DZk8s+6y/egZW8CMzqLJn/CMD9j3Y2X+eg9X8tv3QDFbz39XskIHCn8mC5VdmEMnhvFh1V8mAXbOjH5mBp1Y3OyqD7P+oy7bgN1P322m/AYa6ovM=
   </data>
  </layer>
  <layer name="buildings" width="64" height="64">
   <data encoding="base64" compression="zlib">
-   eJzt2DEKACEMRUErYcstLb3/Jbe0XEHxg8yc4BFCipQCQEpNB1yspQMu8aQDAAAAAIBlftGcZN8GswDYy10FAAAA4M+bDoBJPR3AFH9pIOkDrX8AeQ==
+   eJzt2LEJACEQRUEj8yvhSrAE+2/qQsMTFD/ITAWPZdlgSwEgpaYDLtbSAZd40gEAAAAAwDK/aE6yb4NZAOzlrgIAAADw500HwKSeDmCKvzSQ9AEaxgDJ
   </data>
  </layer>
  <layer name="collision" width="64" height="64">

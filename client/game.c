@@ -386,11 +386,12 @@ void game_attacklist_lines_recalculate() {
 	int tw=map->layer[map->layers-2].tile_w;
 	int th=map->layer[map->layers-2].tile_h;
 	for(i=0; i<MAX_PLAYERS; i++) {
-		d_render_line_free(game_attacklist_render[i].lines);
-		game_attacklist_render[i].lines=d_render_line_new(game_attacklist_render[i].length, 1);
+		game_attacklist_render[i].lines=d_render_line_free(game_attacklist_render[i].lines);
+		if(i<players)
+			game_attacklist_render[i].lines=d_render_line_new(game_attacklist_render[i].length, 1);
 	}
 	
-	int *j=malloc(players);
+	int *j=calloc(players, sizeof(int));
 	
 	for(l=game_attacklist; l; l=l->next) {
 		x1=l->index%map_wt*tw+tw/2;
@@ -506,6 +507,7 @@ void game_view_draw() {
 	else
 		map_draw(0);
 	
+	//TODO:fixfixfix
 	int i=game_attacklist_blink_semaphore/(4*players);
 	d_render_offset(map->cam_x, map->cam_y);
 	d_render_tint(player_color[i].r, player_color[i].g, player_color[i].b, 255);
@@ -514,10 +516,9 @@ void game_view_draw() {
 	d_render_offset(0, 0);
 	d_render_tint(255, 255, 255, 255);
 	
-	if(game_attacklist_blink_semaphore>=(16*players-1))
+	game_attacklist_blink_semaphore++;
+	if(game_attacklist_blink_semaphore>=(16*players))
 		game_attacklist_blink_semaphore=0;
-	else
-		game_attacklist_blink_semaphore++;
 }
 
 void game_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

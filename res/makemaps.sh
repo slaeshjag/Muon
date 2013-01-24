@@ -16,6 +16,7 @@ mkdir -p ../maps
 for map in maps/*; do
 	echo " [DFSI] res/$map"
 	getmapdata "$map"
+	[ ! -e mapdata/default.png ] && cp default.png mapdata/
 	darnit-fsimage mapdata "../maps/`basename "$map"`.ldi"
 	rm -rf mapdata
 done	

@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="64" height="64" tilewidth="32" tileheight="32">
  <properties>
+  <property name="author" value="kqr"/>
   <property name="max_players" value="4"/>
-  <property name="name" value="Wheel of Fortune 0.1 (4)"/>
+  <property name="name" value="Wheel of Fortune"/>
+  <property name="size" value="32x32"/>
   <property name="tileset" value="mapdata/default.png"/>
+  <property name="version" value="0.1"/>
  </properties>
  <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
-  <image source="maps/Twirly 0.1 (2)/default.png" width="256" height="256"/>
+  <image source="default.png" width="512" height="512"/>
  </tileset>
  <layer name="terrain" width="64" height="64">
   <data encoding="base64" compression="zlib">
-   eJztk0EOQyEIRL3Wv//FumryY6owwwA2kYRFW4T30D5jjAfMOX59j/Zk5q94Khisnag5PL2r3U+Kyru+OzhnD53O1XvodlPvo5vt5s2buTmMz9/vdtHtwHp7nJDIvpsqd9Z/PqtgrPaeZ7Jxkr+CmY3u95/FiQR77ywbylmxY/bdvz+jrNne6Ez0fMQ/6o4wq/ytcwhThOPX+Yod7OoRFna+lyWyg6i7xYHOzXBH72BXh7J4Z2b7e1msGsQHqa3w9/SymBEnFbeqz6pf9HdvTYRb1Yd5A9c/5410+c89mVm7GrX73FPhHt11tT/Lzsyu8LdC4e11YHZo1by/W/3GMKPeEfZIjwxuRR+2RumPMkf6eWsz3z/Kjv73o7tS11T6KN7Jv/hH+60i2z/Krdqpl0tR4511or9nntVnFx3+KAvj5/VX8Cv82Xqv0y4q/VmG1Rmk3y6y7k51fnUO8dlFxf1HZ7/rx1j3ZBgQjrlPhfsz1bMeViA80XtH541h97N6eqPCPTJnjN/9FUxRtuq3xvRk4zTvzPvx8kfOKviz3+nOA61X+2fsE/Hpcs9OlX+3R8YemJqbN2/+R6qj26fT/R3dbl3e3+h2POHu58/dueJTcO56d3vvXJWMVpzinsmVNesD6LRibA==
+   eJztk0EOQyEIRL3/7t+4qyY/pgozDGATSVi0RXgP7TPGeMCc49f3aE9m/oqngsHaiZrD07va/aSovOu7g3P20OlcvYduN/U+utlu3ryZm8P4/P1uF90OrLfHCYnsu6lyZ/3nswrGau95Jhsn+SuY2eh+/1mcSLD3zrKhnBU7Zt/9+zPKmu2NzkTPR/yj7gizyt86hzBFOH6dr9jBrh5hYed7WSI7iLpbHOjcDHf0DnZ1KIt3Zra/l8WqQXyQ2gp/Ty+LGXFScav6rPpFf/fWRLhVfZg3cP1z3kiX/9yTmbWrUbvPPRXu0V1X+7PszOwKfysU3l4HZodWzfu71W8MM+odYY/0yOBW9GFrlP4oc6Sftzbz/aPs6H8/uit1TaWP4p38i3+03yqy/aPcqp16uRQ13lkn+nvmWX120eGPsjB+Xn8Fv8Kfrfc67aLSn2VYnUH67SLr7lTnV+cQn11U3H909rt+jHVPhgHhmPtUuD9TPethBcITvXd03hh2P6unNyrcI3PG+N1fwRRlq35rTE82TvPOvB8vf+Ssgj/7ne480Hq1f8Y+EZ8u9+xU+Xd7ZOyBqbl58+Z/pDq6fTrd39Ht1uX9jW7HE+5+/tydKz4F5653t/fOVcloxSnumVxZsz5ZChDg
   </data>
  </layer>
  <layer name="buildings" width="64" height="64">
   <data encoding="base64" compression="zlib">
-   eJzt1zEKg0AQBVCrQIoUKSxSWKTI/a+YQgQZRBB0h1nfg+kW/FMs+x2GXI/k7zN7Zwdo6JsdAIASqnWUankBAAAWVf9nquYGzjNuTPQL05OtfffY/95a7e995u5a3IHXwfPTJSny2P+YHvePE01hgNrOeFt1VAAA2HdFZ9bDAaBPz+wADXyyA6zoVPn+HvUDZg==
+   eJzt1zEKg0AQBVCr9ClygBQeIIUHSJH7XymFCDKIIOgOs74H0y34p1j2Owy5HsnfZ/bODtDQNzsAACVU6yjV8gIAACyq/s9UzQ2cZ9yY6BemJ1v77rH/vbXa3/vM3bW4A6+D56dLUuSx/zE97h8nmsIAtZ3xtuqoAACw74rOrIcDQJ+e2QEa+GQHWNGp8v0BoBIF7g==
   </data>
  </layer>
  <layer name="collision" width="64" height="64">

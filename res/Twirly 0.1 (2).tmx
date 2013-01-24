@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="48" height="48" tilewidth="32" tileheight="32">
  <properties>
+  <property name="author" value="kqr"/>
   <property name="max_players" value="2"/>
-  <property name="name" value="Twirly 0.1 (2)"/>
+  <property name="name" value="Twirly"/>
+  <property name="size" value="32x32"/>
   <property name="tileset" value="mapdata/default.png"/>
+  <property name="version" value="0.1"/>
  </properties>
  <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
-  <image source="maps/Twirly 0.1 (2)/default.png" width="256" height="256"/>
+  <image source="default.png" width="512" height="512"/>
  </tileset>
  <layer name="terrain" width="48" height="48">
   <data encoding="base64" compression="zlib">
-   eJzVkkkOAyEMBPnW/P9juUZRDMa92GOJI13Vhmet9Vye3SjuMQ/K7+7A4HV1UHBc/kqGuoNjR9EoclVvrOBN8K8y3e5MLpqBdI0Gyag6TNm/ix+N07/icZoJbxjlZMa9/6yXwv2XX72P9kC5zDPNucL65+r07t6Z8g90ebD8XT0YvK4OLFZm1N47TtZD3eE2H+ErOtxkMtmMnGzGbpx/lslRZqsZzN2cOjB4SndHB7V7pgeaWd3dhA67u9lBOrjfmtmj4686/NHMk5uqCyvr5j6zAyOrcpfljzhUds/ksrIU/C7/qvt31lv3j/Zm+Xf0YPG7OrC40bzB/dRB1UWRnZmp7o4OSNYH5Vt5sA==
+   eJzVkkkOAyEMBPn/bX6caxTFYNyLPZY40lVteNZaz+XZjeIe86D87g4MXlcHBcflr2SoOzh2FI0iV/XGCt4E/yrT7c7kohlI12iQjKrDlP27+NE4/Ssep5nwhlFOZtz7z3op3H/51ftoD5TLPNOcK6x/rk7v7p0p/0CXB8vf1YPB6+rAYmVG7b3jZD3UHW7zEb6iw00mk83IyWbsxvlnmRxltprB3M2pA4OndHd0ULtneqCZ1d1N6LC7mx2kg/utmT06/qrDH808uam6sLJu7jM7MLIqd1n+iENl90wuK0vB7/Kvun9nvXX/aG+Wf0cPFr+rA4sbzRvcTx1UXRTZmZnq7uiAZH0AFHrAzg==
   </data>
  </layer>
  <layer name="buildings" width="48" height="48">
   <data encoding="base64" compression="zlib">
-   eJzt1iEOgDAURMEqEkgNhPufFV9EDWFbmHHfvVQ0WwrwhNrca6Tif7Z0AFNZ0gEAwOe9sTdsGoA+f+WdNwEAEmbYIEc6gOHtzX1GKqDvAjVBAHs=
+   eJzt1iEOgDAURMEqPKQXgHD/M+KLqCFsCzPuu5eKZksBnlCbe41U/M+WDmAqSzoAAPi8N/aGTQPQ56+88yYAQMIMG+RIBzC8vbnPSAX0XduOAMM=
   </data>
  </layer>
  <layer name="collision" width="48" height="48">

@@ -172,6 +172,7 @@ void map_calculate_powergrid() {
 void map_building_place(int index, int player, int building) {
 	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_CONTROL_POINT)?5:(building!=0)*(((player+1)*tilesx)+building-1)|(map->layer[map->layers-2].tilemap->data[index]&(1<<17));
 	if(building==BUILDING_ATTACKER||building==BUILDING_SCOUT) {
+		printf("adding %i owned by %i to attacklist\n", index, player);
 		game_attacklist_add(index);
 	} else if(building==BUILDING_NONE) {
 		game_attacklist_remove(index);
@@ -413,7 +414,7 @@ void map_draw(int draw_powergrid) {
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
-		d_render_tint(player_color[map_selected.owner].r, player_color[map_selected.owner].r, player_color[map_selected.owner].r, 255);
+		d_render_tint(player_color[map_selected.owner].r, player_color[map_selected.owner].g, player_color[map_selected.owner].b, 255);
 		if(map_selected.circle)
 			d_render_circle_draw(map_selected.circle);
 		d_render_offset(map->cam_x-x, map->cam_y-y);
