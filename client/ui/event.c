@@ -105,7 +105,7 @@ void ui_events(struct UI_PANE_LIST *panes, int render) {
 	}
 	
 	//Global mouse events
-	e.mouse=&e_m;	
+	e.mouse=&e_m;
 	if((ui_e_m_prev.buttons&e_m.buttons)<e_m.buttons)
 		ui_event_global_send(UI_EVENT_TYPE_MOUSE_PRESS, &e);
 	if((ui_e_m_prev.buttons&e_m.buttons)<ui_e_m_prev.buttons)
