@@ -172,7 +172,6 @@ void map_calculate_powergrid() {
 void map_building_place(int index, int player, int building) {
 	map->layer[map->layers-2].tilemap->data[index]=(building==BUILDING_CONTROL_POINT)?5:(building!=0)*(((player+1)*tilesx)+building-1)|(map->layer[map->layers-2].tilemap->data[index]&(1<<17));
 	if(building==BUILDING_ATTACKER||building==BUILDING_SCOUT) {
-		printf("adding %i owned by %i to attacklist\n", index, player);
 		game_attacklist_add(index);
 	} else if(building==BUILDING_NONE) {
 		game_attacklist_remove(index);

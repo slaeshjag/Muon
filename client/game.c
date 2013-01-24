@@ -507,7 +507,6 @@ void game_view_draw() {
 	else
 		map_draw(0);
 	
-	//TODO:fixfixfix
 	int i=game_attacklist_blink_semaphore/(4*players);
 	d_render_offset(map->cam_x, map->cam_y);
 	d_render_tint(player_color[i].r, player_color[i].g, player_color[i].b, 255);
