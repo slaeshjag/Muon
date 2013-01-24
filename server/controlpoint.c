@@ -639,6 +639,8 @@ void controlpointDeploy(int player, int type, int index_dst) {
 			break;
 	}
 
+	controlpointLoop(0);
+
 	messageBufferPushDirect(player, player, MSG_SEND_CP_DEPLOY, type, index_dst, NULL);
 	if (type != UNIT_DEF_CLUSTERBOMB || server->player[player].cp.clusterbomb.count == 0)
 		messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, type, 0, NULL);

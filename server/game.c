@@ -89,6 +89,7 @@ void gameSpawn() {
 				unitSpawn(j, building, i % server->w, i / server->w);
 			}
 		server->player[j].stats.points = 0;
+		server->player[j].stats.points_visible = 0;
 		server->player[j].stats.buildings_raised = 0;
 	}
 	
@@ -213,7 +214,7 @@ void gameEnd() {
 			continue;
 		stats = server->player[i].stats;
 		eff = stats.buildtime * 100 / (stats.buildtime + stats.no_build_time);
-		points = server->player[i].stats.points;
+		points = server->player[i].stats.points_visible;
 		points = (points < 0) ? 0 : points;
 
 		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_1, stats.buildings_raised, stats.buildings_lost, NULL);

@@ -159,7 +159,7 @@ void messageHandlerStartBuild(unsigned int player, MESSAGE *message) {
 
 void messageHandlerPlaceBuilding(unsigned int player, MESSAGE *message) {
 	if (message->arg[0] == 0) {
-		unitDestroy(player, message->arg[1]);
+		unitDestroy(player, message->arg[1], player);
 		return;
 	}
 

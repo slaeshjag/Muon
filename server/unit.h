@@ -161,7 +161,7 @@ static const int unit_buildtime[] = {
  * normalised against the scout... */
 static const int unit_points[] = { 
 	1,		/* Powered tile */
-	0,		/* Generator */
+	40,		/* Generator */
 	1,		/* Scout */
 	8,		/* Attacker */
 	0,		/* Pylon */
@@ -205,8 +205,8 @@ void unitDamageDo(int index, int damage, int time);
 void unitDamagePoke(int index, int damage);
 int unitSpawn(unsigned int player, unsigned int unit, unsigned int x, unsigned int y);
 int unitAdd(int owner, int type, int x, int y);
-int unitRemove(int x, int y);
-void unitDestroy(int player, unsigned int index);
+int unitRemove(int x, int y, int who);
+void unitDestroy(int player, unsigned int index, int who);
 void unitPylonPulse();
 
 void unitDestroyAll(int player);

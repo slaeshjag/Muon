@@ -76,6 +76,7 @@ typedef struct {
 	unsigned int		buildings_lost;
 	unsigned int		buildings_destroyed;
 	int			points;
+	unsigned int		points_visible;
 } PLAYER_STATS;
 
 

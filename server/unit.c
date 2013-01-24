@@ -332,16 +332,17 @@ int unitAdd(int owner, int type, int x, int y) {
 		}
 	}
 	
+	if (server->player[owner].status == PLAYER_IN_GAME_NOW) {
+		server->player[owner].stats.buildings_raised++;
+		server->player[owner].stats.points += unit_points[unit->type];
+		server->player[owner].stats.points_visible += unit_points[unit->type];
+		fprintf(stderr, "Player %i now has %i points (+%i)\n", owner, server->player[owner].stats.points_visible, unit_points[unit->type]);
+	}
+	
 	unit->next = server->unit;
 	server->unit = unit;
 	server->map_c.tile_data[index] |= 0x80000;
 	
-	if (server->game.time_elapsed > SERVER_GAME_START_DELAY) {
-		server->player[owner].stats.points += unit_points[type];
-		server->player[owner].stats.buildings_raised++;
-	}
-
-
 	playerCalcLOS(owner, x , y, 1);
 	if (type == UNIT_DEF_GENERATOR)
 		playerCalcSetPower(owner, x, y, 1);
@@ -350,7 +351,7 @@ int unitAdd(int owner, int type, int x, int y) {
 }
 
 
-int unitRemove(int x, int y) {
+int unitRemove(int x, int y, int who) {
 	SERVER_UNIT *unit, *next, **parent;
 	int i, owner, type, index;
 
@@ -380,15 +381,18 @@ int unitRemove(int x, int y) {
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_SHIELD, 0, index, NULL);
 	}
 	
-	if (server->player[owner].status == PLAYER_IN_GAME_NOW) {
-		server->player[owner].stats.buildings_lost++;
-		server->player[owner].stats.points -= unit_points[unit->type];
-	}
-
 	while (next != unit) {
 		parent = &next->next;
 		next = next->next;
 	}
+	
+	if (server->player[owner].status == PLAYER_IN_GAME_NOW) {
+		server->player[owner].stats.buildings_lost++;
+		server->player[owner].stats.points -= unit_points[unit->type];
+		if (who != owner)
+			server->player[who].stats.points_visible += unit_points[unit->type];
+	}
+	
 	
 	if (next == unit) {
 		*parent = next->next;
@@ -497,14 +501,14 @@ int unitValidateWall(int index, int player) {
 }
 
 
-void unitDestroy(int player, unsigned int index) {
+void unitDestroy(int player, unsigned int index, int who) {
 	if (index > server->w * server->h)
 		return;
 	if (!server->map[index])
 		return;
 	if (server->map[index]->owner != player)
 		return;
-	unitRemove(index % server->w, index / server->w);
+	unitRemove(index % server->w, index / server->w, who);
 
 	return;
 }
@@ -525,7 +529,9 @@ void unitAttackSet(int index_src, int index_dst) {
 
 	from = server->map[index_src]->owner;
 	server->map[index_src]->target = (index_dst > -1) ? index_dst : -1;
-	fprintf(stderr, "Attacking %i->%i\n", index_src, index_dst);
+	
+	/* We might need this later */
+	/*fprintf(stderr, "Attacking %i->%i\n", index_src, index_dst);*/
 	if (index_dst == -1)
 		index_dst = -1;
 
@@ -692,7 +698,7 @@ void unitDamageDo(int index, int damage, int time) {
 			unitShieldAnnounce(next->target);
 		if (server->map[next->target]->hp <= 0) {
 			server->player[next->owner].stats.buildings_destroyed++;
-			unitRemove(next->target % server->w, next->target / server->w);
+			unitRemove(next->target % server->w, next->target / server->w, next->owner);
 			next->target = -1;
 		}
 	}
@@ -753,7 +759,7 @@ void unitDestroyAll(int player) {
 			continue;
 		if (server->map[i]->type == UNIT_DEF_GENERATOR)
 			continue;
-		unitRemove(i % server->w, i / server->w);
+		unitRemove(i % server->w, i / server->w, player);
 	}
 
 	return;

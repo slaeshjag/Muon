@@ -21,7 +21,8 @@
 #define	__SERVER_H__
 
 #define	API_VERSION			0x10000
-#define	SERVER_PORT_DEFAULT		56789
+#define	SERVER_PORT_DEFAULT		62118
+#define	SERVER_PORT_DEFAULT_STR		"62118"
 
 #include "building.h"
 #include "message.h"

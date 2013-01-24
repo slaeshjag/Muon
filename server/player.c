@@ -50,6 +50,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].stats.buildings_lost = 0;
 		player[i].stats.buildings_destroyed = 0;
 		player[i].stats.points = 0;
+		player[i].stats.points_visible = 0;
 		player[i].stats.buildtime = 0;
 		player[i].stats.no_build_time = 0;
 
@@ -159,7 +160,7 @@ void playerDisconnectKill(unsigned int player) {
 
 	/* We probably need to add a mutex here */
 	if (server->game.started)
-		unitRemove(server->player[player].spawn.x, server->player[player].spawn.y);
+		unitRemove(server->player[player].spawn.x, server->player[player].spawn.y, player);
 	server->player[player].status = PLAYER_UNUSED;
 	messageBufferFlush(server->player[player].msg_buf);
 	server->player[player].socket = networkSocketDisconnect(server->player[player].socket);

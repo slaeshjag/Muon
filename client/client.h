@@ -20,7 +20,11 @@
 #ifndef CLIENT_H
 #define CLIENT_H
 
-#define CLIENT_DEFAULT_PORT "1337"
+#include "../server/server_api/server.h"
+
+#define	STRINGIZE(x) #x
+#define STRINGIZE_INT(x) STRINGIZE(x)
+#define CLIENT_DEFAULT_PORT STRINGIZE_INT(SERVER_PORT_DEFAULT)
 #define CLIENT_DEFAULT_PLAYERS 2
 #define CLIENT_DEFAULT_GAMESPEED 3
 #define CLIENT_TIMEOUT 10000
