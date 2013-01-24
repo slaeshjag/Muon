@@ -59,7 +59,8 @@ int main(int argc, char **argv) {
 		port = atoi(argv[4]);
 	else
 		port = SERVER_PORT_DEFAULT;
-	
+
+	fprintf(stderr, "Listening on port %i...\n", port);
 	server_init();
 	gettimeofday(&time_d, NULL);
 	gamespeed = atoi(argv[2]);
