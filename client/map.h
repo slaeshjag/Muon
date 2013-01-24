@@ -48,7 +48,7 @@ enum MINIMAP_COLOR {
 };
 
 static const unsigned int minimap_color[]={
-	0xFF7F007F,
+	0xFF7F7F7F,
 	0xFF165A73,
 	0xFFFFFF,
 	0xFF000030,
