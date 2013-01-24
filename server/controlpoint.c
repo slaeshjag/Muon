@@ -317,8 +317,9 @@ void controlpointDelayLoopConst(int msec, int player) {
 		tmp -= (*speed) * msec * server->game.gamespeed;
 		if ((tmp) < 0 && (*speed) > 0 && msec > 0)
 			tmp = 0;
-		if (CP_DELAY_SEC(tmp) != CP_DELAY_SEC(*delay) || (tmp == 0 && (*delay) != 0))
+		if ((CP_DELAY_SEC(tmp) != CP_DELAY_SEC(*delay) || (tmp == 0 && (*delay) != 0)) && !(i != UNIT_DEF_CLUSTERBOMB && (*count) == 0)) {
 			messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, i, 100 - (tmp) * 100 / defaults, NULL);
+		}
 		(*delay) = tmp;
 		e->temp = 0;
 	}
@@ -642,7 +643,7 @@ void controlpointDeploy(int player, int type, int index_dst) {
 	controlpointLoop(0);
 
 	messageBufferPushDirect(player, player, MSG_SEND_CP_DEPLOY, type, index_dst, NULL);
-	if (type != UNIT_DEF_CLUSTERBOMB || server->player[player].cp.clusterbomb.count == 0)
+	if (type != UNIT_DEF_CLUSTERBOMB || server->player[player].cp.clusterbomb.count > 0)
 		messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, type, 0, NULL);
 
 	return;
