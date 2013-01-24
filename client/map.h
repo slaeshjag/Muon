@@ -40,17 +40,18 @@ int map_grid_chunks;
 unsigned int minimap_data[(SIDEBAR_WIDTH-UI_PADDING*2)*(SIDEBAR_WIDTH-UI_PADDING*2)];
 DARNIT_LINE *minimap_viewport;
 
-static const unsigned int minimap_colors[]={
+enum MINIMAP_COLOR {
+	MINIMAP_COLOR_FOW,
+	MINIMAP_COLOR_TERRAIN,
+	MINIMAP_COLOR_CONTROLPOINT,
+	MINIMAP_COLOR_PLASMA,
+};
+
+static const unsigned int minimap_color[]={
 	0xFF7F007F,
-	0xFF000000,
-	
-	0xFF0000FF,
-	0xFFFF0000,
-	0xFF00FF00,
-	0xFF00FFFF,
-	
+	0xFF165A73,
 	0xFFFFFF,
-	0xFF00007F,
+	0xFF000030,
 };
 
 struct MAP_SELECTED {
