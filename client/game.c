@@ -508,7 +508,7 @@ void game_view_draw() {
 	
 	int i=game_attacklist_blink_semaphore/(4*players);
 	d_render_offset(map->cam_x, map->cam_y);
-	d_render_tint(255*(!(i%3)), 255*(i>1), 255*(i==1), 255);
+	d_render_tint(player_color[i].r, player_color[i].g, player_color[i].b, 255);
 	if(game_attacklist_render[i].lines)
 		d_render_line_draw(game_attacklist_render[i].lines, game_attacklist_render[i].length);
 	d_render_offset(0, 0);

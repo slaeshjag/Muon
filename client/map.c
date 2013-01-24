@@ -370,7 +370,7 @@ void map_flare_draw() {
 			else
 				break;
 		}
-		d_render_tint(255*(!(l->player%3)), 255*(l->player>1), 255*(l->player==1), 255);
+		d_render_tint(player_color[l->player].r, player_color[l->player].g, player_color[l->player].b, 255);
 		d_render_circle_draw(l->circle[l->index/10]);
 		if(l->index>=20) {
 			d_render_offset(0, 0);
@@ -413,7 +413,7 @@ void map_draw(int draw_powergrid) {
 	if(map_selected.index>-1&&map_selected.building) {
 		int x=map->layer[map->layers-2].tile_w*(map_selected.index%map->layer[map->layers-2].tilemap->w);
 		int y=map->layer[map->layers-2].tile_h*(map_selected.index/map->layer[map->layers-2].tilemap->w);
-		d_render_tint(255*(!(map_selected.owner%3)), 255*(map_selected.owner>1), 255*(map_selected.owner==1), 255);
+		d_render_tint(player_color[map_selected.owner].r, player_color[map_selected.owner].r, player_color[map_selected.owner].r, 255);
 		if(map_selected.circle)
 			d_render_circle_draw(map_selected.circle);
 		d_render_offset(map->cam_x-x, map->cam_y-y);
@@ -448,7 +448,7 @@ void map_minimap_render(UI_WIDGET *widget) {
 	struct MAP_FLARE_LIST *l;
 	for(l=map_flares; l; l=l->next)
 		if(l->index>=20) {
-			d_render_tint(255*(!(l->player%3)), 255*(l->player>1), 255*(l->player==1), 255);
+			d_render_tint(player_color[l->player].r, player_color[l->player].r, player_color[l->player].r, 255);
 			d_render_circle_draw(l->minimap_circle);
 		}
 	d_render_tint(r, g, b, a);

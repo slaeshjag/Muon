@@ -117,7 +117,7 @@ int main() {
 		if(state_render[gamestate])
 			state_render[gamestate]();
 		
-		d_render_tint(255*(!(player_id%3)), 255*(player_id>1), 255*(player_id==1), 255);
+		d_render_tint(player_color[player_id].r, player_color[player_id].g, player_color[player_id].b, 255);
 		if(gamestate==GAME_STATE_GAME_MENU) {
 			ui_pane_render(panelist_game_sidebar.pane);
 			ui_pane_render(panelist_game_abilitybar.pane);
