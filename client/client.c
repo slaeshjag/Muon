@@ -216,11 +216,13 @@ int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			
 			if(msg->arg_2==100)
 				ability[i].button->enabled=1;
+			//printf("cp timer\n");
 			break;
 		}
 		case MSG_RECV_CP_CLEAR:
 			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].ready=-1;
 			ability[msg->arg_1-BUILDING_CLUSTERBOMB+1].button->enabled=0;
+			//printf("cp clear\n");
 			break;
 		case MSG_RECV_CP_DEPLOY:
 			if(msg->arg_1==BUILDING_CLUSTERBOMB) {

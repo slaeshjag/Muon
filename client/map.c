@@ -356,7 +356,8 @@ void map_flare_add(int index, int player, unsigned int duration, unsigned int ra
 
 void map_flare_draw() {
 	struct MAP_FLARE_LIST **ll, *l;
-	for(ll=&map_flares; *ll; ll=&((*ll)->next)) {
+	int j=0;
+	for(ll=&map_flares; *ll; ll=&((*ll)->next), j++) {
 		l=*ll;
 		if(d_time_get()>l->created+l->duration) {
 			*ll=l->next;
@@ -372,11 +373,6 @@ void map_flare_draw() {
 		}
 		d_render_tint(player_color[l->player].r, player_color[l->player].g, player_color[l->player].b, 255);
 		d_render_circle_draw(l->circle[l->index/10]);
-		if(l->index>=20) {
-			d_render_offset(0, 0);
-			d_render_circle_draw(l->minimap_circle);
-			d_render_offset(map->cam_x, map->cam_y);
-		}
 		l->index++;
 		if(l->index>=40)
 			l->index=0;
@@ -448,7 +444,7 @@ void map_minimap_render(UI_WIDGET *widget) {
 	struct MAP_FLARE_LIST *l;
 	for(l=map_flares; l; l=l->next)
 		if(l->index>=20) {
-			d_render_tint(player_color[l->player].r, player_color[l->player].r, player_color[l->player].r, 255);
+			d_render_tint(player_color[l->player].r, player_color[l->player].g, player_color[l->player].b, 255);
 			d_render_circle_draw(l->minimap_circle);
 		}
 	d_render_tint(r, g, b, a);
