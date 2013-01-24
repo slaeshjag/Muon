@@ -49,6 +49,7 @@ PLAYER *playerInit(unsigned int players, int map_w, int map_h) {
 		player[i].stats.buildings_raised = 0;
 		player[i].stats.buildings_lost = 0;
 		player[i].stats.buildings_destroyed = 0;
+		player[i].stats.points = 0;
 		player[i].stats.buildtime = 0;
 		player[i].stats.no_build_time = 0;
 

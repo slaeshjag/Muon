@@ -336,8 +336,10 @@ int unitAdd(int owner, int type, int x, int y) {
 	server->unit = unit;
 	server->map_c.tile_data[index] |= 0x80000;
 	
-	if (server->game.time_elapsed > SERVER_GAME_START_DELAY)
+	if (server->game.time_elapsed > SERVER_GAME_START_DELAY) {
+		server->player[owner].stats.points += unit_points[type];
 		server->player[owner].stats.buildings_raised++;
+	}
 
 
 	playerCalcLOS(owner, x , y, 1);
@@ -378,8 +380,10 @@ int unitRemove(int x, int y) {
 		messageBufferPushDirect(i, unit->owner, MSG_SEND_BUILDING_SHIELD, 0, index, NULL);
 	}
 	
-	if (server->player[owner].status == PLAYER_IN_GAME_NOW)
+	if (server->player[owner].status == PLAYER_IN_GAME_NOW) {
 		server->player[owner].stats.buildings_lost++;
+		server->player[owner].stats.points -= unit_points[unit->type];
+	}
 
 	while (next != unit) {
 		parent = &next->next;

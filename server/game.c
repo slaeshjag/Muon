@@ -65,7 +65,7 @@ void gameSpawn() {
 	int n, i, t, j, building, owner;
 
 	n = server->w * server->h;
-	for (j = 0; j < server->players; j++)
+	for (j = 0; j < server->players; j++) {
 		for (i = 0; i < n; i++)
 			if (server->map_c.tile_data[i]) {
 				t = server->map_c.tile_data[i] & 0xFFF;
@@ -75,7 +75,7 @@ void gameSpawn() {
 				owner = (t / MAP_BUILDINGS_PER_PLAYER) - 1;
 				if (owner != server->player[j].spawn_as)
 					continue;
-				if (server->player[j].status != PLAYER_IN_GAME_NOW) 
+				if (server->player[j].status != PLAYER_IN_GAME_NOW)
 					continue;
 				if (building >= UNITS_DEFINED)
 					continue;
@@ -88,6 +88,9 @@ void gameSpawn() {
 
 				unitSpawn(j, building, i % server->w, i / server->w);
 			}
+		server->player[j].stats.points = 0;
+		server->player[j].stats.buildings_raised = 0;
+	}
 	
 	unitPylonPulse();
 	
@@ -181,7 +184,7 @@ int gameDetectIfOver() {
 
 
 void gameEnd() {
-	int i, team, player, eff;
+	int i, team, player, eff, points;
 	PLAYER_STATS stats;
 
 	team = -1;
@@ -210,10 +213,13 @@ void gameEnd() {
 			continue;
 		stats = server->player[i].stats;
 		eff = stats.buildtime * 100 / (stats.buildtime + stats.no_build_time);
+		points = server->player[i].stats.points;
+		points = (points < 0) ? 0 : points;
+
 		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_1, stats.buildings_raised, stats.buildings_lost, NULL);
 		playerMessageBroadcast(i, MSG_SEND_PLAYER_STATS_2, stats.buildings_destroyed, eff, NULL);
-		playerMessageBroadcast(i, MSG_SEND_PLAYER_POINTS, playerCountPoints(i), 0, NULL);
-		fprintf(stderr, "Total amount of points for %.31s: %.8u\n", server->player[i].name, playerCountPoints(i));
+		playerMessageBroadcast(i, MSG_SEND_PLAYER_POINTS, points, 0, NULL);
+		fprintf(stderr, "Total amount of points for %.31s: %.8i\n", server->player[i].name, points);
 	}
 	
 	playerMessageBroadcast(player, MSG_SEND_GAME_ENDED, team, player, NULL);
