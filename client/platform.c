@@ -59,6 +59,23 @@ void platform_config_init_defaults() {
 		config.screen_w=800;
 		config.screen_h=480;
 		config.fullscreen=1;
+		if(platform.platform&DARNIT_PLATFORM_MAEMO) {
+			DARNIT_INPUT_MAP keymap={
+				KEY(w),
+				KEY(s),
+				KEY(a),
+				KEY(d),
+				KEY(KP_ENTER),
+				KEY(LSHIFT),
+				KEY(F4),
+				KEY(r),
+				KEY(BACKSPACE),
+				KEY(LCTRL),
+				KEY(F1),
+				KEY(F2),
+			};
+		d_keymapping_set(keymap);
+		}
 	} else {
 		config.screen_w=800;
 		config.screen_h=600;
