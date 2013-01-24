@@ -336,7 +336,6 @@ int unitAdd(int owner, int type, int x, int y) {
 		server->player[owner].stats.buildings_raised++;
 		server->player[owner].stats.points += unit_points[unit->type];
 		server->player[owner].stats.points_visible += unit_points[unit->type];
-		fprintf(stderr, "Player %i now has %i points (+%i)\n", owner, server->player[owner].stats.points_visible, unit_points[unit->type]);
 	}
 	
 	unit->next = server->unit;
