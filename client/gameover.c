@@ -27,6 +27,7 @@ void gameover_init() {
 	ui_vbox_add_child(panelist_gameover_sidebar.pane->root_widget, ui_widget_create_spacer(), 1);
 	ui_vbox_add_child(panelist_gameover_sidebar.pane->root_widget, gameover_sidebar_button_menu, 0);
 	
+	gameover_stats_label_time=ui_widget_create_label(font_std, T("Game time"));
 	gameover_stats_hbox=ui_widget_create_hbox();
 	
 	for(i=0; i<5; i++) {
@@ -41,6 +42,7 @@ void gameover_init() {
 	//ui_hbox_add_child(gameover_stats_hbox, ui_widget_create_spacer_size(1, 1), 0);
 	
 	ui_vbox_add_child(panelist_gameover_stats.pane->root_widget, ui_widget_create_label(font_std, T("Game statistics")), 0);
+	ui_vbox_add_child(panelist_gameover_stats.pane->root_widget, gameover_stats_label_time, 0);
 	ui_vbox_add_child(panelist_gameover_stats.pane->root_widget, gameover_stats_hbox, 0);
 	
 	gameover_statlabel=NULL;
@@ -49,7 +51,9 @@ void gameover_init() {
 void gameover_update_stats() {
 	//don't look at this function! it is probably the ugliest thing i've ever made!
 	int i;
-	printf("Game time: %u\n", (d_time_get()-game_time_start)/1000);
+	UI_PROPERTY_VALUE v;
+	unsigned int h, m, s, t=(d_time_get()-game_time_start)/1000;
+	
 	if(gameover_statlabel) {
 		for(i=0; i<players; i++) {
 			if(!(gameover_statlabel[i].built&&gameover_statlabel[i].lost&&gameover_statlabel[i].destroyed&&gameover_statlabel[i].efficiency&&gameover_statlabel[i].score&&gameover_statlabel[i].name))
@@ -69,6 +73,15 @@ void gameover_update_stats() {
 		}
 		free(gameover_statlabel);
 	}
+	
+	s=t%60;
+	m=t/60;
+	h=m/60;
+	m=m%60;
+	sprintf(gameover_stats_label_time_text, "%s: %02u:%02u:%02u", T("Game time"), h, m, s);
+	v.p=gameover_stats_label_time_text;
+	gameover_stats_label_time->set_prop(gameover_stats_label_time, UI_LABEL_PROP_TEXT, v);
+	
 	if((gameover_statlabel=malloc(sizeof(struct GAMEOVER_STATLABEL)*players))==NULL)
 		return;
 	for(i=0; i<players; i++) {

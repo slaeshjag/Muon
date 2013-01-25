@@ -5,6 +5,8 @@ struct UI_PANE_LIST panelist_gameover_sidebar;
 struct UI_PANE_LIST panelist_gameover_stats;
 
 UI_WIDGET *gameover_sidebar_button_menu;
+UI_WIDGET *gameover_stats_label_time;
+char gameover_stats_label_time_text[32];
 UI_WIDGET *gameover_stats_hbox;
 UI_WIDGET *gameover_stats_vbox_stat[6];
 
