@@ -23,6 +23,7 @@ Menu			Meny
 Singleplayer		En spelare
 Multiplayer		Flera spelare
 Settings		Inställningar
+Help			Hjälp
 
 Disconnect		Koppla från
 Return to game		Fortsätt spela
@@ -38,6 +39,10 @@ Join game		Delta i spel
 
 Game			Spel
 Video			Skärm
+Sound			Ljud
+
+Tutorial		Lär dig spela
+Credits			Medverkande
 
 ### Settings
 Player name		Spelarnamn
@@ -49,6 +54,9 @@ Alpha blending		Alfakomposition
 
 Show grid		Visa rutnät
 Always show power grid	Visa alltid kraftnät
+
+Sound volume		Ljudvolym
+Music volume		Musikvolym
 
 Please restart Muon for the changes to take place.		Vänligen starta om Muon för att dina inställningar ska börja gälla.
 

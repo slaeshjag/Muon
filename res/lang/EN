@@ -23,6 +23,7 @@ Menu			Menu
 Singleplayer		Singleplayer
 Multiplayer		Multiplayer
 Settings		Settings
+Help			Help
 
 Disconnect		Disconnect
 Return to game		Return to game
@@ -38,6 +39,10 @@ Join game		Join game
 
 Game			Game
 Video			Video
+Sound			Sound
+
+Tutorial		Tutorial
+Credits			Credits
 
 ### Settings
 Player name		Player name
