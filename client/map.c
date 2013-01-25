@@ -258,11 +258,8 @@ unsigned int map_set_tile_attributes(int index, int attrib) {
 			map->layer[map->layers-2].tilemap->data[index]|=(1<<17);
 			break;
 		case MSG_TILE_ATTRIB_TERRAIN_SET:
-			//TODO: fix if ever needed
-			/*for(i=map->layers-3; i>=0; i--) {
-				map->layer[i].tilemap->data[index]=lololol;
-				update|=1<<(i);
-			}*/
+			map->layer[0].tilemap->data[index]=tilesx*(MAX_PLAYERS+1);
+			update|=1;
 			break;
 	}
 	return update;
