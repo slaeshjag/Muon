@@ -24,13 +24,14 @@
 void intmath_init() {
 	int i;
 
-	for (i = 0; i < 360; i++)
-		sinetable[i] = sin(M_PI*i/180)*3600;
+	for (i = 0; i < 256; i++)
+		sinetable[i] = sin(M_PI*i/128)*256*8;
 }
 
 int sine(int angle) {
-	angle%=360;
+	//angle%=360;
+	//angle&=0xFF;
 	if (angle<0)
-		angle=360+angle;
-	return sinetable[angle];
+		angle=~angle+1;
+	return sinetable[angle&0xFF];
 }

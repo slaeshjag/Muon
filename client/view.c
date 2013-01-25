@@ -69,12 +69,12 @@ void view_background_update(int t) {
 	static int x, y, mov1, mov2, c1, c2, c3;
 	for (y=0; y<view_background_h; y++)
 		for (x=0; x<view_background_w; x++) {
-			mov1=360*y/view_background_h+(t>>1);
-			mov2=360*x/view_background_w;
+			mov1=(y<<8)/view_background_h+(t>>1);
+			mov2=(x<<8)/view_background_w;
 			c1=sine(mov1+(t>>1))/2+((mov2>>1)-mov1-mov2+(t>>1));
-			c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/10);
-			c3=sine((c2+(cosine(mov1+mov2+c2/10)>>2)+cosine(mov2)+sine(x))/10);
-			view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/360+26;
+			c2=sine((c1+sine((y>>2)+(t>>1))+sine((x+y)))/8);
+			c3=sine((c2+(cosine(mov1+mov2+c2/8)>>2)+cosine(mov2)+sine(x))/8);
+			view_background_pixbuf[y*view_background_w+x]=(c1+c2+c3)/256+32;
 		}
 	d_render_tilesheet_update(view_background_ts, 0, 0, view_background_w, view_background_h, view_background_pixbuf);
 }
