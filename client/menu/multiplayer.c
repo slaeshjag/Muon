@@ -139,7 +139,7 @@ void multiplayer_host_button_click(UI_WIDGET *widget, unsigned int type, UI_EVEN
 }
 
 void multiplayer_join_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)&&e->keyboard->keysym!=KEY(KP_ENTER)))
 		return;
 	UI_PROPERTY_VALUE v;
 	v=multiplayer_join_entry_host->get_prop(multiplayer_join_entry_host, UI_ENTRY_PROP_TEXT);

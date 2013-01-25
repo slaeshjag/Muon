@@ -207,6 +207,7 @@ void game_view_key_press(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
+	
 	//darnit buttons have no press or release events, we have to handle this ourselves
 	
 	//View movement
@@ -229,17 +230,19 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			map_minimap_update_viewport();
 		}
 	}
-	//Interaction keys
-	if(e->buttons->start&&!prevbuttons.start)
-		game_state(GAME_STATE_GAME_MENU);
-	if(e->buttons->x&&!prevbuttons.x)
-		chat_toggle(&panelist_game_sidebar);
-	if(e->buttons->b&&!prevbuttons.b) {
-		if(building_place>-1) {
-			building_place=-1;
-		} else if(map_selected_building()) {
-			client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_NONE, map_selected_index(), NULL);
-			map_select_nothing();
+	if(!(platform.platform&DARNIT_PLATFORM_MAEMO)||e->buttons->select) {
+		//Interaction keys
+		if(e->buttons->start&&!prevbuttons.start)
+			game_state(GAME_STATE_GAME_MENU);
+		if(e->buttons->x&&!prevbuttons.x)
+			chat_toggle(&panelist_game_sidebar);
+		if(e->buttons->b&&!prevbuttons.b) {
+			if(building_place>-1) {
+				building_place=-1;
+			} else if(map_selected_building()) {
+				client_message_send(player_id, MSG_SEND_PLACE_BUILDING, BUILDING_NONE, map_selected_index(), NULL);
+				map_select_nothing();
+			}
 		}
 	}
 	

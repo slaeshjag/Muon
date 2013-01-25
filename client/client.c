@@ -325,6 +325,8 @@ int client_download_map(MESSAGE_RAW *msg, unsigned char *payload) {
 		case MSG_RECV_GAME_START:
 			chat_countdown(msg->arg_1);
 			if(!msg->arg_1) {
+				chat_hide(&panelist_game_sidebar);
+				game_time_start=d_time_get();
 				game_state(GAME_STATE_GAME);
 				client_message_handler=client_game_handler;
 			}

@@ -49,6 +49,7 @@ void gameover_init() {
 void gameover_update_stats() {
 	//don't look at this function! it is probably the ugliest thing i've ever made!
 	int i;
+	printf("Game time: %u\n", (d_time_get()-game_time_start)/1000);
 	if(gameover_statlabel) {
 		for(i=0; i<players; i++) {
 			if(!(gameover_statlabel[i].built&&gameover_statlabel[i].lost&&gameover_statlabel[i].destroyed&&gameover_statlabel[i].efficiency&&gameover_statlabel[i].score&&gameover_statlabel[i].name))

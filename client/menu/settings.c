@@ -111,7 +111,7 @@ void menu_settings_init() {
 }
 
 void settings_game_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)))
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)&&e->keyboard->keysym!=KEY(KP_ENTER)))
 		return;
 	UI_PROPERTY_VALUE v;
 	v=settings_game_entry_name->get_prop(settings_game_entry_name, UI_ENTRY_PROP_TEXT);
