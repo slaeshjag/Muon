@@ -117,6 +117,7 @@ void menu_settings_init() {
 	settings_sound_label_music=ui_widget_create_label(font_std, T("Music volume"));
 	settings_sound_slider_music=ui_widget_create_slider(10);
 	settings_sound_button_ok=ui_widget_create_button_text(font_std, T("Save"));
+	settings_sound_button_ok->event_handler->add(settings_sound_button_ok, settings_sound_button_save_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_label_sound, 0);
 	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_slider_sound, 0);
 	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_label_music, 0);
@@ -129,9 +130,9 @@ void menu_settings_init() {
 }
 
 void settings_game_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
 	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)&&e->keyboard->keysym!=KEY(KP_ENTER)))
 		return;
-	UI_PROPERTY_VALUE v;
 	v=settings_game_entry_name->get_prop(settings_game_entry_name, UI_ENTRY_PROP_TEXT);
 	if(!strlen(v.p))
 		return;
@@ -173,5 +174,18 @@ void settings_monitor_button_save_click(UI_WIDGET *widget, unsigned int type, UI
 	platform_config_write();
 	ui_messagebox(font_std, T("Please restart Muon for the changes to take place."));
 
+	panelist_menu_sidebar.next=NULL;
+}
+
+void settings_sound_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
+	if((type==UI_EVENT_TYPE_KEYBOARD_PRESS&&e->keyboard->keysym!=KEY(RETURN)&&e->keyboard->keysym!=KEY(KP_ENTER)))
+		return;
+	v=settings_sound_slider_sound->get_prop(settings_sound_slider_sound, UI_SLIDER_PROP_VALUE);
+	config.sound=v.i;
+	v=settings_sound_slider_music->get_prop(settings_sound_slider_music, UI_SLIDER_PROP_VALUE);
+	config.music=v.i;
+	
+	platform_config_write();
 	panelist_menu_sidebar.next=NULL;
 }

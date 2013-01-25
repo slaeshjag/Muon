@@ -52,5 +52,6 @@ void menu_settings_init();
 void settings_monitor_listbox_modes_changed(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void settings_monitor_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void settings_game_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void settings_sound_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
  
  #endif
