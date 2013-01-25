@@ -181,7 +181,7 @@ void controlpointDelayReset(SERVER_UNIT *unit) {
 
 void controlpointClusterbombRemove(SERVER_UNIT *unit) {
 	controlpointDelayReset(unit);
-	server->player[unit->owner].cp.clusterbomb.count = 0;
+//	server->player[unit->owner].cp.clusterbomb.count = 0;
 
 	return;
 }
@@ -189,7 +189,7 @@ void controlpointClusterbombRemove(SERVER_UNIT *unit) {
 
 void controlpointRadarRemove(SERVER_UNIT *unit) {
 	controlpointDelayReset(unit);
-	server->player[unit->owner].cp.radar.count = 0;
+//	server->player[unit->owner].cp.radar.count = 0;
 
 	return;
 }
@@ -197,7 +197,7 @@ void controlpointRadarRemove(SERVER_UNIT *unit) {
 
 void controlpointGroundgenRemove(SERVER_UNIT *unit) {
 	controlpointDelayReset(unit);
-	server->player[unit->owner].cp.groundgen.count = 0;
+//	server->player[unit->owner].cp.groundgen.count = 0;
 
 	return;
 }
@@ -205,7 +205,7 @@ void controlpointGroundgenRemove(SERVER_UNIT *unit) {
 
 void controlpointShieldregenRemove(SERVER_UNIT *unit) {
 	controlpointDelayReset(unit);
-	server->player[unit->owner].cp.shieldregen.count = 0;
+//	server->player[unit->owner].cp.shieldregen.count = 0;
 
 	return;
 }
