@@ -25,6 +25,7 @@ enum MENU_STATE {
 	MENU_STATE_SINGLEPLAYER,
 	MENU_STATE_MULTIPLAYER,
 	MENU_STATE_SETTINGS,
+	MENU_STATE_HELEP,
 	
 	MENU_STATES,
 } menustate, menu_newstate;
@@ -42,12 +43,13 @@ struct UI_PANE_LIST panelist_menu_sidebar;
 
 void menu_init();
 void menu_state(enum MENU_STATE state);
-void meni_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 void menu_main_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void menu_singleplayer_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void menu_multiplayer_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void menu_settings_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void menu_help_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 //In-game menu

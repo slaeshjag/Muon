@@ -3,6 +3,7 @@ muon
 muon-server
 server/server_tester/server-tester
 client/res
+callgrind.out.*
 *.swp
 *.a
 *.ldi

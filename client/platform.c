@@ -33,6 +33,8 @@ struct CONFIG_PARSER parsers[]={
 	{"alpha", platform_option_read_int, platform_option_write_int, &config.alpha},
 	{"gamespeed", platform_option_read_int, platform_option_write_int, &config.gamespeed},
 	{"players", platform_option_read_int, platform_option_write_int, &config.players},
+	{"sound", platform_option_read_int, platform_option_write_int, &config.sound},
+	{"music", platform_option_read_int, platform_option_write_int, &config.music},
 	{"lang", platform_option_read_string, platform_option_write_string, &config.lang},
 	{"name", platform_option_read_string, platform_option_write_string, &config.player_name},
 };
@@ -102,6 +104,8 @@ void platform_config_init_defaults() {
 	config.alpha=1;
 	config.gamespeed=CLIENT_DEFAULT_GAMESPEED;
 	config.players=CLIENT_DEFAULT_PLAYERS;
+	config.sound=7;
+	config.music=5;
 	strcpy(config.lang, "EN");
 	strcpy(config.player_name, "player");
 }

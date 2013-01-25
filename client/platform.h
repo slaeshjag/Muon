@@ -35,6 +35,8 @@ struct CONFIG {
 	int alpha;
 	int gamespeed;
 	int players;
+	int sound;
+	int music;
 	char player_name[32];
 	char lang[3];
 } config;

@@ -108,6 +108,24 @@ void menu_settings_init() {
 		sprintf(buf, "%ix%i", videomodes[i]->w, videomodes[i]->h);
 		ui_listbox_add(settings_monitor_listbox_modes, buf);
 	}
+	
+	//Sound settings
+	panelist_settings_sound.pane=ui_pane_create(16, 16, 256, 128, ui_widget_create_vbox());
+	panelist_settings_sound.next=NULL;
+	settings_sound_label_sound=ui_widget_create_label(font_std, T("Sound volume"));
+	settings_sound_slider_sound=ui_widget_create_slider(10);
+	settings_sound_label_music=ui_widget_create_label(font_std, T("Music volume"));
+	settings_sound_slider_music=ui_widget_create_slider(10);
+	settings_sound_button_ok=ui_widget_create_button_text(font_std, T("Save"));
+	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_label_sound, 0);
+	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_slider_sound, 0);
+	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_label_music, 0);
+	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_slider_music, 0);
+	ui_vbox_add_child(panelist_settings_sound.pane->root_widget, settings_sound_button_ok, 0);
+	v.i=config.sound;
+	settings_sound_slider_sound->set_prop(settings_sound_slider_sound, UI_SLIDER_PROP_VALUE, v);
+	v.i=config.music;
+	settings_sound_slider_music->set_prop(settings_sound_slider_music, UI_SLIDER_PROP_VALUE, v);
 }
 
 void settings_game_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

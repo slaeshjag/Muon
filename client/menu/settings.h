@@ -40,6 +40,13 @@ UI_WIDGET *settings_monitor_checkbox_alpha;
 UI_WIDGET *settings_monitor_slider_plasma;
 UI_WIDGET *settings_monitor_button_ok;
 
+struct UI_PANE_LIST panelist_settings_sound;
+UI_WIDGET *settings_sound_label_sound;
+UI_WIDGET *settings_sound_slider_sound;
+UI_WIDGET *settings_sound_label_music;
+UI_WIDGET *settings_sound_slider_music;
+UI_WIDGET *settings_sound_button_ok;
+
 void menu_settings_init();
 
 void settings_monitor_listbox_modes_changed(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

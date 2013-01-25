@@ -49,6 +49,7 @@ void menu_init() {
 	menu[MENU_STATE_MAIN].button[0]=ui_widget_create_button_text(font_std, T("Singleplayer"));
 	menu[MENU_STATE_MAIN].button[1]=ui_widget_create_button_text(font_std, T("Multiplayer"));
 	menu[MENU_STATE_MAIN].button[2]=ui_widget_create_button_text(font_std, T("Settings"));
+	menu[MENU_STATE_MAIN].button[3]=ui_widget_create_button_text(font_std, T("Help"));
 	menu[MENU_STATE_MAIN].spacer=ui_widget_create_spacer();
 	menu[MENU_STATE_MAIN].button_back=ui_widget_create_button_text(font_std, T("Quit game"));
 	
@@ -63,8 +64,16 @@ void menu_init() {
 	menu[MENU_STATE_SETTINGS].label=ui_widget_create_label(font_std, T("Settings"));
 	menu[MENU_STATE_SETTINGS].button[0]=ui_widget_create_button_text(font_std, T("Game"));
 	menu[MENU_STATE_SETTINGS].button[1]=ui_widget_create_button_text(font_std, T("Video"));
+	menu[MENU_STATE_SETTINGS].button[2]=ui_widget_create_button_text(font_std, T("Sound"));
 	menu[MENU_STATE_SETTINGS].spacer=menu[MENU_STATE_MAIN].spacer;
 	menu[MENU_STATE_SETTINGS].button_back=menu[MENU_STATE_MULTIPLAYER].button_back;
+	
+	menu[MENU_STATE_HELEP].event_handler=menu_help_button_click;
+	menu[MENU_STATE_HELEP].label=ui_widget_create_label(font_std, T("Help"));
+	menu[MENU_STATE_HELEP].button[0]=ui_widget_create_button_text(font_std, T("Tutorial"));
+	menu[MENU_STATE_HELEP].button[1]=ui_widget_create_button_text(font_std, T("Credits"));
+	menu[MENU_STATE_HELEP].spacer=menu[MENU_STATE_MAIN].spacer;
+	menu[MENU_STATE_HELEP].button_back=menu[MENU_STATE_MULTIPLAYER].button_back;
 	
 	menu[MENU_STATE_MAIN].button_back->event_handler->add(menu[MENU_STATE_MAIN].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	menu[MENU_STATE_MULTIPLAYER].button_back->event_handler->add(menu[MENU_STATE_MULTIPLAYER].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
@@ -102,10 +111,10 @@ void menu_state(enum MENU_STATE state) {
 	menu_newstate=state;
 	panelist_menu_sidebar.next=NULL;
 	ui_selected_widget=NULL;
-	ui_event_global_add(meni_state_change, UI_EVENT_TYPE_MOUSE_ENTER);
+	ui_event_global_add(menu_state_change, UI_EVENT_TYPE_MOUSE_ENTER);
 }
 
-void meni_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+void menu_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
 	ui_vbox_remove_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].label);
 	for(i=0; i<8; i++) {
@@ -127,7 +136,7 @@ void meni_state_change(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].spacer, 1);
 	ui_vbox_add_child(panelist_menu_sidebar.pane->root_widget, menu[menustate].button_back, 0);
 	
-	ui_event_global_remove(meni_state_change, UI_EVENT_TYPE_UI_EVENT);
+	ui_event_global_remove(menu_state_change, UI_EVENT_TYPE_UI_EVENT);
 }
 
 
@@ -164,8 +173,19 @@ void menu_settings_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 	} else if(widget==menu[MENU_STATE_SETTINGS].button[1]) {
 		panelist_menu_sidebar.next=&panelist_settings_monitor;
 		ui_selected_widget=NULL;
+	} else if(widget==menu[MENU_STATE_SETTINGS].button[2]) {
+		panelist_menu_sidebar.next=&panelist_settings_sound;
+		ui_selected_widget=NULL;
 	}
 		
+}
+
+void menu_help_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(widget==menu[MENU_STATE_HELEP].button[0]) {
+		ui_messagebox(font_std, "insert-fancy-tutorial-here-when-kqr-is-done");
+	} else if(widget==menu[MENU_STATE_HELEP].button[1]) {
+		ui_messagebox(font_std, "insert-fancy-credits-screen-here-when-mr3d-is-done");
+	}
 }
 
 void menu_sidebar_button_quit_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
