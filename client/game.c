@@ -357,6 +357,8 @@ void game_reset_building_progress() {
 		UI_PROPERTY_VALUE v={.p=game_specialbar_label_build[i]};
 		game_specialbar_button_build[i]->set_prop(game_specialbar_button_build[i], UI_BUTTON_PROP_CHILD, v);
 	}
+	if(building_place>-1)
+		building_place=-1;
 }
 
 void game_set_building_ready(int building) {
