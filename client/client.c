@@ -216,6 +216,8 @@ int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			
 			if(msg->arg_2==100)
 				ability[i].button->enabled=1;
+			else
+				ability[i].button->enabled=0;
 			//printf("cp timer\n");
 			break;
 		}
