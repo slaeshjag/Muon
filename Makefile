@@ -5,7 +5,7 @@ MAKEFLAGS	+=	--no-print-directory
 TOPDIR		=	$(shell pwd)
 export TOPDIR
 
-.PHONY: all server install pandora clean
+.PHONY: all server install pandora msi clean
 
 all:
 	@echo " [ CD ] server/"
@@ -50,10 +50,16 @@ pandora: all
 	@mkdir -p muon-pnd/lib
 	@cp muon muon-pnd
 	@cp res/FreeMonoBold.ttf muon-pnd/res
-	@cp res/FreeMono.ttf muon-pnd/res
+	@cp res/lang.stz muon-pnd/res
+	
 	@cp res/chat.png muon-pnd/res
+	@cp res/flare.png muon-pnd/res
+	@cp res/nuke.png muon-pnd/res
+	@cp res/radar.png muon-pnd/res
 	@cp res/mouse.png muon-pnd/res
+	@cp res/target.png muon-pnd/res
 	@cp res/icon.png muon-pnd/res
+	
 	@cp res/pandora/PXML.xml muon-pnd
 	@cp maps/*.ldi muon-pnd/maps
 	@cp /usr/local/angstrom/arm/arm-angstrom-linux-gnueabi/usr/lib/libdarnit.so muon-pnd/lib
@@ -61,6 +67,27 @@ pandora: all
 	@cat muon-pnd/PXML.xml >> muon.pnd
 	@cat muon-pnd/res/icon.png >> muon.pnd
 	@rm -Rf muon-pnd
+	
+msi:
+	@echo " [MSI ] muon.msi"
+	@mkdir -p res/windows/installer/build
+	@mkdir -p res/windows/installer/build/res
+	@mkdir -p res/windows/installer/build/maps
+	
+	@unix2dos -n README.md res/windows/installer/build/README.txt
+	@unix2dos -n COPYING res/windows/installer/build/COPYING.txt
+	
+	@strip -o res/windows/installer/build/muon.exe muon.exe
+	@strip -o res/windows/installer/build/muon-server.exe muon-server.exe
+	
+	@cp res/*.png res/windows/installer/build/res/
+	@cp res/FreeMonoBold.ttf res/windows/installer/build/res/
+	@cp res/lang.stz res/windows/installer/build/res/
+	@cp maps/*.ldi res/windows/installer/build/maps/
+	
+	@cd res/windows/installer/ && candle -nologo "muon.wxs" -out "muon.wixobj" -ext WixUIExtension
+	@cd res/windows/installer/ && light -nologo "muon.wixobj" -out "muon.msi" -ext WixUIExtension
+	@mv res/windows/installer/muon.msi .
 
 
 clean:

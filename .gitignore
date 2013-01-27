@@ -16,4 +16,5 @@ callgrind.out.*
 *.msi
 *.wixobj
 *.wixpdb
+*.db
 res/windows/installer/build

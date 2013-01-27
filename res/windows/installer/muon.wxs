@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.5.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
+	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.6.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
 		<Package Description="Muon" InstallerVersion="200" Compressed="yes" />
 		<Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
 		<Directory Id="TARGETDIR" Name="SourceDir">
 			<Directory Id="ProgramFilesFolder" Name="PFiles">
-				<Directory Id="INSTALLDIR" Name="muon">
+				<Directory Id="INSTALLDIR" Name="Muon">
 					<Component Id="TEXTFILES" DiskId="1" Guid="0E4BABE6-DCD8-4885-B9B7-C39FFB189CFD">
 						<File Id="COPYING.TXT" Name="COPYING.txt" Source="build\COPYING.txt" />
 						<File Id="README.TXT" Name="README.txt" Source="build\README.txt" />
@@ -18,7 +18,6 @@
 						<File Id="LIBMODPLUG_1.DLL" Name="libmodplug-1.dll" Source="build\libmodplug-1.dll" />
 						<File Id="LIBSTDC___6.DLL" Name="libstdc++-6.dll" Source="build\libstdc++-6.dll" />
 						<File Id="SDL.DLL" Name="SDL.dll" Source="build\SDL.dll" />
-						<File Id="ZLIB1.DLL" Name="zlib1.dll" Source="build\zlib1.dll" />
 					</Component>
 					
 					<Component Id="SERVERBIN" DiskId="1" Guid="572BEE36-5FD4-4DF7-BD84-E391555DA671">
