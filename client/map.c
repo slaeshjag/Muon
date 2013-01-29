@@ -106,7 +106,8 @@ void map_close(/*DARNIT_MAP *map*/) {
 }
 
 void map_update_grid() {
-	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
+	DARNIT_MAP_LAYER *building_layer=&map->layer[map->layers-2];
+	DARNIT_TILEMAP *building_tilemap=building_layer->tilemap;
 	int i, x, y, cols, rows;
 	int tile_w=map->layer[map->layers-2].tile_w;
 	int tile_h=map->layer[map->layers-2].tile_h;
@@ -121,6 +122,11 @@ void map_update_grid() {
 	for(i=0; i<map_grid_chunks; i++) {
 		map_grid_chunk[i].lines=d_render_line_new(128, 1);
 		map_grid_chunk[i].size=0;
+		map_grid_chunk[i].x=(i%cols)*8*building_layer->tile_w;
+		map_grid_chunk[i].y=(i/cols)*8*building_layer->tile_h;
+		map_grid_chunk[i].w=8*building_layer->tile_w;
+		map_grid_chunk[i].h=8*building_layer->tile_h;
+		//printf("map grid chunk %i (%i, %i) w: %i h: %i\n", i, map_grid_chunk[i].x, map_grid_chunk[i].y, map_grid_chunk[i].w, map_grid_chunk[i].h);
 	}
 	
 	int chunk;
@@ -385,13 +391,13 @@ void map_draw(int draw_powergrid) {
 		d_render_blend_enable();
 	d_tilemap_draw(map->layer[map->layers-2].tilemap);
 	d_render_blend_disable();
-	d_tilemap_draw(map->layer[map->layers-1].tilemap);
+	//d_tilemap_draw(map->layer[map->layers-1].tilemap);
 	
 	d_render_offset(map->cam_x, map->cam_y);
 	if(config.grid) {
 		d_render_tint(18, 18, 18, 255);
 		for(i=0; i<map_grid_chunks; i++)
-			if(map_grid_chunk[i].lines)
+			if(map_grid_chunk[i].lines&&map_grid_chunk[i].x+map_grid_chunk[i].w>map->cam_x&&map_grid_chunk[i].x<map->cam_x+platform.screen_w-SIDEBAR_WIDTH&&map_grid_chunk[i].y+map_grid_chunk[i].h>map->cam_y&&map_grid_chunk[i].y<map->cam_y+platform.screen_h)
 				d_render_line_draw(map_grid_chunk[i].lines, map_grid_chunk[i].size);
 		d_render_tint(255, 255, 255, 255);
 	}

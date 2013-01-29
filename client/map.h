@@ -34,6 +34,10 @@ int tilesx, tilesy;
 struct MAP_GRID_CHUNK {
 	DARNIT_LINE *lines;
 	int size;
+	int x;
+	int y;
+	int w;
+	int h;
 } *map_grid_chunk;
 int map_grid_chunks;
 
