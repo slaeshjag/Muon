@@ -12,5 +12,5 @@ LDFLAGS		+=	-lm
 RM		=	rm -f
 
 ifeq ($(strip $(OS)), Windows_NT)
-	LDFLAGS	+=	-lws2_32 -mwindows
+	LDFLAGS	+=	-lws2_32
 endif

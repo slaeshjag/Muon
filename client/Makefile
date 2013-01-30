@@ -8,7 +8,8 @@ BIN		=	../muon
 DEPENDS		=
 
 ifeq ($(strip $(OS)), Windows_NT)
-	DEPENDS += muon.res
+	LDFLAGS	+=	-mwindows
+	DEPENDS +=	muon.res
 endif
 
 SRCFILES=$(wildcard *.c)
