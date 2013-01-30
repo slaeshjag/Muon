@@ -89,7 +89,6 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 					p->offset+=d_utf8_char_length(p->offset);
 				} else if(p->offset==p->text+d_utf8_char_length(p->text))
 					p->offset=p->text;
-				tw=d_font_string_w(p->font, p->offset);
 			} else if(p->cursor_pos>=UI_ENTRY_LENGTH-1||!e->keyboard->character) {
 				return;
 			} else if(e->keyboard->character>=0x20) {
@@ -101,6 +100,7 @@ void ui_entry_event_key(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			}
 			d_text_surface_reset(p->surface);
 			d_text_surface_string_append(p->surface, p->offset);
+			tw=d_font_string_w(p->font, p->offset);
 			d_render_line_move(p->cursor, 0, widget->x+tw+3, widget->y+2, widget->x+tw+3, widget->y+widget->h-2);
 			break;
 	}
