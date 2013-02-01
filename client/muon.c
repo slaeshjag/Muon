@@ -21,6 +21,7 @@
 
 #include "muon.h"
 #include "menu/menu.h"
+#include "menu/credits.h"
 #include "view.h"
 #include "client.h"
 #include "chat.h"
@@ -30,6 +31,7 @@
 
 void (*state_render[])()={
 		view_background_draw,
+		credits_draw,
 		view_background_draw,
 		view_background_draw,
 		view_background_draw,
@@ -49,6 +51,8 @@ void game_state(GAME_STATE state) {
 			ui_event_global_remove(game_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
 			ui_event_global_remove(game_view_key_press, UI_EVENT_TYPE_KEYBOARD_PRESS);
 			break;
+		case GAME_STATE_CREDITS:
+			//d_render_fade_out(1000);
 		case GAME_STATE_GAME_OVER:
 		case GAME_STATE_GAME_MENU:
 		case GAME_STATE_MENU:
@@ -74,6 +78,10 @@ void game_state(GAME_STATE state) {
 			#endif
 		case GAME_STATE_CONNECTING:
 			ui_selected_widget=NULL;
+			break;
+		case GAME_STATE_CREDITS:
+			d_render_fade_in(500, 0, 0, 0);
+			ui_event_global_add(menu_buttons, UI_EVENT_TYPE_BUTTONS);
 			break;
 		case GAME_STATE_GAME_OVER:
 			gameover_update_stats();

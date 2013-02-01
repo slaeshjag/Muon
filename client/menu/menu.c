@@ -68,12 +68,12 @@ void menu_init() {
 	menu[MENU_STATE_SETTINGS].spacer=menu[MENU_STATE_MAIN].spacer;
 	menu[MENU_STATE_SETTINGS].button_back=menu[MENU_STATE_MULTIPLAYER].button_back;
 	
-	menu[MENU_STATE_HELEP].event_handler=menu_help_button_click;
-	menu[MENU_STATE_HELEP].label=ui_widget_create_label(font_std, T("Help"));
-	menu[MENU_STATE_HELEP].button[0]=ui_widget_create_button_text(font_std, T("Tutorial"));
-	menu[MENU_STATE_HELEP].button[1]=ui_widget_create_button_text(font_std, T("Credits"));
-	menu[MENU_STATE_HELEP].spacer=menu[MENU_STATE_MAIN].spacer;
-	menu[MENU_STATE_HELEP].button_back=menu[MENU_STATE_MULTIPLAYER].button_back;
+	menu[MENU_STATE_HELP].event_handler=menu_help_button_click;
+	menu[MENU_STATE_HELP].label=ui_widget_create_label(font_std, T("Help"));
+	menu[MENU_STATE_HELP].button[0]=ui_widget_create_button_text(font_std, T("Tutorial"));
+	menu[MENU_STATE_HELP].button[1]=ui_widget_create_button_text(font_std, T("Credits"));
+	menu[MENU_STATE_HELP].spacer=menu[MENU_STATE_MAIN].spacer;
+	menu[MENU_STATE_HELP].button_back=menu[MENU_STATE_MULTIPLAYER].button_back;
 	
 	menu[MENU_STATE_MAIN].button_back->event_handler->add(menu[MENU_STATE_MAIN].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	menu[MENU_STATE_MULTIPLAYER].button_back->event_handler->add(menu[MENU_STATE_MULTIPLAYER].button_back, menu_sidebar_button_quit_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
@@ -181,10 +181,11 @@ void menu_settings_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 }
 
 void menu_help_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	if(widget==menu[MENU_STATE_HELEP].button[0]) {
+	if(widget==menu[MENU_STATE_HELP].button[0]) {
 		ui_messagebox(font_std, "insert-fancy-tutorial-here-when-kqr-is-done");
-	} else if(widget==menu[MENU_STATE_HELEP].button[1]) {
-		ui_messagebox(font_std, "insert-fancy-credits-screen-here-when-mr3d-is-done");
+	} else if(widget==menu[MENU_STATE_HELP].button[1]) {
+		//ui_messagebox(font_std, "insert-fancy-credits-screen-here-when-mr3d-is-done");
+		game_state(GAME_STATE_CREDITS);
 	}
 }
 

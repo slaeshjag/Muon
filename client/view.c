@@ -66,7 +66,7 @@ void view_init() {
 }
 
 void view_background_update(int t) {
-	static int x, y, mov1, mov2, c1, c2, c3;
+	register int x, y, mov1, mov2, c1, c2, c3;
 	for (y=0; y<view_background_h; y++)
 		for (x=0; x<view_background_w; x++) {
 			mov1=(y<<8)/view_background_h+(t>>1);
