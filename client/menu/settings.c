@@ -27,6 +27,10 @@
 #include "menu.h"
 #include "settings.h"
 
+#ifdef _WIN32
+#define realpath(N,R) _fullpath((R),(N),_MAX_PATH)
+#endif
+
 void menu_settings_init() {
 	int i;
 	UI_PROPERTY_VALUE v={.p=NULL};
