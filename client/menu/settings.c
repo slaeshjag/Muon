@@ -19,6 +19,8 @@
 
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <limits.h>
 
 #include "../muon.h"
 #include "../client.h"
@@ -173,7 +175,9 @@ void settings_monitor_button_save_click(UI_WIDGET *widget, unsigned int type, UI
 	v=settings_monitor_checkbox_alpha->get_prop(settings_monitor_checkbox_alpha, UI_CHECKBOX_PROP_ACTIVATED);
 	config.alpha=v.i;
 	platform_config_write();
-	if(execv(args[0], args))
+	char path[PATH_MAX], *p; 
+	p=realpath(args[0], path);
+	if(p==NULL||execv(path, args))
 		ui_messagebox(font_std, T("Please restart Muon for the changes to take place."));
 
 	panelist_menu_sidebar.next=NULL;
