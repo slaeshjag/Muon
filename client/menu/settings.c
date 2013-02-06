@@ -173,6 +173,7 @@ void settings_monitor_button_save_click(UI_WIDGET *widget, unsigned int type, UI
 	v=settings_monitor_checkbox_alpha->get_prop(settings_monitor_checkbox_alpha, UI_CHECKBOX_PROP_ACTIVATED);
 	config.alpha=v.i;
 	platform_config_write();
+	atexit(d_quit);
 	if(execv(args[0], args))
 		ui_messagebox(font_std, T("Please restart Muon for the changes to take place."));
 
