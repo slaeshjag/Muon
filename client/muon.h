@@ -30,6 +30,8 @@
 #include "ui/ui.h"
 #include "view.h"
 
+char *const *args;
+
 typedef enum {
 	GAME_STATE_MENU,
 	GAME_STATE_CREDITS,

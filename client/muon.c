@@ -101,7 +101,8 @@ void game_state(GAME_STATE state) {
 	gamestate=state;
 }
 
-int main() {
+int main(int argc, char **argv) {
+	args=argv;
 	platform_init();
 	
 	player_id=0;
