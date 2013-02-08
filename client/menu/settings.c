@@ -179,9 +179,8 @@ void settings_monitor_button_save_click(UI_WIDGET *widget, unsigned int type, UI
 	v=settings_monitor_checkbox_alpha->get_prop(settings_monitor_checkbox_alpha, UI_CHECKBOX_PROP_ACTIVATED);
 	config.alpha=v.i;
 	platform_config_write();
-	char path[PATH_MAX], *p; 
-	p=realpath(args[0], path);
-	if(p==NULL||execv(path, args))
+	char *path=d_fs_exec_path();
+	if(execl(path, path, (char *) NULL))
 		ui_messagebox(font_std, T("Please restart Muon for the changes to take place."));
 
 	panelist_menu_sidebar.next=NULL;
