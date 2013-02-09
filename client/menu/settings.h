@@ -26,6 +26,7 @@ UI_WIDGET *settings_game_hbox_grid;
 UI_WIDGET *settings_game_checkbox_grid;
 UI_WIDGET *settings_game_hbox_powergrid;
 UI_WIDGET *settings_game_checkbox_powergrid;
+UI_WIDGET *settings_game_listbox_lang;
 UI_WIDGET *settings_game_button_ok;
  
 struct UI_PANE_LIST panelist_settings_monitor;

@@ -220,6 +220,12 @@ void ui_listbox_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 		case UI_LISTBOX_PROP_FONT:
 			p->font=value.p;
 			break;
+		case UI_LISTBOX_PROP_SELECTED:
+			if(value.i>=0&&value.i<p->size) {
+				p->selected=value.i;
+				widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
+			}
+			break;
 	}
 }
 

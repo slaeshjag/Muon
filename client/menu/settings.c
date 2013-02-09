@@ -34,12 +34,13 @@
 void menu_settings_init() {
 	int i;
 	UI_PROPERTY_VALUE v={.p=NULL};
+	const DARNIT_STRINGTABLE_SECTIONS *languages;
 	
 	//Gameplay settings
-	panelist_settings_game.pane=ui_pane_create(16, 16, 256, 128, NULL);
+	panelist_settings_game.pane=ui_pane_create(16, 16, 256, 256, NULL);
 	ui_pane_set_root_widget(panelist_settings_game.pane, ui_widget_create_vbox());
 	panelist_settings_game.next=NULL;
-	ui_vbox_add_child(panelist_settings_game.pane->root_widget, ui_widget_create_label(font_std, T("Player name")), 1);
+	ui_vbox_add_child(panelist_settings_game.pane->root_widget, ui_widget_create_label(font_std, T("Player name")), 0);
 	settings_game_entry_name=ui_widget_create_entry(font_std);
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_entry_name, 0);
 	settings_game_entry_name->event_handler->add(settings_game_entry_name, settings_game_button_save_click, UI_EVENT_TYPE_KEYBOARD_PRESS);
@@ -61,6 +62,17 @@ void menu_settings_init() {
 	ui_hbox_add_child(settings_game_hbox_powergrid, settings_game_checkbox_powergrid, 0);
 	ui_hbox_add_child(settings_game_hbox_powergrid, ui_widget_create_label(font_std, T("Always show power grid")), 0);
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_hbox_powergrid, 0);
+	
+	ui_vbox_add_child(panelist_settings_game.pane->root_widget, ui_widget_create_label(font_std, T("Language")), 0);
+	settings_game_listbox_lang=ui_widget_create_listbox(font_std);
+	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_listbox_lang, 1);
+	ui_vbox_add_child(panelist_settings_game.pane->root_widget, ui_widget_create_spacer_size(1, 4), 0);
+	languages=d_stringtable_section_list(stringtable);
+	for(i=0; i<languages->names; i++)
+		ui_listbox_add(settings_game_listbox_lang, languages->name[i]);
+	v.i=ui_listbox_index_of(settings_game_listbox_lang, config.lang);
+	if(v.i>=0)
+		settings_game_listbox_lang->set_prop(settings_game_listbox_lang, UI_LISTBOX_PROP_SELECTED, v);
 	
 	settings_game_button_ok=ui_widget_create_button_text(font_std, T("Save"));
 	ui_vbox_add_child(panelist_settings_game.pane->root_widget, settings_game_button_ok, 0);
@@ -150,7 +162,15 @@ void settings_game_button_save_click(UI_WIDGET *widget, unsigned int type, UI_EV
 	config.grid=v.i;
 	v=settings_game_checkbox_powergrid->get_prop(settings_game_checkbox_powergrid, UI_CHECKBOX_PROP_ACTIVATED);
 	config.powergrid=v.i;
+	v=settings_game_listbox_lang->get_prop(settings_game_listbox_lang, UI_LISTBOX_PROP_SELECTED);
+	if(v.i>=0) {
+		strncpy(config.lang, ui_listbox_get(settings_game_listbox_lang, v.i), 2);
+		config.lang[2]=0;
+	}
 	platform_config_write();
+	char *path=d_fs_exec_path();
+	if(execl(path, path, (char *) NULL))
+		ui_messagebox(font_std, T("Please restart Muon for the changes to take place."));
 	panelist_menu_sidebar.next=NULL;
 }
 
