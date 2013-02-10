@@ -27,10 +27,6 @@
 #include "menu.h"
 #include "settings.h"
 
-#ifdef _WIN32
-#define realpath(N,R) _fullpath((R),(N),_MAX_PATH)
-#endif
-
 void menu_settings_init() {
 	int i;
 	UI_PROPERTY_VALUE v={.p=NULL};
@@ -70,8 +66,7 @@ void menu_settings_init() {
 	languages=d_stringtable_section_list(stringtable);
 	for(i=0; i<languages->names; i++)
 		ui_listbox_add(settings_game_listbox_lang, languages->name[i]);
-	v.i=ui_listbox_index_of(settings_game_listbox_lang, config.lang);
-	if(v.i>=0)
+	if((v.i=ui_listbox_index_of(settings_game_listbox_lang, config.lang))>=0)
 		settings_game_listbox_lang->set_prop(settings_game_listbox_lang, UI_LISTBOX_PROP_SELECTED, v);
 	
 	settings_game_button_ok=ui_widget_create_button_text(font_std, T("Save"));
@@ -126,6 +121,10 @@ void menu_settings_init() {
 	for(i=0; videomodes[i]; i++) {
 		sprintf(buf, "%ix%i", videomodes[i]->w, videomodes[i]->h);
 		ui_listbox_add(settings_monitor_listbox_modes, buf);
+		if(videomodes[i]->w==config.screen_w&&videomodes[i]->h==config.screen_h) {
+			v.i=i;
+			settings_monitor_listbox_modes->set_prop(settings_monitor_listbox_modes, UI_LISTBOX_PROP_SELECTED, v);
+		}
 	}
 	
 	//Sound settings

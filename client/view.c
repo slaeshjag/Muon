@@ -22,6 +22,7 @@
 #include "muon.h"
 #include "menu/menu.h"
 #include "menu/multiplayer.h"
+#include "menu/credits.h"
 #include "view.h"
 #include "game.h"
 #include "gameover.h"
@@ -55,6 +56,7 @@ void view_init() {
 	chat_init();
 	
 	gamestate_pane[GAME_STATE_MENU]=&panelist_menu_sidebar;
+	gamestate_pane[GAME_STATE_CREDITS]=&panelist_credits;
 	gamestate_pane[GAME_STATE_CONNECTING]=&panelist_multiplayer_connecting;
 	gamestate_pane[GAME_STATE_LOBBY]=&panelist_lobby_players;
 	gamestate_pane[GAME_STATE_GAME]=&panelist_game_sidebar;

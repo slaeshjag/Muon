@@ -20,6 +20,13 @@
 #ifndef CREDITS_H
 #define CREDITS_H
 
+struct UI_PANE_LIST panelist_credits;
+struct UI_PANE_LIST panelist_credits_contact;
+struct UI_PANE_LIST panelist_credits_dbcc;
+UI_WIDGET *credits_button_back;
+
+void credits_init();
+void credits_button_back_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void credits_draw();
 
 #endif

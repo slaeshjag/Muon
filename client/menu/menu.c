@@ -27,6 +27,7 @@
 #include "menu.h"
 #include "multiplayer.h"
 #include "settings.h"
+#include "credits.h"
 
 const char *menu_sidebar_button_text_main[8];
 
@@ -35,6 +36,7 @@ void menu_init() {
 	
 	menu_multiplayer_init();
 	menu_settings_init();
+	credits_init();
 	
 	//Main menu
 	panelist_menu_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);

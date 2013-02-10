@@ -17,10 +17,39 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "../muon.h"
 #include "../intmath.h"
 #include "../view.h"
 #include "../platform.h"
 #include "credits.h"
+
+char credits_text[256];
+char credits_contact_text[128];
+
+void credits_init() {
+	sprintf(credits_text, "%s:\n    %s\n    %s\n\n%s:\n    %s\n    %s\n\n%s:\n    %s\n    %s",
+		T("Server-side programmer"), "slaeshjag", "http://rdw.se/",
+		T("Client-side programmer"), "h4xxel", "http://h4xxel.org/",
+		T("Maps and graphics"), "~kqr", "http://hasp.xkqr.org/"
+	);
+	panelist_credits.pane=ui_pane_create(platform.screen_w/2-320/2, platform.screen_h/2-240/2, 320, 240, ui_widget_create_vbox());
+	panelist_credits.next=&panelist_credits_contact;
+	ui_vbox_add_child(panelist_credits.pane->root_widget, ui_widget_create_label(font_std, T("Credits")), 0);
+	ui_vbox_add_child(panelist_credits.pane->root_widget, ui_widget_create_label(font_std, credits_text), 0);
+	ui_vbox_add_child(panelist_credits.pane->root_widget, ui_widget_create_spacer(), 1);
+	ui_vbox_add_child(panelist_credits.pane->root_widget, credits_button_back=ui_widget_create_button_text(font_std, T("Back")), 0);
+	credits_button_back->event_handler->add(credits_button_back, credits_button_back_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	
+	sprintf(credits_contact_text, "%s: %s\n%s: %s",
+		T("Bug tracker"), "http://github.com/slaeshjag/Muon/",
+		T("Contact"), "muon@rdw.se"
+	);
+	panelist_credits_contact.pane=ui_pane_create(0, 0, 256, 48, ui_widget_create_label(font_std, credits_contact_text));
+}
+
+void credits_button_back_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	game_state(GAME_STATE_MENU);
+}
 
 void credits_background_update(int t) {
 	register int x, y, mov1, mov2, c1, c2, c3, c;
@@ -54,8 +83,10 @@ void credits_draw() {
 	if(d_render_fade_status()==1) {
 		view_background_draw();
 		fade=1;
+		gamestate_pane[GAME_STATE_CREDITS]=NULL;
 		return;
 	}
+	gamestate_pane[GAME_STATE_CREDITS]=&panelist_credits;
 	if(fade) {
 		d_render_fade_out(500);
 		fade=0;
