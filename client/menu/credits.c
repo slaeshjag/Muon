@@ -45,6 +45,12 @@ void credits_init() {
 		T("Contact"), "muon@rdw.se"
 	);
 	panelist_credits_contact.pane=ui_pane_create(0, 0, 256, 48, ui_widget_create_label(font_std, credits_contact_text));
+	
+	if(platform.platform&DARNIT_PLATFORM_PANDORA) {
+		panelist_credits_dbcc.pane=ui_pane_create(config.screen_w-(200+UI_PADDING*2), 0, 200+UI_PADDING*2, 187+UI_PADDING*2, ui_widget_create_imageview_file("res/dragonbox_compo.png", 200, 187, DARNIT_PFORMAT_RGB5A1));
+		panelist_credits_contact.next=&panelist_credits_dbcc;
+		panelist_credits_dbcc.next=NULL;
+	}
 }
 
 void credits_button_back_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
