@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PXML xmlns="http://openpandora.org/namespaces/PXML">
 	<package id="muon-slaeshjag">
-		<version major="0" minor="0" release="1" build="0"/>
+		<version major="0" minor="9" release="9" build="0"/>
 		<author name="Slaeshjag" website="http://slaeshjag.org" />
 		<titles> 
 			<title lang="en_US">Muon</title>
@@ -15,8 +15,8 @@
 	<application id="muon-slaeshjag-egegheew" appdata="muon">
 		<title lang="en_US">Muon</title>
 		<description lang="en_US">Muon is a new kind of RTS with a minimalistic gameplay design.</description>
-		<version major="0" minor="0" release="1" build="0"/>
-		<exec command="./muon" background="true" standalone="true"/>
+		<version major="0" minor="9" release="9" build="0"/>
+		<exec command="./run" background="true" standalone="true"/>
 		<author name="Undecided" website="http://slaeshjag.org/" />
 		<icon src="icon.png"/>
 		<previewpics>
