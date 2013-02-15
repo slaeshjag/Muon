@@ -484,6 +484,8 @@ int unitValidateWall(int index, int player) {
 				continue;
 
 			index_dst = (x + i) + (y + j) * server->w;
+			if (index_dst < 0 || index_dst >= server->w * server->h)
+				continue;
 			if (!server->map[index_dst])
 				continue;
 			if (server->map[index_dst]->type != UNIT_DEF_GENERATOR && server->map[index_dst]->type != UNIT_DEF_PYLON)
