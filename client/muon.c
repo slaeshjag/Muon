@@ -101,6 +101,21 @@ void game_state(GAME_STATE state) {
 	gamestate=state;
 }
 
+void sound_init() {
+	sound_ready=d_sound_streamed_load("res/ready.ogg", 1, 0);
+	sound_defeated=d_sound_streamed_load("res/defeated.ogg", 1, 0);
+	sound_explosion=d_sound_streamed_load("res/explosion.ogg", 1, 0);
+	sound_chat=d_sound_streamed_load("res/chat.ogg", 1, 0);
+	sound_flare=d_sound_streamed_load("res/flare.ogg", 1, 0);
+	sound_nuke=d_sound_streamed_load("res/nuke.ogg", 1, 0);
+	sound_radar=d_sound_streamed_load("res/radar.ogg", 1, 0);
+}
+
+void sound_play(DARNIT_SOUND *snd) {
+	if(snd)
+		d_sound_play(snd, 0, config.sound*12, config.sound*12, 0);
+}
+
 int main(int argc, char **argv) {
 	args=argv;
 	platform_init();
@@ -112,6 +127,7 @@ int main(int argc, char **argv) {
 	intmath_init();
 	ui_init();
 	view_init();
+	sound_init();
 	
 	ui_event_global_add(view_mouse_draw, UI_EVENT_TYPE_UI);
 	game_state(GAME_STATE_MENU);

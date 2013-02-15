@@ -160,12 +160,14 @@ int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_CHAT:
 			chat_recv(msg->player_id, msg->arg_1, (char *)payload, msg->arg_2);
+			sound_play(sound_chat);
 			break;
 		case MSG_RECV_LEAVE:
 			chat_leave(msg->player_id);
 			break;
 		case MSG_RECV_PLAYER_DEFEATED:
 			chat_defeated(msg->player_id);
+			sound_play(sound_defeated);
 			break;
 		case MSG_RECV_CLEAR_MAP:
 			map_clear_fow();
@@ -194,6 +196,7 @@ int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_UNIT_READY:
 			game_set_building_ready(msg->arg_1);
+			sound_play(sound_ready);
 			break;
 		case MSG_RECV_BUILDING_PROGRESS:
 			game_set_building_progress(0, msg->arg_2);
@@ -206,6 +209,7 @@ int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 			break;
 		case MSG_RECV_MAP_FLARE:
 			map_flare_add(msg->arg_2, msg->player_id, 10000, 40);
+			sound_play(sound_flare);
 			break;
 		case MSG_RECV_CP_TIMER: {
 			int i=msg->arg_1-BUILDING_CLUSTERBOMB+1;
@@ -235,10 +239,12 @@ int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 					ability[1].ready=-1;
 					ability[1].button->enabled=0;
 				}*/
-			}
+			} else if(msg->arg_1==BUILDING_RADAR)
+				sound_play(sound_radar);
 			break;
 		case MSG_RECV_MAJOR_IMPACT:
 			map_flare_add(msg->arg_2, msg->player_id, 2000, map->layer[map->layers-2].tile_w);
+			sound_play(sound_nuke);
 			break;
 		case MSG_RECV_PLAYER_STATS_1:
 			player[msg->player_id].stats.built=msg->arg_1;
