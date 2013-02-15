@@ -419,9 +419,9 @@ void playerClear(int player) {
 	
 	for (i = 0; i < server->w * server->h; i++) {
 		server->player[player].map[i].fog = 1;
-		if (!server->map[i])
+/*		if (!server->map[i])
 			continue;
-		unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);
+		unitAnnounce(server->map[i]->owner, player, server->map[i]->type, i);*/
 	}
 
 	return;

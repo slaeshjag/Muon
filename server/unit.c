@@ -399,22 +399,23 @@ int unitRemove(int x, int y, int who) {
 			unitPylonDelete(next);
 			unitPylonPulse();
 		} else if (next->type == UNIT_DEF_GENERATOR) {
+			server->player[unit->owner].spawn.x = -1;
 			server->player[next->owner].status = PLAYER_SPECTATING;
 			playerMessageBroadcast(next->owner, MSG_SEND_PLAYER_DEFEATED, 0, 0, NULL);
 			unitDestroyAll(next->owner);
 			playerDefeatAnnounce(next->owner);
 			unitPylonDelete(next);
-			server->map[x + y * server->h] = NULL;
+			server->map[x + y * server->w] = NULL;
 			if (gameDetectIfOver() == 0)
 				gameEnd();
 		} else if (next->type >= UNIT_DEF_BUILDSITE) {
 			controlpointRemove(next);
 		}
 		free(next);
-		server->map[x + y * server->h] = NULL;
+		server->map[x + y * server->w] = NULL;
 	}
 	
-	server->map[x + y * server->h] = NULL;
+	server->map[x + y * server->w] = NULL;
 
 	return 0;
 }

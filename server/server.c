@@ -197,12 +197,14 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 
 	for (i = 0; i < map_w * map_h; i++)
 		server->map[i] = NULL;
+	
+	server->state = SERVER_RUNNING;
 
 	server->unit = NULL;
 	controlpointInit();
 	if ((max_players = serverInitMap(fname)) < 0) {
-		server = serverStop();
-		return server;
+		serverStop();
+		return NULL;
 	}
 
 	for (i = 0; i < players; i++)
@@ -226,7 +228,6 @@ SERVER *serverStart(const char *fname, unsigned int players, int port, int games
 		server->player[i].spawn_as = spawn_as;
 	}
 
-	server->state = SERVER_RUNNING;
 
 	return server;
 }
