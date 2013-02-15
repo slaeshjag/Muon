@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="32" height="32" tilewidth="32" tileheight="32">
  <properties>
-  <property name="author" value="arne"/>
+  <property name="author" value="h4xxel"/>
   <property name="max_players" value="4"/>
-  <property name="name" value="testmap"/>
+  <property name="name" value="Squared"/>
   <property name="size" value="32x32"/>
   <property name="tileset" value="mapdata/default.png"/>
-  <property name="version" value="1337"/>
+  <property name="version" value="0.1"/>
  </properties>
  <tileset firstgid="1" name="lol" tilewidth="32" tileheight="32">
   <image source="default.png" width="512" height="512"/>

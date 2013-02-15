@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="24" height="32" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="author" value="h4xxel"/>
+  <property name="max_players" value="3"/>
+  <property name="name" value="Advantage"/>
+  <property name="size" value="24x32"/>
+  <property name="tileset" value="mapdata/default.png"/>
+  <property name="version" value="0.1"/>
+ </properties>
+ <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
+  <image source="default.png" trans="00ffff" width="512" height="512"/>
+ </tileset>
+ <layer name="terrain" width="24" height="32">
+  <data encoding="base64" compression="zlib">
+   eJzt00sKACEMBNHcf+eN3YrjJ8QukSEN2b4ChzH7rgTOs4jrbZzau0b6vL8a7SsapO+d2os0SVvVod6J/L6qf7jvKd1Rg/Lz8v54Bpnt0p/bN/xXGhXFqkkl
+  </data>
+ </layer>
+ <layer name="buildings" width="24" height="32">
+  <data encoding="base64" compression="zlib">
+   eJxjYBg5QJAGZoqTKD4KRsEoIA8IDbQDRsEoGAUYgG2ImDkKRi4wpKJZilQ0a6ABALN9ALA=
+  </data>
+ </layer>
+ <layer name="collision" width="24" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztlDkKADAIBC38/5vTByEbdXPADtjOFIm6mfk0GWZHNFWY7lVDfr6f/b43/2fVj+zXTgP1ZZpMd1cHheXNdDpheaOGEAKHsTPMW/K7/+Stfa0xAKd7Au0=
+  </data>
+ </layer>
+ <layer name="fow" width="24" height="32" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztwwEJAAAMBKHj+4dekCm4aqqq6osHGhwGAQ==
+  </data>
+ </layer>
+</map>

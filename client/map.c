@@ -68,7 +68,7 @@ void map_init(char *filename) {
 	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
 	
-	for(i=0; i<map->layer->tilemap->w*map->layer->tilemap->w; i++) {
+	for(i=0; i<map->layer->tilemap->w*map->layer->tilemap->h; i++) {
 		for(j=0; j<map->layers-2; j++)
 			if(map->layer[j].tilemap->data[i]&0xFFF)
 				break;
@@ -137,7 +137,7 @@ void map_update_grid() {
 				d_render_line_move(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, (x+1)*tile_w, y*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				map_grid_chunk[chunk].size++;
 			}
-			if(y+1<building_tilemap->w&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[(y+1)*building_tilemap->w+x]&(1<<17)))) {
+			if(y+1<building_tilemap->h&&!((building_tilemap->data[y*building_tilemap->w+x]&(1<<17))&(building_tilemap->data[(y+1)*building_tilemap->w+x]&(1<<17)))) {
 				d_render_line_move(map_grid_chunk[chunk].lines, map_grid_chunk[chunk].size, x*tile_w, (y+1)*tile_h, (x+1)*tile_w, (y+1)*tile_h);
 				map_grid_chunk[chunk].size++;
 			}

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="48" height="16" tilewidth="32" tileheight="32">
+ <properties>
+  <property name="author" value="h4xxel"/>
+  <property name="max_players" value="4"/>
+  <property name="name" value="River of Plasma"/>
+  <property name="size" value="48x16"/>
+  <property name="tileset" value="mapdata/default.png"/>
+  <property name="version" value="0.1"/>
+ </properties>
+ <tileset firstgid="1" name="default" tilewidth="32" tileheight="32">
+  <image source="default.png" trans="00ffff" width="512" height="512"/>
+ </tileset>
+ <layer name="terrain" width="48" height="16">
+  <data encoding="base64" compression="zlib">
+   eJybyMDAMJEGGBughT20wqPuH3U/tf0w0O6hxP0D7ZZR9w89POr+UfePVPejg4F2z0h3/1DyAy5AC7sA5mOO0A==
+  </data>
+ </layer>
+ <layer name="buildings" width="48" height="16">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgF6EAIh7gRDe0UpKHZ1AaGA+2AUYATsA20A/CAwey2UUA9gCueR+OfMBjMYTSY3TbSgeJAO4AE4Ehj85VwiDvR2N6hCABw4QFx
+  </data>
+ </layer>
+ <layer name="collision" width="48" height="16">
+  <data encoding="base64" compression="zlib">
+   eJzt1DEKAAAIQtGG7n/maHcVUfzQ/lya4bTgnKpfm7v/S/I7Vr+2+rXVryvp9yf4nTYgO8t/HqoBAQ==
+  </data>
+ </layer>
+ <layer name="fow" width="48" height="16" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJztwwEJAAAMBKHj+4dekCm4aqqq6osHGhwGAQ==
+  </data>
+ </layer>
+</map>
