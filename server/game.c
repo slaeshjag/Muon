@@ -87,7 +87,7 @@ void gameSpawn() {
 				}
 				
 				if (building >= UNIT_DEF_BUILDSITE)
-					server->map_c.tile_data[i] = UNIT_BUILDSITE
+					server->map_c.tile_data[i] = UNIT_BUILDSITE;
 				unitSpawn(j, building, i % server->w, i / server->w);
 			}
 		server->player[j].stats.points = 0;
