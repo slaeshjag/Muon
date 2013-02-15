@@ -184,10 +184,12 @@ int client_game_handler(MESSAGE_RAW *msg, unsigned char *payload) {
 					map_set_home(msg->arg_2);
 					game_view_scroll_to(home_x, home_y);
 				}
-				game_reset_building_progress();
 				if(msg->arg_1>=BUILDING_BUILDSITE)
 					panelist_game_sidebar.next=&panelist_game_abilitybar;
-				game_set_building_ready(BUILDING_NONE);
+				if(msg->arg_1!=BUILDING_NONE) {
+					game_reset_building_progress();
+					game_set_building_ready(BUILDING_NONE);
+			}
 			}
 			break;
 		case MSG_RECV_UNIT_READY:
