@@ -50,7 +50,7 @@ void game_view_init() {
 	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
 	game_sidebar_minimap->render=map_minimap_render;
 	game_sidebar_minimap->event_handler->add(game_sidebar_minimap, game_sidebar_minimap_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
-	//if(!(platform.platform&DARNIT_PLATFORM_PANDORA))
+	if(!(platform.platform&DARNIT_PLATFORM_PANDORA))
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Buildings:")), 0);
 	
@@ -73,8 +73,8 @@ void game_view_init() {
 	game_sidebar_status.label_shield=ui_widget_create_label(font_std, T("Shields"));
 	game_sidebar_status.label_health=ui_widget_create_label(font_std, T("Health"));
 	
-	/*if(platform.platform&DARNIT_PLATFORM_PANDORA)
-		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);*/
+	if(platform.platform&DARNIT_PLATFORM_PANDORA)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	
 	/*Special buildings for control points*/
 	panelist_game_specialbar.pane=ui_pane_create(config.screen_w-SIDEBAR_WIDTH*2, game_sidebar_button_build[4]->y-64, SIDEBAR_WIDTH, 128, ui_widget_create_vbox());
@@ -311,6 +311,8 @@ void game_view_mouse_release(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 }
 
 void game_update_building_status() {
+	if(platform.platform&DARNIT_PLATFORM_PANDORA)
+		ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_health);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_health);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield);
@@ -326,6 +328,8 @@ void game_update_building_status() {
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_health, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_health, 0);
+	if(platform.platform&DARNIT_PLATFORM_PANDORA)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	UI_PROPERTY_VALUE v;
 	v.p=(void *)building[map_selected_building()].name;
 	
