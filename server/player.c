@@ -142,19 +142,19 @@ void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned 
 
 
 void playerDisconnect(unsigned int player) {
+	int broadcast;
+	
+	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
+	if (broadcast)
+		playerMessageBroadcast(player, MSG_SEND_LEAVE, 0, 0, NULL);
 	server->player[player].status = PLAYER_BEING_DISCONNECTED;
 	server->player[player].last_ping_reply = time(NULL);
-
-	fprintf(stderr, "request to disconnect player...\n");
 
 	return;
 }
 
 
 void playerDisconnectKill(unsigned int player) {
-	int broadcast;
-
-	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
 	if (server->player[player].status == PLAYER_UNUSED)
 		return;
 
@@ -167,10 +167,6 @@ void playerDisconnectKill(unsigned int player) {
 
 	fprintf(stderr, "Disconnecting player...\n");
 	
-	if (!broadcast)
-		return;
-	
-	playerMessageBroadcast(player, MSG_SEND_LEAVE, 0, 0, NULL);
 
 	return;
 }

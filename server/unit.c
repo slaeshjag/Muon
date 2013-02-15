@@ -190,7 +190,7 @@ void unitPylonInit(SERVER_UNIT *unit, unsigned int x, unsigned int y) {
 		if (j + x < 0 || j + x >= server->w)
 			continue;
 		for (k = -1 * radius; k <= radius; k++) {
-			if (k + y < 0 || k + y >= server->w)
+			if (k + y < 0 || k + y >= server->h)
 				continue;
 			if (k * k + j * j > radius*radius)
 				continue;
