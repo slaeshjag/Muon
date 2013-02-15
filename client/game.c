@@ -73,6 +73,8 @@ void game_view_init() {
 	game_sidebar_status.label_shield=ui_widget_create_label(font_std, T("Shields"));
 	game_sidebar_status.label_health=ui_widget_create_label(font_std, T("Health"));
 	
+	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer, 1);
+	
 	if(platform.platform&DARNIT_PLATFORM_PANDORA)
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	
@@ -316,14 +318,14 @@ void game_update_building_status() {
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_shield);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_name);
-	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer);
+	//ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer);
 	if(map_selected_index()<0)
 		return;
 	
 	if(platform.platform&DARNIT_PLATFORM_PANDORA)
 		ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap);
 	
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer, 1);
+	//ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer, 1);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_name, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_shield, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield, 0);
