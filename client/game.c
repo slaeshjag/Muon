@@ -223,7 +223,7 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		else if(e->buttons->down&&map->cam_y<map_h-screen_h/2)
 			scroll_y=SCROLL_SPEED;
 			
-		if(e->buttons->y) {
+		if(e->buttons->l) {
 			scroll_x*=2;
 			scroll_y*=2;
 		}
@@ -236,7 +236,7 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		//Interaction keys
 		if(e->buttons->start&&!prevbuttons.start)
 			game_state(GAME_STATE_GAME_MENU);
-		if(e->buttons->x&&!prevbuttons.x)
+		if(e->buttons->a&&!prevbuttons.a)
 			chat_toggle(&panelist_game_sidebar);
 		if(e->buttons->b&&!prevbuttons.b) {
 			if(building_place>-1) {
@@ -246,10 +246,22 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 				map_select_nothing();
 			}
 		}
+		if(e->buttons->x&&!prevbuttons.x) {
+			DARNIT_MOUSE m=d_mouse_get();
+			UI_EVENT_MOUSE e_m={
+				0,
+				0,
+				UI_EVENT_MOUSE_BUTTON_LEFT,
+				0,
+			};
+			e_m.x=m.x; e_m.y=m.y;
+			UI_EVENT e={.mouse=&e_m};
+			ui_event_global_send(UI_EVENT_TYPE_MOUSE_PRESS, &e);
+		}
 	}
 	
 	// If shift is pressed (button Y) set building_cancel
-	building_cancel = e->buttons->y;
+	building_cancel = e->buttons->l;
 	
 	memcpy(&prevbuttons, e->buttons, sizeof(UI_EVENT_BUTTONS));
 }
