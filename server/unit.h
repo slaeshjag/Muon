@@ -53,6 +53,7 @@ static const int unit_los[] = {
 	7,		/* owned control point (buildsite) */
 	2,		/* carpet bomb */
 	2,		/* radar */
+	2,		/* ground generator */
 	2,		/* shield regenerator */
 };
 
@@ -73,6 +74,7 @@ static const int unit_maxhp[] = {
 	2000 * 50,	/* owned control point (buildsite) */
 	2000 * 50,	/* carpet bomb */
 	2000 * 30,	/* radar */
+	2000 * 30,	/* ground generator */
 	2000 * 30,	/* shield regenerator */
 };
 
@@ -89,6 +91,7 @@ static const int unit_maxshield[] = {
 	1,		/* owned control point (buildsite) */
 	1,		/* carpet bomb */
 	1,		/* radar */
+	1,		/* ground generator */
 	1,		/* shield regenerator */
 
 };
@@ -103,6 +106,7 @@ static const int unit_shieldreg[] = {
 	1,		/* owned control point (buildsite) */
 	1,		/* carpet bomb */
 	1,		/* radar */
+	1,		/* ground generator */
 	1,		/* shield regenerator */
 };
 
