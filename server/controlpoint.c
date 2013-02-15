@@ -598,6 +598,7 @@ void controlpointDeployShieldregen(int player, int index_dst) {
 
 
 void controlpointDeploy(int player, int type, int index_dst) {
+	fprintf(stderr, "Ready: %i\n", server->player[0].queue.queue.ready);
 	if (index_dst < 0 || index_dst > server->w * server->h)
 		return;
 	switch (type) {
@@ -645,6 +646,7 @@ void controlpointDeploy(int player, int type, int index_dst) {
 	messageBufferPushDirect(player, player, MSG_SEND_CP_DEPLOY, type, index_dst, NULL);
 	if (type != UNIT_DEF_CLUSTERBOMB || (server->player[player].cp.clusterbomb.count > 0 || server->player[player].cp.clusterbomb_delay > 0))
 		messageBufferPushDirect(player, player, MSG_SEND_CP_DELAY, type, 0, NULL);
+	fprintf(stderr, "Ready: %i\n", server->player[0].queue.queue.ready);
 
 	return;
 }
