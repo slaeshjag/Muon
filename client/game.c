@@ -311,8 +311,6 @@ void game_view_mouse_release(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) 
 }
 
 void game_update_building_status() {
-	if(platform.platform&DARNIT_PLATFORM_PANDORA)
-		ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_health);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_health);
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield);
@@ -321,6 +319,9 @@ void game_update_building_status() {
 	ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer);
 	if(map_selected_index()<0)
 		return;
+	
+	if(platform.platform&DARNIT_PLATFORM_PANDORA)
+		ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap);
 	
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer, 1);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_name, 0);
