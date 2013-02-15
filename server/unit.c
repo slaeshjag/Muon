@@ -478,7 +478,7 @@ int unitValidateWall(int index, int player) {
 		if (x + i < 0 || x + i >= server->w)
 			continue;
 		for (j = -1*range; j <= range; j++) {
-			if (y + j < 0 || y + j >= server->w)
+			if (y + j < 0 || y + j >= server->h)
 				continue;
 			if (i*i + j*j > range*range)
 				continue;
