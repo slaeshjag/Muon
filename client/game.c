@@ -195,6 +195,7 @@ void game_sidebar_button_build_click(UI_WIDGET *widget, unsigned int type, UI_EV
 		widget->set_prop(widget, UI_BUTTON_PROP_CHILD, v);
 		game_set_building_progress(0, 0);
 		game_set_building_ready(BUILDING_NONE); // No buildings in progress
+		building_place=-1;
 	}
 	ui_selected_widget=NULL;
 }
@@ -257,6 +258,15 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			e_m.x=m.x; e_m.y=m.y;
 			UI_EVENT e={.mouse=&e_m};
 			ui_event_global_send(UI_EVENT_TYPE_MOUSE_PRESS, &e);
+		}
+		if(e->buttons->y&&!prevbuttons.y) {
+			if(building_place==-1&&ability_place==0) {
+				int selected_building=map_selected_building();
+				if(attacker_target)
+					attacker_target=0;
+				else if(map_selected_owner()==player_id&&(selected_building==BUILDING_ATTACKER||selected_building==BUILDING_SCOUT))
+					attacker_target=1;
+			}
 		}
 	}
 	
