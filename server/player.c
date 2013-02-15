@@ -135,26 +135,24 @@ void playerMessageBroadcast(unsigned int player, unsigned int command, unsigned 
 	msg.extra = data;
 
 	for (i = 0; i < server->players; i++)
-		if (server->player[i].status > PLAYER_WAITING_FOR_IDENTIFY)
+		if (server->player[i].status > PLAYER_WAITING_FOR_IDENTIFY && server->player[i].status != PLAYER_BEING_DISCONNECTED)
 			messageBufferPush(server->player[i].msg_buf, &msg);
 	return;
 }
 
 
 void playerDisconnect(unsigned int player) {
-	int broadcast;
-	
-	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
 	server->player[player].status = PLAYER_BEING_DISCONNECTED;
 	server->player[player].last_ping_reply = time(NULL);
-	if (broadcast)
-		playerMessageBroadcast(player, MSG_SEND_LEAVE, 0, 0, NULL);
 
 	return;
 }
 
 
 void playerDisconnectKill(unsigned int player) {
+	int broadcast;
+	
+	broadcast = (server->player[player].status > PLAYER_WAITING_FOR_IDENTIFY) ? 1 : 0;
 	if (server->player[player].status == PLAYER_UNUSED)
 		return;
 
@@ -165,6 +163,8 @@ void playerDisconnectKill(unsigned int player) {
 	messageBufferFlush(server->player[player].msg_buf);
 	server->player[player].socket = networkSocketDisconnect(server->player[player].socket);
 
+	if (broadcast)
+		playerMessageBroadcast(player, MSG_SEND_LEAVE, 0, 0, NULL);
 	fprintf(stderr, "Disconnecting player...\n");
 	
 
