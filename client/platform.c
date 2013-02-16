@@ -67,14 +67,14 @@ void platform_config_init_defaults() {
 				KEY(s),
 				KEY(a),
 				KEY(d),
+				KEY(F1),
+				KEY(F2),
 				KEY(KP_ENTER),
-				KEY(LSHIFT),
-				KEY(F4),
 				KEY(r),
 				KEY(BACKSPACE),
 				KEY(LCTRL),
-				KEY(F1),
-				KEY(F2),
+				KEY(LSHIFT),
+				KEY(F3),
 			};
 		d_keymapping_set(keymap);
 		}
@@ -87,14 +87,14 @@ void platform_config_init_defaults() {
 			KEY(s),
 			KEY(a),
 			KEY(d),
+			KEY(F1),
+			KEY(F2),
 			KEY(TAB),
-			KEY(LSHIFT),
-			KEY(SPACE),
 			KEY(DELETE),
 			KEY(ESCAPE),
 			KEY(RETURN),
-			KEY(F1),
-			KEY(F2),
+			KEY(LSHIFT),
+			KEY(F3),
 		};
 		d_keymapping_set(keymap);
 	}

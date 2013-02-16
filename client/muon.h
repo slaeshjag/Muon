@@ -32,6 +32,14 @@
 
 char *const *args;
 
+DARNIT_SOUND *sound_ready;
+DARNIT_SOUND *sound_defeated;
+DARNIT_SOUND *sound_explosion;
+DARNIT_SOUND *sound_chat;
+DARNIT_SOUND *sound_flare;
+DARNIT_SOUND *sound_nuke;
+DARNIT_SOUND *sound_radar;
+
 typedef enum {
 	GAME_STATE_MENU,
 	GAME_STATE_CREDITS,
@@ -51,5 +59,7 @@ struct UI_PANE_LIST *gamestate_pane[GAME_STATES];
 UI_EVENT_BUTTONS prevbuttons;
 
 void game_state(GAME_STATE state);
+void sound_init();
+void sound_play(DARNIT_SOUND *snd);
 
 #endif
