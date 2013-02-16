@@ -137,6 +137,8 @@ $(DEB).deb:
 	@mkdir -p $(DEB)/usr/games
 	@mkdir -p $(DEB)/usr/lib
 	@mkdir -p $(DEB)/usr/share/doc/muon-rts
+	@mkdir -p $(DEB)/usr/share/man/man1
+	@mkdir -p $(DEB)/usr/share/man/man6
 	@mkdir -p $(DEB)/usr/share/menu
 	@mkdir -p $(DEB)/usr/share/pixmaps
 	@mkdir -p $(DEB)$(DATAPATH)/res
@@ -157,6 +159,13 @@ $(DEB).deb:
 		sed	-e 's/^Icon=.*/Icon=$(subst /,\/,$(DATAPATH)/res/icon.png)/' \
 			-e 's/^Exec=.*/Exec=$(subst /,\/,/usr/games/muon-rts)/' \
 		> "$(DEB)$(APPLICATIONSPATH)/muon-rts.desktop"
+	
+	@cat "res/doc/muon-rts.6" | \
+		sed	-e 's/\$$VERSION/$(subst .,\.,$(VERSION))/' | \
+		gzip -9 > "$(DEB)/usr/share/man/man6/muon-rts.6.gz"
+	@cat "res/doc/muon-server.1" | \
+		sed	-e 's/\$$VERSION/$(subst .,\.,$(VERSION))/' | \
+		gzip -9 > "$(DEB)/usr/share/man/man1/muon-server.1.gz"
 	
 	@cat "res/debian/menu" | sed -e 's/\$$BIN/$(subst /,\/,/usr/games/muon-rts)/' > "$(DEB)/usr/share/menu/muon-rts"
 	@cp "res/debian/postinst" "$(DEB)/DEBIAN/postinst"
