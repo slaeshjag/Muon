@@ -1,0 +1,2 @@
+?package(muon):needs="X11" section="Games/Strategy"\
+  title="muon" command="$BIN"
