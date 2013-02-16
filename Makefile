@@ -138,6 +138,7 @@ $(DEB).deb:
 	@mkdir -p $(DEB)/usr/lib
 	@mkdir -p $(DEB)/usr/share/doc/muon-rts
 	@mkdir -p $(DEB)/usr/share/menu
+	@mkdir -p $(DEB)/usr/share/pixmaps
 	@mkdir -p $(DEB)$(DATAPATH)/res
 	@mkdir -p $(DEB)$(APPLICATIONSPATH)
 	
@@ -151,6 +152,7 @@ $(DEB).deb:
 	@cp res/FreeMonoBold.ttf $(DEB)$(DATAPATH)/res
 	@cp -R maps $(DEB)$(DATAPATH)/
 	@cp README.md $(DEB)/usr/share/doc/muon-rts
+	@cp res/icon.xpm $(DEB)/usr/share/pixmaps/muon-rts.xpm
 	@cat "res/muon.desktop" | \
 		sed	-e 's/^Icon=.*/Icon=$(subst /,\/,$(DATAPATH)/res/icon.png)/' \
 			-e 's/^Exec=.*/Exec=$(subst /,\/,/usr/games/muon-rts)/' \
