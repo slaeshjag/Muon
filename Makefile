@@ -62,6 +62,7 @@ pandora: all
 	@cp res/pandora/dragonbox_compo.png muon-pnd/res
 	
 	@cp res/pandora/PXML.xml muon-pnd
+	@cp res/pandora/run muon-pnd
 	@cp maps/*.ldi muon-pnd/maps
 	@cp /usr/local/angstrom/arm/arm-angstrom-linux-gnueabi/usr/lib/libdarnit.so muon-pnd/lib
 	@mksquashfs muon-pnd/* muon.pnd > /dev/null
