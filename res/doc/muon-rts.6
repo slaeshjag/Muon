@@ -1,0 +1,122 @@
+.TH MUON-RTS 6 muon-rts\-1.0
+.SH NAME
+Muon \- a new kind of RTS
+
+.SH SYNOPSIS
+.B muon-rts
+
+.SH DESCRIPTION
+Muon is a real time strategy game currently under heavy development.
+The game has an unusual twist – there are no moving units. To win the game,
+you must conquer your opponent using only static buildings!
+.P
+The game is fairly minimalistic but offers many opportunities for cunning
+plans, tricks and tactical badassery. Games are usually not long, but very
+intense. Because of the lack of movable units, you will need to make sure
+that every building counts!
+.P
+Are you going to outsmart your enemy, sneaking into the back of their base
+to snipe their generator silently? Or are you going to go for a map full of
+construction yards and overpower your enemy by sheer numbers, like a flood
+wave? Or are you looking for that technological advantage that can just be
+gained with a few cluster bombs delivered with surgical precision?
+
+.SH BUILDINGS
+There are five
+.B "normal buildings"
+in the game:
+.IP *
+You start with a
+.B Generator
+and you cannot build a new one. This building generates energy for all of your
+other buildings, and without it, the war is lost!
+.IP *
+The 
+.B Pylon
+picks up weak energy signals and amplifies them. This essentially provides an
+extension to the power field which all of your buildings depend on. Buildings 
+do not function properly if not within range of a Pylon or the Generator.
+.IP *
+The
+.B Scout
+is a basic fighting unit and watch tower. The Scout is very effective for
+exploring the map or forcing your will during simple territorial disputes.
+.IP *
+The
+.B Attacker
+is a strong military building armed to its teeth. An Attacker is effectively
+applied when a situation takes a turn for the exceptionally hairy.
+.IP *
+The
+.B Wall
+doesn't look like much, but it is solid as a rock and cancels out the enemies
+power grid, which prevents their further mobilisation across the terrain.
+.P
+There are also three
+.B "special buildings"
+which can be placed on a few
+.B "strategic points"
+(control points) on the map.
+.IP *
+The
+.B Conyard
+is a construction yard which works diligently with your building construction,
+cutting down on your building times. The more construction yards you have,
+the faster you can build.
+.IP *
+The
+.B "Missile Silo"
+gives you the ability to drop a devastating cluster bomb anywhere on any
+visible location of the map. The more Silos you have, the faster in succession
+can you drop the bombs.
+.IP *
+The
+.B Radar
+gives you the ability to expose any part of the map for a short period of time.
+The more radars you have, the faster in succession can you reveal parts of
+the map.
+
+.SH USAGE
+
+.SS Mouse
+.TP
+.B Left mouse button
+Activate menu buttons, place buildings and select buildings on the map.
+Clicking twice on a
+.B Scout
+or
+.B Attacker
+will allow you to manually target their attack on a specific building.
+.TP
+.B Right mouse button
+Cancel buildings and cancel building placement.
+
+.SS Keyboard 
+.TP
+.B WASD
+Move the map display around. Hold down
+.B Shift
+to move faster.
+.TP
+.B "1..5"
+Activate corresponding building button in sidebar Hold down
+.B Shift
+to cancel the corresponding building.
+.TP
+.B "Delete"
+Delete the selected building (provided it is owned by you).
+.TP
+.B Tab
+Toggle visibility of the chat window.
+.TP
+.B Escape
+Open the in-game menu.
+
+.SH "SEE ALSO"
+.BR muon-server (1)
+
+.SH BUGS
+Since Muon is a fairly young project, still under heavy development it is most
+likely to contain many bugs. If you find one, or have a suggestion for a new
+feature; submit an issue to our issue tracker at
+.I "https://github.com/slaeshjag/Muon/issues"
