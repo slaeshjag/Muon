@@ -60,6 +60,7 @@ pandora: all
 	@cp res/target.png muon-pnd/res
 	@cp res/icon.png muon-pnd/res
 	@cp res/pandora/dragonbox_compo.png muon-pnd/res
+	@cp res/pandora/muon-1.0.png muon-pnd/
 	
 	@cp res/pandora/PXML.xml muon-pnd
 	@cp maps/*.ldi muon-pnd/maps
