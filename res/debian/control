@@ -1,4 +1,4 @@
-Package: muon
+Package: muon-rts
 Version: $VERSION
 Priority: optional
 Section: $SECTION
