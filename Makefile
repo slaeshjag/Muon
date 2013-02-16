@@ -102,7 +102,7 @@ muon-rts-$(VERSION)maemo.deb:
 	@strip `whereis libdarnit.so|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o muon-rts-$(VERSION)maemo/opt/muon/libdarnit.so
 	@strip `whereis libmodplug.so.1|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o muon-rts-$(VERSION)maemo/opt/muon/libmodplug.so.1
 	@chmod 644 muon-rts-$(VERSION)maemo/opt/muon/libdarnit.so
-	@chmod 644 muon-rts-$(VERSION)maemo/opt/muon/libmodplug.so
+	@chmod 644 muon-rts-$(VERSION)maemo/opt/muon/libmodplug.so.1
 	@cp res/*.png muon-rts-$(VERSION)maemo/opt/muon/res
 	@#cp res/*.ogg muon-rts-$(VERSION)maemo/opt/muon/res
 	@cp res/lang.stz muon-rts-$(VERSION)maemo/opt/muon/res
