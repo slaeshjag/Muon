@@ -93,8 +93,43 @@ msi:
 	@mv res/windows/installer/muon.msi .
 	
 muon-$(VERSION)maemo.deb:
-	@#mkdir "muon-$(VERSION)maemo"
+	@mkdir -p muon-$(VERSION)maemo/DEBIAN
+	@mkdir -p muon-$(VERSION)maemo/opt/muon/res
+	@mkdir -p muon-$(VERSION)maemo$(APPLICATIONSPATH)/hildon
+	
+	@strip muon -o muon-$(VERSION)maemo/opt/muon/muon
+	@strip muon-server -o muon-$(VERSION)maemo/opt/muon/muon-server
+	@strip `whereis libdarnit.so|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o muon-$(VERSION)maemo/opt/muon/libdarnit.so
+	@strip `whereis libmodplug.so|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o muon-$(VERSION)maemo/opt/muon/libmodplug.so
+	@chmod 644 muon-$(VERSION)maemo/opt/muon/libdarnit.so
+	@chmod 644 muon-$(VERSION)maemo/opt/muon/libmodplug.so
+	@cp res/*.png muon-$(VERSION)maemo/opt/muon/res
+	@#cp res/*.ogg muon-$(VERSION)maemo/opt/muon/res
+	@cp res/lang.stz muon-$(VERSION)maemo/opt/muon/res
+	@cp res/FreeMonoBold.ttf muon-$(VERSION)maemo/opt/muon/res
+	@cp -R maps muon-$(VERSION)maemo/opt/muon/
+	@cp README.md muon-$(VERSION)maemo/opt/muon
+	@cp COPYING muon-$(VERSION)maemo/opt/muon
+	@cp res/maemo/run muon-$(VERSION)maemo/opt/muon
+	@cat "res/muon.desktop" | \
+		sed 	-e 's/^Icon=.*/Icon=$(subst /,\/,/opt/muon/res/icon.png)/' \
+			-e 's/^Exec=.*/Exec=$(subst /,\/,/opt/muon/run)/' \
+			> "muon-$(VERSION)maemo$(APPLICATIONSPATH)/hildon/muon.desktop"
+	
+	@cp "res/debian/copyright" "muon-$(VERSION)maemo/DEBIAN/copyright"
+	@gzip -9 -c "res/debian/changelog" > "muon-$(VERSION)maemo/DEBIAN/changelog.gz"
+	@cat "res/debian/control" "res/maemo/control" | \
+		sed	-e 's/\$$VERSION/$(subst .,\.,$(VERSION))/' \
+			-e 's/\$$DEPS/$(subst .,\.,$(DEPS))/' \
+			-e 's/\$$SIZE/'"`du -k --exclude=DEBIAN muon-$(VERSION)maemo/|tail -n 1|cut -f 1`/" \
+			-e 's/\$$ARCH/$(ARCH)/' \
+			-e 's/\$$SECTION/$(subst /,\/,$(SECTION))/' \
+		> "muon-$(VERSION)maemo/DEBIAN/control"
+	
+	@chmod -R g-w muon-$(VERSION)maemo
 	@echo " [DPKG] $@"
+	@fakeroot dpkg -b muon-$(VERSION)maemo > /dev/null
+	@rm -Rf muon-$(VERSION)maemo
 
 $(DEB).deb:
 	@mkdir -p $(DEB)/DEBIAN
@@ -108,13 +143,15 @@ $(DEB).deb:
 	
 	@strip muon -o $(DEB)/usr/games/muon
 	@strip muon-server -o $(DEB)/usr/bin/muon-server
-	@strip `whereis libdarnit.so|sed 's/^.*: //'` -o $(DEB)/usr/lib/libdarnit.so
+	@strip `whereis libdarnit.so|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o $(DEB)/usr/lib/libdarnit.so
 	@chmod 644 $(DEB)/usr/lib/libdarnit.so
 	@cp res/*.png $(DEB)$(DATAPATH)/res
 	@#cp res/*.ogg $(DEB)$(DATAPATH)/res
 	@cp res/lang.stz $(DEB)$(DATAPATH)/res
 	@cp res/FreeMonoBold.ttf $(DEB)$(DATAPATH)/res
 	@cp -R maps $(DEB)$(DATAPATH)/
+	@cp README.md $(DEB)/usr/share/doc/muon
+	@cat "res/muon.desktop" | sed -e 's/^Icon=.*/Icon=$(subst /,\/,$(DATAPATH)/res/icon.png)/' > "$(DEB)$(APPLICATIONSPATH)/muon.desktop"
 	
 	@cat "res/debian/menu" | sed -e 's/\$$BIN/$(subst /,\/,/usr/games/muon)/' > "$(DEB)/usr/share/menu/muon"
 	@cp "res/debian/postinst" "$(DEB)/DEBIAN/postinst"
@@ -133,7 +170,7 @@ $(DEB).deb:
 	@fakeroot dpkg -b $(DEB) > /dev/null
 	@rm -Rf $(DEB)
 	
-deb: $(PACKAGE)
+deb: all $(PACKAGE)
 
 clean:
 	@echo " [ CD ] server/"
