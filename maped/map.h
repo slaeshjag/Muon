@@ -17,5 +17,60 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MAPED_MAP_H
+#define MAPED_MAP_H
+
+ #include <stdint.h>
+ 
+#define LDI_MAGIC 0x83B3661B
+#define LDI_VERSION 0xBBA77ABC
+
+typedef struct {
+	uint32_t magic;
+	uint32_t version;
+	uint32_t files;
+} LDI_MAIN;
+
+
+typedef struct {
+	char name[128];
+	uint32_t pos;
+	uint32_t len;
+	uint32_t pad;
+} LDI_ENTRY;
+
+#define LDMZ_MAGIC 0xFF00E00E
+#define LDMZ_VERSION 0x55555555
+struct LDMZ {
+	struct {
+		uint32_t magic;
+		uint32_t version;
+		uint32_t stringtable_size;
+		uint32_t stringtable_zsize;
+		uint32_t ref_size;
+		uint32_t ref_zsize;
+		uint32_t layers;
+		uint32_t layer_headers_zsize;
+		uint32_t objects;
+		uint32_t objects_zsize;
+		uint32_t refs;
+		uint32_t main_ref_index;
+	} header;
+};
+
+struct MAP_PROPERTY {
+	const char *key;
+	const char *value;
+};
+
+typedef struct {
+	DARNIT_MAP *map;
+	unsigned char *tilesheet;
+	uint32_t tilesheet_size;
+} MAP;
+
 DARNIT_MAP *map;
 DARNIT_MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layers, DARNIT_TILESHEET *ts);
+void map_save(DARNIT_MAP *map, const char *filename);
+
+#endif

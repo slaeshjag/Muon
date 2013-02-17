@@ -17,6 +17,9 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef EDITOR_H
+#define EDITOR_H
+
 enum {
 	EDITOR_TOPBAR_BUTTON_MENU,
 	EDITOR_TOPBAR_BUTTON_TERRAIN,
@@ -54,3 +57,5 @@ void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned
 void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_render();
+
+#endif

@@ -67,3 +67,23 @@ DARNIT_MAP *map_new(unsigned int width, unsigned int height, unsigned int terrai
 		
 	return map;
 }
+
+void map_save(DARNIT_MAP *map, const char *filename) {
+	LDI_MAIN m;
+	FILE *f;
+	struct LDMZ ldmz;
+	
+	ldmz.header.magic=d_util_htonl(LDMZ_MAGIC);
+	ldmz.header.version=d_util_htonl(LDMZ_VERSION);
+	
+	if(!(f=fopen(filename, "wb")))
+		return;
+	m.magic=d_util_htonl(LDI_MAGIC);
+	m.version=d_util_htonl(LDI_VERSION);
+	m.files=d_util_htonl(2);
+	fwrite(&m.magic, 4, 1, f);
+	fwrite(&m.version, 4, 1, f);
+	fwrite(&m.files, 4, 1, f);
+	
+	fclose(f);
+}

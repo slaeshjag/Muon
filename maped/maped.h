@@ -17,6 +17,9 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MAPED_H
+#define MAPED_H
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -48,3 +51,5 @@ DARNIT_FONT *font_std;
 
 void state_set(enum STATE state);
 void view_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+
+#endif

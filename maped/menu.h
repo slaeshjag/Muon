@@ -17,6 +17,9 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef MAPED_MENU_H
+#define MAPED_MENU_H
+
 enum {
 	MENU_BUTTON_NEW,
 	MENU_BUTTON_LOAD,
@@ -28,3 +31,5 @@ UI_WIDGET *menu_button[MENU_BUTTONS];
 
 void menu_init();
 void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+
+#endif
