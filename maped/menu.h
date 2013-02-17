@@ -17,31 +17,14 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PANE_H
-#define PANE_H
-
-typedef struct {
-	int x;
-	int y;
-	int w;
-	int h;
-	UI_COLOR background_color;
-	DARNIT_LINE *border;
-	DARNIT_RECT *background;
-	UI_WIDGET *root_widget;
-} UI_PANE;
-
-struct UI_PANE_LIST {
-	UI_PANE *pane;
-	struct UI_PANE_LIST *next;
+enum {
+	MENU_BUTTON_NEW,
+	MENU_BUTTON_LOAD,
+	MENU_BUTTON_QUIT,
+	MENU_BUTTONS,
 };
 
-UI_PANE *ui_pane_create(int x, int y, int w, int h, UI_WIDGET *root_widget);
-void *ui_pane_destroy(UI_PANE *pane);
+UI_WIDGET *menu_button[MENU_BUTTONS];
 
-void ui_pane_resize(UI_PANE *pane, int x, int y, int w, int h);
-void ui_pane_set_root_widget(UI_PANE *pane, UI_WIDGET *root_widget);
-void ui_pane_render(UI_PANE *pane);
-void ui_panelist_render(struct UI_PANE_LIST *panelist);
-
-#endif
+void menu_init();
+void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

@@ -6,12 +6,12 @@ BEGIN
 	BEGIN
 		BLOCK "080904E4"
 		BEGIN
-			VALUE "FileDescription", "A new kind of RTS"
+			VALUE "FileDescription", "Muon map editor"
 			VALUE "FileVersion", "1.0"
-			VALUE "InternalName", "muon"
+			VALUE "InternalName", "muon-maped"
 			VALUE "LegalCopyright", "Steven Arnow <s@rdw.se>, Axel Isaksson (mr3d/h4xxel)"
-			VALUE "OriginalFilename", "muon.exe"
-			VALUE "ProductName", "Muon"
+			VALUE "OriginalFilename", "muon-maped.exe"
+			VALUE "ProductName", "Muon map editor"
 			VALUE "ProductVersion", "1.0"
 		END
 	END
@@ -22,4 +22,4 @@ BEGIN
 	END
 END
 
-2 ICON "icon.ico"
+2 ICON "icon-maped.ico"

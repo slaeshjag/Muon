@@ -83,7 +83,8 @@ void ui_listbox_add(UI_WIDGET *widget, const char *text) {
 	strncpy((*l)->text, text, 127);
 	(*l)->text[127]=0;
 	p->size++;
-	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
+	ui_listbox_scroll(widget, p->scroll);
+	//widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
 
 void ui_listbox_clear(UI_WIDGET *widget) {
@@ -98,6 +99,7 @@ void ui_listbox_clear(UI_WIDGET *widget) {
 	p->offset=NULL;
 	p->size=0;
 	p->scroll=0;
+	p->scroll_max=0;
 	p->selected=-1;
 	widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
 }
@@ -134,6 +136,8 @@ void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	int text_h;
 	struct UI_LISTBOX_LIST *l, *ll;
 	int i=0;
+	if(!(p->size&&widget->w>0&&widget->h>0))
+		return;
 	for(l=p->list; l; l=l->next) {
 		text_h=2;
 		for(ll=l; ll; ll=ll->next)

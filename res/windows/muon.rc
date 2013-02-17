@@ -1,0 +1,25 @@
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "080904E4"
+		BEGIN
+			VALUE "FileDescription", "Muon - A new kind of RTS"
+			VALUE "FileVersion", "1.0"
+			VALUE "InternalName", "muon"
+			VALUE "LegalCopyright", "Steven Arnow <s@rdw.se>, Axel Isaksson (mr3d/h4xxel)"
+			VALUE "OriginalFilename", "muon.exe"
+			VALUE "ProductName", "Muon"
+			VALUE "ProductVersion", "1.0"
+		END
+	END
+
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0x809, 1252
+	END
+END
+
+2 ICON "icon.ico"

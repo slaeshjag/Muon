@@ -12,6 +12,8 @@ all:
 	+@make -C server/
 	@echo " [ CD ] client/"
 	+@make -C client/
+	@echo " [ CD ] maped/"
+	+@make -C maped/
 	@echo " [ CD ] res/"
 	+@make -C res/
 

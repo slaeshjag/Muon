@@ -31,6 +31,13 @@ typedef union {
 	int i;
 } UI_PROPERTY_VALUE;
 
+typedef struct {
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+	unsigned char a;
+} UI_COLOR;
+
 typedef struct UI_WIDGET {
 	void *(*destroy)(struct UI_WIDGET *);
 	void (*set_prop)(struct UI_WIDGET *, int, UI_PROPERTY_VALUE);

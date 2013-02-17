@@ -25,6 +25,8 @@ UI_PANE *ui_pane_create(int x, int y, int w, int h, UI_WIDGET *root_widget) {
 		return NULL;
 	pane->x=x; pane->y=y;
 	pane->w=w; pane->h=h;
+	pane->background_color.r=pane->background_color.g=pane->background_color.b=0;
+	pane->background_color.a=255;
 	pane->background=d_render_rect_new(1);
 	pane->border=d_render_line_new(4, 2);
 	pane->root_widget=NULL;
@@ -60,7 +62,7 @@ void ui_pane_set_root_widget(UI_PANE *pane, UI_WIDGET *root_widget) {
 void ui_pane_render(UI_PANE *pane) {
 	unsigned char r, g, b, a;
 	d_render_tint_get(&r, &g, &b, &a);
-	d_render_tint(0, 0, 0, 1);
+	d_render_tint(pane->background_color.r, pane->background_color.g, pane->background_color.b, pane->background_color.a);
 	d_render_rect_draw(pane->background, 1);
 	d_render_tint(r, g, b, a);
 	d_render_line_draw(pane->border, 4);
