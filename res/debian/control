@@ -1,0 +1,18 @@
+Package: muon-rts
+Version: $VERSION
+Priority: optional
+Section: $SECTION
+Installed-Size: $SIZE
+Maintainer: Axel Isaksson <isaksson.axel@telia.com>
+Homepage: http://h4xxel.org/software/muon/
+Architecture: $ARCH
+Depends: $DEPS
+Description: Minimalistic real time strategy game
+ Muon is a real time strategy game currently under heavy development.
+ The game has an unusual twist – there are no moving units. To win the game,
+ you must conquer your opponent using only static buildings!
+ .
+ The game is fairly minimalistic but offers many opportunities for cunning
+ plans, tricks and tactical badassery. Games are usually not long, but very
+ intense. Because of the lack of movable units, you will need to make sure that
+ every building counts!

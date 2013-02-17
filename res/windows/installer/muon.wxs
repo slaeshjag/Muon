@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="0.9.6.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
+	<Product Id="6FCDAE7B-EA80-4499-925F-6835C7E883E4" Name="Muon" Language="1033" Version="1.0.0.0" Manufacturer="Steven Arnow, Axel Isaksson" UpgradeCode="E73E5949-4C54-4A8B-95A0-A9AC46F70C9B">
 		<Package Description="Muon" InstallerVersion="200" Compressed="yes" />
 		<Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
 		<Directory Id="TARGETDIR" Name="SourceDir">
@@ -33,8 +33,10 @@
 					
 					<Directory Id="MAPS" Name="maps">
 						<Component Id="MAPS" DiskId="1" Guid="33A49397-EC64-45A9-BD2B-8368DEFC2B2A">
-							<File Id="TESTMAP.LDI" Name="testmap.ldi" Source="build\maps\testmap.ldi" />
 							<File Id="TWIRLY_0.1__2_.LDI" Name="Twirly 0.1 (2).ldi" Source="build\maps\Twirly 0.1 (2).ldi" />
+							<File Id="ADVANTAGE_0.1__3_.LDI" Name="Advantage 0.1 (3).ldi" Source="build\maps\Advantage 0.1 (3).ldi" />
+							<File Id="RIVER_OF_PLASMA_0.1__4_.LDI" Name="River of Plasma 0.1 (4).ldi" Source="build\maps\River of Plasma 0.1 (4).ldi" />
+							<File Id="SQUARED_0.1__4_.LDI" Name="Squared 0.1 (4).ldi" Source="build\maps\Squared 0.1 (4).ldi" />
 							<File Id="WHEEL_OF_FORTUNE_0.1__4_.LDI" Name="Wheel of Fortune 0.1 (4).ldi" Source="build\maps\Wheel of Fortune 0.1 (4).ldi" />
 							<File Id="ABERRATION_0.1__4_.LDI" Name="Aberration 0.1 (4).ldi" Source="build\maps\Aberration 0.1 (4).ldi" />
 						</Component>

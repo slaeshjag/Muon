@@ -1,0 +1,40 @@
+.TH MUON-SERVER 1 muon-rts\-$VERSION
+.SH NAME
+muon\-server \- Muon standalone server
+
+.SH SYNOPSIS
+.B muon\-server
+.RB < map >
+.RB < gamespeed >
+.RB < players >
+.RB [ port ]
+
+.SH DESCRIPTION
+Standalone server for
+.BR muon\-rts (6).
+
+.SH OPTIONS
+.SS Mandatory
+.TP
+.RB < map >
+Name of a map file in
+.B ldi
+format to load.
+.TP
+.RB < gamespeed >
+Game speed in the range 1..10 where
+.B 3
+is normal.
+.TP
+.RB < players >
+Number of players that are allowed to join the server. May not exceed the
+map limit.
+
+.SS Optional
+.TP
+.RB [ port ]
+Port to listen to. Default if none is specified is 
+.B 62118.
+
+.SH "SEE ALSO"
+.BR muon\-rts (6)

@@ -1,0 +1,3 @@
+?package(muon-rts):needs="X11" section="Games/Strategy"\
+  title="muon" command="$BIN"\
+  icon="/usr/share/pixmaps/muon-rts.xpm"
