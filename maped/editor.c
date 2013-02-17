@@ -18,6 +18,7 @@
  */
 
 #include "maped.h"
+#include "map.h"
 #include "editor.h"
 
 static const char *topbar_button_text[EDITOR_TOPBAR_BUTTONS]={
@@ -46,6 +47,8 @@ static const char *building_text[]={
 	"Radar",
 };
 
+static int building_place=-1;
+
 void editor_init() {
 	int i;
 	editor.topbar.pane=ui_pane_create(0, 0, platform.screen_w, 32, ui_widget_create_hbox());
@@ -69,13 +72,15 @@ void editor_init() {
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]=ui_widget_create_listbox(font_std);
 	for(i=0; i<MAX_PLAYERS+1; i++)
 		ui_listbox_add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], player_text[i]);
-	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], editor_sidebar_buildings_listbox_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], editor_sidebar_buildings_listbox_player_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], editor_sidebar_buildings_listbox_building_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->pane=editor.topbar.pane;
 	state[STATE_EDITOR].panelist->next->pane=editor.sidebar.pane;
 	state[STATE_EDITOR].panelist->next->next=NULL;
+	state[STATE_EDITOR].render=editor_render;
 }
 
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -88,16 +93,72 @@ void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 	}
 }
 
-void editor_sidebar_buildings_listbox_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
 	UI_PROPERTY_VALUE v;
+	building_place=-1;
 	v=widget->get_prop(widget, UI_LISTBOX_PROP_SELECTED);
 	if(v.i==-1)
 		return;
 	ui_listbox_clear(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]);
-	if(v.i==0)
+	if(v.i==0) {
+		ui_listbox_add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], "[Erase]");
 		ui_listbox_add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], "Control point");
-	else
+	} else
 		for(i=0; i<BUILDINGS; i++)
 			ui_listbox_add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], building_text[i]);
+}
+
+void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int building;
+	UI_PROPERTY_VALUE v;
+	v=widget->get_prop(widget, UI_LISTBOX_PROP_SELECTED);
+	building=v.i;
+	v=editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->get_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], UI_LISTBOX_PROP_SELECTED);
+	
+	building_place=building&&!v.i?5:v.i*16+building;
+}
+
+void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	//Make sure there is no pane in the way
+	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH||e->mouse->y<32)
+		return;
+	
+	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT) {
+		UI_PROPERTY_VALUE v;
+		v.i=building_place=-1;
+		editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->set_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], UI_LISTBOX_PROP_SELECTED, v);
+		
+	} else if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
+		int map_offset=((e->mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((e->mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
+		if(map_offset<0||map_offset>map->layer->tilemap->w*map->layer->tilemap->h)
+			return;
+		if(building_place>-1&&map->layer[map->layers-1].tilemap->data[map_offset]!=building_place) {
+			map->layer[map->layers-1].tilemap->data[map_offset]=building_place;
+			d_tilemap_recalc(map->layer[map->layers-1].tilemap);
+		}
+	}
+}
+
+void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(building_place>=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
+		unsigned char r, g, b, a;
+		d_render_tint_get(&r, &g, &b, &a);
+		d_render_tint(255, 255, 255, 255);
+		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
+		int x=(e->mouse->x+map->cam_x)/l->tile_w*l->tile_w;
+		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
+		d_render_offset(map->cam_x, map->cam_y);
+		d_render_blend_enable();
+		d_render_tile_blit(l->ts, building_place, x, y);
+		d_render_blend_disable();
+		d_render_offset(0, 0);
+		d_render_tint(r, g, b, a);
+	}
+}
+
+void editor_render() {
+	int i;
+	for(i=0; i<map->layers; i++)
+		d_tilemap_draw(map->layer[i].tilemap);
 }

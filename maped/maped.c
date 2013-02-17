@@ -22,6 +22,20 @@
 #include "editor.h"
 
 void state_set(enum STATE state) {
+	switch(state_current) {
+		case STATE_EDITOR:
+			ui_event_global_remove(editor_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
+			ui_event_global_remove(editor_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
+		default:
+			break;
+	}
+	switch(state) {
+		case STATE_EDITOR:
+			ui_event_global_add(editor_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
+			ui_event_global_add(editor_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
+		default:
+			break;
+	}
 	state_current=state;
 }
 
@@ -40,6 +54,9 @@ int main(int argc, char **argv) {
 	
 	while(state_current!=STATE_QUIT) {
 		d_render_begin();
+		d_render_tint(255, 255, 255, 255);
+		if(state[state_current].render)
+			state[state_current].render();
 		d_render_tint(255, 0, 0, 255);
 		ui_events(state[state_current].panelist, 1);
 		d_render_end();

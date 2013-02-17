@@ -19,6 +19,7 @@
 
 #include "maped.h"
 #include "menu.h"
+#include "map.h"
 
 static const char *button_text[MENU_BUTTONS]={
 	"New map",
@@ -45,6 +46,7 @@ void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	for(i=0; widget!=menu_button[i]; i++);
 	switch(i) {
 		case MENU_BUTTON_NEW:
+			map=map_new(32, 32, 1, d_render_tilesheet_load("res/default.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
 			state_set(STATE_EDITOR);
 			break;
 		case MENU_BUTTON_QUIT:

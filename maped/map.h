@@ -17,34 +17,5 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <darnit/darnit.h>
-
-#include "../client/ui/ui.h"
-#include "../client/platform.h"
-
-#define SIDEBAR_WIDTH 128
-#define MAX_PLAYERS 4
-#define BUILDINGS 8
-
-enum STATE {
-	STATE_MENU,
-	STATE_EDITOR,
-	STATE_QUIT,
-	STATES,
-};
-
-struct {
-	void (*render)();
-	struct UI_PANE_LIST *panelist;
-} state[STATES];
-
-enum STATE state_current;
-
-DARNIT_TILESHEET *mouse_tilesheet;
-DARNIT_FONT *font_std;
-
-void state_set(enum STATE state);
-void view_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+DARNIT_MAP *map;
+DARNIT_MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layers, DARNIT_TILESHEET *ts);
