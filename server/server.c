@@ -293,7 +293,7 @@ void serverSendPing() {
 		if (server->player[i].status < PLAYER_IN_LOBBY)
 			continue;
 
-		if (now - server->player[i].last_ping_sent >= SERVER_PING_INTERVAL) {
+		if (now - server->player[i].last_ping_sent >= SERVER_PING_INTERVAL && server->player[i].status != PLAYER_BEING_DISCONNECTED) {
 			msg.command = MSG_SEND_PING;
 			msg.arg[0] = msg.arg[1] = 0;
 			msg.player_ID = i;
