@@ -61,7 +61,7 @@ strategic points (control points) on the map.
 Downloading
 -----------
 
-There's pre-built packages available at h4xxel's homepage: http://h4xxel.org/software/muon/
+There are pre-built packages available at h4xxel's homepage: http://h4xxel.org/software/muon/
 
 
 Note to developers
