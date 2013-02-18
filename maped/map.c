@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <string.h>
 
 #include "maped.h"
 #include "map.h"
@@ -68,13 +69,62 @@ DARNIT_MAP *map_new(unsigned int width, unsigned int height, unsigned int terrai
 	return map;
 }
 
-void map_save(DARNIT_MAP *map, const char *filename) {
+void map_save(MAP *map, const char *filename) {
+	int i;
 	LDI_MAIN m;
 	FILE *f;
 	struct LDMZ ldmz;
+	struct MAP_PROPERTY *stringtable;
+	char *stringtable_data, *p;
+	unsigned char *stringtable_zdata;
+	unsigned int stringtable_nullref;
+	int32_t *ref_data;
+	unsigned char *ref_zdata;
 	
-	ldmz.header.magic=d_util_htonl(LDMZ_MAGIC);
-	ldmz.header.version=d_util_htonl(LDMZ_VERSION);
+	//OOPS: must convert endianess..
+	ldmz.header.magic=LDMZ_MAGIC;
+	ldmz.header.version=LDMZ_VERSION;
+	ldmz.header.layers=map->map->layers;
+	ldmz.layer=malloc(ldmz.header.layers*sizeof(struct LDMZ_LAYER));
+	ldmz.header.objects=0; /*map->map->objects; nope.jpg*/
+	ldmz.object=NULL;
+	ldmz.objectz=NULL;
+	
+	ldmz.header.stringtable_size=0;
+	/*Yeah two passes are inefficient, but wth*/
+	for(stringtable=map->stringtable, i=0; stringtable; stringtable=stringtable->next, i++)
+		ldmz.header.stringtable_size+=strlen(stringtable->key)+strlen(stringtable->value)+2;
+	stringtable_data=malloc(ldmz.header.stringtable_size);
+	ldmz.header.ref_size=sizeof(int32_t)*(i+1)*2;
+	ref_data=malloc(ldmz.header.ref_size);
+	stringtable_nullref=ldmz.header.ref_size-2;
+	ref_data[stringtable_nullref]=ref_data[stringtable_nullref+1]=-1;
+	for(stringtable=map->stringtable, i=0, p=stringtable_data; stringtable; stringtable=stringtable->next) {
+		unsigned int size;
+		strcpy(p, stringtable->key);
+		size=strlen(stringtable->key)+1;
+		ref_data[i++]=d_util_htonl(p-stringtable_data);
+		p+=size;
+		strcpy(p, stringtable->value);
+		size=strlen(stringtable->value)+1;
+		ref_data[i++]=d_util_htonl(p-stringtable_data);
+		p+=size;
+	}
+	//compress stringdata and refs, free stuff
+	free(stringtable_data);
+	free(ref_data);
+	
+	for(i=0; i<map->map->layers; i++) {
+		ldmz.layer[i].width=d_util_htonl(map->map->layer[i].tilemap->w);
+		ldmz.layer[i].height=d_util_htonl(map->map->layer[i].tilemap->h);
+		ldmz.layer[i].offset_x=d_util_htonl(map->map->layer[i].offset_x);
+		ldmz.layer[i].offset_y=d_util_htonl(map->map->layer[i].offset_y);
+		ldmz.layer[i].tile_w=d_util_htonl(map->map->layer[i].tile_w);
+		ldmz.layer[i].tile_h=d_util_htonl(map->map->layer[i].tile_h);
+		ldmz.layer[i].ref_index=d_util_htonl(stringtable_nullref);
+		//compress layer data
+	}
+	//compress layer header
 	
 	if(!(f=fopen(filename, "wb")))
 		return;
