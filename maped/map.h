@@ -94,10 +94,12 @@ typedef struct {
 	uint32_t tilesheet_size;
 	int w;
 	int h;
+	char sizestring[8];
 } MAP;
 
 MAP *map;
 MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layers, DARNIT_TILESHEET *ts);
+void map_prop_set_or_add(MAP *map, const char *key, const char *value);
 void map_save(MAP *map, const char *filename);
 
 #endif

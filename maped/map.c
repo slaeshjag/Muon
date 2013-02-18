@@ -74,13 +74,12 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	map->stringtable=malloc(sizeof(MAP_PROPERTY));
 	map->stringtable->key="tileset";
 	map->stringtable->value="mapdata/default.png";
-	map->stringtable->next=malloc(sizeof(MAP_PROPERTY));
-	map->stringtable->next->key="max_players";
-	map->stringtable->next->value="2";
-	map->stringtable->next->next=NULL;
+	map->stringtable->next=NULL;
 	
 	map->w=width*tile_w;
 	map->h=height*tile_h;
+	sprintf(map->sizestring, "%ix%i", width, height);
+	map_prop_set_or_add(map, "size", map->sizestring);
 	
 	f_ts=fopen("res/default.png", "rb");
 	fseek(f_ts, 0, SEEK_END);
@@ -91,6 +90,26 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	fclose(f_ts);
 	
 	return map;
+}
+
+void map_prop_set_or_add(MAP *map, const char *key, const char *value) {
+	MAP_PROPERTY *p;
+	if(!map->stringtable) {
+		p=map->stringtable=malloc(sizeof(MAP_PROPERTY));
+		goto map_prop_set_or_add_add;
+	}
+	for(p=map->stringtable; p->next; p=p->next) {
+		if(!strcmp(p->key, key)) {
+			p->value=value;
+			return;
+		}
+	}
+	p->next=malloc(sizeof(MAP_PROPERTY));
+	p=p->next;
+	map_prop_set_or_add_add:
+	p->key=key;
+	p->value=value;
+	p->next=NULL;
 }
 
 void map_save(MAP *map, const char *filename) {
