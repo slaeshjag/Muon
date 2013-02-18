@@ -32,19 +32,33 @@ enum {
 };
 
 enum {
+	EDITOR_SIDEBAR_MENU_LABEL,
+	EDITOR_SIDEBAR_MENU_BUTTON_SAVE,
+	EDITOR_SIDEBAR_MENU_BUTTON_QUIT,
+	EDITOR_SIDEBAR_MENU_WIDGETS,
+};
+
+enum {
 	EDITOR_SIDEBAR_BUILDINGS_LABEL,
 	EDITOR_SIDEBAR_BUILDINGS_LABEL_PLAYER,
 	EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER,
 	EDITOR_SIDEBAR_BUILDINGS_LABEL_BUILDING,
 	EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING,
+	EDITOR_SIDEBAR_BUILDINGS_SPACER,
 	EDITOR_SIDEBAR_BUILDINGS_WIDGETS,
 };
 
 enum {
-	EDITOR_SIDEBAR_MENU_LABEL,
-	EDITOR_SIDEBAR_MENU_BUTTON_SAVE,
-	EDITOR_SIDEBAR_MENU_BUTTON_QUIT,
-	EDITOR_SIDEBAR_MENU_WIDGETS,
+	EDITOR_SIDEBAR_PROPERTIES_LABEL,
+	EDITOR_SIDEBAR_PROPERTIES_LABEL_NAME,
+	EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME,
+	EDITOR_SIDEBAR_PROPERTIES_LABEL_VERSION,
+	EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION,
+	EDITOR_SIDEBAR_PROPERTIES_LABEL_AUTHOR,
+	EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR,
+	EDITOR_SIDEBAR_PROPERTIES_LABEL_PLAYERS,
+	EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS,
+	EDITOR_SIDEBAR_PROPERTIES_WIDGETS,
 };
 
 struct {
@@ -57,15 +71,15 @@ struct {
 		UI_WIDGET *menu[EDITOR_SIDEBAR_MENU_WIDGETS];
 		UI_WIDGET *terrain[2];
 		UI_WIDGET *buildings[EDITOR_SIDEBAR_BUILDINGS_WIDGETS];
-		UI_WIDGET *properties[2];
+		UI_WIDGET *properties[EDITOR_SIDEBAR_PROPERTIES_WIDGETS];
 	} sidebar;
 } editor;
 
 void editor_init();
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
-void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) ;
 void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

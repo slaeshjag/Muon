@@ -70,6 +70,7 @@ void editor_init() {
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]=ui_widget_create_listbox(font_std);
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LABEL_BUILDING]=ui_widget_create_label(font_std, "Building");
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]=ui_widget_create_listbox(font_std);
+	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_SPACER]=ui_widget_create_spacer_size(1, 4);
 	for(i=0; i<MAX_PLAYERS+1; i++)
 		ui_listbox_add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], player_text[i]);
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], editor_sidebar_buildings_listbox_player_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
@@ -80,6 +81,16 @@ void editor_init() {
 	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_QUIT]=ui_widget_create_button_text(font_std, "Quit");
 	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; i<EDITOR_SIDEBAR_MENU_WIDGETS; i++)
 		editor.sidebar.menu[i]->event_handler->add(editor.sidebar.menu[i], editor_sidebar_menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL]=ui_widget_create_label(font_std, "Properites");
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL_NAME]=ui_widget_create_label(font_std, "Map name");
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME]=ui_widget_create_entry(font_std);
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL_VERSION]=ui_widget_create_label(font_std, "Version");
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION]=ui_widget_create_entry(font_std);
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL_AUTHOR]=ui_widget_create_label(font_std, "Map author");
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR]=ui_widget_create_entry(font_std);
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL_PLAYERS]=ui_widget_create_label(font_std, "Max players");
+	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]=ui_widget_create_slider(4);
 	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
@@ -102,6 +113,23 @@ void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 	} else if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_BUILDINGS]) {
 		for(i=0; i<EDITOR_SIDEBAR_BUILDINGS_WIDGETS; i++)
 			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.buildings[i], i&&!(i&1));
+	} else if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_PROPERTIES]) {
+		for(i=0; i<EDITOR_SIDEBAR_PROPERTIES_WIDGETS; i++)
+			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.properties[i], 0);
+	}
+}
+
+void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int i;
+	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; widget!=editor.sidebar.menu[i]; i++);
+	switch(i) {
+		case EDITOR_SIDEBAR_MENU_BUTTON_SAVE:
+			//TODO: save properties to map stringtable
+			map_save(map, "arne.ldi");
+			break;
+		case EDITOR_SIDEBAR_MENU_BUTTON_QUIT:
+			d_quit();
+			break;
 	}
 }
 
@@ -129,19 +157,6 @@ void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned
 	v=editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->get_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], UI_LISTBOX_PROP_SELECTED);
 	
 	building_place=building&&!v.i?5:v.i*16+building;
-}
-
-void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	int i;
-	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; widget!=editor.sidebar.menu[i]; i++);
-	switch(i) {
-		case EDITOR_SIDEBAR_MENU_BUTTON_SAVE:
-			map_save(map, "arne.ldi");
-			break;
-		case EDITOR_SIDEBAR_MENU_BUTTON_QUIT:
-			d_quit();
-			break;
-	}
 }
 
 void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
