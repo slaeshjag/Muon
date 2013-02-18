@@ -130,12 +130,12 @@ void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->set_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], UI_LISTBOX_PROP_SELECTED, v);
 		
 	} else if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
-		int map_offset=((e->mouse->y+map->cam_y)/map->layer->tile_h)*map->layer->tilemap->w+((e->mouse->x+map->cam_x)/map->layer->tile_w)%map->layer->tilemap->w;
-		if(map_offset<0||map_offset>map->layer->tilemap->w*map->layer->tilemap->h)
+		int map_offset=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h)*map->map->layer->tilemap->w+((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w)%map->map->layer->tilemap->w;
+		if(map_offset<0||map_offset>map->map->layer->tilemap->w*map->map->layer->tilemap->h)
 			return;
-		if(building_place>-1&&map->layer[map->layers-1].tilemap->data[map_offset]!=building_place) {
-			map->layer[map->layers-1].tilemap->data[map_offset]=building_place;
-			d_tilemap_recalc(map->layer[map->layers-1].tilemap);
+		if(building_place>-1&&map->map->layer[map->map->layers-1].tilemap->data[map_offset]!=building_place) {
+			map->map->layer[map->map->layers-1].tilemap->data[map_offset]=building_place;
+			d_tilemap_recalc(map->map->layer[map->map->layers-1].tilemap);
 		}
 	}
 }
@@ -145,10 +145,10 @@ void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		unsigned char r, g, b, a;
 		d_render_tint_get(&r, &g, &b, &a);
 		d_render_tint(255, 255, 255, 255);
-		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
-		int x=(e->mouse->x+map->cam_x)/l->tile_w*l->tile_w;
-		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;
-		d_render_offset(map->cam_x, map->cam_y);
+		DARNIT_MAP_LAYER *l=&map->map->layer[map->map->layers-1];
+		int x=(e->mouse->x+map->map->cam_x)/l->tile_w*l->tile_w;
+		int y=(e->mouse->y+map->map->cam_y)/l->tile_h*l->tile_h;
+		d_render_offset(map->map->cam_x, map->map->cam_y);
 		d_render_blend_enable();
 		d_render_tile_blit(l->ts, building_place, x, y);
 		d_render_blend_disable();
@@ -159,6 +159,6 @@ void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void editor_render() {
 	int i;
-	for(i=0; i<map->layers; i++)
-		d_tilemap_draw(map->layer[i].tilemap);
+	for(i=0; i<map->map->layers; i++)
+		d_tilemap_draw(map->map->layer[i].tilemap);
 }

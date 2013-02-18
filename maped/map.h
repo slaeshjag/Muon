@@ -80,21 +80,21 @@ struct LDMZ {
 	unsigned char *layer_headerz;
 };
 
-struct MAP_PROPERTY {
+typedef struct MAP_PROPERTY {
 	const char *key;
 	const char *value;
 	struct MAP_PROPERTY *next;
-};
+} MAP_PROPERTY;
 
 typedef struct {
 	DARNIT_MAP *map;
-	struct MAP_PROPERTY *stringtable;
+	MAP_PROPERTY *stringtable;
 	unsigned char *tilesheet;
 	uint32_t tilesheet_size;
 } MAP;
 
-DARNIT_MAP *map;
-DARNIT_MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layers, DARNIT_TILESHEET *ts);
+MAP *map;
+MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layers, DARNIT_TILESHEET *ts);
 void map_save(MAP *map, const char *filename);
 
 #endif
