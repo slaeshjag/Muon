@@ -87,7 +87,9 @@ void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 	int i;
 	ui_widget_destroy(editor.sidebar.pane->root_widget);
 	ui_pane_set_root_widget(editor.sidebar.pane, ui_widget_create_vbox());
-	if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_BUILDINGS]) {
+	if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU]) {
+		map_save(map, "arne.ldi");
+	} else if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_BUILDINGS]) {
 		for(i=0; i< EDITOR_SIDEBAR_BUILDINGS_WIDGETS; i++)
 			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.buildings[i], i&&!(i&1));
 	}
@@ -133,9 +135,9 @@ void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int map_offset=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h)*map->map->layer->tilemap->w+((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w)%map->map->layer->tilemap->w;
 		if(map_offset<0||map_offset>map->map->layer->tilemap->w*map->map->layer->tilemap->h)
 			return;
-		if(building_place>-1&&map->map->layer[map->map->layers-1].tilemap->data[map_offset]!=building_place) {
-			map->map->layer[map->map->layers-1].tilemap->data[map_offset]=building_place;
-			d_tilemap_recalc(map->map->layer[map->map->layers-1].tilemap);
+		if(building_place>-1&&map->map->layer[map->map->layers-2].tilemap->data[map_offset]!=building_place) {
+			map->map->layer[map->map->layers-2].tilemap->data[map_offset]=building_place;
+			d_tilemap_recalc(map->map->layer[map->map->layers-2].tilemap);
 		}
 	}
 }
@@ -145,7 +147,7 @@ void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		unsigned char r, g, b, a;
 		d_render_tint_get(&r, &g, &b, &a);
 		d_render_tint(255, 255, 255, 255);
-		DARNIT_MAP_LAYER *l=&map->map->layer[map->map->layers-1];
+		DARNIT_MAP_LAYER *l=&map->map->layer[map->map->layers-2];
 		int x=(e->mouse->x+map->map->cam_x)/l->tile_w*l->tile_w;
 		int y=(e->mouse->y+map->map->cam_y)/l->tile_h*l->tile_h;
 		d_render_offset(map->map->cam_x, map->map->cam_y);

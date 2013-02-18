@@ -24,6 +24,7 @@
  
 #define LDI_MAGIC 0x83B3661B
 #define LDI_VERSION 0xBBA77ABC
+#define LDI_FILENAME_LEN 128
 
 typedef struct {
 	uint32_t magic;
@@ -33,7 +34,7 @@ typedef struct {
 
 
 typedef struct {
-	char name[128];
+	char name[LDI_FILENAME_LEN];
 	uint32_t pos;
 	uint32_t len;
 	uint32_t pad;

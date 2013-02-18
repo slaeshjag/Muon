@@ -29,6 +29,7 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	DARNIT_MAP *d_map=NULL;
 	DARNIT_MAP_LAYER *layer=NULL;
 	MAP *map;
+	FILE *f_ts;
 	map=malloc(sizeof(MAP));
 	
 	if(!(ts&&terrain_layers&&(d_map=malloc(sizeof(DARNIT_MAP)))&&(layer=malloc((terrain_layers+2)*sizeof(DARNIT_MAP_LAYER))))) {
@@ -72,17 +73,27 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	map->map=d_map;
 	map->stringtable=malloc(sizeof(MAP_PROPERTY));
 	map->stringtable->key="tileset";
-	map->stringtable->value="default.png";
-	map->stringtable->next=NULL;
-	map->tilesheet=NULL;
-	map->tilesheet_size=0;
-	map_save(map, "testmap.ldmz");
+	map->stringtable->value="mapdata/default.png";
+	map->stringtable->next=malloc(sizeof(MAP_PROPERTY));
+	map->stringtable->next->key="max_players";
+	map->stringtable->next->value="2";
+	map->stringtable->next->next=NULL;
+	
+	f_ts=fopen("res/default.png", "rb");
+	fseek(f_ts, 0, SEEK_END);
+	map->tilesheet_size=ftell(f_ts);
+	map->tilesheet=malloc(map->tilesheet_size);
+	fseek(f_ts, 0, SEEK_SET);
+	fread(map->tilesheet, map->tilesheet_size, 1, f_ts);
+	fclose(f_ts);
+	
 	return map;
 }
 
 void map_save(MAP *map, const char *filename) {
 	int i, j;
 	LDI_MAIN m;
+	LDI_ENTRY *entry;
 	FILE *f;
 	struct LDMZ ldmz;
 	MAP_PROPERTY *stringtable, **st_add, **st_temp;
@@ -182,7 +193,34 @@ void map_save(MAP *map, const char *filename) {
 	free(layer_header);
 	
 	if(!(f=fopen(filename, "wb")))
-		return;
+		goto map_save_error;
+	
+	
+	m.magic=d_util_htonl(LDI_MAGIC);
+	m.version=d_util_htonl(LDI_VERSION);
+	m.files=d_util_htonl(2);
+	fwrite(&m.magic, sizeof(uint32_t), 1, f);
+	fwrite(&m.version, sizeof(uint32_t), 1, f);
+	fwrite(&m.files, sizeof(uint32_t), 1, f);
+	m.files=d_util_ntohl(m.files);
+	
+	entry=calloc(sizeof(LDI_ENTRY), m.files);
+	strcpy(entry[0].name, "mapdata/map.ldmz");
+	entry[0].len=sizeof(uint32_t)*12+ldmz.header.stringtable_zsize+ldmz.header.refs_zsize+ldmz.header.layer_headers_zsize;
+	for(i=0; i<ldmz.header.layers; i++)
+		entry[0].len+=ldmz.layer[i].zsize;
+	entry[0].len=d_util_htonl(entry[0].len);
+	strcpy(entry[1].name, "mapdata/default.png");
+	entry[1].pos=entry[0].len;
+	entry[1].len=d_util_htonl(map->tilesheet_size);
+	
+	for(i=0; i<m.files; i++) {
+		fwrite(entry[i].name, LDI_FILENAME_LEN, 1, f);
+		fwrite(&entry[i].pos, sizeof(uint32_t), 1, f);
+		fwrite(&entry[i].len, sizeof(uint32_t), 1, f);
+		fwrite(&entry[i].pad, sizeof(uint32_t), 1, f);
+	}
+	free(entry);
 	
 	d_util_endian_convert(header, 12);
 	fwrite(&header, sizeof(uint32_t), 12, f);
@@ -191,15 +229,10 @@ void map_save(MAP *map, const char *filename) {
 	fwrite(ldmz.layer_headerz, ldmz.header.layer_headers_zsize, 1, f);
 	for(i=0; i<ldmz.header.layers; i++)
 		fwrite(ldmz.layer[i].dataz, ldmz.layer[i].zsize, 1, f);
-		
-	/*
-	m.magic=d_util_htonl(LDI_MAGIC);
-	m.version=d_util_htonl(LDI_VERSION);
-	m.files=d_util_htonl(2);
-	fwrite(&m.magic, 4, 1, f);
-	fwrite(&m.version, 4, 1, f);
-	fwrite(&m.files, 4, 1, f);*/
 	
+	fwrite(map->tilesheet, map->tilesheet_size, 1, f);
+	
+	map_save_error:
 	fclose(f);
 	free(ldmz.stringtablez);
 	free(ldmz.refsz);
