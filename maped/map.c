@@ -150,7 +150,7 @@ void map_save(MAP *map, const char *filename) {
 			(*st_add)->key=(*st_add)->value=NULL;
 		} else {
 			(*st_add)->key="NAME";
-			(*st_add)->value="lol";
+			(*st_add)->value="layer";
 			ldmz.header.stringtable_size+=strlen((*st_add)->key)+strlen((*st_add)->value)+2;
 		}
 	}
