@@ -20,6 +20,9 @@
 #ifndef EDITOR_H
 #define EDITOR_H
 
+#define SCROLL_OFFSET 8
+#define SCROLL_SPEED 4
+
 enum {
 	EDITOR_TOPBAR_BUTTON_MENU,
 	EDITOR_TOPBAR_BUTTON_TERRAIN,
@@ -37,6 +40,13 @@ enum {
 	EDITOR_SIDEBAR_BUILDINGS_WIDGETS,
 };
 
+enum {
+	EDITOR_SIDEBAR_MENU_LABEL,
+	EDITOR_SIDEBAR_MENU_BUTTON_SAVE,
+	EDITOR_SIDEBAR_MENU_BUTTON_QUIT,
+	EDITOR_SIDEBAR_MENU_WIDGETS,
+};
+
 struct {
 	struct {
 		UI_PANE *pane;
@@ -44,8 +54,9 @@ struct {
 	} topbar;
 	struct {
 		UI_PANE *pane;
+		UI_WIDGET *menu[EDITOR_SIDEBAR_MENU_WIDGETS];
 		UI_WIDGET *terrain[2];
-		UI_WIDGET *buildings[5];
+		UI_WIDGET *buildings[EDITOR_SIDEBAR_BUILDINGS_WIDGETS];
 		UI_WIDGET *properties[2];
 	} sidebar;
 } editor;
@@ -54,6 +65,7 @@ void editor_init();
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) ;
 void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_render();

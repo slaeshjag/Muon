@@ -75,6 +75,10 @@ void editor_init() {
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], editor_sidebar_buildings_listbox_player_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], editor_sidebar_buildings_listbox_building_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
+	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_LABEL]=ui_widget_create_label(font_std, "Menu");
+	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_SAVE]=ui_widget_create_button_text(font_std, "Save");
+	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_QUIT]=ui_widget_create_button_text(font_std, "Quit");
+	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->pane=editor.topbar.pane;
@@ -85,12 +89,16 @@ void editor_init() {
 
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
+	UI_PROPERTY_VALUE v;
+	v.i=building_place=-1;
+	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->set_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], UI_LISTBOX_PROP_SELECTED, v);
 	ui_widget_destroy(editor.sidebar.pane->root_widget);
 	ui_pane_set_root_widget(editor.sidebar.pane, ui_widget_create_vbox());
 	if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU]) {
-		map_save(map, "arne.ldi");
+		for(i=0; i<EDITOR_SIDEBAR_MENU_WIDGETS; i++)
+			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.menu[i], 0);
 	} else if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_BUILDINGS]) {
-		for(i=0; i< EDITOR_SIDEBAR_BUILDINGS_WIDGETS; i++)
+		for(i=0; i<EDITOR_SIDEBAR_BUILDINGS_WIDGETS; i++)
 			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.buildings[i], i&&!(i&1));
 	}
 }
@@ -121,6 +129,26 @@ void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned
 	building_place=building&&!v.i?5:v.i*16+building;
 }
 
+void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int scroll_x=0, scroll_y=0;
+	int screen_w=platform.screen_w, screen_h=platform.screen_h;
+	
+	if(e->mouse->x<SCROLL_OFFSET&&map->map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
+		scroll_x=-SCROLL_SPEED;
+	else if(e->mouse->x>platform.screen_w-SCROLL_OFFSET&&map->map->cam_x<map->w-(screen_w-SIDEBAR_WIDTH)/2)
+		scroll_x=SCROLL_SPEED;
+	if(e->mouse->y<SCROLL_OFFSET&&map->map->cam_y>-(screen_h)/2)
+		scroll_y=-SCROLL_SPEED;
+	else if(e->mouse->y>platform.screen_h-SCROLL_OFFSET&&map->map->cam_y<map->h-screen_h/2)
+		scroll_y=SCROLL_SPEED;
+		
+	if(!scroll_x&&!scroll_y)
+		return;
+	
+	d_map_camera_move(map->map, map->map->cam_x+scroll_x, map->map->cam_y+scroll_y);
+	/*map_minimap_update_viewport();*/
+}
+
 void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	//Make sure there is no pane in the way
 	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH||e->mouse->y<32)
@@ -143,6 +171,7 @@ void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 }
 
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	editor_mouse_move(widget, type, e);
 	if(building_place>=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
 		unsigned char r, g, b, a;
 		d_render_tint_get(&r, &g, &b, &a);

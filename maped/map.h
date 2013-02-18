@@ -92,6 +92,8 @@ typedef struct {
 	MAP_PROPERTY *stringtable;
 	unsigned char *tilesheet;
 	uint32_t tilesheet_size;
+	int w;
+	int h;
 } MAP;
 
 MAP *map;

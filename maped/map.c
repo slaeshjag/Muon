@@ -79,6 +79,9 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	map->stringtable->next->value="2";
 	map->stringtable->next->next=NULL;
 	
+	map->w=width*tile_w;
+	map->h=height*tile_h;
+	
 	f_ts=fopen("res/default.png", "rb");
 	fseek(f_ts, 0, SEEK_END);
 	map->tilesheet_size=ftell(f_ts);
