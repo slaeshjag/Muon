@@ -1,6 +1,6 @@
 # Project: muon
 include $(TOPDIR)/config.mk
-LDFLAGS		+=	-ldarnit
+LDFLAGS		+=	-ldarnit -lz
 
 BIN		=	../muon-maped
 

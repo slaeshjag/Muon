@@ -47,8 +47,8 @@ struct LDMZ {
 		uint32_t version;
 		uint32_t stringtable_size;
 		uint32_t stringtable_zsize;
-		uint32_t ref_size;
-		uint32_t ref_zsize;
+		uint32_t refs_size;
+		uint32_t refs_zsize;
 		uint32_t layers;
 		uint32_t layer_headers_zsize;
 		uint32_t objects;

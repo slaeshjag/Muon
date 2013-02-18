@@ -17,6 +17,7 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <string.h>
+#include <zlib.h>
 
 #include "maped.h"
 #include "map.h"
@@ -95,9 +96,9 @@ void map_save(MAP *map, const char *filename) {
 	for(stringtable=map->stringtable, i=0; stringtable; stringtable=stringtable->next, i++)
 		ldmz.header.stringtable_size+=strlen(stringtable->key)+strlen(stringtable->value)+2;
 	stringtable_data=malloc(ldmz.header.stringtable_size);
-	ldmz.header.ref_size=sizeof(int32_t)*(i+1)*2;
-	ref_data=malloc(ldmz.header.ref_size);
-	stringtable_nullref=ldmz.header.ref_size-2;
+	ldmz.header.refs_size=sizeof(int32_t)*(i+1)*2;
+	ref_data=malloc(ldmz.header.refs_size);
+	stringtable_nullref=ldmz.header.refs_size-2;
 	ref_data[stringtable_nullref]=ref_data[stringtable_nullref+1]=-1;
 	for(stringtable=map->stringtable, i=0, p=stringtable_data; stringtable; stringtable=stringtable->next) {
 		unsigned int size;
@@ -111,6 +112,8 @@ void map_save(MAP *map, const char *filename) {
 		p+=size;
 	}
 	//compress stringdata and refs, free stuff
+	ldmz.stringtablez=malloc(ldmz.header.stringtable_zsize=compressBound(ldmz.header.stringtable_size));
+	ldmz.refsz=malloc(ldmz.header.refs_zsize=compressBound(ldmz.header.refs_size));
 	free(stringtable_data);
 	free(ref_data);
 	
