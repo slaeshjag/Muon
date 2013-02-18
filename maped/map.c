@@ -85,7 +85,7 @@ void map_save(MAP *map, const char *filename) {
 	LDI_MAIN m;
 	FILE *f;
 	struct LDMZ ldmz;
-	MAP_PROPERTY *stringtable, **st_add;
+	MAP_PROPERTY *stringtable, **st_add, **st_temp;
 	char *stringtable_data, *p;
 	int32_t *ref_data;
 	unsigned long zsize;
@@ -106,6 +106,8 @@ void map_save(MAP *map, const char *filename) {
 	ldmz.header.stringtable_size=0;
 	for(st_add=&(map->stringtable), i=0; *st_add; st_add=&((*st_add)->next), i++)
 		ldmz.header.stringtable_size+=strlen((*st_add)->key)+strlen((*st_add)->value)+2;
+	/*So we can later clean out the added elements*/
+	st_temp=st_add;
 	*st_add=malloc(sizeof(MAP_PROPERTY));
 	(*st_add)->key=(*st_add)->value=(void *) ((*st_add)->next=NULL);
 	for(st_add=&((*st_add)->next), j=0; j<ldmz.header.layers*2; st_add=&((*st_add)->next), j++ ) {
@@ -143,8 +145,6 @@ void map_save(MAP *map, const char *filename) {
 		p+=size;
 	}
 	
-	
-	//TODO: add layer names to stringdata!
 	ldmz.stringtablez=malloc(zsize=compressBound(ldmz.header.stringtable_size));
 	compress(ldmz.stringtablez, &zsize, (void *) stringtable_data, ldmz.header.stringtable_size);
 	header[3]=ldmz.header.stringtable_zsize=zsize;
@@ -179,6 +179,7 @@ void map_save(MAP *map, const char *filename) {
 	ldmz.layer_headerz=malloc(zsize=compressBound(sizeof(uint32_t)*8*ldmz.header.layers));
 	compress((void *) ldmz.layer_headerz, &zsize, (void *) layer_header, sizeof(uint32_t)*8*ldmz.header.layers);
 	header[7]=ldmz.header.layer_headers_zsize=zsize;
+	free(layer_header);
 	
 	if(!(f=fopen(filename, "wb")))
 		return;
@@ -200,4 +201,16 @@ void map_save(MAP *map, const char *filename) {
 	fwrite(&m.files, 4, 1, f);*/
 	
 	fclose(f);
+	free(ldmz.stringtablez);
+	free(ldmz.refsz);
+	free(ldmz.layer_headerz);
+	for(i=0; i<ldmz.header.layers; i++)
+		free(ldmz.layer[i].dataz);
+	free(ldmz.layer);
+	while(*st_temp) {
+		stringtable=(*st_temp)->next;
+		free(*st_temp);
+		*st_temp=stringtable;
+	}
+	
 }
