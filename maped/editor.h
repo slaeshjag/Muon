@@ -65,6 +65,7 @@ void editor_init();
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) ;
 void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

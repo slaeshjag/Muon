@@ -78,6 +78,8 @@ void editor_init() {
 	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_LABEL]=ui_widget_create_label(font_std, "Menu");
 	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_SAVE]=ui_widget_create_button_text(font_std, "Save");
 	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_QUIT]=ui_widget_create_button_text(font_std, "Quit");
+	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; i<EDITOR_SIDEBAR_MENU_WIDGETS; i++)
+		editor.sidebar.menu[i]->event_handler->add(editor.sidebar.menu[i], editor_sidebar_menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
@@ -127,6 +129,19 @@ void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned
 	v=editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->get_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], UI_LISTBOX_PROP_SELECTED);
 	
 	building_place=building&&!v.i?5:v.i*16+building;
+}
+
+void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int i;
+	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; widget!=editor.sidebar.menu[i]; i++);
+	switch(i) {
+		case EDITOR_SIDEBAR_MENU_BUTTON_SAVE:
+			map_save(map, "arne.ldi");
+			break;
+		case EDITOR_SIDEBAR_MENU_BUTTON_QUIT:
+			d_quit();
+			break;
+	}
 }
 
 void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
