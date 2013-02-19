@@ -30,7 +30,8 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	DARNIT_MAP_LAYER *layer=NULL;
 	MAP *map;
 	FILE *f_ts;
-	map=malloc(sizeof(MAP));
+	if(!(map=malloc(sizeof(MAP))))
+		return NULL;
 	
 	if(!(ts&&terrain_layers&&(d_map=malloc(sizeof(DARNIT_MAP)))&&(layer=malloc((terrain_layers+2)*sizeof(DARNIT_MAP_LAYER))))) {
 		free(d_map);
@@ -92,6 +93,19 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	return map;
 }
 
+MAP *map_close(MAP *map) {
+	MAP_PROPERTY *p;
+	d_map_unload(map->map);
+	while(map->stringtable) {
+		p=map->stringtable;
+		map->stringtable=p->next;
+		free(p);
+	}
+	free(map->tilesheet);
+	free(map);
+	return NULL;
+}
+
 void map_prop_set_or_add(MAP *map, const char *key, const char *value) {
 	MAP_PROPERTY **p;
 	
@@ -112,7 +126,7 @@ void map_save(MAP *map, const char *filename) {
 	int i, j;
 	LDI_MAIN m;
 	LDI_ENTRY *entry;
-	FILE *f;
+	DARNIT_FILE *f;
 	struct LDMZ ldmz;
 	MAP_PROPERTY *stringtable, **st_add, **st_temp;
 	char *stringtable_data, *p;
@@ -210,16 +224,18 @@ void map_save(MAP *map, const char *filename) {
 	header[7]=ldmz.header.layer_headers_zsize=zsize;
 	free(layer_header);
 	
-	if(!(f=fopen(filename, "wb")))
+	if(!(f=d_file_open(filename, "wb"))) {
+		ui_messagebox(font_std, "Unable to save map");
 		goto map_save_error;
+	}
 	
 	
 	m.magic=d_util_htonl(LDI_MAGIC);
 	m.version=d_util_htonl(LDI_VERSION);
 	m.files=d_util_htonl(2);
-	fwrite(&m.magic, sizeof(uint32_t), 1, f);
-	fwrite(&m.version, sizeof(uint32_t), 1, f);
-	fwrite(&m.files, sizeof(uint32_t), 1, f);
+	d_file_write(&m.magic, sizeof(uint32_t), f);
+	d_file_write(&m.version, sizeof(uint32_t), f);
+	d_file_write(&m.files, sizeof(uint32_t), f);
 	m.files=d_util_ntohl(m.files);
 	
 	entry=calloc(sizeof(LDI_ENTRY), m.files);
@@ -233,25 +249,25 @@ void map_save(MAP *map, const char *filename) {
 	entry[1].len=d_util_htonl(map->tilesheet_size);
 	
 	for(i=0; i<m.files; i++) {
-		fwrite(entry[i].name, LDI_FILENAME_LEN, 1, f);
-		fwrite(&entry[i].pos, sizeof(uint32_t), 1, f);
-		fwrite(&entry[i].len, sizeof(uint32_t), 1, f);
-		fwrite(&entry[i].pad, sizeof(uint32_t), 1, f);
+		d_file_write(entry[i].name, LDI_FILENAME_LEN, f);
+		d_file_write(&entry[i].pos, sizeof(uint32_t), f);
+		d_file_write(&entry[i].len, sizeof(uint32_t), f);
+		d_file_write(&entry[i].pad, sizeof(uint32_t), f);
 	}
 	free(entry);
 	
 	d_util_endian_convert(header, 12);
-	fwrite(&header, sizeof(uint32_t), 12, f);
-	fwrite(ldmz.stringtablez, ldmz.header.stringtable_zsize, 1, f);
-	fwrite(ldmz.refsz, ldmz.header.refs_zsize, 1, f);
-	fwrite(ldmz.layer_headerz, ldmz.header.layer_headers_zsize, 1, f);
+	d_file_write(&header, sizeof(uint32_t)*12, f);
+	d_file_write(ldmz.stringtablez, ldmz.header.stringtable_zsize, f);
+	d_file_write(ldmz.refsz, ldmz.header.refs_zsize, f);
+	d_file_write(ldmz.layer_headerz, ldmz.header.layer_headers_zsize, f);
 	for(i=0; i<ldmz.header.layers; i++)
-		fwrite(ldmz.layer[i].dataz, ldmz.layer[i].zsize, 1, f);
+		d_file_write(ldmz.layer[i].dataz, ldmz.layer[i].zsize, f);
 	
-	fwrite(map->tilesheet, map->tilesheet_size, 1, f);
+	d_file_write(map->tilesheet, map->tilesheet_size, f);
 	
 	map_save_error:
-	fclose(f);
+	d_file_close(f);
 	free(ldmz.stringtablez);
 	free(ldmz.refsz);
 	free(ldmz.layer_headerz);

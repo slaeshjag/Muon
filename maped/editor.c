@@ -134,21 +134,23 @@ void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_E
 	int i;
 	UI_PROPERTY_VALUE v;
 	static char buf_players[2];
-	char buf[32];
+	char filename[128], *name, *version;
 	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; widget!=editor.sidebar.menu[i]; i++);
 	switch(i) {
 		case EDITOR_SIDEBAR_MENU_BUTTON_SAVE:
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME], UI_ENTRY_PROP_TEXT);
 			map_prop_set_or_add(map, "name", v.p);
-			sprintf(buf, "%s.ldi", (char *) v.p);
+			name=v.p;
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION], UI_ENTRY_PROP_TEXT);
 			map_prop_set_or_add(map, "version", v.p);
+			version=v.p;
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR], UI_ENTRY_PROP_TEXT);
 			map_prop_set_or_add(map, "author", v.p);
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS], UI_SLIDER_PROP_VALUE);
 			sprintf(buf_players, "%i", v.i+1);
 			map_prop_set_or_add(map, "max_players", buf_players);
-			map_save(map, buf);
+			sprintf(filename, "maps/%s %s (%s).ldi", name, version, buf_players);
+			map_save(map, filename);
 			break;
 		case EDITOR_SIDEBAR_MENU_BUTTON_QUIT:
 			d_quit();
