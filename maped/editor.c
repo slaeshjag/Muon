@@ -65,6 +65,19 @@ void editor_init() {
 	editor.sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 32, SIDEBAR_WIDTH, platform.screen_h-32, ui_widget_create_vbox());
 	//editor.sidebar.pane->background_color.r=editor.sidebar.pane->background_color.g=editor.sidebar.pane->background_color.b=0xCD;
 	
+	/*Menu tab*/
+	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_LABEL]=ui_widget_create_label(font_std, "Menu");
+	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_SAVE]=ui_widget_create_button_text(font_std, "Save");
+	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_QUIT]=ui_widget_create_button_text(font_std, "Quit");
+	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; i<EDITOR_SIDEBAR_MENU_WIDGETS; i++)
+		editor.sidebar.menu[i]->event_handler->add(editor.sidebar.menu[i], editor_sidebar_menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	
+	/*Terrain tab*/
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LABEL]=ui_widget_create_label(font_std, "Terrain");
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LABEL_LAYERS]=ui_widget_create_label(font_std, "Layers");
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]=ui_widget_create_listbox(font_std);
+	
+	/*Buildings tab*/
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LABEL]=ui_widget_create_label(font_std, "Buildings");
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LABEL_PLAYER]=ui_widget_create_label(font_std, "Player");
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]=ui_widget_create_listbox(font_std);
@@ -76,12 +89,7 @@ void editor_init() {
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_PLAYER], editor_sidebar_buildings_listbox_player_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->event_handler->add(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], editor_sidebar_buildings_listbox_building_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
-	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_LABEL]=ui_widget_create_label(font_std, "Menu");
-	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_SAVE]=ui_widget_create_button_text(font_std, "Save");
-	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_BUTTON_QUIT]=ui_widget_create_button_text(font_std, "Quit");
-	for(i=EDITOR_SIDEBAR_MENU_BUTTON_SAVE; i<EDITOR_SIDEBAR_MENU_WIDGETS; i++)
-		editor.sidebar.menu[i]->event_handler->add(editor.sidebar.menu[i], editor_sidebar_menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-	
+	/*Properties tab*/
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL]=ui_widget_create_label(font_std, "Properites");
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL_NAME]=ui_widget_create_label(font_std, "Map name");
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME]=ui_widget_create_entry(font_std);
@@ -110,6 +118,9 @@ void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 	if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU]) {
 		for(i=0; i<EDITOR_SIDEBAR_MENU_WIDGETS; i++)
 			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.menu[i], 0);
+	} else if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_TERRAIN]) {
+		for(i=0; i<EDITOR_SIDEBAR_TERRAIN_WIDGETS; i++)
+			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.terrain[i], 0);
 	} else if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_BUILDINGS]) {
 		for(i=0; i<EDITOR_SIDEBAR_BUILDINGS_WIDGETS; i++)
 			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.buildings[i], i&&!(i&1));

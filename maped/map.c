@@ -93,23 +93,19 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 }
 
 void map_prop_set_or_add(MAP *map, const char *key, const char *value) {
-	MAP_PROPERTY *p;
-	if(!map->stringtable) {
-		p=map->stringtable=malloc(sizeof(MAP_PROPERTY));
-		goto map_prop_set_or_add_add;
-	}
-	for(p=map->stringtable; p->next; p=p->next) {
-		if(!strcmp(p->key, key)) {
-			p->value=value;
+	MAP_PROPERTY **p;
+	
+	for(p=&map->stringtable; *p; p=&((*p)->next)) {
+		if(!strcmp((*p)->key, key)) {
+			(*p)->value=value;
 			return;
 		}
 	}
-	p->next=malloc(sizeof(MAP_PROPERTY));
-	p=p->next;
-	map_prop_set_or_add_add:
-	p->key=key;
-	p->value=value;
-	p->next=NULL;
+	
+	*p=malloc(sizeof(MAP_PROPERTY));
+	(*p)->key=key;
+	(*p)->value=value;
+	(*p)->next=NULL;
 }
 
 void map_save(MAP *map, const char *filename) {
