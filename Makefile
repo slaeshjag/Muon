@@ -26,12 +26,15 @@ install:
 	@install -m 0755 -D muon $(PREFIX)/bin/muon
 	@echo " [INST] muon-server"
 	@install -m 0755 -D muon-server $(PREFIX)/bin/muon-server
+	@echo " [INST] muon-maped"
+	@install -m 0755 -D muon-maped $(PREFIX)/bin/muon-maped
 	@echo " [INST] muon resources"
 	@install -m 0744 -D res/FreeMonoBold.ttf $(DATAPATH)/res/FreeMonoBold.ttf
 	
 	@install -m 0744 -D res/mouse.png $(DATAPATH)/res/mouse.png
 	@install -m 0744 -D res/target.png $(DATAPATH)/res/target.png
 	@install -m 0744 -D res/icon.png $(DATAPATH)/res/icon.png
+	@install -m 0744 -D res/icon-maped.png $(DATAPATH)/res/icon.png
 	
 	@install -m 0744 -D res/chat.png $(DATAPATH)/res/chat.png
 	@install -m 0744 -D res/flare.png $(DATAPATH)/res/flare.png
@@ -193,6 +196,8 @@ clean:
 	+@make -C server/ clean
 	@echo " [ CD ] client/"
 	+@make -C client/ clean
+	@echo " [ CD ] maped/"
+	+@make -C maped/ clean
 	@echo " [ CD ] res/"
 	+@make -C res/ clean
 	@echo " [ RM ] maps/"
