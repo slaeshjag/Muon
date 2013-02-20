@@ -17,6 +17,8 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include "maped.h"
 #include "map.h"
 #include "editor.h"
@@ -139,12 +141,22 @@ void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_E
 	switch(i) {
 		case EDITOR_SIDEBAR_MENU_BUTTON_SAVE:
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME], UI_ENTRY_PROP_TEXT);
-			map_prop_set_or_add(map, "name", v.p);
-			name=v.p;
+			if(!strlen(name=v.p)) {
+				ui_messagebox(font_std, "Map is missing name property");
+				break;
+			}
+			map_prop_set_or_add(map, "name", name);
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION], UI_ENTRY_PROP_TEXT);
-			map_prop_set_or_add(map, "version", v.p);
-			version=v.p;
+			if(!strlen(version=v.p)) {
+				ui_messagebox(font_std, "Map is missing version property");
+				break;
+			}
+			map_prop_set_or_add(map, "version", version);
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR], UI_ENTRY_PROP_TEXT);
+			if(!strlen(v.p)) {
+				ui_messagebox(font_std, "Map is missing author property");
+				break;
+			}
 			map_prop_set_or_add(map, "author", v.p);
 			v=editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]->get_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS], UI_SLIDER_PROP_VALUE);
 			sprintf(buf_players, "%i", v.i+1);
