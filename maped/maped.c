@@ -40,7 +40,7 @@ void state_set(enum STATE state) {
 }
 
 int main(int argc, char **argv) {
-	platform_init();
+	platform_init("Muon map editor", "res/icon-maped.png");
 	font_std=d_font_load("res/FreeMonoBold.ttf", 12, 512, 512);
 	mouse_tilesheet=d_render_tilesheet_load("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	

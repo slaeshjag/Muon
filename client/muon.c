@@ -118,7 +118,7 @@ void sound_play(DARNIT_SOUND *snd) {
 
 int main(int argc, char **argv) {
 	args=argv;
-	platform_init();
+	platform_init("Muon", "res/icon.png");
 	
 	player_id=0;
 	memset(&prevbuttons, 0, sizeof(prevbuttons));

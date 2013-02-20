@@ -169,13 +169,13 @@ void platform_config_write() {
 	d_file_close(f);
 }*/
 
-void platform_init() {
+void platform_init(char *name, char *icon) {
 	d_init_partial("muon");
 	platform=d_platform_get();
 	videomodes=d_videomode_get();
 	platform_config_init_defaults();
 	platform_config_read();
-	d_init_rest("Muon", config.screen_w, config.screen_h, config.fullscreen, "res/icon.png");
+	d_init_rest(name, config.screen_w, config.screen_h, config.fullscreen, icon);
 	platform=d_platform_get();
 	d_directory_create("maps");
 	stringtable=d_stringtable_open("res/lang.stz");

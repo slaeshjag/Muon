@@ -50,7 +50,7 @@ struct CONFIG_PARSER {
 
 DARNIT_VIDEOMODE **videomodes;
 
-void platform_init();
+void platform_init(char *name, char *icon);
 
 void platform_config_read();
 void platform_config_write();
