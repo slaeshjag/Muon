@@ -51,7 +51,7 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 		/*This is needed to at least null all tilemaps so we can free them i one fails*/
 		if(!(fail|=!(layer[i].tilemap=d_tilemap_new(0xFFF, ts, 0xFFF, width, height)))) {
 			for(j=0; j<width*height; j++)
-				layer[i].tilemap->data[j]=144*(!i);
+				layer[i].tilemap->data[j]=i==terrain_layers+1?1:144*(!i);
 			d_tilemap_recalc(layer[i].tilemap);
 		}
 		layer[i].ts=ts;
@@ -94,6 +94,8 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 
 void map_prop_set_or_add(MAP *map, const char *key, const char *value) {
 	MAP_PROPERTY **p;
+	if(!map)
+		return;
 	
 	for(p=&map->stringtable; *p; p=&((*p)->next)) {
 		if(!strcmp((*p)->key, key)) {

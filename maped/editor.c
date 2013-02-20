@@ -243,6 +243,6 @@ void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void editor_render() {
 	int i;
-	for(i=0; i<map->map->layers; i++)
+	for(i=0; i<map->map->layers-1; i++)
 		d_tilemap_draw(map->map->layer[i].tilemap);
 }
