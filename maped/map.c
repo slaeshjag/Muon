@@ -97,8 +97,12 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 MAP *map_load(const char *filename) {
 	MAP *map;
 	DARNIT_FILE *f_ts;
-	if(d_fs_mount(filename)||!(map=malloc(sizeof(MAP))))
+	if(d_fs_mount(filename))
 		return NULL;
+	if(!(map=malloc(sizeof(MAP)))) {
+		d_fs_unmount(filename);
+		return NULL;
+	}
 	if(!(map->stringtable=malloc(sizeof(MAP_PROPERTY)))) {
 		free(map);
 		d_fs_unmount(filename);

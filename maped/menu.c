@@ -17,6 +17,8 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string.h>
+
 #include "maped.h"
 #include "menu.h"
 #include "editor.h"
@@ -40,11 +42,47 @@ void menu_init() {
 		menu_button[i]->event_handler->add(menu_button[i], menu_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 		ui_vbox_add_child(state[STATE_MENU].panelist->pane->root_widget, menu_button[i], 0);
 	}
+	
+	state[STATE_LOAD].panelist=malloc(sizeof(struct UI_PANE_LIST));
+	state[STATE_LOAD].panelist->next=NULL;
+	state[STATE_LOAD].panelist->pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, ui_widget_create_vbox());
+	
+	ui_vbox_add_child(state[STATE_LOAD].panelist->pane->root_widget, load.label=ui_widget_create_label(font_std, "Load map"), 0);
+	ui_vbox_add_child(state[STATE_LOAD].panelist->pane->root_widget, load.listbox=ui_widget_create_listbox(font_std), 1);
+	load.hbox=ui_widget_create_hbox();
+	load.button[LOAD_BUTTON_CANCEL]=ui_widget_create_button_text(font_std, "Cancel");
+	load.button[LOAD_BUTTON_LOAD]=ui_widget_create_button_text(font_std, "Load");
+	ui_hbox_add_child(load.hbox, ui_widget_create_spacer(), 1);
+	for(i=0; i<LOAD_BUTTONS; i++) {
+		ui_hbox_add_child(load.hbox, load.button[i], 0);
+		load.button[i]->event_handler->add(load.button[i], load_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	}
+	ui_vbox_add_child(state[STATE_LOAD].panelist->pane->root_widget, load.hbox, 0);
+}
+
+void load_maplist_reload() {
+	DARNIT_FILE *f;
+	DARNIT_DIR_LIST *dir, *d;
+	char buf[256];
+	int dirs;
+	ui_listbox_clear(load.listbox);
+	dir=d_file_list(mapdir, DARNIT_FILESYSTEM_TYPE_READ|DARNIT_FILESYSTEM_TYPE_WRITE, &dirs);
+	for(d=dir; d; d=d->next) {
+		if(d->file&&ui_listbox_index_of(load.listbox, d->fname)==-1) {
+			sprintf(buf, "%s/%s", mapdir, d->fname);
+			f=d_file_open(buf, "rb");
+			d_file_read(buf, 8, f);
+			d_file_close(f);
+			if(memcmp(buf, ldimagic, 8))
+				continue;
+			ui_listbox_add(load.listbox, d->fname);
+		}
+	}
+	d_file_list_free(dir);
 }
 
 void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
-	UI_PROPERTY_VALUE v;
 	for(i=0; widget!=menu_button[i]; i++);
 	switch(i) {
 		case MENU_BUTTON_NEW:
@@ -52,21 +90,37 @@ void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			state_set(STATE_EDITOR);
 			break;
 		case MENU_BUTTON_LOAD:
-			if((map=map_load("maps/Twirly 0.1 (2).ldi"))) {
-				if((v.p=(void *) map_prop_get(map, "name")))
-					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME], UI_ENTRY_PROP_TEXT, v);
-				if((v.p=(void *) map_prop_get(map, "version")))
-					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION], UI_ENTRY_PROP_TEXT, v);
-				if((v.p=(void *) map_prop_get(map, "author")))
-					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR], UI_ENTRY_PROP_TEXT, v);
-				if((v.p=(void *) map_prop_get(map, "max_players")))
-					if((v.i=atoi(v.p)-1)>=0)
-						editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS], UI_SLIDER_PROP_VALUE, v);
-				state_set(STATE_EDITOR);
-			}
+			load_maplist_reload();
+			state_set(STATE_LOAD);
 			break;
 		case MENU_BUTTON_QUIT:
 			state_set(STATE_QUIT);
 			break;
 	}
+}
+
+void load_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
+	char buf[256];
+	if(widget==load.button[LOAD_BUTTON_LOAD]) {
+		v=load.listbox->get_prop(load.listbox, UI_LISTBOX_PROP_SELECTED);
+		if(v.i<0)
+			return;
+		sprintf(buf, "%s/%s", mapdir, ui_listbox_get(load.listbox, v.i));
+		printf("%s\n", buf);
+		if((map=map_load(buf))) {
+			if((v.p=(void *) map_prop_get(map, "name")))
+				editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME], UI_ENTRY_PROP_TEXT, v);
+			if((v.p=(void *) map_prop_get(map, "version")))
+				editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION], UI_ENTRY_PROP_TEXT, v);
+			if((v.p=(void *) map_prop_get(map, "author")))
+				editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR], UI_ENTRY_PROP_TEXT, v);
+			if((v.p=(void *) map_prop_get(map, "max_players")))
+				if((v.i=atoi(v.p)-1)>=0)
+					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS], UI_SLIDER_PROP_VALUE, v);
+			state_set(STATE_EDITOR);
+			return;
+		}
+	}
+	state_set(STATE_MENU);
 }

@@ -27,9 +27,24 @@ enum {
 	MENU_BUTTONS,
 };
 
+enum {
+	LOAD_BUTTON_CANCEL,
+	LOAD_BUTTON_LOAD,
+	LOAD_BUTTONS,
+};
+
 UI_WIDGET *menu_button[MENU_BUTTONS];
 
+struct {
+	UI_WIDGET *label;
+	UI_WIDGET *listbox;
+	UI_WIDGET *hbox;
+	UI_WIDGET *button[LOAD_BUTTONS];
+} load;
+
 void menu_init();
+void load_maplist_reload();
 void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void load_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif
