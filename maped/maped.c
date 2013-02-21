@@ -25,15 +25,13 @@ void state_set(enum STATE state) {
 	switch(state_current) {
 		case STATE_EDITOR:
 			ui_event_global_remove(editor_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
-			ui_event_global_remove(editor_mouse_click, UI_EVENT_TYPE_MOUSE_DOWN);
-			ui_event_global_remove(editor_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
+			ui_event_global_remove(editor_mouse, UI_EVENT_TYPE_MOUSE_DOWN|UI_EVENT_TYPE_MOUSE_PRESS|UI_EVENT_TYPE_MOUSE_RELEASE);
 		default:
 			break;
 	}
 	switch(state) {
 		case STATE_EDITOR:
-			ui_event_global_add(editor_mouse_click, UI_EVENT_TYPE_MOUSE_PRESS);
-			ui_event_global_add(editor_mouse_click, UI_EVENT_TYPE_MOUSE_DOWN);
+			ui_event_global_add(editor_mouse, UI_EVENT_TYPE_MOUSE_DOWN|UI_EVENT_TYPE_MOUSE_PRESS|UI_EVENT_TYPE_MOUSE_RELEASE);
 			ui_event_global_add(editor_mouse_draw, UI_EVENT_TYPE_MOUSE_ENTER);
 		default:
 			break;

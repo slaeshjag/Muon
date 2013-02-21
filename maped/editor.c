@@ -61,6 +61,15 @@ static int building_place=-1;
 static enum TERRAIN_TOOL terrain_tool=TERRAIN_TOOL_NONE;
 static int terrain_tile=0;
 
+struct {
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+} terrain_rectange_coords;
+
+DARNIT_RECT *terrain_rectangle;
+
 void editor_init() {
 	int i;
 	editor.topbar.pane=ui_pane_create(0, 0, platform.screen_w, 32, ui_widget_create_hbox());
@@ -90,8 +99,13 @@ void editor_init() {
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]=ui_widget_create_listbox(font_std);
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH]=ui_widget_create_button_text(font_std, "Brush");
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_BUCKET]=ui_widget_create_button_text(font_std, "Bucket");
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_RECTANGLE]=ui_widget_create_button_text(font_std, "Rectangle");
+	
 	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; i<EDITOR_SIDEBAR_TERRAIN_WIDGETS; i++)
 		editor.sidebar.terrain[i]->event_handler->add(editor.sidebar.terrain[i], editor_sidebar_terrain_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+		
+	terrain_rectangle=d_render_rect_new(1);
+	d_render_rect_move(terrain_rectangle, 0, 0, 0, 0, 0);
 	
 	/*Buildings tab*/
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LABEL]=ui_widget_create_label(font_std, "Buildings");
@@ -256,11 +270,31 @@ void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	/*map_minimap_update_viewport();*/
 }
 
-void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	UI_PROPERTY_VALUE v;
 	//Make sure there is no pane in the way
 	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH||e->mouse->y<32)
 		return;
+	
+	if(type==UI_EVENT_TYPE_MOUSE_RELEASE) {
+		if(!(e->mouse->buttons&~UI_EVENT_MOUSE_BUTTON_LEFT)&&terrain_tool==TERRAIN_TOOL_RECTANGLE) {
+			int x, y, layer;
+			DARNIT_TILEMAP *tilemap;
+			v=editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]->get_prop(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS], UI_LISTBOX_PROP_SELECTED);
+			layer=v.i>0&&v.i<map->map->layers?v.i:0;
+			tilemap=map->map->layer[layer].tilemap;
+			for(y=terrain_rectange_coords.y1; y<terrain_rectange_coords.y2; y++)
+				for(x=terrain_rectange_coords.x1; x<terrain_rectange_coords.x2; x++)
+					if(x>=0&&y>=0)
+						tilemap->data[y*tilemap->w+x]=terrain_tile;
+			
+			
+			d_tilemap_recalc(tilemap);
+			terrain_rectange_coords.x1=terrain_rectange_coords.y1=terrain_rectange_coords.x2=terrain_rectange_coords.y2=0;
+			d_render_rect_move(terrain_rectangle, 0, 0, 0, 0, 0);
+		}
+		return;
+	}
 	
 	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT&&type==UI_EVENT_TYPE_MOUSE_PRESS) {
 		v.i=building_place=-1;
@@ -275,6 +309,8 @@ void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			d_tilemap_recalc(map->map->layer[map->map->layers-2].tilemap);
 		} else if(terrain_tool>TERRAIN_TOOL_NONE) {
 			int layer;
+			int x=((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w);
+			int y=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h);
 			v=editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]->get_prop(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS], UI_LISTBOX_PROP_SELECTED);
 			layer=v.i>0&&v.i<map->map->layers?v.i:0;
 			switch(terrain_tool) {
@@ -286,11 +322,24 @@ void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 					break;
 				case TERRAIN_TOOL_BUCKET:
 					if(type==UI_EVENT_TYPE_MOUSE_PRESS) {
-						int x=((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w);
-						int y=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h);
 						editor_floodfill(map->map->layer[layer].tilemap, x, y, terrain_tile);
 						d_tilemap_recalc(map->map->layer[layer].tilemap);
 					}
+					break;
+				case TERRAIN_TOOL_RECTANGLE:
+						if(type==UI_EVENT_TYPE_MOUSE_PRESS) {
+							terrain_rectange_coords.x1=x;
+							terrain_rectange_coords.y1=y;
+							break;
+						}
+						terrain_rectange_coords.x2=x<0?1:x+1>map->map->layer[layer].tilemap->w?map->map->layer[layer].tilemap->w:x+1;
+						terrain_rectange_coords.y2=y<0?1:y+1>map->map->layer[layer].tilemap->h?map->map->layer[layer].tilemap->h:y+1;
+						d_render_rect_move(terrain_rectangle, 0,
+							terrain_rectange_coords.x1*map->map->layer[layer].tile_w,
+							terrain_rectange_coords.y1*map->map->layer[layer].tile_h,
+							terrain_rectange_coords.x2*map->map->layer[layer].tile_w,
+							terrain_rectange_coords.y2*map->map->layer[layer].tile_h
+						);
 					break;
 				default:
 					break;
@@ -350,4 +399,13 @@ void editor_render() {
 	int i;
 	for(i=0; i<map->map->layers-1; i++)
 		d_tilemap_draw(map->map->layer[i].tilemap);
+	if(terrain_tool==TERRAIN_TOOL_RECTANGLE) {
+		d_render_tint(255, 255, 255, 127);
+		d_render_blend_enable();
+		d_render_offset(map->map->cam_x, map->map->cam_y);
+		d_render_rect_draw(terrain_rectangle, 1);
+		d_render_offset(0, 0);
+		d_render_blend_disable();
+		d_render_tint(255, 255, 255, 255);
+	}
 }
