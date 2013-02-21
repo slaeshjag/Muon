@@ -102,6 +102,9 @@ void editor_init() {
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL_PLAYERS]=ui_widget_create_label(font_std, "Max players");
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]=ui_widget_create_slider(4);
 	
+	for(i=0; i<EDITOR_SIDEBAR_PROPERTIES_WIDGETS; i++)
+			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.properties[i], 0);
+	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->pane=editor.topbar.pane;

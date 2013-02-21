@@ -19,6 +19,7 @@
 
 #include "maped.h"
 #include "menu.h"
+#include "editor.h"
 #include "map.h"
 
 static const char *button_text[MENU_BUTTONS]={
@@ -43,11 +44,26 @@ void menu_init() {
 
 void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
+	UI_PROPERTY_VALUE v;
 	for(i=0; widget!=menu_button[i]; i++);
 	switch(i) {
 		case MENU_BUTTON_NEW:
 			map=map_new(32, 32, 1, d_render_tilesheet_load("res/default.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
 			state_set(STATE_EDITOR);
+			break;
+		case MENU_BUTTON_LOAD:
+			if((map=map_load("maps/Twirly 0.1 (2).ldi"))) {
+				if((v.p=(void *) map_prop_get(map, "name")))
+					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_NAME], UI_ENTRY_PROP_TEXT, v);
+				if((v.p=(void *) map_prop_get(map, "version")))
+					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_VERSION], UI_ENTRY_PROP_TEXT, v);
+				if((v.p=(void *) map_prop_get(map, "author")))
+					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_ENTRY_AUTHOR], UI_ENTRY_PROP_TEXT, v);
+				if((v.p=(void *) map_prop_get(map, "max_players")))
+					if((v.i=atoi(v.p)-1)>=0)
+						editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS], UI_SLIDER_PROP_VALUE, v);
+				state_set(STATE_EDITOR);
+			}
 			break;
 		case MENU_BUTTON_QUIT:
 			state_set(STATE_QUIT);

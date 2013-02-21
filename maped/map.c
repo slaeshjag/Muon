@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #include <string.h>
 #include <zlib.h>
 
@@ -93,6 +94,53 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	return map;
 }
 
+MAP *map_load(const char *filename) {
+	MAP *map;
+	DARNIT_FILE *f_ts;
+	if(d_fs_mount(filename)||!(map=malloc(sizeof(MAP))))
+		return NULL;
+	if(!(map->stringtable=malloc(sizeof(MAP_PROPERTY)))) {
+		free(map);
+		d_fs_unmount(filename);
+		return NULL;
+	}
+	if(!(map->map=d_map_load("mapdata/map.ldmz"))) {
+		free(map->stringtable);
+		free(map);
+		d_fs_unmount(filename);
+		return NULL;
+	}
+	if(!(f_ts=d_file_open(d_map_prop(map->map->prop, "tileset"), "rb")))
+		if(!(f_ts=fopen("res/default.png", "rb"))) {
+			free(map->stringtable);
+			free(map);
+			d_fs_unmount(filename);
+			return NULL;
+		}
+	
+	map->stringtable->key="tileset";
+	map->stringtable->value="mapdata/default.png";
+	map->stringtable->next=NULL;
+	
+	d_file_seek(f_ts, 0, SEEK_END);
+	map->tilesheet_size=d_file_tell(f_ts);
+	map->tilesheet=malloc(map->tilesheet_size);
+	d_file_seek(f_ts, 0, SEEK_SET);
+	d_file_read(map->tilesheet, map->tilesheet_size, f_ts);
+	d_file_close(f_ts);
+	d_fs_unmount(filename);
+	map->w=map->map->layer->tile_w*map->map->layer->tilemap->w;
+	map->h=map->map->layer->tile_h*map->map->layer->tilemap->h;
+	sprintf(map->sizestring, "%ix%i", map->map->layer->tilemap->w, map->map->layer->tilemap->h);
+	map_prop_set_or_add(map, "size", map->sizestring);
+	
+	map_prop_set_or_add(map, "name", d_map_prop(map->map->prop, "name"));
+	map_prop_set_or_add(map, "version", d_map_prop(map->map->prop, "version"));
+	map_prop_set_or_add(map, "author", d_map_prop(map->map->prop, "author"));
+	map_prop_set_or_add(map, "max_players", d_map_prop(map->map->prop, "max_players"));
+	return map;
+}
+
 MAP *map_close(MAP *map) {
 	MAP_PROPERTY *p;
 	d_map_unload(map->map);
@@ -122,6 +170,16 @@ void map_prop_set_or_add(MAP *map, const char *key, const char *value) {
 	(*p)->key=key;
 	(*p)->value=value;
 	(*p)->next=NULL;
+}
+
+const char *map_prop_get(MAP *map, const char *key) {
+	MAP_PROPERTY *p;
+	if(!map)
+		return NULL;
+	for(p=map->stringtable; p; p=p->next)
+		if(!strcmp(p->key, key))
+			return p->value;
+	return NULL;
 }
 
 void map_save(MAP *map, const char *filename) {

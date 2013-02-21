@@ -123,6 +123,7 @@ void ui_entry_set_prop(UI_WIDGET *widget, int prop, UI_PROPERTY_VALUE value) {
 	switch(prop) {
 		case UI_ENTRY_PROP_TEXT:
 			strncpy(p->text, value.p, UI_ENTRY_LENGTH);
+			p->text[UI_ENTRY_LENGTH-1]=0;
 			p->offset=p->text;
 			for(; (tw=d_font_string_w(p->font, p->offset))>widget->w-4; p->offset++);
 			p->cursor_pos=strlen(p->text);

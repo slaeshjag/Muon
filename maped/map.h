@@ -20,7 +20,7 @@
 #ifndef MAPED_MAP_H
 #define MAPED_MAP_H
 
- #include <stdint.h>
+#include <stdint.h>
  
 #define LDI_MAGIC 0x83B3661B
 #define LDI_VERSION 0xBBA77ABC
@@ -100,8 +100,10 @@ typedef struct {
 MAP *map;
 
 MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layers, DARNIT_TILESHEET *ts);
+MAP *map_load(const char *filename);
 MAP *map_close(MAP *map);
 void map_prop_set_or_add(MAP *map, const char *key, const char *value);
+const char *map_prop_get(MAP *map, const char *key);
 void map_save(MAP *map, const char *filename);
 
 #endif
