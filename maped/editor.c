@@ -49,7 +49,17 @@ static const char *building_text[]={
 	"Radar",
 };
 
+enum TERRAIN_TOOL {
+	TERRAIN_TOOL_NONE=-1,
+	TERRAIN_TOOL_BRUSH,
+	TERRAIN_TOOL_BUCKET,
+	TERRAIN_TOOL_RECTANGLE,
+	TERRAIN_TOOLS,
+};
+
 static int building_place=-1;
+static enum TERRAIN_TOOL terrain_tool=TERRAIN_TOOL_NONE;
+static int terrain_tile=0;
 
 void editor_init() {
 	int i;
@@ -78,6 +88,9 @@ void editor_init() {
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LABEL]=ui_widget_create_label(font_std, "Terrain");
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LABEL_LAYERS]=ui_widget_create_label(font_std, "Layers");
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]=ui_widget_create_listbox(font_std);
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH]=ui_widget_create_button_text(font_std, "Brush");
+	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; i<EDITOR_SIDEBAR_TERRAIN_WIDGETS; i++)
+		editor.sidebar.terrain[i]->event_handler->add(editor.sidebar.terrain[i], editor_sidebar_terrain_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
 	/*Buildings tab*/
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LABEL]=ui_widget_create_label(font_std, "Buildings");
@@ -116,7 +129,7 @@ void editor_init() {
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
 	UI_PROPERTY_VALUE v;
-	v.i=building_place=-1;
+	v.i=building_place=terrain_tool=-1;
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->set_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], UI_LISTBOX_PROP_SELECTED, v);
 	ui_widget_destroy(editor.sidebar.pane->root_widget);
 	ui_pane_set_root_widget(editor.sidebar.pane, ui_widget_create_vbox());
@@ -173,6 +186,10 @@ void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_E
 	}
 }
 
+void editor_sidebar_terrain_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	terrain_tool=TERRAIN_TOOL_BRUSH;
+}
+
 void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
 	UI_PROPERTY_VALUE v;
@@ -220,25 +237,66 @@ void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 }
 
 void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
 	//Make sure there is no pane in the way
 	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH||e->mouse->y<32)
 		return;
 	
-	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT) {
-		UI_PROPERTY_VALUE v;
+	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_RIGHT&&type==UI_EVENT_TYPE_MOUSE_PRESS) {
 		v.i=building_place=-1;
-		editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->set_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], UI_LISTBOX_PROP_SELECTED, v);
-		
+		editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->set_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], UI_LISTBOX_PROP_SELECTED, v);	
+		terrain_tool=TERRAIN_TOOL_NONE;
 	} else if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
 		int map_offset=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h)*map->map->layer->tilemap->w+((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w)%map->map->layer->tilemap->w;
 		if(map_offset<0||map_offset>map->map->layer->tilemap->w*map->map->layer->tilemap->h)
 			return;
-		if(building_place>-1&&map->map->layer[map->map->layers-2].tilemap->data[map_offset]!=building_place) {
+		if(type==UI_EVENT_TYPE_MOUSE_PRESS&&building_place>-1&&map->map->layer[map->map->layers-2].tilemap->data[map_offset]!=building_place) {
 			map->map->layer[map->map->layers-2].tilemap->data[map_offset]=building_place;
 			d_tilemap_recalc(map->map->layer[map->map->layers-2].tilemap);
+		} else if(terrain_tool>TERRAIN_TOOL_NONE) {
+			int layer;
+			v=editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]->get_prop(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS], UI_LISTBOX_PROP_SELECTED);
+			layer=v.i>0&&v.i<map->map->layers?v.i:0;
+			switch(terrain_tool) {
+				case TERRAIN_TOOL_BRUSH:
+					if(map->map->layer[layer].tilemap->data[map_offset]!=terrain_tile) {
+						map->map->layer[layer].tilemap->data[map_offset]=terrain_tile;
+						d_tilemap_recalc(map->map->layer[layer].tilemap);
+					}
+					break;
+				default:
+					break;
+			}
 		}
 	}
 }
+
+/*void editor_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	UI_PROPERTY_VALUE v;
+	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH||e->mouse->y<32)
+		return;
+	
+	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
+		int map_offset=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h)*map->map->layer->tilemap->w+((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w)%map->map->layer->tilemap->w;
+		if(map_offset<0||map_offset>map->map->layer->tilemap->w*map->map->layer->tilemap->h)
+			return;
+		if(terrain_tool>TERRAIN_TOOL_NONE) {
+			int layer;
+			v=editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]->get_prop(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS], UI_LISTBOX_PROP_SELECTED);
+			layer=v.i>0&&v.i<map->map->layers?v.i:0;
+			switch(terrain_tool) {
+				case TERRAIN_TOOL_BRUSH:
+					if(map->map->layer[layer].tilemap->data[map_offset]!=terrain_tile) {
+						map->map->layer[layer].tilemap->data[map_offset]=terrain_tile;
+						d_tilemap_recalc(map->map->layer[layer].tilemap);
+					}
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}*/
 
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	editor_mouse_move(widget, type, e);

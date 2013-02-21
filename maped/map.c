@@ -345,3 +345,29 @@ void map_save(MAP *map, const char *filename) {
 	}
 	
 }
+
+#if 0
+void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h) {
+	//This is really slow and retarded, but it works
+	int x, y;
+	DARNIT_TILEMAP *building_tilemap=map->layer[map->layers-2].tilemap;
+	DARNIT_TILEMAP *fow_tilemap=map->layer[map->layers-1].tilemap;
+	for(y=0; y<(h); y++)
+		for(x=0; x<(h); x++) {
+			int index=(y*(fow_tilemap->h)/(h))*(fow_tilemap->w)+(x*(fow_tilemap->w))/(w);
+			minimap_data[y*(w)+x]=minimap_color[((fow_tilemap->data[index]&0xFFF)!=1||!show_fow)*(((map->layer[map->layers-2].tilemap->data[index]&(1<<17))==0)?MINIMAP_COLOR_TERRAIN:MINIMAP_COLOR_PLASMA)];
+		}
+	
+	for(y=0; y<building_tilemap->h; y++)
+		for(x=0; x<building_tilemap->w; x++)
+			if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==5)
+				minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_color[MINIMAP_COLOR_CONTROLPOINT];
+			else if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)>0) {
+				int i=((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/tilesx-1;
+				unsigned int c=player_color[i].r|(player_color[i].g<<8)|(player_color[i].b<<16);
+				minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=c;
+			}
+	
+	d_render_tilesheet_update(ts, 0, 0, w, h, minimap_data);
+}
+#endif
