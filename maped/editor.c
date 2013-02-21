@@ -89,6 +89,7 @@ void editor_init() {
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LABEL_LAYERS]=ui_widget_create_label(font_std, "Layers");
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]=ui_widget_create_listbox(font_std);
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH]=ui_widget_create_button_text(font_std, "Brush");
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_BUCKET]=ui_widget_create_button_text(font_std, "Bucket");
 	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; i<EDITOR_SIDEBAR_TERRAIN_WIDGETS; i++)
 		editor.sidebar.terrain[i]->event_handler->add(editor.sidebar.terrain[i], editor_sidebar_terrain_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	
@@ -125,6 +126,23 @@ void editor_init() {
 	state[STATE_EDITOR].panelist->next->next=NULL;
 	state[STATE_EDITOR].render=editor_render;
 }
+
+/*Editor functions*/
+
+void editor_floodfill(DARNIT_TILEMAP *tilemap, int x, int y, unsigned int tile) {
+	tilemap->data[y*tilemap->w+x]=tile;
+	
+	if(x>0&&tilemap->data[y*tilemap->w+(x-1)]!=tile)
+		editor_floodfill(tilemap, x-1, y, tile);
+	if(x<tilemap->w-1&&tilemap->data[y*tilemap->w+(x+1)]!=tile)
+		editor_floodfill(tilemap, x+1, y, tile);
+	if(y>0&&tilemap->data[(y-1)*tilemap->w+x]!=tile)
+		editor_floodfill(tilemap, x, y-1, tile);
+	if(y<tilemap->h-1&&tilemap->data[(y+1)*tilemap->w+x]!=tile)
+		editor_floodfill(tilemap, x, y+1, tile);
+}
+
+/*Editor events*/
 
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
@@ -187,7 +205,9 @@ void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_E
 }
 
 void editor_sidebar_terrain_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	terrain_tool=TERRAIN_TOOL_BRUSH;
+	int i;
+	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; widget!=editor.sidebar.terrain[i]; i++);
+	terrain_tool=i-EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH;
 }
 
 void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -264,6 +284,14 @@ void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 						d_tilemap_recalc(map->map->layer[layer].tilemap);
 					}
 					break;
+				case TERRAIN_TOOL_BUCKET:
+					if(type==UI_EVENT_TYPE_MOUSE_PRESS) {
+						int x=((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w);
+						int y=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h);
+						editor_floodfill(map->map->layer[layer].tilemap, x, y, terrain_tile);
+						d_tilemap_recalc(map->map->layer[layer].tilemap);
+					}
+					break;
 				default:
 					break;
 			}
@@ -297,6 +325,8 @@ void editor_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		}
 	}
 }*/
+
+/*Render functions*/
 
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	editor_mouse_move(widget, type, e);
