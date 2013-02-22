@@ -31,6 +31,12 @@
 						</File>
 					</Component>
 					
+					<Component Id="MAPEDBIN" DiskId="1" Guid="5C4500B3-41BA-45EE-A56A-5E241E4EBCF4">
+						<File Id="MUON_MAPED.EXE" Name="muon-maped.exe" Source="build\muon-maped.exe">
+							<Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Muon map editor" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+						</File>
+					</Component>
+					
 					<Directory Id="MAPS" Name="maps">
 						<Component Id="MAPS" DiskId="1" Guid="33A49397-EC64-45A9-BD2B-8368DEFC2B2A">
 							<File Id="TWIRLY_0.1__2_.LDI" Name="Twirly 0.1 (2).ldi" Source="build\maps\Twirly 0.1 (2).ldi" />
@@ -91,6 +97,9 @@
 			<ComponentRef Id="RegistryEntries" />
 			<Feature Id="Maps" Level="2" Title="Maps" Description="Standard map pack with a variety of different maps">
 				<ComponentRef Id="MAPS" />
+			</Feature>
+			<Feature Id="Maped" Level="2" Title="Map editor" Description="Map editor for Muon ldi-maps">
+				<ComponentRef Id="MAPEDBIN" />
 			</Feature>
 			<Feature Id="Server" Level="1" Title="Server" Description="Dedicated server for muon">
 				<ComponentRef Id="SERVERBIN" />
