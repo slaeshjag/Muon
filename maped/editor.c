@@ -25,6 +25,8 @@
 
 static const char *topbar_button_text[EDITOR_TOPBAR_BUTTONS]={
 	"Menu",
+	"Mirror X",
+	"Mirror Y",
 	"Terrain",
 	"Buildings",
 	"Properties"
@@ -74,13 +76,21 @@ void editor_init() {
 	int i;
 	editor.topbar.pane=ui_pane_create(0, 0, platform.screen_w, 32, ui_widget_create_hbox());
 	//editor.topbar.pane->background_color.r=editor.topbar.pane->background_color.g=editor.topbar.pane->background_color.b=0xCD;
-
-	for(i=0; i<EDITOR_TOPBAR_BUTTONS; i++) {
+	
+	editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU]=ui_widget_create_button_text(font_std, topbar_button_text[EDITOR_TOPBAR_BUTTON_MENU]);
+	editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU]->event_handler->add(editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU], editor_topbar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	ui_hbox_add_child(editor.topbar.pane->root_widget, editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU], 0);
+	ui_hbox_add_child(editor.topbar.pane->root_widget, ui_widget_create_spacer(), 1);
+	
+	ui_hbox_add_child(editor.topbar.pane->root_widget, editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX]=ui_widget_create_checkbox(), 0);
+	ui_hbox_add_child(editor.topbar.pane->root_widget, ui_widget_create_label(font_std, topbar_button_text[EDITOR_TOPBAR_CHECKBOX_MIRRORX]), 0);
+	ui_hbox_add_child(editor.topbar.pane->root_widget, editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY]=ui_widget_create_checkbox(), 0);
+	ui_hbox_add_child(editor.topbar.pane->root_widget, ui_widget_create_label(font_std, topbar_button_text[EDITOR_TOPBAR_CHECKBOX_MIRRORY]), 0);
+	
+	for(i=EDITOR_TOPBAR_BUTTON_TERRAIN; i<EDITOR_TOPBAR_BUTTONS; i++) {
 		editor.topbar.button[i]=ui_widget_create_button_text(font_std, topbar_button_text[i]);
 		editor.topbar.button[i]->event_handler->add(editor.topbar.button[i], editor_topbar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
-		ui_vbox_add_child(editor.topbar.pane->root_widget, editor.topbar.button[i], 0);
-		if(i==0)
-			ui_vbox_add_child(editor.topbar.pane->root_widget, ui_widget_create_spacer(), 1);
+		ui_hbox_add_child(editor.topbar.pane->root_widget, editor.topbar.button[i], 0);
 	}
 	
 	editor.sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 32, SIDEBAR_WIDTH, platform.screen_h-32, ui_widget_create_vbox());
@@ -100,8 +110,10 @@ void editor_init() {
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH]=ui_widget_create_button_text(font_std, "Brush");
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_BUCKET]=ui_widget_create_button_text(font_std, "Bucket");
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_RECTANGLE]=ui_widget_create_button_text(font_std, "Rectangle");
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_SPACER]=ui_widget_create_spacer_size(1, 16);
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_PALETTE]=ui_widget_create_button_text(font_std, "Tile palette");
 	
-	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; i<EDITOR_SIDEBAR_TERRAIN_WIDGETS; i++)
+	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; i<=EDITOR_SIDEBAR_TERRAIN_BUTTON_RECTANGLE; i++)
 		editor.sidebar.terrain[i]->event_handler->add(editor.sidebar.terrain[i], editor_sidebar_terrain_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 		
 	terrain_rectangle=d_render_rect_new(1);
@@ -285,8 +297,11 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			tilemap=map->map->layer[layer].tilemap;
 			for(y=terrain_rectange_coords.y1; y<terrain_rectange_coords.y2; y++)
 				for(x=terrain_rectange_coords.x1; x<terrain_rectange_coords.x2; x++)
-					if(x>=0&&y>=0)
-						tilemap->data[y*tilemap->w+x]=terrain_tile;
+					map_tile_set(map->map->layer[layer].tilemap, x ,y,
+						(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX], UI_CHECKBOX_PROP_ACTIVATED)).i,
+						(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY], UI_CHECKBOX_PROP_ACTIVATED)).i,
+						terrain_tile
+					);
 			
 			
 			d_tilemap_recalc(tilemap);
@@ -315,10 +330,12 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			layer=v.i>0&&v.i<map->map->layers?v.i:0;
 			switch(terrain_tool) {
 				case TERRAIN_TOOL_BRUSH:
-					if(map->map->layer[layer].tilemap->data[map_offset]!=terrain_tile) {
-						map->map->layer[layer].tilemap->data[map_offset]=terrain_tile;
-						d_tilemap_recalc(map->map->layer[layer].tilemap);
-					}
+					map_tile_set(map->map->layer[layer].tilemap, x ,y,
+						(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX], UI_CHECKBOX_PROP_ACTIVATED)).i,
+						(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY], UI_CHECKBOX_PROP_ACTIVATED)).i,
+						terrain_tile
+					);
+					d_tilemap_recalc(map->map->layer[layer].tilemap);
 					break;
 				case TERRAIN_TOOL_BUCKET:
 					if(type==UI_EVENT_TYPE_MOUSE_PRESS) {

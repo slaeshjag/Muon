@@ -106,4 +106,6 @@ void map_prop_set_or_add(MAP *map, const char *key, const char *value);
 const char *map_prop_get(MAP *map, const char *key);
 void map_save(MAP *map, const char *filename);
 
+void map_tile_set(DARNIT_TILEMAP *tilemap, int x, int y, int mirrorx, int mirrory, unsigned int tile);
+
 #endif

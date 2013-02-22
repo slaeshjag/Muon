@@ -346,6 +346,18 @@ void map_save(MAP *map, const char *filename) {
 	
 }
 
+void map_tile_set(DARNIT_TILEMAP *tilemap, int x, int y, int mirrorx, int mirrory, unsigned int tile) {
+	if(x<0||y<0||x>=tilemap->w||y>=tilemap->h)
+		return;
+	tilemap->data[y*tilemap->w+x]=tile;
+	if(mirrorx)
+		tilemap->data[y*tilemap->w+abs(tilemap->w-1-x)]=tile;
+	if(mirrory)
+		tilemap->data[abs(tilemap->h-1-y)*tilemap->w+x]=tile;
+	if(mirrorx&&mirrory)
+		tilemap->data[abs(tilemap->h-1-y)*tilemap->w+abs(tilemap->w-1-x)]=tile;
+}
+
 #if 0
 void map_minimap_update(DARNIT_TILESHEET *ts, int w, int h) {
 	//This is really slow and retarded, but it works
