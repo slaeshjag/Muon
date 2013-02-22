@@ -252,6 +252,7 @@ void editor_reload() {
 	d_render_line_move(map_border, 2, 0, 0, 0, map->h);
 	d_render_line_move(map_border, 3, map->w, 0, map->w, map->h);
 	editor_minimap_update();
+	editor_minimap_update_viewport();
 }
 
 void editor_palette_update(DARNIT_TILESHEET *ts) {
@@ -323,7 +324,29 @@ void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 	}
 }
 
+void editor_minimap_update_viewport() {
+	int x=editor.sidebar.minimap->w*map->map->cam_x/map->w+editor.sidebar.minimap->x;
+	int y=editor.sidebar.minimap->h*(map->map->cam_y+32)/map->h+editor.sidebar.minimap->y;
+	int w=editor.sidebar.minimap->w*(platform.screen_w-SIDEBAR_WIDTH)/map->w;
+	int h=editor.sidebar.minimap->h*(platform.screen_h-32)/map->h;
+	int x1=MAX(x, editor.sidebar.minimap->x);
+	int x2=MIN(x+w, editor.sidebar.minimap->x+editor.sidebar.minimap->w);
+	int y1=MAX(y, editor.sidebar.minimap->y);
+	int y2=MIN(y+h, editor.sidebar.minimap->y+editor.sidebar.minimap->h);
+	d_render_line_move(minimap_viewport, 0, x1, y1, x2, y1);
+	d_render_line_move(minimap_viewport, 1, x1, y2, x2, y2);
+	d_render_line_move(minimap_viewport, 2, x1, y1, x1, y2);
+	d_render_line_move(minimap_viewport, 3, x2, y1, x2, y2);
+}
+
 void editor_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int x=(map->w*(e->mouse->x-widget->x)/widget->w);
+	int y=(map->h*(e->mouse->y-widget->y)/widget->h);
+	x-=(platform.screen_w-SIDEBAR_WIDTH)/2;
+	y-=(platform.screen_h-32)/2;
+	
+	d_map_camera_move(map->map, x, y+16);
+	editor_minimap_update_viewport();
 	
 }
 
@@ -462,7 +485,7 @@ void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		return;
 	
 	d_map_camera_move(map->map, map->map->cam_x+scroll_x, map->map->cam_y+scroll_y);
-	/*map_minimap_update_viewport();*/
+	editor_minimap_update_viewport();
 }
 
 void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
