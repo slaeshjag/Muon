@@ -87,7 +87,7 @@ void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	switch(i) {
 		case MENU_BUTTON_NEW:
 			map=map_new(32, 32, 1, d_render_tilesheet_load("res/default.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
-			editor_palette_update(map->map->layer->ts);
+			editor_reload();
 			state_set(STATE_EDITOR);
 			break;
 		case MENU_BUTTON_LOAD:
@@ -119,7 +119,7 @@ void load_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			if((v.p=(void *) map_prop_get(map, "max_players")))
 				if((v.i=atoi(v.p)-1)>=0)
 					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS], UI_SLIDER_PROP_VALUE, v);
-			editor_palette_update(map->map->layer->ts);
+			editor_reload();
 			state_set(STATE_EDITOR);
 			return;
 		}

@@ -97,6 +97,7 @@ struct {
 void editor_init();
 
 void editor_floodfill(DARNIT_TILEMAP *tilemap, int x, int y, unsigned int tile);
+void editor_reload();
 void editor_palette_update(DARNIT_TILESHEET *ts);
 
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);

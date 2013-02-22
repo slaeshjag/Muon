@@ -75,6 +75,8 @@ DARNIT_RECT *terrain_rectangle;
 DARNIT_MAP *terrain_palette=NULL;
 DARNIT_LINE *terrain_palette_selected;
 
+DARNIT_LINE *map_border;
+
 void editor_init() {
 	int i;
 	editor.topbar.pane=ui_pane_create(0, 0, platform.screen_w, 32, ui_widget_create_hbox());
@@ -159,6 +161,10 @@ void editor_init() {
 	editor.palette.palette->render=editor_palette_render;
 	editor.palette.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH-128, platform.screen_h/2-64, 128, 128, editor.palette.palette);
 	
+	map_border=d_render_line_new(4, 1);
+	for(i=0; i<4; i++)
+		d_render_line_move(map_border, i, 0, 0, 20, 20);
+	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->pane=editor.topbar.pane;
@@ -180,6 +186,14 @@ void editor_floodfill(DARNIT_TILEMAP *tilemap, int x, int y, unsigned int tile) 
 		editor_floodfill(tilemap, x, y-1, tile);
 	if(y<tilemap->h-1&&tilemap->data[(y+1)*tilemap->w+x]!=tile)
 		editor_floodfill(tilemap, x, y+1, tile);
+}
+
+void editor_reload() {
+	editor_palette_update(map->map->layer->ts);
+	d_render_line_move(map_border, 0, 0, 0, map->w, 0);
+	d_render_line_move(map_border, 1, 0, map->h, map->w, map->h);
+	d_render_line_move(map_border, 2, 0, 0, 0, map->h);
+	d_render_line_move(map_border, 3, map->w, 0, map->w, map->h);
 }
 
 void editor_palette_update(DARNIT_TILESHEET *ts) {
@@ -475,13 +489,17 @@ void editor_render() {
 	int i;
 	for(i=0; i<map->map->layers-1; i++)
 		d_tilemap_draw(map->map->layer[i].tilemap);
+	
+	d_render_offset(map->map->cam_x, map->map->cam_y);
+	d_render_line_draw(map_border, 4);
+	
 	if(terrain_tool==TERRAIN_TOOL_RECTANGLE) {
 		d_render_tint(255, 255, 255, 127);
 		d_render_blend_enable();
 		d_render_offset(map->map->cam_x, map->map->cam_y);
 		d_render_rect_draw(terrain_rectangle, 1);
-		d_render_offset(0, 0);
 		d_render_blend_disable();
 		d_render_tint(255, 255, 255, 255);
 	}
+	d_render_offset(0, 0);
 }
