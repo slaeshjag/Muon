@@ -163,7 +163,7 @@ void editor_init() {
 	
 	map_border=d_render_line_new(4, 1);
 	for(i=0; i<4; i++)
-		d_render_line_move(map_border, i, 0, 0, 20, 20);
+		d_render_line_move(map_border, i, 0, 0, 0, 0);
 	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
@@ -410,7 +410,14 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		if(map_offset<0||map_offset>map->map->layer->tilemap->w*map->map->layer->tilemap->h)
 			return;
 		if(type==UI_EVENT_TYPE_MOUSE_PRESS&&building_place>-1&&map->map->layer[map->map->layers-2].tilemap->data[map_offset]!=building_place) {
-			map->map->layer[map->map->layers-2].tilemap->data[map_offset]=building_place;
+			//map->map->layer[map->map->layers-2].tilemap->data[map_offset]=building_place;
+			int x=((e->mouse->x+map->map->cam_x)/map->map->layer[map->map->layers-2].tile_w);
+			int y=((e->mouse->y+map->map->cam_y)/map->map->layer[map->map->layers-2].tile_h);
+			map_tile_set(map->map->layer[map->map->layers-2].tilemap, x, y,
+				(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX], UI_CHECKBOX_PROP_ACTIVATED)).i,
+				(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY], UI_CHECKBOX_PROP_ACTIVATED)).i,
+				building_place
+			);
 			d_tilemap_recalc(map->map->layer[map->map->layers-2].tilemap);
 		} else if(terrain_tool>TERRAIN_TOOL_NONE) {
 			int layer;
