@@ -43,6 +43,24 @@ void menu_init() {
 		ui_vbox_add_child(state[STATE_MENU].panelist->pane->root_widget, menu_button[i], 0);
 	}
 	
+	state[STATE_NEW].panelist=malloc(sizeof(struct UI_PANE_LIST));
+	state[STATE_NEW].panelist->next=NULL;
+	state[STATE_NEW].panelist->pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-80, 256, 160, ui_widget_create_vbox());
+	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.label=ui_widget_create_label(font_std, "New map"), 0);
+	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.label_w=ui_widget_create_label(font_std, "Width"), 0);
+	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.entry_w=ui_widget_create_entry(font_std), 0);
+	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.label_h=ui_widget_create_label(font_std, "Height"), 0);
+	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.entry_h=ui_widget_create_entry(font_std), 0);
+	new.hbox=ui_widget_create_hbox();
+	new.button[NEW_BUTTON_CANCEL]=ui_widget_create_button_text(font_std, "Cancel");
+	new.button[NEW_BUTTON_NEW]=ui_widget_create_button_text(font_std, "New");
+	ui_hbox_add_child(new.hbox, ui_widget_create_spacer(), 1);
+	for(i=0; i<NEW_BUTTONS; i++) {
+		ui_hbox_add_child(new.hbox, new.button[i], 0);
+		new.button[i]->event_handler->add(new.button[i], new_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	}
+	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.hbox, 0);
+	
 	state[STATE_LOAD].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_LOAD].panelist->next=NULL;
 	state[STATE_LOAD].panelist->pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, ui_widget_create_vbox());
@@ -86,9 +104,7 @@ void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	for(i=0; widget!=menu_button[i]; i++);
 	switch(i) {
 		case MENU_BUTTON_NEW:
-			map=map_new(32, 32, 1, d_render_tilesheet_load("res/default.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
-			editor_reload();
-			state_set(STATE_EDITOR);
+			state_set(STATE_NEW);
 			break;
 		case MENU_BUTTON_LOAD:
 			load_maplist_reload();
@@ -98,6 +114,21 @@ void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			state_set(STATE_QUIT);
 			break;
 	}
+}
+
+void new_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	if(widget==new.button[NEW_BUTTON_NEW]) {
+		int w, h;
+		w=atoi((new.entry_w->get_prop(new.entry_w, UI_ENTRY_PROP_TEXT)).p);
+		h=atoi((new.entry_h->get_prop(new.entry_h, UI_ENTRY_PROP_TEXT)).p);
+		if(w<=0||h<=0)
+			return;
+		map=map_new(w, h, 1, d_render_tilesheet_load("res/default.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+		editor_reload();
+		state_set(STATE_EDITOR);
+		return;
+	}
+	state_set(STATE_MENU);
 }
 
 void load_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

@@ -347,7 +347,6 @@ void editor_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_
 	
 	d_map_camera_move(map->map, x, y+16);
 	editor_minimap_update_viewport();
-	
 }
 
 void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {

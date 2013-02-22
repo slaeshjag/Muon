@@ -33,6 +33,12 @@ enum {
 	LOAD_BUTTONS,
 };
 
+enum {
+	NEW_BUTTON_CANCEL,
+	NEW_BUTTON_NEW,
+	NEW_BUTTONS,
+};
+
 UI_WIDGET *menu_button[MENU_BUTTONS];
 
 struct {
@@ -42,9 +48,20 @@ struct {
 	UI_WIDGET *button[LOAD_BUTTONS];
 } load;
 
+struct {
+	UI_WIDGET *label;
+	UI_WIDGET *label_w;
+	UI_WIDGET *entry_w;
+	UI_WIDGET *label_h;
+	UI_WIDGET *entry_h;
+	UI_WIDGET *hbox;
+	UI_WIDGET *button[NEW_BUTTONS];
+} new;
+
 void menu_init();
 void load_maplist_reload();
 void menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void new_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void load_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 #endif

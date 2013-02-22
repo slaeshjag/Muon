@@ -37,6 +37,7 @@ static const unsigned char ldimagic[]={0x83, 0xB3, 0x66, 0x1B, 0xBB, 0xA7, 0x7A,
 
 enum STATE {
 	STATE_MENU,
+	STATE_NEW,
 	STATE_LOAD,
 	STATE_EDITOR,
 	STATE_QUIT,
