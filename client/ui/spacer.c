@@ -27,11 +27,21 @@ UI_WIDGET *ui_widget_create_spacer() {
 		free(widget);
 		return NULL;
 	}
+	
+	if((widget->event_handler=malloc(sizeof(UI_EVENT_HANDLER)))==NULL) {
+		free(widget->properties);
+		free(widget);
+		return NULL;
+	}
+	widget->event_handler->handlers=NULL;
+	widget->event_handler->add=ui_event_add;
+	widget->event_handler->remove=ui_event_remove;
+	widget->event_handler->send=ui_event_send;
+	
 	struct UI_SPACER_PROPERTIES *p=widget->properties;
 	p->set_w=0;
 	p->set_h=0;
 	
-	widget->event_handler=NULL;
 	widget->destroy=ui_widget_destroy;
 	widget->set_prop=ui_spacer_set_prop;
 	widget->get_prop=ui_spacer_get_prop;

@@ -72,6 +72,8 @@ struct {
 
 DARNIT_RECT *terrain_rectangle;
 
+DARNIT_MAP *terrain_palette=NULL;
+
 void editor_init() {
 	int i;
 	editor.topbar.pane=ui_pane_create(0, 0, platform.screen_w, 32, ui_widget_create_hbox());
@@ -112,9 +114,12 @@ void editor_init() {
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_RECTANGLE]=ui_widget_create_button_text(font_std, "Rectangle");
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_SPACER]=ui_widget_create_spacer_size(1, 16);
 	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_PALETTE]=ui_widget_create_button_text(font_std, "Tile palette");
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_ERASER]=ui_widget_create_button_text(font_std, "Tile 0 (erase)");
 	
 	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; i<=EDITOR_SIDEBAR_TERRAIN_BUTTON_RECTANGLE; i++)
 		editor.sidebar.terrain[i]->event_handler->add(editor.sidebar.terrain[i], editor_sidebar_terrain_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_PALETTE]->event_handler->add(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_PALETTE], editor_sidebar_terrain_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
+	editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_ERASER]->event_handler->add(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_ERASER], editor_sidebar_terrain_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 		
 	terrain_rectangle=d_render_rect_new(1);
 	d_render_rect_move(terrain_rectangle, 0, 0, 0, 0, 0);
@@ -143,7 +148,12 @@ void editor_init() {
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]=ui_widget_create_slider(4);
 	
 	for(i=0; i<EDITOR_SIDEBAR_PROPERTIES_WIDGETS; i++)
-			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.properties[i], 0);
+		ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.properties[i], 0);
+	
+	editor.palette.palette=ui_widget_create_spacer();
+	editor.palette.palette->event_handler->add(editor.palette.palette, editor_palette_click, UI_EVENT_TYPE_MOUSE_PRESS);
+	editor.palette.palette->render=editor_palette_render;
+	editor.palette.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH-128, platform.screen_h/2-64, 128, 128, editor.palette.palette);
 	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
@@ -166,6 +176,19 @@ void editor_floodfill(DARNIT_TILEMAP *tilemap, int x, int y, unsigned int tile) 
 		editor_floodfill(tilemap, x, y-1, tile);
 	if(y<tilemap->h-1&&tilemap->data[(y+1)*tilemap->w+x]!=tile)
 		editor_floodfill(tilemap, x, y+1, tile);
+}
+
+void editor_palette_update(DARNIT_TILESHEET *ts) {
+	int i, w, h, hh, tile_w, tile_h;
+	d_render_tilesheet_geometrics(ts, &w, &h, &tile_w, &tile_h);
+	hh=h-tile_h*9;
+	ui_pane_resize(editor.palette.pane, platform.screen_w-SIDEBAR_WIDTH-w-UI_PADDING*2, platform.screen_h/2-hh/2, w+UI_PADDING*2, hh+UI_PADDING*2);
+	terrain_palette=map_new_palette(w/tile_w, hh/tile_h, ts);
+	for(i=0; i<w/tile_w*((h)/tile_h-9); i++) {
+		terrain_palette->layer->tilemap->data[i]=i+(w/tile_w)*9;
+	}
+	d_map_camera_move(terrain_palette, -editor.palette.palette->x, -editor.palette.palette->y);
+	d_tilemap_recalc(terrain_palette->layer->tilemap);
 }
 
 /*Editor events*/
@@ -232,6 +255,21 @@ void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_E
 
 void editor_sidebar_terrain_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int i;
+	if(widget==editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_PALETTE]) {
+		if(state[STATE_EDITOR].panelist->next->next) {
+			free(state[STATE_EDITOR].panelist->next->next);
+			state[STATE_EDITOR].panelist->next->next=NULL;
+		} else {
+			state[STATE_EDITOR].panelist->next->next=malloc(sizeof(struct UI_PANE_LIST));
+			state[STATE_EDITOR].panelist->next->next->pane=editor.palette.pane;
+			state[STATE_EDITOR].panelist->next->next->next=NULL;
+		}
+		return;
+	} else if(widget==editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_ERASER]) {
+		terrain_tile=0;
+		return;
+	}
+	
 	for(i=EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH; widget!=editor.sidebar.terrain[i]; i++);
 	terrain_tool=i-EDITOR_SIDEBAR_TERRAIN_BUTTON_BRUSH;
 }
@@ -262,6 +300,14 @@ void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned
 	building_place=building&&!v.i?5:v.i*16+building;
 }
 
+void editor_palette_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	int x, y;
+	x=(e->mouse->x-widget->x)/terrain_palette->layer->tile_w;
+	y=(e->mouse->y-widget->y)/terrain_palette->layer->tile_h;
+	y+=9;
+	terrain_tile=y*terrain_palette->layer->tilemap->w+x;
+}
+
 void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
@@ -287,6 +333,8 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	//Make sure there is no pane in the way
 	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH||e->mouse->y<32)
 		return;
+	if(state[STATE_EDITOR].panelist->next->next&&PINR(e->mouse->x, e->mouse->y, editor.palette.pane->x, editor.palette.pane->y, editor.palette.pane->w, editor.palette.pane->h))
+		return;
 	
 	if(type==UI_EVENT_TYPE_MOUSE_RELEASE) {
 		if(!(e->mouse->buttons&~UI_EVENT_MOUSE_BUTTON_LEFT)&&terrain_tool==TERRAIN_TOOL_RECTANGLE) {
@@ -302,7 +350,6 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 						(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY], UI_CHECKBOX_PROP_ACTIVATED)).i,
 						terrain_tile
 					);
-			
 			
 			d_tilemap_recalc(tilemap);
 			terrain_rectange_coords.x1=terrain_rectange_coords.y1=terrain_rectange_coords.x2=terrain_rectange_coords.y2=0;
@@ -365,33 +412,6 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	}
 }
 
-/*void editor_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
-	UI_PROPERTY_VALUE v;
-	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH||e->mouse->y<32)
-		return;
-	
-	if(e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT) {
-		int map_offset=((e->mouse->y+map->map->cam_y)/map->map->layer->tile_h)*map->map->layer->tilemap->w+((e->mouse->x+map->map->cam_x)/map->map->layer->tile_w)%map->map->layer->tilemap->w;
-		if(map_offset<0||map_offset>map->map->layer->tilemap->w*map->map->layer->tilemap->h)
-			return;
-		if(terrain_tool>TERRAIN_TOOL_NONE) {
-			int layer;
-			v=editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]->get_prop(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS], UI_LISTBOX_PROP_SELECTED);
-			layer=v.i>0&&v.i<map->map->layers?v.i:0;
-			switch(terrain_tool) {
-				case TERRAIN_TOOL_BRUSH:
-					if(map->map->layer[layer].tilemap->data[map_offset]!=terrain_tile) {
-						map->map->layer[layer].tilemap->data[map_offset]=terrain_tile;
-						d_tilemap_recalc(map->map->layer[layer].tilemap);
-					}
-					break;
-				default:
-					break;
-			}
-		}
-	}
-}*/
-
 /*Render functions*/
 
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -410,6 +430,14 @@ void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		d_render_offset(0, 0);
 		d_render_tint(r, g, b, a);
 	}
+}
+
+void editor_palette_render(UI_WIDGET *widget) {
+	unsigned char r, g, b, a;
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
+	d_tilemap_draw(terrain_palette->layer->tilemap);
+	d_render_tint(r, g, b, a);
 }
 
 void editor_render() {

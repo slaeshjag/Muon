@@ -94,6 +94,48 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	return map;
 }
 
+DARNIT_MAP *map_new_palette(unsigned int width, unsigned int height, DARNIT_TILESHEET *ts) {
+	int i;
+	int tile_w, tile_h;
+	DARNIT_MAP *d_map=NULL;
+	DARNIT_MAP_LAYER *layer=NULL;
+	
+	if(!(ts&&(d_map=malloc(sizeof(DARNIT_MAP)))&&(layer=malloc(sizeof(DARNIT_MAP_LAYER))))) {
+		free(d_map);
+		free(layer);
+		return NULL;
+	}
+	
+	d_map->layer=layer;
+	*((unsigned int *) &d_map->layers)=1;
+	d_map->object=NULL;
+	*((unsigned int *) &d_map->objects)=0;
+	d_map->prop=NULL;
+	d_map->stringdata=NULL;
+	d_map->stringrefs=NULL;
+	
+	d_render_tilesheet_geometrics(ts, NULL, NULL, &tile_w, &tile_h);
+	
+		/*This is needed to at least null all tilemaps so we can free them i one fails*/
+	if(!(layer->tilemap=d_tilemap_new(0xFFF, ts, 0xFFF, width, height))) {
+		free(d_map);
+		free(layer);
+		return NULL;
+	}
+	for(i=0; i<width*height; i++)
+		layer->tilemap->data[i]=0;
+	d_tilemap_recalc(layer->tilemap);
+		
+	layer->ts=ts;
+	layer->offset_x=0;
+	layer->offset_y=0;
+	layer->tile_w=tile_w;
+	layer->tile_h=tile_h;
+	
+	d_map_camera_move(d_map, 0, 0);
+	return d_map;
+}
+
 MAP *map_load(const char *filename) {
 	MAP *map;
 	DARNIT_FILE *f_ts;

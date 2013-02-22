@@ -49,6 +49,7 @@ enum {
 	EDITOR_SIDEBAR_TERRAIN_BUTTON_RECTANGLE,
 	EDITOR_SIDEBAR_TERRAIN_SPACER,
 	EDITOR_SIDEBAR_TERRAIN_BUTTON_PALETTE,
+	EDITOR_SIDEBAR_TERRAIN_BUTTON_ERASER,
 	EDITOR_SIDEBAR_TERRAIN_WIDGETS,
 };
 
@@ -87,21 +88,28 @@ struct {
 		UI_WIDGET *buildings[EDITOR_SIDEBAR_BUILDINGS_WIDGETS];
 		UI_WIDGET *properties[EDITOR_SIDEBAR_PROPERTIES_WIDGETS];
 	} sidebar;
+	struct {
+		UI_PANE *pane;
+		UI_WIDGET *palette;
+	} palette;
 } editor;
 
 void editor_init();
 
 void editor_floodfill(DARNIT_TILEMAP *tilemap, int x, int y, unsigned int tile);
+void editor_palette_update(DARNIT_TILESHEET *ts);
 
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_terrain_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_building_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void editor_palette_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) ;
 void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void editor_palette_render(UI_WIDGET *widget);
 void editor_render();
 
 #endif

@@ -100,6 +100,7 @@ typedef struct {
 MAP *map;
 
 MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layers, DARNIT_TILESHEET *ts);
+DARNIT_MAP *map_new_palette(unsigned int width, unsigned int height, DARNIT_TILESHEET *ts);
 MAP *map_load(const char *filename);
 MAP *map_close(MAP *map);
 void map_prop_set_or_add(MAP *map, const char *key, const char *value);

@@ -44,6 +44,11 @@ void *ui_pane_destroy(UI_PANE *pane) {
 }
 
 void ui_pane_resize(UI_PANE *pane, int x, int y, int w, int h) {
+	pane->x=x;
+	pane->y=y;
+	pane->w=w;
+	pane->h=h;
+	
 	d_render_rect_move(pane->background, 0, x, y, x+w, y+h);
 	d_render_line_move(pane->border, 0, x, y, x+w, y);
 	d_render_line_move(pane->border, 1, x, y+h, x+w, y+h);
