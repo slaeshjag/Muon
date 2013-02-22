@@ -23,6 +23,9 @@
 #include "map.h"
 #include "editor.h"
 
+#define MIN(a, b) ((a)<(b)?(a):(b))
+#define MAX(a, b) ((a)>(b)?(a):(b))
+
 static const char *topbar_button_text[EDITOR_TOPBAR_BUTTONS]={
 	"Menu",
 	"Mirror X",
@@ -386,8 +389,8 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			v=editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS]->get_prop(editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_LISTBOX_LAYERS], UI_LISTBOX_PROP_SELECTED);
 			layer=v.i>0&&v.i<map->map->layers?v.i:0;
 			tilemap=map->map->layer[layer].tilemap;
-			for(y=terrain_rectange_coords.y1; y<terrain_rectange_coords.y2; y++)
-				for(x=terrain_rectange_coords.x1; x<terrain_rectange_coords.x2; x++)
+			for(y=MIN(terrain_rectange_coords.y1, terrain_rectange_coords.y2); y<MAX(terrain_rectange_coords.y1, terrain_rectange_coords.y2); y++)
+				for(x=MIN(terrain_rectange_coords.x1, terrain_rectange_coords.x2); x<MAX(terrain_rectange_coords.x1, terrain_rectange_coords.x2); x++)
 					map_tile_set(map->map->layer[layer].tilemap, x ,y,
 						(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORX], UI_CHECKBOX_PROP_ACTIVATED)).i,
 						(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY]->get_prop(editor.topbar.button[EDITOR_TOPBAR_CHECKBOX_MIRRORY], UI_CHECKBOX_PROP_ACTIVATED)).i,
