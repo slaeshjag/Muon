@@ -83,6 +83,7 @@ struct {
 	} topbar;
 	struct {
 		UI_PANE *pane;
+		UI_WIDGET *minimap;
 		UI_WIDGET *menu[EDITOR_SIDEBAR_MENU_WIDGETS];
 		UI_WIDGET *terrain[EDITOR_SIDEBAR_TERRAIN_WIDGETS];
 		UI_WIDGET *buildings[EDITOR_SIDEBAR_BUILDINGS_WIDGETS];
@@ -99,8 +100,10 @@ void editor_init();
 void editor_floodfill(DARNIT_TILEMAP *tilemap, int x, int y, unsigned int tile);
 void editor_reload();
 void editor_palette_update(DARNIT_TILESHEET *ts);
+void editor_minimap_update();
 
 void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
+void editor_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_terrain_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_sidebar_buildings_listbox_player_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
@@ -111,6 +114,7 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e);
 void editor_palette_render(UI_WIDGET *widget);
+void editor_minimap_render(UI_WIDGET *widget);
 void editor_render();
 
 #endif

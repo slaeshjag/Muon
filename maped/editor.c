@@ -26,6 +26,38 @@
 #define MIN(a, b) ((a)<(b)?(a):(b))
 #define MAX(a, b) ((a)>(b)?(a):(b))
 
+enum MINIMAP_COLOR {
+	MINIMAP_COLOR_FOW,
+	MINIMAP_COLOR_TERRAIN,
+	MINIMAP_COLOR_CONTROLPOINT,
+	MINIMAP_COLOR_PLASMA,
+};
+
+static const unsigned int minimap_color[]={
+	0xFF7F7F7F,
+	0xFF165A73,
+	0xFFFFFF,
+	0xFF000030,
+};
+
+struct COLOR {
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+};
+
+static const struct COLOR player_color[]={
+	{255, 0, 0},
+	{0, 0, 255},
+	{0, 255, 0},
+	{255, 255, 0},
+	
+	{255, 0, 255},
+	{0, 255, 255},
+	{127, 127, 127},
+	{191, 127, 31},
+};
+
 static const char *topbar_button_text[EDITOR_TOPBAR_BUTTONS]={
 	"Menu",
 	"Mirror X",
@@ -80,6 +112,9 @@ DARNIT_LINE *terrain_palette_selected;
 
 DARNIT_LINE *map_border;
 
+unsigned int minimap_data[(SIDEBAR_WIDTH-UI_PADDING*2)*(SIDEBAR_WIDTH-UI_PADDING*2)];
+DARNIT_LINE *minimap_viewport;
+
 void editor_init() {
 	int i;
 	editor.topbar.pane=ui_pane_create(0, 0, platform.screen_w, 32, ui_widget_create_hbox());
@@ -103,6 +138,10 @@ void editor_init() {
 	
 	editor.sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 32, SIDEBAR_WIDTH, platform.screen_h-32, ui_widget_create_vbox());
 	//editor.sidebar.pane->background_color.r=editor.sidebar.pane->background_color.g=editor.sidebar.pane->background_color.b=0xCD;
+	
+	editor.sidebar.minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
+	editor.sidebar.minimap->render=editor_minimap_render;
+	editor.sidebar.minimap->event_handler->add(editor.sidebar.minimap, editor_sidebar_minimap_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
 	
 	/*Menu tab*/
 	editor.sidebar.menu[EDITOR_SIDEBAR_MENU_LABEL]=ui_widget_create_label(font_std, "Menu");
@@ -156,6 +195,7 @@ void editor_init() {
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_LABEL_PLAYERS]=ui_widget_create_label(font_std, "Max players");
 	editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]=ui_widget_create_slider(4);
 	
+	ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.minimap, 0);
 	for(i=0; i<EDITOR_SIDEBAR_PROPERTIES_WIDGETS; i++)
 		ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.properties[i], 0);
 	
@@ -168,6 +208,12 @@ void editor_init() {
 	for(i=0; i<4; i++)
 		d_render_line_move(map_border, i, 0, 0, 0, 0);
 	
+	minimap_viewport=d_render_line_new(4, 1);
+	for(i=0; i<4; i++)
+		d_render_line_move(minimap_viewport, i, 0, 0, 0, 0);
+	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
+		((unsigned int *)minimap_data)[i]=0;
+	
 	state[STATE_EDITOR].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->next=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_EDITOR].panelist->pane=editor.topbar.pane;
@@ -179,7 +225,15 @@ void editor_init() {
 /*Editor functions*/
 
 void editor_floodfill(DARNIT_TILEMAP *tilemap, int x, int y, unsigned int tile) {
+	int i;
 	tilemap->data[y*tilemap->w+x]=tile;
+	
+	map->map->layer[map->map->layers-2].tilemap->data[y*map->map->layer[map->map->layers-2].tilemap->w+x]|=(1<<17);
+	for(i=0; i<map->map->layers-2; i++)
+		if(map->map->layer[i].tilemap->data[y*map->map->layer[i].tilemap->w+x]) {
+			map->map->layer[map->map->layers-2].tilemap->data[y*map->map->layer[map->map->layers-2].tilemap->w+x]&=~(1<<17);
+			break;
+		}
 	
 	if(x>0&&tilemap->data[y*tilemap->w+(x-1)]!=tile)
 		editor_floodfill(tilemap, x-1, y, tile);
@@ -197,6 +251,7 @@ void editor_reload() {
 	d_render_line_move(map_border, 1, 0, map->h, map->w, map->h);
 	d_render_line_move(map_border, 2, 0, 0, 0, map->h);
 	d_render_line_move(map_border, 3, map->w, 0, map->w, map->h);
+	editor_minimap_update();
 }
 
 void editor_palette_update(DARNIT_TILESHEET *ts) {
@@ -205,11 +260,42 @@ void editor_palette_update(DARNIT_TILESHEET *ts) {
 	hh=h-tile_h*9;
 	ui_pane_resize(editor.palette.pane, platform.screen_w-SIDEBAR_WIDTH-w-UI_PADDING*2, platform.screen_h/2-hh/2, w+UI_PADDING*2, hh+UI_PADDING*2);
 	terrain_palette=map_new_palette(w/tile_w, hh/tile_h, ts);
-	for(i=0; i<w/tile_w*((h)/tile_h-9); i++) {
+	for(i=0; i<w/tile_w*((h)/tile_h-9); i++)
 		terrain_palette->layer->tilemap->data[i]=i+(w/tile_w)*9;
-	}
+	
 	d_map_camera_move(terrain_palette, -editor.palette.palette->x, -editor.palette.palette->y);
 	d_tilemap_recalc(terrain_palette->layer->tilemap);
+}
+
+void editor_minimap_update() {
+	//This is really slow and retarded, but it works
+	int x, y, w, h;
+	int tilesx;
+	DARNIT_TILEMAP *building_tilemap=map->map->layer[map->map->layers-2].tilemap;
+	DARNIT_TILESHEET *ts=(editor.sidebar.minimap->get_prop(editor.sidebar.minimap, UI_IMAGEVIEW_PROP_TILESHEET)).p;
+	w=editor.sidebar.minimap->w;
+	h=editor.sidebar.minimap->h;
+	
+	d_render_tilesheet_geometrics(map->map->layer->ts, &tilesx, NULL, NULL, NULL);
+	tilesx/=map->map->layer->tile_w;
+	
+	for(y=0; y<h; y++)
+		for(x=0; x<h; x++) {
+			int index=(y*(building_tilemap->h)/(h))*(building_tilemap->w)+(x*(building_tilemap->w))/(w);
+			minimap_data[y*w+x]=minimap_color[(((building_tilemap->data[index]&(1<<17))==0)?MINIMAP_COLOR_TERRAIN:MINIMAP_COLOR_PLASMA)];
+		}
+	
+	for(y=0; y<building_tilemap->h; y++)
+		for(x=0; x<building_tilemap->w; x++)
+			if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)==5)
+				minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=minimap_color[MINIMAP_COLOR_CONTROLPOINT];
+			else if((building_tilemap->data[(y*building_tilemap->w)+x]&0xFFF)>0) {
+				int i=((building_tilemap->data[(y*building_tilemap->w)+x])&0xFFF)/tilesx-1;
+				unsigned int c=player_color[i].r|(player_color[i].g<<8)|(player_color[i].b<<16);
+				minimap_data[(y*(h))/(building_tilemap->h)*(w)+(x*(w))/(building_tilemap->w)]=c;
+			}
+	
+	d_render_tilesheet_update(ts, 0, 0, w, h, minimap_data);
 }
 
 /*Editor events*/
@@ -221,6 +307,7 @@ void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING]->set_prop(editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LISTBOX_BUILDING], UI_LISTBOX_PROP_SELECTED, v);
 	ui_widget_destroy(editor.sidebar.pane->root_widget);
 	ui_pane_set_root_widget(editor.sidebar.pane, ui_widget_create_vbox());
+	ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.minimap, 0);
 	if(widget==editor.topbar.button[EDITOR_TOPBAR_BUTTON_MENU]) {
 		for(i=0; i<EDITOR_SIDEBAR_MENU_WIDGETS; i++)
 			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.menu[i], 0);
@@ -234,6 +321,10 @@ void editor_topbar_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *
 		for(i=0; i<EDITOR_SIDEBAR_PROPERTIES_WIDGETS; i++)
 			ui_vbox_add_child(editor.sidebar.pane->root_widget, editor.sidebar.properties[i], 0);
 	}
+}
+
+void editor_sidebar_minimap_mouse_down(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	
 }
 
 void editor_sidebar_menu_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -401,6 +492,7 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 			terrain_rectange_coords.x1=terrain_rectange_coords.y1=terrain_rectange_coords.x2=terrain_rectange_coords.y2=0;
 			d_render_rect_move(terrain_rectangle, 0, 0, 0, 0, 0);
 		}
+		editor_minimap_update();
 		return;
 	}
 	
@@ -441,6 +533,7 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 					if(type==UI_EVENT_TYPE_MOUSE_PRESS) {
 						editor_floodfill(map->map->layer[layer].tilemap, x, y, terrain_tile);
 						d_tilemap_recalc(map->map->layer[layer].tilemap);
+						editor_minimap_update();
 					}
 					break;
 				case TERRAIN_TOOL_RECTANGLE:
@@ -492,6 +585,16 @@ void editor_palette_render(UI_WIDGET *widget) {
 	d_tilemap_draw(terrain_palette->layer->tilemap);
 	if(terrain_tile>=terrain_palette->layer->tilemap->w*9)
 		d_render_line_draw(terrain_palette_selected, 4);
+	d_render_tint(r, g, b, a);
+}
+
+void editor_minimap_render(UI_WIDGET *widget) {
+	//override for imagebox render, to render viewport border on minimap
+	unsigned char r, g, b, a;
+	ui_imageview_render(widget);
+	d_render_tint_get(&r, &g, &b, &a);
+	d_render_tint(255, 255, 255, 255);
+	d_render_line_draw(minimap_viewport, 4);
 	d_render_tint(r, g, b, a);
 }
 
