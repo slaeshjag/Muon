@@ -73,6 +73,7 @@ struct {
 DARNIT_RECT *terrain_rectangle;
 
 DARNIT_MAP *terrain_palette=NULL;
+DARNIT_LINE *terrain_palette_selected;
 
 void editor_init() {
 	int i;
@@ -123,6 +124,9 @@ void editor_init() {
 		
 	terrain_rectangle=d_render_rect_new(1);
 	d_render_rect_move(terrain_rectangle, 0, 0, 0, 0, 0);
+	terrain_palette_selected=d_render_line_new(4, 1);
+	for(i=0; i<4; i++)
+		d_render_line_move(terrain_palette_selected, i, 0, 0, 0, 0);
 	
 	/*Buildings tab*/
 	editor.sidebar.buildings[EDITOR_SIDEBAR_BUILDINGS_LABEL]=ui_widget_create_label(font_std, "Buildings");
@@ -267,6 +271,8 @@ void editor_sidebar_terrain_button_click(UI_WIDGET *widget, unsigned int type, U
 		return;
 	} else if(widget==editor.sidebar.terrain[EDITOR_SIDEBAR_TERRAIN_BUTTON_ERASER]) {
 		terrain_tile=0;
+		for(i=0; i<4; i++)
+			d_render_line_move(terrain_palette_selected, i, 0, 0, 0, 0);
 		return;
 	}
 	
@@ -304,8 +310,31 @@ void editor_palette_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int x, y;
 	x=(e->mouse->x-widget->x)/terrain_palette->layer->tile_w;
 	y=(e->mouse->y-widget->y)/terrain_palette->layer->tile_h;
-	y+=9;
-	terrain_tile=y*terrain_palette->layer->tilemap->w+x;
+	terrain_tile=(y+9)*terrain_palette->layer->tilemap->w+x;
+	d_render_line_move(terrain_palette_selected, 0,
+		widget->x+x*terrain_palette->layer->tile_w,
+		widget->y+y*terrain_palette->layer->tile_h,
+		widget->x+x*terrain_palette->layer->tile_w,
+		widget->y+(y+1)*terrain_palette->layer->tile_h
+	);
+	d_render_line_move(terrain_palette_selected, 1,
+		widget->x+(x+1)*terrain_palette->layer->tile_w,
+		widget->y+y*terrain_palette->layer->tile_h,
+		widget->x+(x+1)*terrain_palette->layer->tile_w,
+		widget->y+(y+1)*terrain_palette->layer->tile_h
+	);
+	d_render_line_move(terrain_palette_selected, 2,
+		widget->x+x*terrain_palette->layer->tile_w,
+		widget->y+y*terrain_palette->layer->tile_h,
+		widget->x+(x+1)*terrain_palette->layer->tile_w,
+		widget->y+y*terrain_palette->layer->tile_h
+	);
+	d_render_line_move(terrain_palette_selected, 3,
+		widget->x+x*terrain_palette->layer->tile_w,
+		widget->y+(y+1)*terrain_palette->layer->tile_h,
+		widget->x+(x+1)*terrain_palette->layer->tile_w,
+		widget->y+(y+1)*terrain_palette->layer->tile_h
+	);
 }
 
 void editor_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
@@ -437,6 +466,8 @@ void editor_palette_render(UI_WIDGET *widget) {
 	d_render_tint_get(&r, &g, &b, &a);
 	d_render_tint(255, 255, 255, 255);
 	d_tilemap_draw(terrain_palette->layer->tilemap);
+	if(terrain_tile>=terrain_palette->layer->tilemap->w*9)
+		d_render_line_draw(terrain_palette_selected, 4);
 	d_render_tint(r, g, b, a);
 }
 
