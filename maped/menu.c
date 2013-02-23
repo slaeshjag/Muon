@@ -32,6 +32,7 @@ static const char *button_text[MENU_BUTTONS]={
 
 void menu_init() {
 	int i;
+	UI_PROPERTY_VALUE v;
 	state[STATE_MENU].panelist=malloc(sizeof(struct UI_PANE_LIST));
 	state[STATE_MENU].panelist->next=NULL;
 	state[STATE_MENU].panelist->pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-64, 256, 128, ui_widget_create_vbox());
@@ -51,6 +52,9 @@ void menu_init() {
 	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.entry_w=ui_widget_create_entry(font_std), 0);
 	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.label_h=ui_widget_create_label(font_std, "Height"), 0);
 	ui_vbox_add_child(state[STATE_NEW].panelist->pane->root_widget, new.entry_h=ui_widget_create_entry(font_std), 0);
+	v.p="32";
+	new.entry_w->set_prop(new.entry_w, UI_ENTRY_PROP_TEXT, v);
+	new.entry_h->set_prop(new.entry_h, UI_ENTRY_PROP_TEXT, v);
 	new.hbox=ui_widget_create_hbox();
 	new.button[NEW_BUTTON_CANCEL]=ui_widget_create_button_text(font_std, "Cancel");
 	new.button[NEW_BUTTON_NEW]=ui_widget_create_button_text(font_std, "New");
