@@ -27,6 +27,7 @@
 
 #include "../client/ui/ui.h"
 #include "../client/platform.h"
+#include "editor.h"
 
 #define SIDEBAR_WIDTH 128
 #define MAX_PLAYERS 4
@@ -51,7 +52,12 @@ struct {
 
 enum STATE state_current;
 
-DARNIT_TILESHEET *mouse_tilesheet;
+struct MOUSE_CURSOR {
+	DARNIT_TILESHEET *image;
+	int x;
+	int y;
+};
+
 DARNIT_FONT *font_std;
 
 void state_set(enum STATE state);

@@ -21,6 +21,13 @@
 #include "menu.h"
 #include "editor.h"
 
+struct MOUSE_CURSOR mouse_cursor[TERRAIN_TOOLS+1]={
+	{NULL, 0, 0},
+	{NULL, 0, 15},
+	{NULL, 0, 14},
+	{NULL, 0, 0},
+};
+
 void state_set(enum STATE state) {
 	switch(state_current) {
 		case STATE_EDITOR:
@@ -42,7 +49,10 @@ void state_set(enum STATE state) {
 int main(int argc, char **argv) {
 	platform_init("Muon map editor", "res/icon-maped.png");
 	font_std=d_font_load("res/FreeMonoBold.ttf", 12, 512, 512);
-	mouse_tilesheet=d_render_tilesheet_load("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
+	mouse_cursor[TERRAIN_TOOL_NONE+1].image=d_render_tilesheet_load("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
+	mouse_cursor[TERRAIN_TOOL_BRUSH+1].image=d_render_tilesheet_load("res/brush.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
+	mouse_cursor[TERRAIN_TOOL_BUCKET+1].image=d_render_tilesheet_load("res/bucket.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
+	mouse_cursor[TERRAIN_TOOL_RECTANGLE+1].image=d_render_tilesheet_load("res/rectangle.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	
 	menu_init();
 	editor_init();
@@ -68,11 +78,12 @@ int main(int argc, char **argv) {
 }
 
 void view_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
+	extern enum TERRAIN_TOOL terrain_tool;
 	unsigned char r, g, b, a;
 	d_render_tint_get(&r, &g, &b, &a);
 	d_render_tint(255, 255, 255, 255);
 	d_render_blend_enable();
-	d_render_tile_blit(mouse_tilesheet, 0, e->mouse->x, e->mouse->y);
+	d_render_tile_blit(mouse_cursor[terrain_tool+1].image, 0, e->mouse->x-mouse_cursor[terrain_tool+1].x, e->mouse->y-mouse_cursor[terrain_tool+1].y);
 	d_render_blend_disable();
 	d_render_tint(r, g, b, a);
 }

@@ -86,16 +86,8 @@ static const char *building_text[]={
 	"Radar",
 };
 
-enum TERRAIN_TOOL {
-	TERRAIN_TOOL_NONE=-1,
-	TERRAIN_TOOL_BRUSH,
-	TERRAIN_TOOL_BUCKET,
-	TERRAIN_TOOL_RECTANGLE,
-	TERRAIN_TOOLS,
-};
-
 static int building_place=-1;
-static enum TERRAIN_TOOL terrain_tool=TERRAIN_TOOL_NONE;
+enum TERRAIN_TOOL terrain_tool=TERRAIN_TOOL_NONE;
 static int terrain_tile=0;
 
 struct {
@@ -553,6 +545,8 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 					break;
 				case TERRAIN_TOOL_BUCKET:
 					if(type==UI_EVENT_TYPE_MOUSE_PRESS) {
+						if(map->map->layer[layer].tilemap->data[map_offset]==terrain_tile)
+							break;
 						editor_floodfill(map->map->layer[layer].tilemap, x, y, terrain_tile);
 						d_tilemap_recalc(map->map->layer[layer].tilemap);
 						editor_minimap_update();
@@ -584,7 +578,7 @@ void editor_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void editor_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	editor_mouse_move(widget, type, e);
-	if(building_place>=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
+	if(building_place>-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
 		unsigned char r, g, b, a;
 		d_render_tint_get(&r, &g, &b, &a);
 		d_render_tint(255, 255, 255, 255);
