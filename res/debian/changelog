@@ -1,3 +1,10 @@
+muon-rts (1.0-2) unstable; urgency=low
+
+  * Package map editor
+
+ -- Axel Isaksson <isaksson.axel@telia.com>  Sun, 24 Feb 2013 18:50:00 +0100
+
+
 muon-rts (1.0-1) unstable; urgency=low
 
   * Initial release

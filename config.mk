@@ -19,7 +19,7 @@ ifneq ($(wildcard /etc/debian_version),)
 	DEB	:=	muon-rts-$(VERSION)$(ARCH)
 	PACKAGE	:=	$(DEB).deb
 	SECTION	:=	games
-	DEPS	=	libc6, libsdl1.2debian, libbz2-1.0 zlib1g
+	DEPS	=	libc6, libsdl1.2debian, libbz2-1.0, zlib1g
 endif
 
 ifeq ($(strip $(OS)), Windows_NT)
@@ -29,6 +29,6 @@ ifeq ($(strip $(SBOX_UNAME_MACHINE)), arm)
 	#Maemo packaging
 	PACKAGE	:=	muon-rts-$(VERSION)maemo.deb
 	SECTION	:=	user/games
-	DEPS	=	libc6, libsdl-gles1.2-1, libbz2-1.0 zlib1g
+	DEPS	=	libc6, libsdl-gles1.2-1, libbz2-1.0, zlib1g
 endif
 endif

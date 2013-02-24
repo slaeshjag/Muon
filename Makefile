@@ -34,7 +34,10 @@ install:
 	@install -m 0744 -D res/mouse.png $(DATAPATH)/res/mouse.png
 	@install -m 0744 -D res/target.png $(DATAPATH)/res/target.png
 	@install -m 0744 -D res/icon.png $(DATAPATH)/res/icon.png
-	@install -m 0744 -D res/icon-maped.png $(DATAPATH)/res/icon.png
+	@install -m 0744 -D res/icon-maped.png $(DATAPATH)/res/icon-maped.png
+	@install -m 0744 -D res/brush.png $(DATAPATH)/res/brush.png
+	@install -m 0744 -D res/bucket.png $(DATAPATH)/res/bucket.png
+	@install -m 0744 -D res/rectangle.png $(DATAPATH)/res/rectangle.png
 	
 	@install -m 0744 -D res/chat.png $(DATAPATH)/res/chat.png
 	@install -m 0744 -D res/flare.png $(DATAPATH)/res/flare.png
@@ -45,6 +48,7 @@ install:
 	@install -m 0755 -d $(DATAPATH)/maps
 	@install -m 0744 -D -t $(DATAPATH)/maps/ maps/*
 	@install -m 0755 -D res/muon.desktop $(APPLICATIONSPATH)/muon.desktop
+	@install -m 0755 -D res/muon-maped.desktop $(APPLICATIONSPATH)/muon-maped.desktop
 
 pandora: all
 	@echo " [PND ] muon.pnd"
@@ -86,6 +90,7 @@ msi:
 	@unix2dos -n COPYING res/windows/installer/build/COPYING.txt
 	
 	@strip -o res/windows/installer/build/muon.exe muon.exe
+	@strip -o res/windows/installer/build/muon-maped.exe muon-maped.exe
 	@strip -o res/windows/installer/build/muon-server.exe muon-server.exe
 	
 	@cp res/*.png res/windows/installer/build/res/
@@ -103,6 +108,7 @@ muon-rts-$(VERSION)maemo.deb:
 	@mkdir -p muon-rts-$(VERSION)maemo$(APPLICATIONSPATH)/hildon
 	
 	@strip muon -o muon-rts-$(VERSION)maemo/opt/muon/muon
+	@strip muon-maped -o muon-rts-$(VERSION)maemo/opt/muon/muon-maped
 	@strip muon-server -o muon-rts-$(VERSION)maemo/opt/muon/muon-server
 	@strip `whereis libdarnit.so|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o muon-rts-$(VERSION)maemo/opt/muon/libdarnit.so
 	@strip `whereis libmodplug.so.1|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o muon-rts-$(VERSION)maemo/opt/muon/libmodplug.so.1
@@ -116,10 +122,16 @@ muon-rts-$(VERSION)maemo.deb:
 	@cp README.md muon-rts-$(VERSION)maemo/opt/muon
 	@cp COPYING muon-rts-$(VERSION)maemo/opt/muon
 	@cp res/maemo/run muon-rts-$(VERSION)maemo/opt/muon
+	@cp res/maemo/run-maped muon-rts-$(VERSION)maemo/opt/muon
 	@cat "res/muon.desktop" | \
 		sed 	-e 's/^Icon=.*/Icon=$(subst /,\/,/opt/muon/res/icon.png)/' \
 			-e 's/^Exec=.*/Exec=$(subst /,\/,/opt/muon/run)/' \
 			> "muon-rts-$(VERSION)maemo$(APPLICATIONSPATH)/hildon/muon-rts.desktop"
+	
+	@cat "res/muon-maped.desktop" | \
+		sed 	-e 's/^Icon=.*/Icon=$(subst /,\/,/opt/muon/res/icon-maped.png)/' \
+			-e 's/^Exec=.*/Exec=$(subst /,\/,/opt/muon/run-maped)/' \
+			> "muon-rts-$(VERSION)maemo$(APPLICATIONSPATH)/hildon/muon-maped.desktop"
 	
 	@cp "res/debian/copyright" "muon-rts-$(VERSION)maemo/DEBIAN/copyright"
 	@gzip -9 -c "res/debian/changelog" > "muon-rts-$(VERSION)maemo/DEBIAN/changelog.gz"
@@ -150,6 +162,7 @@ $(DEB).deb:
 	@mkdir -p $(DEB)$(APPLICATIONSPATH)
 	
 	@strip muon -o $(DEB)/usr/games/muon-rts
+	@strip muon-maped -o $(DEB)/usr/bin/muon-maped
 	@strip muon-server -o $(DEB)/usr/bin/muon-server
 	@strip `whereis libdarnit.so|sed 's/ /\n/g'|grep -m 1 -e '.*/lib/.*'` -o $(DEB)/usr/lib/libdarnit.so
 	@chmod 644 $(DEB)/usr/lib/libdarnit.so
@@ -160,10 +173,17 @@ $(DEB).deb:
 	@cp -R maps $(DEB)$(DATAPATH)/
 	@cp README.md $(DEB)/usr/share/doc/muon-rts
 	@cp res/icon.xpm $(DEB)/usr/share/pixmaps/muon-rts.xpm
+	@cp res/icon-maped.xpm $(DEB)/usr/share/pixmaps/muon-maped.xpm
 	@cat "res/muon.desktop" | \
 		sed	-e 's/^Icon=.*/Icon=$(subst /,\/,$(DATAPATH)/res/icon.png)/' \
 			-e 's/^Exec=.*/Exec=$(subst /,\/,/usr/games/muon-rts)/' \
 		> "$(DEB)$(APPLICATIONSPATH)/muon-rts.desktop"
+	
+	@cat "res/muon-maped.desktop" | \
+		sed	-e 's/^Icon=.*/Icon=$(subst /,\/,$(DATAPATH)/res/icon-maped.png)/' \
+			-e 's/^Exec=.*/Exec=$(subst /,\/,/usr/bin/muon-maped)/' \
+		> "$(DEB)$(APPLICATIONSPATH)/muon-maped.desktop"
+	
 	
 	@cat "res/doc/muon-rts.6" | \
 		sed	-e 's/\$$VERSION/$(subst .,\.,$(VERSION))/' | \
@@ -171,6 +191,9 @@ $(DEB).deb:
 	@cat "res/doc/muon-server.1" | \
 		sed	-e 's/\$$VERSION/$(subst .,\.,$(VERSION))/' | \
 		gzip -9 > "$(DEB)/usr/share/man/man1/muon-server.1.gz"
+	@cat "res/doc/muon-maped.1" | \
+		sed	-e 's/\$$VERSION/$(subst .,\.,$(VERSION))/' | \
+		gzip -9 > "$(DEB)/usr/share/man/man1/muon-maped.1.gz"
 	
 	@cat "res/debian/menu" | sed -e 's/\$$BIN/$(subst /,\/,/usr/games/muon-rts)/' > "$(DEB)/usr/share/menu/muon-rts"
 	@cp "res/debian/postinst" "$(DEB)/DEBIAN/postinst"

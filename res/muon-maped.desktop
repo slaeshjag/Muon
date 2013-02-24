@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Muon map editor
+Comment=Mapeditor for muon ldi maps
+Exec=muon-maped
+Icon=/usr/share/games/muon/res/icon-maped.png
+Terminal=false
+Type=Application
+Categories=Game;StrategyGame;
+Keywords=muon
+StartupNotify=true

@@ -1,0 +1,48 @@
+.TH MUON-MAPED 1 muon-rts\-$VERSION
+.SH NAME
+muon\-maped \- Muon map editor
+
+.SH SYNOPSIS
+.B muon\-maped
+
+.SH DESCRIPTION
+Map editor for
+.BR muon\-rts (6)
+ldi map files
+
+.SH USAGE
+
+.SS Terrain editing
+.TP
+.B Brush
+Draw tiles on the map using the tile selected from the
+.B palette
+.TP
+.B Bucket fill
+Fill an area with the selected tile.
+The area is limited by borders of the same tile
+.TP
+.B Rectangle
+Fill a rectangular area with the selected tile
+.TP
+.B Palette
+The palette button displays the tile selection dialogue which lets you select
+a terrain tile from the the map's tilesheet to be drawn by the tools.
+Selecting
+.I "Tile 0 (erase)"
+lets you erase tiles from the map.
+
+.SS Building placement
+Select a building from the list and place it on the map.
+Selecting
+.I [Neutral]/[Erase]
+lets you remove buildings from the map.
+
+.SS Map properties
+All properties are mandatory. The
+.I "max players"
+property should correspond to the number of generators on the map.
+
+.SH "SEE ALSO"
+.BR muon\-rts (6)
+.BR muon\-server (1)
