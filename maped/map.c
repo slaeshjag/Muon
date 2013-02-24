@@ -83,7 +83,11 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	sprintf(map->sizestring, "%ix%i", width, height);
 	map_prop_set_or_add(map, "size", map->sizestring);
 	
-	f_ts=d_file_open("res/default.png", "rb");
+	if(!(f_ts=d_file_open("res/default.png", "rb"))) {
+		map->tilesheet=NULL;
+		map_close(map);
+		return NULL;
+	}
 	d_file_seek(f_ts, 0, SEEK_END);
 	map->tilesheet_size=d_file_tell(f_ts);
 	map->tilesheet=malloc(map->tilesheet_size);

@@ -125,9 +125,14 @@ void new_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int w, h;
 		w=atoi((new.entry_w->get_prop(new.entry_w, UI_ENTRY_PROP_TEXT)).p);
 		h=atoi((new.entry_h->get_prop(new.entry_h, UI_ENTRY_PROP_TEXT)).p);
-		if(w<=0||h<=0)
+		if(w<=0||h<=0) {
+			ui_messagebox(font_std, "Map width and height must be integer values larger than zero.");
 			return;
-		map=map_new(w, h, 1, d_render_tilesheet_load("res/default.png", 32, 32, DARNIT_PFORMAT_RGB5A1));
+		}
+		if(!(map=map_new(w, h, 1, d_render_tilesheet_load("res/default.png", 32, 32, DARNIT_PFORMAT_RGB5A1)))) {
+			ui_messagebox(font_std, "Unable to create a new map. Please check your installation.");
+			return;
+		}
 		editor_reload();
 		state_set(STATE_EDITOR);
 		return;
@@ -156,6 +161,9 @@ void load_button_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 					editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS]->set_prop(editor.sidebar.properties[EDITOR_SIDEBAR_PROPERTIES_SLIDER_PLAYERS], UI_SLIDER_PROP_VALUE, v);
 			editor_reload();
 			state_set(STATE_EDITOR);
+			return;
+		} else {
+			ui_messagebox(font_std, "Unable to load map.");
 			return;
 		}
 	}
