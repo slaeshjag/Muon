@@ -35,6 +35,7 @@
 						<File Id="MUON_MAPED.EXE" Name="muon-maped.exe" Source="build\muon-maped.exe">
 							<Shortcut Id="ExeMapedShortcut" Directory="ProgramMenuDir" Name="Muon map editor" Advertise="yes" Icon="MapedStartMenuIcon.exe" IconIndex="0" />
 						</File>
+						<File Id="ZLIB1.DLL" Name="zlib1.dll" Source="build\zlib1.dll" />
 					</Component>
 					
 					<Directory Id="MAPS" Name="maps">
