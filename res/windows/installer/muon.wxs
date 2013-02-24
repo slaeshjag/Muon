@@ -60,7 +60,7 @@
 						</Component>
 						
 						<Component Id="MAPEDFILES" DiskId="1" Guid="C6826AFB-34DC-4B86-A85C-014982CAE136">
-							<File Id="DEFAULT.PNG" Name="defualt.png" Source="build\res\default.png" />
+							<File Id="DEFAULT.PNG" Name="default.png" Source="build\res\default.png" />
 							<File Id="BRUSH.PNG" Name="brush.png" Source="build\res\brush.png" />
 							<File Id="BUCKET.PNG" Name="bucket.png" Source="build\res\bucket.png" />
 							<File Id="RECTANGLE.PNG" Name="rectangle.png" Source="build\res\rectangle.png" />
