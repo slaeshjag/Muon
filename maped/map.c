@@ -30,7 +30,7 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	DARNIT_MAP *d_map=NULL;
 	DARNIT_MAP_LAYER *layer=NULL;
 	MAP *map;
-	FILE *f_ts;
+	DARNIT_FILE *f_ts;
 	if(!(map=malloc(sizeof(MAP))))
 		return NULL;
 	
@@ -83,13 +83,13 @@ MAP *map_new(unsigned int width, unsigned int height, unsigned int terrain_layer
 	sprintf(map->sizestring, "%ix%i", width, height);
 	map_prop_set_or_add(map, "size", map->sizestring);
 	
-	f_ts=fopen("res/default.png", "rb");
-	fseek(f_ts, 0, SEEK_END);
-	map->tilesheet_size=ftell(f_ts);
+	f_ts=d_file_open("res/default.png", "rb");
+	d_file_seek(f_ts, 0, SEEK_END);
+	map->tilesheet_size=d_file_tell(f_ts);
 	map->tilesheet=malloc(map->tilesheet_size);
-	fseek(f_ts, 0, SEEK_SET);
-	fread(map->tilesheet, map->tilesheet_size, 1, f_ts);
-	fclose(f_ts);
+	d_file_seek(f_ts, 0, SEEK_SET);
+	d_file_read(map->tilesheet, map->tilesheet_size, f_ts);
+	d_file_close(f_ts);
 	
 	return map;
 }
