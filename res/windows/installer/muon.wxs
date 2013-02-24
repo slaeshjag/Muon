@@ -116,6 +116,6 @@
 		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
 		<Icon Id="DesktopIcon.exe" SourceFile="build\muon.exe" />
 		<Icon Id="StartMenuIcon.exe" SourceFile="build\muon.exe" />
-		<Icon Id="MuonStartMenuIcon.exe" SourceFile="build\muon-maped.exe" />
+		<Icon Id="MapedStartMenuIcon.exe" SourceFile="build\muon-maped.exe" />
 	</Product>
 </Wix>
