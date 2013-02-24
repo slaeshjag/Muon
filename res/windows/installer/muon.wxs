@@ -33,7 +33,7 @@
 					
 					<Component Id="MAPEDBIN" DiskId="1" Guid="5C4500B3-41BA-45EE-A56A-5E241E4EBCF4">
 						<File Id="MUON_MAPED.EXE" Name="muon-maped.exe" Source="build\muon-maped.exe">
-							<Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Muon map editor" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
+							<Shortcut Id="ExeMapedShortcut" Directory="ProgramMenuDir" Name="Muon map editor" Advertise="yes" Icon="MapedStartMenuIcon.exe" IconIndex="0" />
 						</File>
 					</Component>
 					
@@ -116,5 +116,6 @@
 		<WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
 		<Icon Id="DesktopIcon.exe" SourceFile="build\muon.exe" />
 		<Icon Id="StartMenuIcon.exe" SourceFile="build\muon.exe" />
+		<Icon Id="MuonStartMenuIcon.exe" SourceFile="build\muon-maped.exe" />
 	</Product>
 </Wix>
