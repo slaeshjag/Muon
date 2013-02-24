@@ -59,6 +59,14 @@
 							<File Id="ICON.PNG" Name="icon.png" Source="build\res\icon.png" />
 						</Component>
 						
+						<Component Id="MAPEDFILES" DiskId="1" Guid="C6826AFB-34DC-4B86-A85C-014982CAE136">
+							<File Id="DEFAULT.PNG" Name="defualt.png" Source="build\res\default.png" />
+							<File Id="BRUSH.PNG" Name="brush.png" Source="build\res\brush.png" />
+							<File Id="BUCKET.PNG" Name="bucket.png" Source="build\res\bucket.png" />
+							<File Id="RECTANGLE.PNG" Name="rectangle.png" Source="build\res\rectangle.png" />
+							<File Id="ICON_MAPED.PNG" Name="icon-maped.png" Source="build\res\icon-maped.png" />
+						</Component>
+						
 						<Component Id="FONTFILES" DiskId="1" Guid="0C11EA58-96F7-4574-8A42-221F5A98DD9F">
 							<File Id="FREEMONOBOLD.TTF" Name="FreeMonoBold.ttf" Source="build\res\FreeMonoBold.ttf" />
 						</Component>
@@ -100,6 +108,7 @@
 			</Feature>
 			<Feature Id="Maped" Level="2" Title="Map editor" Description="Map editor for Muon ldi-maps">
 				<ComponentRef Id="MAPEDBIN" />
+				<ComponentRef Id="MAPEDFILES" />
 			</Feature>
 			<Feature Id="Server" Level="1" Title="Server" Description="Dedicated server for muon">
 				<ComponentRef Id="SERVERBIN" />
