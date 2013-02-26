@@ -1,0 +1,82 @@
+Muon AI
+2013, Axel Isaksson (h4xxel)
+GPL3, just as the rest of Muon
+
+The AI will probably be implemented as a separate client in a static lib that
+is linked into the server at compile time. The server admin will then be able
+to join "bots" to the game that play instead of human players.
+It probably makes sense to have a few difficulty levels to choose from.
+
+Personalities
+
+1)	Scout
+	Relies on inteligence and light artillery
+	Lots of buildings, tries to cover as much ground as possible
+	Avoids confrontation if possible, finds alternative ways into the heart
+	of the enemy base and strikes full-force on the generator, possible
+	from many directions at once.
+	Prefers the radar and conyards for swift, unseen gameplay and
+	stealthy moves
+	
+2)	Attacker
+	Prefers heavy artillery and is not afraid to take up a fight.
+	Builds lots of conyards for quick deployment of attackers, and
+	possibly nuke silos. Not much for scouting, but will search and
+	destroy when encountering enemy structures on the battlefield
+	
+3)	Defender
+	Tries to identify easily defended spots on the map and fortifies
+	them with walls and heavy artillery. Not much for running head
+	first into battle, the defender prefers to deploy nukes from within
+	his fortress, a safe distance from the heat and action.
+	Happily leaves the dirty work to team mates, but will help them
+	defend their bases in their absence. Will eventually strike - and
+	strike hard when the other players have nearly annihilated eachother
+	or he has gained enough confidience in his defence to leave it
+	unattended for a while.
+
+Heuristics
+
+*)	Finding players
+	The AI will using his own location on the map try to figure out where
+	the others are located.
+	
+*)	Cutting power chains
+	When encountering a single line of enemy pylons on the map it might
+	decide to destroy just one or a couple and then continue with the
+	previous task, in an attempt to stall or temporarily weaken the enemy
+	by cutting the power to his outer nodes.
+	
+*)	High value targets
+	Control points and generators are considered high value targets gaining
+	higher priority by the AI task allocator
+	
+*)	Mind map
+	The AI will try to remember positions and statistics about buildings it
+	has once seen, but since lost sight of. It will then try to predict the
+	movement of the troups by graphing earlier behaviour in the area,
+	and taking into consideration, nearby high value targets that might
+	be of interest to the enemy.
+
+*)	Avoiding disaster
+	The AI will try to avoid clustering buildings, making it harder for the
+	enemy to find a spot good for nuking.
+
+*)	Backup
+	The AI will try, if possibly to back up power lines and prioritize
+	repowering vital branches if power is lost.
+	
+*)	"Branch prediction"
+	A branch is considered vital if it
+	*)	Powers a long chain of buildings or several other branches
+	*)	Powers high value targets or defensive systems close to them
+	*)	(Attacker) Powers military structures along the branch that
+		have dealt a great deal of damage or are often engaged in
+		enemy confrontation
+	*)	(Defender) Powers defensive structures that fortifies an easily
+		defended spot on the map, such as a tight passage
+
+*)	Idle task
+	The idle task is very dependant on the AI personality, but generally
+	consists of building buildings to expand the base, snatch control
+	points, find (or try to avoid) enemy confrontation.
