@@ -3,7 +3,6 @@ include $(TOPDIR)/config.mk
 LDFLAGS		+=	-ldarnit
 
 SERVER		=	../server/server.a
-AI		=	../server/ai/ai.a
 BIN		=	../muon
 
 DEPENDS		=
@@ -24,7 +23,7 @@ all: $(OBJFILES) $(DEPENDS)
 	@echo " [ CD ] client/menu/"
 	+@make -C menu/
 	@echo " [ LD ]	client/$(BIN)"
-	@$(CC) $(OBJFILES) $(DEPENDS) ui/*.o menu/*.o $(SERVER) $(AI) -o $(BIN) $(LIBS) $(LDFLAGS)
+	@$(CC) $(OBJFILES) $(DEPENDS) ui/*.o menu/*.o $(SERVER) -o $(BIN) $(LIBS) $(LDFLAGS)
 	@echo " Done."
 	@echo
 

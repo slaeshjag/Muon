@@ -3,8 +3,8 @@ include $(TOPDIR)/config.mk
 
 BIN		=	../muon-server
 LIBOUT		=	server.a
-STANDALONE	=	standalone/*.o ai/ai.a
-LIBOBJ		=	lib/*.o
+STANDALONE	=	standalone/*.o
+LIBOBJ		=	lib/*.o ai/ai.a
 
 DEPENDS		=	server_tester
 
@@ -16,7 +16,7 @@ SRCFILES	=	$(wildcard *.c)
 OBJFILES	=	$(SRCFILES:.c=.o)
 .PHONY: all ai clean
 
-all: server_lib server_standalone ai $(DEPENDS)
+all: ai server_lib server_standalone $(DEPENDS)
 	@echo " Done."
 	@echo
 	
