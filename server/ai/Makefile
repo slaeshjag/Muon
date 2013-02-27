@@ -7,9 +7,13 @@ SRCFILES	=	$(wildcard *.c)
 OBJFILES	=	$(SRCFILES:.c=.o)
 .PHONY: all clean
 
-all: $(OBJFILES)
+all: $(OBJFILES) ai_lib
 	@echo " Done."
 	@echo
+
+ai_lib:
+	@echo " [ AR ] $(LIBOUT)"
+	@$(AR) -cr $(LIBOUT) $(OBJFILES)
 
 clean:
 	@echo " [ RM ]	$(OBJFILES)"
@@ -18,5 +22,5 @@ clean:
 	@$(RM) $(LIBOUT)
 
 %.o: %.c %.h
-	@echo " [ CC ]	server/$<"
+	@echo " [ CC ]	server/ai/$<"
 	@$(CC) $(CFLAGS) -c -o $@ $< 

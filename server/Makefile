@@ -3,7 +3,7 @@ include $(TOPDIR)/config.mk
 
 BIN		=	../muon-server
 LIBOUT		=	server.a
-STANDALONE	=	standalone/*.o
+STANDALONE	=	standalone/*.o ai/ai.a
 LIBOBJ		=	lib/*.o
 
 DEPENDS		=	server_tester
@@ -24,7 +24,7 @@ server_tester:
 	@echo " [ CD ] server/server_tester/"
 	+@make -C server_tester/
 	
-server_standalone: $(OBJFILES)
+server_standalone: $(OBJFILES) ai
 	@echo ""
 	@echo " [ CD ] server/standalone/"
 	+@make -C standalone/
