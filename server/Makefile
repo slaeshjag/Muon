@@ -14,9 +14,9 @@ endif
 
 SRCFILES	=	$(wildcard *.c)
 OBJFILES	=	$(SRCFILES:.c=.o)
-.PHONY: all clean
+.PHONY: all ai clean
 
-all: server_lib server_standalone $(DEPENDS)
+all: server_lib server_standalone ai $(DEPENDS)
 	@echo " Done."
 	@echo
 	
@@ -39,6 +39,10 @@ server_lib: $(OBJFILES)
 	@echo " [ AR ] $(LIBOUT)"
 	@$(AR) -cr $(LIBOUT) $(OBJFILES) $(LIBOBJ)
 
+ai:
+	@echo " [ CD ] server/ai/"
+	+@make -C ai/
+
 clean:
 	@echo " [ RM ]	$(OBJFILES)"
 	@$(RM) $(OBJFILES)
@@ -51,6 +55,8 @@ clean:
 	+@make -C standalone/ clean
 	@echo " [ CD ] server/lib/"
 	+@make -C lib/ clean
+	@echo " [ CD ] server/ai/"
+	+@make -C ai/ clean
 	@echo " [ CD ] server/server_tester/"
 	+@make -C server_tester/ clean
 

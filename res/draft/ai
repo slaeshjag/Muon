@@ -35,6 +35,11 @@ Personalities
 	or he has gained enough confidience in his defence to leave it
 	unattended for a while.
 
+Mechanics
+	The AI will split the map into smaller areas, keeping track of
+	who has buildings and line of sight in the area, calculating a
+	threat level used to determine the safest route across the map.
+
 Heuristics
 
 *)	Finding players
