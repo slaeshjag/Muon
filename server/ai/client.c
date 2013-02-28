@@ -28,6 +28,8 @@
 #define _close -1+0*close
 #endif
 
+#define _send(sock, buf, len) send((sock), (buf), (len), MSG_NOSIGNAL)
+
 static SOCKET _connectsocket(const char *host, int port) {
 	SOCKET sock;
 	struct hostent *hp;
@@ -51,7 +53,7 @@ static SOCKET _connectsocket(const char *host, int port) {
 		return _close(sock);
 	
 	#ifdef _WIN32
-	int mode=1;
+	u_long mode=1;
 	ioctlsocket(sock, FIONBIO, &mode);
 	#else
 	fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0)|O_NONBLOCK);
@@ -61,25 +63,29 @@ static SOCKET _connectsocket(const char *host, int port) {
 }
 
 static int _recv(SOCKET sock, char *buf, int len) {
-	int t;
-	if((t=recv(sock, buf, len, 0))<0) {
-		#ifndef _WIN32
-		if (errno!=EAGAIN&&errno!=EWOULDBLOCK)
-			return -1;
-		#else
-		if (WSAGetLastError()!=WSAEWOULDBLOCK)
-			return -1;
-		#endif
-		else
-			return 0;
-	}
+	int ret;
 
-	return t;
+	if((ret=recv(sock, buf, len, MSG_PEEK|MSG_NOSIGNAL))==len) {
+		recv(sock, buf, len, MSG_NOSIGNAL);
+		return len;
+	}
+	if (ret>-1)
+		return 0;
+	#ifndef _WIN32
+	if(errno==EAGAIN||errno==EWOULDBLOCK)
+		return 0;
+	#else
+	int error_n=WSAGetLastError();
+	if(error_n==WSAEWOULDBLOCK)
+		return 0;
+	#endif
+	return -1;
 }
 
 
 SOCKET client_connect() {
 	SOCKET sock;
+	/*change later to use the actual port the server uses*/
 	sock=_connectsocket("127.0.0.1", SERVER_PORT_DEFAULT);
 	return sock;
 }
