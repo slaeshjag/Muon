@@ -22,6 +22,72 @@
 #include "ai.h"
 #include "client.h"
 
-void client_connect() {
+#ifdef _WIN32
+#define _close -1+0*closesocket
+#else
+#define _close -1+0*close
+#endif
+
+static SOCKET _connectsocket(const char *host, int port) {
+	SOCKET sock;
+	struct hostent *hp;
+	struct sockaddr_in sin={0};
+	
+	if((sock=socket(AF_INET, SOCK_STREAM, 0))<0)
+		return -1;
+	
+	if(!(hp=gethostbyname(host)))
+		return _close(sock);
+	
+	sin.sin_family=AF_INET;
+	sin.sin_port=htons(port);
+	#ifdef _WIN32
+		sin.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
+	#else
+		sin.sin_addr.s_addr = *(unsigned long *) hp->h_addr_list[0];
+	#endif
+	
+	if(connect(sock, (void *) &sin, sizeof(struct sockaddr_in))==-1)
+		return _close(sock);
+	
+	#ifdef _WIN32
+	int mode=1;
+	ioctlsocket(sock, FIONBIO, &mode);
+	#else
+	fcntl(sock, F_SETFL, fcntl(sock, F_GETFL, 0)|O_NONBLOCK);
+	#endif
+	
+	return sock;
+}
+
+static int _recv(SOCKET sock, char *buf, int len) {
+	int t;
+	if((t=recv(sock, buf, len, 0))<0) {
+		#ifndef _WIN32
+		if (errno!=EAGAIN&&errno!=EWOULDBLOCK)
+			return -1;
+		#else
+		if (WSAGetLastError()!=WSAEWOULDBLOCK)
+			return -1;
+		#endif
+		else
+			return 0;
+	}
+
+	return t;
+}
+
+
+SOCKET client_connect() {
+	SOCKET sock;
+	sock=_connectsocket("127.0.0.1", SERVER_PORT_DEFAULT);
+	return sock;
+}
+
+void client_send() {
+	
+}
+
+void client_check_incoming() {
 	
 }

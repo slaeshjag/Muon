@@ -39,6 +39,13 @@ struct UNIT {
 	struct UNIT *next;
 };
 
+struct PLAYER {
+	struct {
+		int x;
+		int y;
+	} home;
+};
+
 struct AREA {
 	int x;
 	int y;
@@ -60,6 +67,8 @@ typedef struct AI {
 		int y;
 		int direction;
 	} expand;
+	struct PLAYER *player;
+	int players;
 } AI;
 
 struct {
