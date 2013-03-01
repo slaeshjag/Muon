@@ -18,21 +18,33 @@
  */
 
 #include <stdlib.h>
+#include <time.h>
 
 #include "ai.h"
+#include "scout.h"
 
 static AI *ai=NULL;
 static int ais;
 
+void ai_init() {
+	personality[PERSONALITY_SCOUT].task.idle=scout_idle;
+	personality[PERSONALITY_SCOUT].task.spot=NULL;
+	personality[PERSONALITY_SCOUT].task.engage=NULL;
+}
+
 void ai_join(int n) {
-	srand(time());
+	int i;
+	srand(time(NULL));
 	ai=calloc(sizeof(AI), n);
 	ais=n;
-	for(i=0; a<ais; i++)
+	for(i=0; i<ais; i++)
 		ai[i].personality=rand()%PERSONALITIES;
 }
 
 void ai_loop() {
+	int i;
 	if(!ai)
 		return;
+	for(i=0; i<ais; i++)
+		personality[ai[i].personality].task.idle(&ai[i]);
 }

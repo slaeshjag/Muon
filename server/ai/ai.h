@@ -75,7 +75,7 @@ struct {
 	struct {
 		void (*idle)(AI *ai);
 		void (*spot)(AI *ai);
-		void (*engage)();
+		void (*engage)(AI *ai);
 	} task;
 } personality[PERSONALITIES];
 
