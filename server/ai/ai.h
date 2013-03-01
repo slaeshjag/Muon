@@ -21,6 +21,7 @@
 #define AI_H
 
 #include "../server_api/server.h"
+#include "client.h"
 
 enum PERSONALITY {
 	PERSONALITY_SCOUT,
@@ -57,6 +58,7 @@ struct AREA {
 };
 
 typedef struct AI {
+	SOCKET sock;
 	int player_id;
 	char player_name[32];
 	enum PERSONALITY personality;

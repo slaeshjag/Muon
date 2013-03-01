@@ -90,8 +90,34 @@ SOCKET client_connect() {
 	return sock;
 }
 
-void client_send() {
-	
+void client_disconnect(SOCKET sock) {
+	_close(sock);
+}
+
+void client_message_convert_send(MESSAGE_RAW *message) {
+	message->player_id=htonl(message->player_id);
+	message->command=htonl(message->command);
+	message->arg_1=htonl(message->arg_1);
+	message->arg_2=htonl(message->arg_2);
+}
+
+void client_message_convert_recv(MESSAGE_RAW *message) {
+	message->player_id=ntohl(message->player_id);
+	message->command=ntohl(message->command);
+	message->arg_1=ntohl(message->arg_1);
+	message->arg_2=ntohl(message->arg_2);
+}
+
+void client_message_send(SOCKET sock, int player_id, int command, int arg_1, int arg_2, unsigned char *payload) {
+	MESSAGE_RAW msg_send;
+	msg_send.player_id=player_id;
+	msg_send.command=command;
+	msg_send.arg_1=arg_1;
+	msg_send.arg_2=arg_2;
+	client_message_convert_send(&msg_send);
+	_send(sock, &msg_send, sizeof(MESSAGE_RAW));
+	if(payload)
+		_send(sock, payload, arg_2);
 }
 
 void client_check_incoming() {
