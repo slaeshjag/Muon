@@ -17,4 +17,22 @@
  * along with Muon.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdlib.h>
+
 #include "ai.h"
+
+static AI *ai=NULL;
+static int ais;
+
+void ai_join(int n) {
+	srand(time());
+	ai=calloc(sizeof(AI), n);
+	ais=n;
+	for(i=0; a<ais; i++)
+		ai[i].personality=rand()%PERSONALITIES;
+}
+
+void ai_loop() {
+	if(!ai)
+		return;
+}
