@@ -21,6 +21,7 @@
 #define AI_H
 
 #include "../server_api/server.h"
+#include "../standalone/map.h"
 
 enum PERSONALITY {
 	PERSONALITY_SCOUT,
