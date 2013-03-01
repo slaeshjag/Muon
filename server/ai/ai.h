@@ -21,6 +21,7 @@
 #define AI_H
 
 #include "../server_api/server.h"
+#include "../standalone/map.h"
 #include "client.h"
 
 enum PERSONALITY {
@@ -77,7 +78,7 @@ struct {
 	struct {
 		void (*idle)(AI *ai);
 		void (*spot)(AI *ai);
-		void (*engage)();
+		void (*engage)(AI *ai);
 	} task;
 } personality[PERSONALITIES];
 

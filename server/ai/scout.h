@@ -20,4 +20,6 @@
 #ifndef SCOUT_H
 #define SCOUT_H
 
+void scout_idle(AI *ai);
+
 #endif
