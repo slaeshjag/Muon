@@ -27,9 +27,9 @@
 
 void lobby_init() {
 	UI_PROPERTY_VALUE v;
-	
+	int spacing=platform_lowres?0:16;
 	//Player list
-	panelist_lobby_players.pane=ui_pane_create(16, 16, 256, 128+48, NULL);
+	panelist_lobby_players.pane=ui_pane_create(spacing, spacing, platform_lowres?200:256, platform_lowres?112:128+48, NULL);
 	panelist_lobby_players.next=&panelist_lobby_download;
 	ui_pane_set_root_widget(panelist_lobby_players.pane, ui_widget_create_vbox());
 	ui_vbox_add_child(panelist_lobby_players.pane->root_widget, ui_widget_create_label(font_std, T("Players")), 0);
@@ -61,8 +61,8 @@ void lobby_init() {
 	lobby_download_progress->set_prop(lobby_download_progress, UI_PROGRESSBAR_PROP_PROGRESS, v);
 	
 	//Sidebar with map preview
-	panelist_lobby_map.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
-	lobby_map_imageview=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-2*UI_PADDING, SIDEBAR_WIDTH-2*UI_PADDING, DARNIT_PFORMAT_RGB5A1);
+	panelist_lobby_map.pane=ui_pane_create(platform.screen_w-sidebar_width, 0, sidebar_width, platform.screen_h, NULL);
+	lobby_map_imageview=ui_widget_create_imageview_raw(sidebar_width-2*ui_padding, sidebar_width-2*ui_padding, DARNIT_PFORMAT_RGB5A1);
 	lobby_map_label=ui_widget_create_label(font_std, T("Map"));
 	lobby_map_button_back=ui_widget_create_button_text(font_std, T("Back"));
 	lobby_map_button_back->event_handler->add(lobby_map_button_back, lobby_map_button_back_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);

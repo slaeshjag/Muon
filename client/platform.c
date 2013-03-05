@@ -182,4 +182,5 @@ void platform_init(char *name, char *icon) {
 	if(d_stringtable_section_load(stringtable, config.lang)==-1)
 		d_stringtable_section_load(stringtable, "EN");
 	d_input_unicode(1);
+	platform_lowres=platform.screen_w<640||platform.screen_w<480;
 }

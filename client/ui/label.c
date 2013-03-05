@@ -97,7 +97,7 @@ void ui_label_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 
 void ui_label_request_size(UI_WIDGET *widget, int *w, int *h) {
 	struct UI_LABEL_PROPERTIES *p=widget->properties;
-	int ww=((w==NULL)||(*w==-1))?d_font_string_w(p->font, p->text)+UI_PADDING:*w;
+	int ww=((w==NULL)||(*w==-1))?d_font_string_w(p->font, p->text)+ui_padding:*w;
 	if(ww==0||*h==0)
 		return;
 	
@@ -105,7 +105,7 @@ void ui_label_request_size(UI_WIDGET *widget, int *w, int *h) {
 	int text_h=d_font_string_geometrics(p->font, p->text, ww, &text_w);
 	*h=text_h;
 	if(w&&*w==-1)
-		*w=text_w+UI_PADDING;
+		*w=text_w+ui_padding;
 }
 
 void ui_label_render(UI_WIDGET *widget) {

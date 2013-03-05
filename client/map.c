@@ -65,7 +65,7 @@ void map_init(char *filename) {
 	
 	minimap_viewport=d_render_line_new(4, 1);
 	
-	for(i=0; i<(SIDEBAR_WIDTH-8)*(SIDEBAR_WIDTH-8); i++)
+	for(i=0; i<(sidebar_width-8)*(sidebar_width-8); i++)
 		((unsigned int *)minimap_data)[i]=0;
 	
 	for(i=0; i<map->layer->tilemap->w*map->layer->tilemap->h; i++) {
@@ -397,7 +397,7 @@ void map_draw(int draw_powergrid) {
 	if(config.grid) {
 		d_render_tint(18, 18, 18, 255);
 		for(i=0; i<map_grid_chunks; i++)
-			if(map_grid_chunk[i].lines&&map_grid_chunk[i].x+map_grid_chunk[i].w>map->cam_x&&map_grid_chunk[i].x<map->cam_x+platform.screen_w-SIDEBAR_WIDTH&&map_grid_chunk[i].y+map_grid_chunk[i].h>map->cam_y&&map_grid_chunk[i].y<map->cam_y+platform.screen_h)
+			if(map_grid_chunk[i].lines&&map_grid_chunk[i].x+map_grid_chunk[i].w>map->cam_x&&map_grid_chunk[i].x<map->cam_x+platform.screen_w-sidebar_width&&map_grid_chunk[i].y+map_grid_chunk[i].h>map->cam_y&&map_grid_chunk[i].y<map->cam_y+platform.screen_h)
 				d_render_line_draw(map_grid_chunk[i].lines, map_grid_chunk[i].size);
 		d_render_tint(255, 255, 255, 255);
 	}

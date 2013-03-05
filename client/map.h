@@ -41,7 +41,7 @@ struct MAP_GRID_CHUNK {
 } *map_grid_chunk;
 int map_grid_chunks;
 
-unsigned int minimap_data[(SIDEBAR_WIDTH-UI_PADDING*2)*(SIDEBAR_WIDTH-UI_PADDING*2)];
+unsigned int minimap_data[(SIDEBAR_WIDTH_MAX)*(SIDEBAR_WIDTH_MAX)];
 DARNIT_LINE *minimap_viewport;
 
 enum MINIMAP_COLOR {

@@ -104,7 +104,7 @@ DARNIT_LINE *terrain_palette_selected;
 
 DARNIT_LINE *map_border;
 
-unsigned int minimap_data[(SIDEBAR_WIDTH-UI_PADDING*2)*(SIDEBAR_WIDTH-UI_PADDING*2)];
+unsigned int minimap_data[(SIDEBAR_WIDTH)*(SIDEBAR_WIDTH)];
 DARNIT_LINE *minimap_viewport;
 
 void editor_init() {
@@ -251,7 +251,7 @@ void editor_palette_update(DARNIT_TILESHEET *ts) {
 	int i, w, h, hh, tile_w, tile_h;
 	d_render_tilesheet_geometrics(ts, &w, &h, &tile_w, &tile_h);
 	hh=h-tile_h*9;
-	ui_pane_resize(editor.palette.pane, platform.screen_w-SIDEBAR_WIDTH-w-UI_PADDING*2, platform.screen_h/2-hh/2, w+UI_PADDING*2, hh+UI_PADDING*2);
+	ui_pane_resize(editor.palette.pane, platform.screen_w-SIDEBAR_WIDTH-w-ui_padding*2, platform.screen_h/2-hh/2, w+ui_padding*2, hh+ui_padding*2);
 	terrain_palette=map_new_palette(w/tile_w, hh/tile_h, ts);
 	for(i=0; i<w/tile_w*((h)/tile_h-9); i++)
 		terrain_palette->layer->tilemap->data[i]=i+(w/tile_w)*9;

@@ -151,7 +151,7 @@ void ui_vbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 			c->widget->request_size(c->widget, &req_w, &req_h);
 			requested[i]=req_h;
 			i++;
-			h-=req_h+UI_PADDING*2;
+			h-=req_h+ui_padding*2;
 		}
 	}
 	if(p->size-i)
@@ -160,11 +160,11 @@ void ui_vbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 		exp_h=0;
 	for(c=p->children, i=0; c; c=c->next) {
 		if(c->expand) {
-			c->widget->resize(c->widget, x, y+UI_PADDING, w, exp_h);
+			c->widget->resize(c->widget, x, y+ui_padding, w, exp_h);
 			y+=exp_h;
 		} else {
-			c->widget->resize(c->widget, x, y+UI_PADDING, w, requested[i]);
-			y+=requested[i]+UI_PADDING*2;
+			c->widget->resize(c->widget, x, y+ui_padding, w, requested[i]);
+			y+=requested[i]+ui_padding*2;
 			i++;
 		}
 	}

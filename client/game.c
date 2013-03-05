@@ -43,16 +43,18 @@ void game_view_init() {
 	
 	game_attacklist_blink_semaphore=0;
 	/*Game sidebar*/
-	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
+	panelist_game_sidebar.pane=ui_pane_create(platform.screen_w-sidebar_width, 0, sidebar_width, platform.screen_h, NULL);
 	ui_pane_set_root_widget(panelist_game_sidebar.pane, ui_widget_create_vbox());
 	panelist_game_sidebar.next=&panelist_game_abilitybar;
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Muon")), 0);
-	game_sidebar_minimap=ui_widget_create_imageview_raw(SIDEBAR_WIDTH-8, SIDEBAR_WIDTH-8, DARNIT_PFORMAT_RGB5A1);
+	if(!platform_lowres)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Muon")), 0);
+	game_sidebar_minimap=ui_widget_create_imageview_raw(sidebar_width-8, sidebar_width-8, DARNIT_PFORMAT_RGB5A1);
 	game_sidebar_minimap->render=map_minimap_render;
 	game_sidebar_minimap->event_handler->add(game_sidebar_minimap, game_sidebar_minimap_mouse_down, UI_EVENT_TYPE_MOUSE_DOWN);
 	if(!(platform.platform&DARNIT_PLATFORM_PANDORA))
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Buildings:")), 0);
+	if(!platform_lowres)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, ui_widget_create_label(font_std, T("Buildings:")), 0);
 	
 	int i;
 	for(i=0; i<4; i++)
@@ -79,7 +81,10 @@ void game_view_init() {
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
 	
 	/*Special buildings for control points*/
-	panelist_game_specialbar.pane=ui_pane_create(config.screen_w-SIDEBAR_WIDTH*2, game_sidebar_button_build[4]->y-64, SIDEBAR_WIDTH, 128, ui_widget_create_vbox());
+	if(platform_lowres)
+		panelist_game_specialbar.pane=ui_pane_create(config.screen_w-sidebar_width*2, platform.screen_h-72, sidebar_width, 72, ui_widget_create_vbox());
+	else
+		panelist_game_specialbar.pane=ui_pane_create(config.screen_w-sidebar_width*2, game_sidebar_button_build[4]->y-64, sidebar_width, 128, ui_widget_create_vbox());
 	panelist_game_specialbar.next=&panelist_game_abilitybar;
 	
 	for(i=0; i<3; i++) {
@@ -91,12 +96,16 @@ void game_view_init() {
 	
 	/*Special abilities*/
 	UI_WIDGET *iconwidget;
-	panelist_game_abilitybar.pane=ui_pane_create(2, 64, 52, 128+44, ui_widget_create_vbox());
+	int iconsize=32;//platform_lowres?16:32;
+	if(platform_lowres)
+		panelist_game_abilitybar.pane=ui_pane_create(2, 2, 44, 128+16, ui_widget_create_vbox());
+	else
+		panelist_game_abilitybar.pane=ui_pane_create(2, 64, 52, 128+44, ui_widget_create_vbox());
 	panelist_game_abilitybar.next=NULL;
 	ability[0].name=T("Flare");
 	ability[0].icon=d_render_tilesheet_load("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[0].action=NULL;
-	iconwidget=ui_widget_create_imageview_file("res/flare.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget=ui_widget_create_imageview_file("res/flare.png", iconsize, iconsize, DARNIT_PFORMAT_RGB5A1);
 	iconwidget->render=game_abilitybar_icon_render;
 	ability[0].button=ui_widget_create_button(iconwidget);
 	ability[0].button->event_handler->add(ability[0].button, game_abilitybar_button_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
@@ -104,7 +113,7 @@ void game_view_init() {
 	ability[1].name=T("Nuke");
 	ability[1].icon=d_render_tilesheet_load("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[1].action=NULL;
-	iconwidget=ui_widget_create_imageview_file("res/nuke.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget=ui_widget_create_imageview_file("res/nuke.png", iconsize, iconsize, DARNIT_PFORMAT_RGB5A1);
 	iconwidget->render=game_abilitybar_icon_render;
 	ability[1].button=ui_widget_create_button(iconwidget);
 	ability[1].button->enabled=0;
@@ -113,7 +122,7 @@ void game_view_init() {
 	ability[2].name=T("Radar");
 	ability[2].icon=d_render_tilesheet_load("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ability[2].action=NULL;
-	iconwidget=ui_widget_create_imageview_file("res/radar.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
+	iconwidget=ui_widget_create_imageview_file("res/radar.png", iconsize, iconsize, DARNIT_PFORMAT_RGB5A1);
 	iconwidget->render=game_abilitybar_icon_render;
 	ability[2].button=ui_widget_create_button(iconwidget);
 	ability[2].button->enabled=0;
@@ -215,9 +224,9 @@ void game_view_buttons(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	
 	//View movement
 	if(!chat_is_visible(&panelist_game_sidebar)) {
-		if(e->buttons->left&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
+		if(e->buttons->left&&map->cam_x>-((screen_w-sidebar_width)/2))
 			scroll_x=-SCROLL_SPEED;
-		else if(e->buttons->right&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
+		else if(e->buttons->right&&map->cam_x<map_w-(screen_w-sidebar_width)/2)
 			scroll_x=SCROLL_SPEED;
 		if(e->buttons->up&&map->cam_y>-(screen_h)/2)
 			scroll_y=-SCROLL_SPEED;
@@ -280,9 +289,9 @@ void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	int scroll_x=0, scroll_y=0;
 	int screen_w=platform.screen_w, screen_h=platform.screen_h;
 	
-	if(e->mouse->x<SCROLL_OFFSET&&map->cam_x>-((screen_w-SIDEBAR_WIDTH)/2))
+	if(e->mouse->x<SCROLL_OFFSET&&map->cam_x>-((screen_w-sidebar_width)/2))
 		scroll_x=-SCROLL_SPEED;
-	else if(e->mouse->x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-(screen_w-SIDEBAR_WIDTH)/2)
+	else if(e->mouse->x>platform.screen_w-SCROLL_OFFSET&&map->cam_x<map_w-(screen_w-sidebar_width)/2)
 		scroll_x=SCROLL_SPEED;
 	if(e->mouse->y<SCROLL_OFFSET&&map->cam_y>-(screen_h)/2)
 		scroll_y=-SCROLL_SPEED;
@@ -298,7 +307,7 @@ void game_view_mouse_move(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 
 void game_view_mouse_click(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	//Make sure there is no pane in the way
-	if(e->mouse->x>platform.screen_w-SIDEBAR_WIDTH)
+	if(e->mouse->x>platform.screen_w-sidebar_width)
 		return;
 	if(panelist_game_sidebar.next==&panelist_game_specialbar&&PINR(e->mouse->x, e->mouse->y, panelist_game_specialbar.pane->x, panelist_game_specialbar.pane->y, panelist_game_specialbar.pane->w, panelist_game_specialbar.pane->h))
 		return;
@@ -348,10 +357,13 @@ void game_update_building_status() {
 		ui_vbox_remove_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap);
 	
 	//ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.spacer, 1);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_name, 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_shield, 0);
+	if(!platform_lowres) {
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_name, 0);
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_shield, 0);
+	}
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_shield, 0);
-	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_health, 0);
+	if(!platform_lowres)
+		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.label_health, 0);
 	ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_status.progress_health, 0);
 	if(platform.platform&DARNIT_PLATFORM_PANDORA)
 		ui_vbox_add_child(panelist_game_sidebar.pane->root_widget, game_sidebar_minimap, 0);
@@ -366,7 +378,7 @@ void game_update_building_status() {
 }
 
 void game_view_scroll_to(int x, int y) {
-	d_map_camera_move(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-SIDEBAR_WIDTH)/2, y*map->layer[map->layers-2].tile_h-platform.screen_h/2);
+	d_map_camera_move(map, x*map->layer[map->layers-2].tile_w-(platform.screen_w-sidebar_width)/2, y*map->layer[map->layers-2].tile_h-platform.screen_h/2);
 	map_minimap_update_viewport();
 }
 
@@ -558,7 +570,7 @@ void game_mouse_draw(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 	unsigned char r, g, b, a;
 	d_render_tint_get(&r, &g, &b, &a);
 	d_render_tint(255, 255, 255, 255);
-	if(building_place!=-1&&e->mouse->x<platform.screen_w-SIDEBAR_WIDTH) {
+	if(building_place!=-1&&e->mouse->x<platform.screen_w-sidebar_width) {
 		DARNIT_MAP_LAYER *l=&map->layer[map->layers-1];
 		int x=(e->mouse->x+map->cam_x)/l->tile_w*l->tile_w;
 		int y=(e->mouse->y+map->cam_y)/l->tile_h*l->tile_h;

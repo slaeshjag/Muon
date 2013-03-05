@@ -141,7 +141,7 @@ void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	for(l=p->list; l; l=l->next) {
 		text_h=2;
 		for(ll=l; ll; ll=ll->next)
-			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-UI_PADDING*5, NULL);
+			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-ui_padding*5, NULL);
 		if((pos>=0&&i>=pos))
 			break;
 		if(text_h<widget->h-2)
@@ -155,7 +155,7 @@ void ui_listbox_scroll(UI_WIDGET *widget, int pos) {
 	for(; l; l=l->next) {
 		text_h=2;
 		for(ll=l; ll; ll=ll->next)
-			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-UI_PADDING*5, NULL);
+			text_h+=d_font_string_geometrics(p->font, ll->text, widget->w-ui_padding*5, NULL);
 		if(text_h<widget->h-2)
 			break;
 		i++;
@@ -173,7 +173,7 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		p->scroll+=e->mouse->wheel;
 		p->scroll=p->scroll<0?0:p->scroll;
 		ui_listbox_scroll(widget, p->scroll);
-	} else if(e->mouse->x>=widget->x+widget->w-UI_PADDING*3&&e->mouse->x<widget->x+widget->w-UI_PADDING) {
+	} else if(e->mouse->x>=widget->x+widget->w-ui_padding*3&&e->mouse->x<widget->x+widget->w-ui_padding) {
 		if(type==UI_EVENT_TYPE_MOUSE_PRESS) {
 			int sb_y1, sb_y2;
 			d_render_rect_get(p->scrollbar, 0, NULL, &sb_y1, NULL, &sb_y2);
@@ -192,12 +192,12 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		} else if(type==UI_EVENT_TYPE_MOUSE_DOWN&&e->mouse->buttons&UI_EVENT_MOUSE_BUTTON_LEFT&&scroll_y>-1) {
 			int sb_y1, sb_y2;
 			d_render_rect_get(p->scrollbar, 0, NULL, &sb_y1, NULL, &sb_y2);
-			int delta=e->mouse->y-(widget->y+UI_PADDING/2)-scroll_y;
+			int delta=e->mouse->y-(widget->y+ui_padding/2)-scroll_y;
 			int scroll;
-			if((widget->h-UI_PADDING-(sb_y2-sb_y1))==0)
+			if((widget->h-ui_padding-(sb_y2-sb_y1))==0)
 				scroll=0;
 			else
-				scroll=p->scroll_max*(delta<0?0:delta)/(widget->h-UI_PADDING-(sb_y2-sb_y1));
+				scroll=p->scroll_max*(delta<0?0:delta)/(widget->h-ui_padding-(sb_y2-sb_y1));
 			ui_listbox_scroll(widget, scroll<0?0:scroll);
 			return;
 		}
@@ -206,7 +206,7 @@ void ui_listbox_event_mouse(UI_WIDGET *widget, unsigned int type, UI_EVENT *e) {
 		int i=p->scroll;
 		int item_y=widget->y+2;
 		for(l=p->offset; l; l=l->next, i++) {
-			int item_h=d_font_string_geometrics(p->font, l->text, widget->w-UI_PADDING*5, NULL);
+			int item_h=d_font_string_geometrics(p->font, l->text, widget->w-ui_padding*5, NULL);
 			if(e->mouse->y>item_y&&e->mouse->y<item_y+item_h) {
 				p->selected=i;
 				widget->resize(widget, widget->x, widget->y, widget->w, widget->h);
@@ -273,19 +273,19 @@ void ui_listbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	int i=p->scroll;
 	while(l) {
 		l->surface=d_text_surface_free(l->surface);
-		int item_h=d_font_string_geometrics(p->font, l->text, w-UI_PADDING*5, NULL);
+		int item_h=d_font_string_geometrics(p->font, l->text, w-ui_padding*5, NULL);
 		if(item_y+item_h>y+h-2)
 			break;
-		l->surface=d_text_surface_new(p->font, 128, w-UI_PADDING*4, x+UI_PADDING, item_y);
+		l->surface=d_text_surface_new(p->font, 128, w-ui_padding*4, x+ui_padding, item_y);
 		d_text_surface_string_append(l->surface, l->text);
 		if(i==p->selected)
-			d_render_rect_move(p->selected_rect, 0, x+UI_PADDING, item_y, x+w-UI_PADDING*3, item_y+item_h);
+			d_render_rect_move(p->selected_rect, 0, x+ui_padding, item_y, x+w-ui_padding*3, item_y+item_h);
 		item_y+=item_h;
 		l=l->next; i++;
 	}
-	int scroll=p->size?(widget->h-UI_PADDING)*p->scroll/p->size:0;
-	int scroll_left=p->size?(widget->h-UI_PADDING)*(p->scroll_max)/p->size:0;
-	d_render_rect_move(p->scrollbar, 0, widget->x+widget->w-(UI_PADDING*2+UI_PADDING/2), widget->y+UI_PADDING/2+scroll, widget->x+widget->w-UI_PADDING, widget->y+widget->h-UI_PADDING/2-scroll_left+scroll);
+	int scroll=p->size?(widget->h-ui_padding)*p->scroll/p->size:0;
+	int scroll_left=p->size?(widget->h-ui_padding)*(p->scroll_max)/p->size:0;
+	d_render_rect_move(p->scrollbar, 0, widget->x+widget->w-(ui_padding*2+ui_padding/2), widget->y+ui_padding/2+scroll, widget->x+widget->w-ui_padding, widget->y+widget->h-ui_padding/2-scroll_left+scroll);
 }
 
 void ui_listbox_request_size(UI_WIDGET *widget, int *w, int *h) {

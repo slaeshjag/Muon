@@ -22,7 +22,8 @@
 
 #include <darnit/darnit.h>
 
-#define UI_PADDING 4
+#define UI_PADDING_DEFAULT 4
+int ui_padding;
 
 //#include "../muon.h"
 
@@ -75,7 +76,7 @@ struct UI_PANE_LIST ui_panelist_dialogue;
 
 #include "messagebox.h"
 
-void ui_init();
+void ui_init(int padding);
 void *ui_widget_destroy(UI_WIDGET *widget);
 
 #endif

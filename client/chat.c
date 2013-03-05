@@ -26,7 +26,9 @@
 #include "chat.h"
 
 void chat_init() {
-	panelist_chat.pane=ui_pane_create(16, platform.screen_h-256-16, 200, 256, NULL);
+	int h=platform_lowres?128:256;
+	int spacing=platform_lowres?0:16;
+	panelist_chat.pane=ui_pane_create(spacing, platform.screen_h-h-spacing, platform_lowres?128:200, h, NULL);
 	panelist_chat.next=NULL;
 	ui_pane_set_root_widget(panelist_chat.pane, ui_widget_create_vbox());
 	ui_vbox_add_child(panelist_chat.pane->root_widget, ui_widget_create_label(font_std, T("Chat")), 0);
@@ -46,7 +48,7 @@ void chat_init() {
 	chat_button_send->event_handler->add(chat_button_send, chat_button_send_click, UI_EVENT_TYPE_UI_WIDGET_ACTIVATE);
 	chat_entry->event_handler->add(chat_entry, chat_button_send_click, UI_EVENT_TYPE_KEYBOARD_PRESS);
 	
-	panelist_chat_indicator.pane=ui_pane_create(0, platform.screen_h-(32+UI_PADDING*2), 32+UI_PADDING*2, 32+UI_PADDING*2, NULL);
+	panelist_chat_indicator.pane=ui_pane_create(0, platform.screen_h-(32+ui_padding*2), 32+ui_padding*2, 32+ui_padding*2, NULL);
 	panelist_chat_indicator.next=NULL;
 	chat_indicator_image=ui_widget_create_imageview_file("res/chat.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	ui_pane_set_root_widget(panelist_chat_indicator.pane, chat_indicator_image);
