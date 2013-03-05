@@ -170,7 +170,7 @@ void ui_button_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	widget->x=x; widget->y=y;
 	widget->w=w; widget->h=h;
-	p->child->resize(p->child, x+2+UI_PADDING, y+2+UI_PADDING, w-4-UI_PADDING*2, h-4-UI_PADDING*2);
+	p->child->resize(p->child, x+2+ui_padding, y+2+ui_padding, w-4-ui_padding*2, h-4-ui_padding*2);
 	
 	d_render_line_move(p->border, 0, x, y, x+w-1, y);
 	d_render_line_move(p->border, 1, x, y+h, x+w-1, y+h);
@@ -190,8 +190,8 @@ void ui_button_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 void ui_button_request_size(UI_WIDGET *widget, int *w, int *h) {
 	struct UI_BUTTON_PROPERTIES *p=widget->properties;
 	p->child->request_size(p->child, w, h);
-	(*w)+=8+UI_PADDING*2;
-	(*h)+=8+UI_PADDING*2;
+	(*w)+=8+ui_padding*2;
+	(*h)+=8+ui_padding*2;
 }
 
 void ui_button_render(UI_WIDGET *widget) {

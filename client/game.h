@@ -21,13 +21,15 @@
 #define GAME_H
 #include "client.h"
 
-#define SIDEBAR_WIDTH 128
+#define SIDEBAR_WIDTH_MAX 128
 #define SCROLL_OFFSET 8
 #define SCROLL_SPEED 4
 
 #define PLACE_FLARE -2
 #define PLACE_NUKE -3
 #define PLACE_RADAR -4
+
+int sidebar_width;
 
 struct UI_PANE_LIST panelist_game_sidebar;
 UI_WIDGET *game_sidebar_minimap;

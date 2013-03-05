@@ -54,6 +54,7 @@ int main(int argc, char **argv) {
 	mouse_cursor[TERRAIN_TOOL_BUCKET+1].image=d_render_tilesheet_load("res/bucket.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	mouse_cursor[TERRAIN_TOOL_RECTANGLE+1].image=d_render_tilesheet_load("res/rectangle.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	
+	ui_init(platform_lowres?2:UI_PADDING_DEFAULT);
 	menu_init();
 	editor_init();
 	

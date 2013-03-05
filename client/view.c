@@ -32,7 +32,8 @@
 #include "map.h"
 
 void view_init() {
-	font_std=d_font_load("res/FreeMonoBold.ttf", 12, 512, 512);
+	sidebar_width=platform_lowres?3*SIDEBAR_WIDTH_MAX/4:SIDEBAR_WIDTH_MAX;
+	font_std=d_font_load("res/FreeMonoBold.ttf", platform_lowres?8:12, 512, 512);
 	mouse_tilesheet=d_render_tilesheet_load("res/mouse.png", 16, 16, DARNIT_PFORMAT_RGB5A1);
 	mouse_target_tilesheet=d_render_tilesheet_load("res/target.png", 32, 32, DARNIT_PFORMAT_RGB5A1);
 	

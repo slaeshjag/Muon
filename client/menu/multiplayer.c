@@ -27,7 +27,7 @@ void menu_multiplayer_init() {
 	UI_PROPERTY_VALUE v={.p=NULL};
 	
 	//Host server
-	panelist_multiplayer_host.pane=ui_pane_create(16, 16, 480, 256, NULL);
+	panelist_multiplayer_host.pane=ui_pane_create(16, 16, platform_lowres?200:480, platform_lowres?200:256, NULL);
 	panelist_multiplayer_host.next=NULL;
 	ui_pane_set_root_widget(panelist_multiplayer_host.pane, ui_widget_create_hbox());
 	multiplayer_host_listbox_maps=ui_widget_create_listbox(font_std);
@@ -57,7 +57,7 @@ void menu_multiplayer_init() {
 	
 	//Join server
 	v.p=NULL;
-	panelist_multiplayer_join.pane=ui_pane_create(16, 16, 256, 128, NULL);
+	panelist_multiplayer_join.pane=ui_pane_create(16, 16, platform_lowres?200:256, 128, NULL);
 	ui_pane_set_root_widget(panelist_multiplayer_join.pane, ui_widget_create_vbox());
 	panelist_multiplayer_join.next=NULL;
 	ui_vbox_add_child(panelist_multiplayer_join.pane->root_widget, ui_widget_create_label(font_std, T("Join a server")), 1);

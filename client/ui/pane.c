@@ -55,13 +55,13 @@ void ui_pane_resize(UI_PANE *pane, int x, int y, int w, int h) {
 	d_render_line_move(pane->border, 2, x, y, x, y+h);
 	d_render_line_move(pane->border, 3, x+w, y, x+w, y+h);
 	if(pane->root_widget!=NULL)
-		pane->root_widget->resize(pane->root_widget, x+UI_PADDING, y+UI_PADDING, w-UI_PADDING*2, h-UI_PADDING*2);
+		pane->root_widget->resize(pane->root_widget, x+ui_padding, y+ui_padding, w-ui_padding*2, h-ui_padding*2);
 }
 
 void ui_pane_set_root_widget(UI_PANE *pane, UI_WIDGET *root_widget) {
 	pane->root_widget=root_widget;
 	if(pane->root_widget!=NULL)
-		pane->root_widget->resize(pane->root_widget, pane->x+UI_PADDING, pane->y+UI_PADDING, pane->w-UI_PADDING*2, pane->h-UI_PADDING*2);
+		pane->root_widget->resize(pane->root_widget, pane->x+ui_padding, pane->y+ui_padding, pane->w-ui_padding*2, pane->h-ui_padding*2);
 }
 
 void ui_pane_render(UI_PANE *pane) {

@@ -151,21 +151,21 @@ void ui_hbox_resize(UI_WIDGET *widget, int x, int y, int w, int h) {
 			c->widget->request_size(c->widget, &req_w, &req_h);
 			requested[i]=req_w;
 			i++;
-			w-=req_w+UI_PADDING*2;
+			w-=req_w+ui_padding*2;
 		}
 	}
 	if(p->size-i)
 		exp_w=w/(p->size-i);
 	else
 		exp_w=0;
-	x+=UI_PADDING;
+	x+=ui_padding;
 	for(c=p->children, i=0; c; c=c->next) {
 		if(c->expand) {
-			c->widget->resize(c->widget, x, y+UI_PADDING, exp_w-UI_PADDING, h-UI_PADDING*2);
+			c->widget->resize(c->widget, x, y+ui_padding, exp_w-ui_padding, h-ui_padding*2);
 			x+=exp_w;
 		} else {
-			c->widget->resize(c->widget, x, y+UI_PADDING, requested[i], h-UI_PADDING*2);
-			x+=requested[i]+UI_PADDING*2;
+			c->widget->resize(c->widget, x, y+ui_padding, requested[i], h-ui_padding*2);
+			x+=requested[i]+ui_padding*2;
 			i++;
 		}
 	}

@@ -39,7 +39,7 @@ void menu_init() {
 	credits_init();
 	
 	//Main menu
-	panelist_menu_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, NULL);
+	panelist_menu_sidebar.pane=ui_pane_create(platform.screen_w-sidebar_width, 0, sidebar_width, platform.screen_h, NULL);
 	panelist_menu_sidebar.next=NULL;
 	ui_pane_set_root_widget(panelist_menu_sidebar.pane, ui_widget_create_vbox());
 	
@@ -91,7 +91,10 @@ void menu_init() {
 	
 	
 	//In-game menu
-	panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);
+	if(platform_lowres)
+		panelist_game_menu.pane=ui_pane_create(platform.screen_w-sidebar_width, 0, sidebar_width, platform.screen_h, NULL);
+	else
+		panelist_game_menu.pane=ui_pane_create(platform.screen_w/2-128, platform.screen_h/2-128, 256, 256, NULL);
 	ui_pane_set_root_widget(panelist_game_menu.pane, ui_widget_create_vbox());
 	panelist_game_menu.next=&panelist_chat;
 	ui_vbox_add_child(panelist_game_menu.pane->root_widget, ui_widget_create_label(font_std, "Muon\n===="), 0);

@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 	server_init();
 	
 	intmath_init();
-	ui_init();
+	ui_init(platform_lowres?2:UI_PADDING_DEFAULT);
 	view_init();
 	sound_init();
 	

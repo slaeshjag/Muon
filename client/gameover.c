@@ -35,9 +35,9 @@ const char *gameover_stats_headers[6]={
 
 void gameover_init() {
 	int i;
-	panelist_gameover_sidebar.pane=ui_pane_create(platform.screen_w-SIDEBAR_WIDTH, 0, SIDEBAR_WIDTH, platform.screen_h, ui_widget_create_vbox());
+	panelist_gameover_sidebar.pane=ui_pane_create(platform.screen_w-sidebar_width, 0, sidebar_width, platform.screen_h, ui_widget_create_vbox());
 	panelist_gameover_sidebar.next=&panelist_gameover_stats;
-	panelist_gameover_stats.pane=ui_pane_create((platform.screen_w-SIDEBAR_WIDTH)/2-480/2, platform.screen_h/2-240/2, 480, 240, ui_widget_create_vbox());
+	panelist_gameover_stats.pane=ui_pane_create((platform.screen_w-sidebar_width)/2-480/2, platform.screen_h/2-240/2, 480, 240, ui_widget_create_vbox());
 	panelist_gameover_stats.next=NULL;
 	
 	gameover_sidebar_button_menu=ui_widget_create_button_text(font_std, T("Menu"));

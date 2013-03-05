@@ -25,6 +25,8 @@
 DARNIT_PLATFORM platform;
 DARNIT_STRINGTABLE *stringtable;
 
+int platform_lowres;
+
 struct CONFIG {
 	int screen_w;
 	int screen_h;
