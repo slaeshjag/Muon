@@ -35,4 +35,11 @@
 #endif
 #include <errno.h>
 
+#define CLIENT_TIMEOUT 3
+
+MESSAGE_RAW msg_recv;
+void *msg_recv_offset;
+unsigned char msg_recv_payload[512];
+unsigned char *msg_recv_payload_offset;
+
 #endif

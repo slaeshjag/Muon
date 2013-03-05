@@ -60,6 +60,7 @@ struct AREA {
 
 typedef struct AI {
 	SOCKET sock;
+	int (*message)(struct AI *ai, MESSAGE_RAW *mgs, unsigned char *payload);
 	int player_id;
 	char player_name[32];
 	enum PERSONALITY personality;

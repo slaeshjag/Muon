@@ -18,6 +18,8 @@
  */
 
 #include <stdio.h>
+#include <time.h>
+#include <limits.h>
 
 #include "ai.h"
 #include "client.h"
@@ -62,7 +64,7 @@ static SOCKET _connectsocket(const char *host, int port) {
 	return sock;
 }
 
-static int _recv(SOCKET sock, char *buf, int len) {
+static int _recv(SOCKET sock, void *buf, int len) {
 	int ret;
 
 	if((ret=recv(sock, buf, len, MSG_PEEK|MSG_NOSIGNAL))==len) {
@@ -90,8 +92,8 @@ SOCKET client_connect() {
 	return sock;
 }
 
-void client_disconnect(SOCKET sock) {
-	_close(sock);
+void client_disconnect(AI *ai) {
+	_close(ai->sock);
 }
 
 void client_message_convert_send(MESSAGE_RAW *message) {
@@ -108,18 +110,76 @@ void client_message_convert_recv(MESSAGE_RAW *message) {
 	message->arg_2=ntohl(message->arg_2);
 }
 
-void client_message_send(SOCKET sock, int player_id, int command, int arg_1, int arg_2, unsigned char *payload) {
+void client_message_send(AI *ai, int player_id, int command, int arg_1, int arg_2, unsigned char *payload) {
 	MESSAGE_RAW msg_send;
 	msg_send.player_id=player_id;
 	msg_send.command=command;
 	msg_send.arg_1=arg_1;
 	msg_send.arg_2=arg_2;
 	client_message_convert_send(&msg_send);
-	_send(sock, &msg_send, sizeof(MESSAGE_RAW));
+	_send(ai->sock, &msg_send, sizeof(MESSAGE_RAW));
 	if(payload)
-		_send(sock, payload, arg_2);
+		_send(ai->sock, payload, arg_2);
 }
 
-void client_check_incoming() {
+void client_check_incoming(AI *ai) {
+	int s;
+	unsigned int chunk_got=0, chunk_size, chunk_time;
+	static unsigned int chunk_size_time=UINT_MAX;
+	if((s=_recv(ai->sock, &chunk_size, 4))<4) {
+		if(s==-1)
+			client_disconnect(ai);
+		if(time(NULL)-chunk_size_time>CLIENT_TIMEOUT) {
+			client_disconnect(ai);
+			return;
+		} else
+			return;
+	} else
+		chunk_size_time=time(NULL);
+	chunk_size=htonl(chunk_size)-4;
+	chunk_time=time(NULL);
 	
+	while(chunk_got<chunk_size) {
+		if(time(NULL)-chunk_time>CLIENT_TIMEOUT) {
+			client_disconnect(ai);
+			return;
+		}
+		if(msg_recv.command&MSG_PAYLOAD_BIT) {
+			//download message payload
+			//printf("payload size %i\n", msg_recv.arg_2);
+			s=_recv(ai->sock, msg_recv_payload, msg_recv.arg_2);
+			if(s==0)
+				continue;
+			if(s==-1) {
+				client_disconnect(ai);
+				return;
+			}
+			if(ai->message)
+				if(ai->message(ai, &msg_recv, msg_recv_payload)) {
+					chunk_size_time=UINT_MAX;
+					return;
+				}
+			msg_recv.command=0;
+		} else {
+			//download message
+			s=_recv(ai->sock, msg_recv_offset, sizeof(MESSAGE_RAW));
+			if(s==0) {
+				msg_recv.command = 0;
+				continue;
+			}
+			if(s==-1) {
+				client_disconnect(ai);
+				return;
+			}
+			client_message_convert_recv(&msg_recv);
+			//printf("message: 0x%x (%i, %i) to player %i\n", msg_recv.command, msg_recv.arg_1, msg_recv.arg_2, msg_recv.player_id);
+			if(ai->message&&!(msg_recv.command&MSG_PAYLOAD_BIT))
+				if(ai->message(ai, &msg_recv, NULL)) {
+					chunk_size_time=UINT_MAX;
+					return;
+				}
+		}
+		chunk_got+=s;
+	}
+	client_message_send(ai, ai->player_id, MSG_SEND_CHUNK_OK, 0, 0, NULL);
 }
